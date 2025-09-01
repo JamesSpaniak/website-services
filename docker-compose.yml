@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.9" # TODO When deploying, set to only one file: docker-compose -f docker-compose.yml up --build -d
 services:
   postgres:
     container_name: postgres
@@ -22,8 +22,9 @@ services:
       - /Users/jamesspaniak/certs:/ssl/
   api_server:
     container_name: api_server
-    image: node:16
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -36,13 +37,13 @@ services:
       - postgres
       - nginx
   drone:
-    build: ./drone
-    image: node:18
+    container_name: drone
+    build:
+      context: .
+      dockerfile: drone/Dockerfile
     ports:
       - "8080:8080"
-    volumes:
-      - ./drone:/app
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=production
 networks:
   default:

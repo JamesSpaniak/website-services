@@ -1,26 +1,5 @@
 import { QuestionData } from '@/app/lib/data/questions';
 
-const units: UnitData[] = [{
-    id: 1,
-    title: 'Unit 1',
-    sub_units: [
-        {
-            id: 1,
-            title: 'Subunit example 1',
-            description: 'Example content goes hereasdfs.d,fm as.fas.fas,d.fas  eakllas;df;as dflasdjflkas jfl;asj dfl;asj fals;kd',
-            video_url: '', 
-            image_url: ''
-        },
-        {
-            id: 2,
-            title: 'Subunit example 2',
-            description: 'Example asdf goes hereasdfs.dklasjs sdafhuka sdhfasdhf aksjhgfass jfl;asj dfl;asj fadls;kd',
-            video_url: '', 
-            image_url: ''
-        }
-    ]
-}]
-
 interface CourseData {
     id: number;
     title: string;
