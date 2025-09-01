@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -47,7 +48,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
+        <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="/dashboard/courses"
           rel="noopener noreferrer"
@@ -60,8 +61,8 @@ export default function Home() {
             height={16}
           />
           Learn
-        </a>
-        <a
+        </Link>
+        <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="/dashboard/courses"
           rel="noopener noreferrer"
@@ -74,8 +75,8 @@ export default function Home() {
             height={16}
           />
           Practice Exams
-        </a>
-        <a
+        </Link>
+        <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="/dashboard/about"
           rel="noopener noreferrer"
@@ -88,7 +89,7 @@ export default function Home() {
             height={16}
           />
           Social Medias
-        </a>
+        </Link>
       </footer>
     </div>
   );

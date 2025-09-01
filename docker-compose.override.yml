@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  api_server:
+    # For development, we need devDependencies, so we target the 'builder' stage
+    # of our multi-stage Dockerfile, which has everything installed.
+    build:
+      context: ./
+      target: builder
+    volumes:
+      # Mount the source code for hot-reloading.
+      - ./backend:/api
+      # Use an anonymous volume to prevent the host's node_modules from
+      # overwriting the container's, which were installed via `npm ci`.
+      - /api/node_modules
+    command: npm run start:dev
+
+  drone:
+    build:
+      context: ./
+      target: builder
+    volumes:
+      - ./drone:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development

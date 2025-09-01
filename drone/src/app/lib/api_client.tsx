@@ -1,9 +1,9 @@
 import { UserDto } from "./data/profile";
 import { CourseData } from "./data/units";
 
-const BASE_URL: String = "http://localhost:3000"
+const BASE_URL: string = "http://localhost:3000"
 
-async function make_http_call(endpoint: string, httpMethod: string, httpHeaders?: Record<string, string>, bodyStr?: string): Promise<any> {
+async function make_http_call(endpoint: string, httpMethod: string, httpHeaders?: Record<string, string>, bodyStr?: string): Promise<any | null> {
   try {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
       method: httpMethod,
@@ -24,9 +24,9 @@ async function make_http_call(endpoint: string, httpMethod: string, httpHeaders?
   }
 }
 
-async function login(userName: string, password: String): Promise<string> { // Adjust 'any[]' to your article data type
-    let queryParams = `username=${userName}&password=${password}`
-    let data: LoginResponse = await make_http_call(`auth/login?${queryParams}`, 'POST');
+async function login(userName: string, password: string): Promise<string> { // Adjust 'any[]' to your article data type
+    const queryParams = `username=${userName}&password=${password}`
+    const data: LoginResponse = await make_http_call(`auth/login?${queryParams}`, 'POST');
     return data.access_token;
 }
 
@@ -35,8 +35,7 @@ async function getArticles(token: string): Promise<any | Error> { // Adjust 'any
         const headers = {
             authorization: `Bearer ${token}`
         }
-        let data = await make_http_call('articles', 'GET', headers); // TODO
-        return data;
+        return await make_http_call('articles', 'GET', headers); // TODO
     } catch (error) {
         console.error('Operation failed:', error);
         return new Error("Courses API Call Failed.");
@@ -48,9 +47,7 @@ async function getCourses(token: string): Promise<CourseData[] | Error> { // Adj
         const headers = {
             authorization: `Bearer ${token}`
         }
-        let data = await make_http_call('courses', 'GET', headers);
-        console.log(data);
-        return data;
+        return await make_http_call('courses', 'GET', headers);
     } catch (error) {
         console.error('Operation failed:', error);
         return new Error("Courses API Call Failed.");
@@ -63,9 +60,7 @@ async function getCourse(id: string, token: string): Promise<CourseData | Error>
             authorization: `Bearer ${token}`
         }
         // Assuming an endpoint like /courses/:id
-        let data = await make_http_call(`courses/${id}`, 'GET', headers);
-        console.log(data);
-        return data;
+        return await make_http_call(`courses/${id}`, 'GET', headers);
     } catch (error) {
         console.error('Operation failed:', error);
         return new Error("Course API Call Failed.");
@@ -77,9 +72,7 @@ async function getUser(username: string, token: string): Promise<UserDto | Error
         const headers = {
             authorization: `Bearer ${token}`
         }
-        let data = await make_http_call(`users/${username}`, 'GET', headers);
-        console.log(data);
-        return data;
+        return await make_http_call(`users/${username}`, 'GET', headers);
     } catch (error) {
         console.error('Operation failed:', error);
         return new Error("Users API Call Failed.");

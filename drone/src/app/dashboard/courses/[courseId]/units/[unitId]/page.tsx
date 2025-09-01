@@ -32,7 +32,7 @@ export default function SingleUnitPage() {
                 let foundUnit: UnitData | undefined = undefined;
                 if(courseData.units!=undefined) {
                     for(let i=0; i<courseData?.units.length; i++) {
-                        let unit: UnitData = courseData.units[i];
+                        const unit: UnitData = courseData.units[i];
                         if (unit.id === unitId) {
                             foundUnit = unit;
                             setUnit(foundUnit);
