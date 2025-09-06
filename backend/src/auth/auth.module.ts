@@ -1,17 +1,25 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from 'src/users/user.module';
-import { AuthController } from './auth.controller';
-import { AuthMiddleware } from './auth.middleware';
 import { AuthService } from './auth.service';
-import { ScheduleModule } from '@nestjs/schedule';
+import { UsersModule } from '../users/user.module'; // Assuming this exists
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { JwtStrategy } from './jwt.strategy';
+
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [
     UsersModule,
-    ScheduleModule.forRoot()
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1d' }, // Token expires in 1 day
+    }),
   ],
-  providers: [AuthService, AuthMiddleware],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService, AuthMiddleware]
 })
 export class AuthModule {}
+

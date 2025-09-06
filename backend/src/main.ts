@@ -1,6 +1,9 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
+
+require("dotenv").config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule,
@@ -8,7 +11,12 @@ async function bootstrap() {
         logger: ['error', 'warn']
     }
   );
-  app.enableCors();
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: 'http://localhost:8080', // Your drone service's URL
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe());
   // TODO winston, exception handling, 
   

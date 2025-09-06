@@ -1,5 +1,6 @@
 'use client'
-import { AnswerData, QuestionData }  from '@/app/lib/data/questions';
+
+import { AnswerData, QuestionData } from "@/app/lib/types/course";
 
 interface QuestionComponentProps extends QuestionData {
     onAnswerSelect: (questionId: number, answerId: number, isCorrect: boolean) => void;

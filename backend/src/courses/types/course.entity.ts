@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from "../../users/types/user.entity";
+import { Column, CreateDateColumn, Entity, Index, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('courses')
 export class Course {
@@ -20,4 +21,7 @@ export class Course {
 
     @Column({ type: 'boolean' })
     hidden: boolean;
+
+    @ManyToMany(() => User, (user) => user.purchased_courses)
+    purchased_by_users: User[];
 }
