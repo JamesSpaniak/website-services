@@ -2,6 +2,7 @@ import { DataSourceOptions } from 'typeorm';
 import { Article } from '../articles/types/article.entity';
 import { User } from '../users/types/user.entity';
 import { Course } from '../courses/types/course.entity';
+import { Progress } from '../progress/types/progress.entity';
 
 
 const defaultConnection: DataSourceOptions = {
@@ -11,10 +12,12 @@ const defaultConnection: DataSourceOptions = {
     password: process.env.DB_PASSWORD || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || '5432'),
+    synchronize: false,
     entities: [
         Article,
         Course,
-        User
+        User,
+        Progress
     ],
     migrations: [
         'dist/**/migrations/**'

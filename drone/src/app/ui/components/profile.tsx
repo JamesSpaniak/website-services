@@ -1,7 +1,39 @@
-import { UserDto } from "@/app/lib/data/profile";
-import Image from 'next/image';
+'use client';
 
-export default function ProfileComponent({ user }: { user: UserDto }) {
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { updateUser, resetAllProgress, getCoursesWithProgress } from '@/app/lib/api-client';
+import { useAuth } from '@/app/lib/auth-context';
+import { CourseData } from '@/app/lib/types/course';
+import { z } from 'zod';
+import CourseProgressPreview from './course-progress-preview';
+
+const emailSchema = z.string().email({ message: "Please enter a valid email." });
+
+export default function ProfileComponent() {
+    const { user, setUser } = useAuth();
+    const [newEmail, setNewEmail] = useState(user?.email || '');
+    const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [courses, setCourses] = useState<CourseData[]>([]);
+    const [coursesLoading, setCoursesLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchCourses() {
+            try {
+                const data = await getCoursesWithProgress();
+                setCourses(data);
+            } catch (e) {
+                console.error("Failed to fetch course progress", e);
+            } finally {
+                setCoursesLoading(false);
+            }
+        }
+        fetchCourses();
+    }, []);
+
+    if (!user) return null;
+
     const { first_name, last_name, picture_url, email, username } = user;
     const displayName = (first_name && last_name) ? `${first_name} ${last_name}` : username;
 
@@ -32,12 +64,103 @@ export default function ProfileComponent({ user }: { user: UserDto }) {
             </div>
             
             <div className="mt-10">
-                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">Course Progress</h3>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">Course progress tracking will be displayed here in the future.</p>
+                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">My Courses</h3>
+                {coursesLoading ? (
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                        <p className="text-gray-600">Loading courses...</p>
+                    </div>
+                ) : courses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {courses.map(course => (
+                            <CourseProgressPreview key={course.id} course={course} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                        <p className="text-gray-600">You have not started any courses yet. <a href="/courses" className="text-blue-600 hover:underline">Browse courses</a> to get started.</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-10">
+                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">Settings</h3>
+                
+                {message && (
+                    <div className={`p-3 mb-4 rounded-md text-white ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {message.text}
+                    </div>
+                )}
+
+                <div className="p-4 bg-gray-50 rounded-lg space-y-6">
+                    {/* Update Email */}
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Update Email</label>
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                            <input
+                                type="email"
+                                id="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
+                            />
+                            <button
+                                onClick={async () => {
+                                    const validationResult = emailSchema.safeParse(newEmail);
+                                    if (!validationResult.success) {
+                                        setEmailError(validationResult.error.format()._errors[0]);
+                                        return;
+                                    }
+                                    setEmailError(null);
+                                    setMessage(null);
+
+                                    try {
+                                        const updatedUser = await updateUser({ email: newEmail });
+                                        setMessage({ text: 'Email updated successfully!', type: 'success' });
+                                        setUser(updatedUser); // Update the user in the auth context
+                                    } catch (e) {
+                                        setMessage({ text: e instanceof Error ? e.message : 'Failed to update email.', type: 'error' });
+                                    }
+                                }}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700"
+                            >
+                                Save
+                            </button>
+                        </div>
+                        {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
+                    </div>
+
+                    {/* Reset Progress */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700">Course Progress</h4>
+                        <button
+                            onClick={async () => {
+                                if (window.confirm('Are you sure you want to reset all your course progress? This cannot be undone.')) {
+                                    try {
+                                        await resetAllProgress();
+                                        setMessage({ text: 'All course progress has been reset.', type: 'success' });
+                                        setCourses([]); // Visually clear the courses
+                                    } catch (e) {
+                                        setMessage({ text: 'Failed to reset progress.', type: 'error' });
+                                    }
+                                }
+                            }}
+                            className="mt-1 px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
+                        >
+                            Reset All Progress
+                        </button>
+                    </div>
+
+                    {/* Membership Type */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700">Membership</h4>
+                        <div className="mt-2 space-x-4">
+                            <button className="px-4 py-2 border rounded-md bg-gray-200 text-gray-600 cursor-not-allowed">Basic (Current)</button>
+                            <button className="px-4 py-2 border rounded-md text-gray-700 bg-yellow-100 hover:bg-yellow-200">Upgrade to Pro</button>
+                            <button className="px-4 py-2 border rounded-md text-gray-700 bg-purple-100 hover:bg-purple-200">Upgrade to Enterprise</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
-

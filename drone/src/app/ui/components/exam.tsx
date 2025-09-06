@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react';
-import { QuestionData }  from '@/app/lib/data/questions';
-import { ExamData } from '@/app/lib/data/units';
 import QuestionComponent from '@/app/ui/components/question';
+import { ExamData, QuestionData } from '@/app/lib/types/course';
 
 interface AnswerRecord {
     answerId: number;

@@ -11,7 +11,7 @@ interface CoursePreviewProps {
 
 export default function CoursePreviewComponent({ id, title, sub_title, image_url, unitCount }: CoursePreviewProps) {
     return (
-        <Link href={`/dashboard/courses/${id}`} className="block p-4 mb-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+        <Link href={`/courses/${id}`} className="block p-4 mb-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
             <div className="flex flex-col h-full">
                 {image_url && (
                     <div className="relative w-full h-48 mb-4">

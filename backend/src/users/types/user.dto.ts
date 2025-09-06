@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 
 class UserDto {
@@ -10,8 +10,6 @@ class UserDto {
     @IsNotEmpty()
     password: string;
 
-    write_access: boolean;
-
     first_name?: string;
 
     last_name?: string;
@@ -19,6 +17,9 @@ class UserDto {
     email?: string;
 
     picture_url?: string;
+    role?: string;
+    pro_membership_expires_at?: Date;
+    courses?: string[];
 };
 
 type UserDtoResponseOnly = {
@@ -38,7 +39,23 @@ type UserSlim = {
     picture_url?: string;
 }
 
+class UpdateUserDto {
+    @IsOptional()
+    @IsString()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    first_name?: string;
+
+    @IsOptional()
+    @IsString()
+    last_name?: string;
+}
+
 export {
+    UpdateUserDto,
     UserDto,
     UserFull,
     UserSlim,

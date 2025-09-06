@@ -25,7 +25,7 @@ export default function Home() {
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <a
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="/dashboard"
+            href="/articles"
             rel="noopener noreferrer"
           >
             <Image
@@ -35,12 +35,11 @@ export default function Home() {
               width={20}
               height={20}
             />
-            Dashboard
+            Articles
           </a>
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="/dashboard/profile"
-            target="_blank"
+            href="/login"
             rel="noopener noreferrer"
           >
             Sign Up
@@ -50,7 +49,7 @@ export default function Home() {
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/dashboard/courses"
+          href="/courses"
           rel="noopener noreferrer"
         >
           <Image
@@ -64,7 +63,7 @@ export default function Home() {
         </Link>
         <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/dashboard/courses"
+          href="/courses"
           rel="noopener noreferrer"
         >
           <Image
@@ -78,7 +77,7 @@ export default function Home() {
         </Link>
         <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/dashboard/about"
+          href="/about"
           rel="noopener noreferrer"
         >
           <Image
