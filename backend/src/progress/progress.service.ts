@@ -60,9 +60,11 @@ export class ProgressService {
   /**
    * Recursively finds a unit or sub-unit by its ID within a list of units.
    */
-  private findUnit(units: Unit[], unitId: string): Unit | null {
+  private findUnit(units: Unit[], unitId: number): Unit | null {
     for (const unit of units) {
-      if (unit.id === unitId) {
+        console.log(unit.id, unitId);
+      
+      if (parseInt(unit.id) === unitId) {
         return unit;
       }
       if (unit.sub_units?.length) {
@@ -156,7 +158,7 @@ export class ProgressService {
     const progress = await this.getOrCreateProgress(userId, courseId);
     const progressPayload = progress.payload as CourseDetails;
 
-    const unitToUpdate = this.findUnit(progressPayload.units, unitId);
+    const unitToUpdate = this.findUnit(progressPayload.units, parseInt(unitId));
     if (!unitToUpdate) {
       throw new NotFoundException(`Unit with ID ${unitId} not found in course ${courseId}`);
     }
@@ -182,8 +184,8 @@ export class ProgressService {
     const progressPayload = progress.payload as CourseDetails;
     const coursePayload: CourseDetails = JSON.parse(course.payload);
 
-    const unitInProgress = this.findUnit(progressPayload.units, unitId);
-    const unitInCourse = this.findUnit(coursePayload.units, unitId);
+    const unitInProgress = this.findUnit(progressPayload.units, parseInt(unitId));
+    const unitInCourse = this.findUnit(coursePayload.units, parseInt(unitId));
 
     if (!unitInProgress?.exam || !unitInCourse?.exam) {
       throw new NotFoundException(`Exam for unit ID ${unitId} not found`);
@@ -222,5 +224,9 @@ export class ProgressService {
 
   async resetAllProgress(userId: number): Promise<void> {
     await this.progressRepository.delete({ userId });
+  }
+
+  async resetCourseProgress(userId: number, courseId: number): Promise<void> {
+    await this.progressRepository.delete({ userId, courseId });
   }
 }

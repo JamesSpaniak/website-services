@@ -8,7 +8,7 @@ interface ArticleSlim {
 }
 
 interface ArticleFull extends ArticleSlim {
-    content: string;
+    body: string;
 }
 
 export type {

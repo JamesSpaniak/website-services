@@ -12,7 +12,7 @@ export default function ArticlePreviewComponent({ article }: ArticlePreviewProps
   return (
     <Link href={`/articles/${article.id}`} className="group relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80">
       <Image 
-        src={article.image_url || '/about-placeholder.jpg'} 
+        src={article.image_url || '/globe.svg'} 
         alt="" 
         className="absolute inset-0 -z-10 h-full w-full object-cover"
         layout="fill"

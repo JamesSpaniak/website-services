@@ -27,6 +27,9 @@ export default function HeaderComponent() {
           <Link href="/courses" className="hover:text-blue-600 transition-colors">
             Courses
           </Link>
+          <Link href="/contact" className="hover:text-blue-600 transition-colors">
+            Contact
+          </Link>
           <Link href="/about" className="hover:text-blue-600 transition-colors">
             About
           </Link>

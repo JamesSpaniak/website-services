@@ -8,12 +8,14 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CourseModule } from './courses/course.module';
 import { PurchaseModule } from './purchases/purchase.module';
 import { ProgressModule } from './progress/progress.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
     ArticleModule,
     AuthModule,
     CourseModule,
+    EmailModule,
     TypeOrmModule.forRoot({
         ...defaultConnection,
         migrationsRun: true,

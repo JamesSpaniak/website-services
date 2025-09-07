@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { updateUser, resetAllProgress, getCoursesWithProgress } from '@/app/lib/api-client';
+import { updateUser, getCoursesWithProgress } from '@/app/lib/api-client';
 import { useAuth } from '@/app/lib/auth-context';
 import { CourseData } from '@/app/lib/types/course';
 import { z } from 'zod';
@@ -31,6 +31,10 @@ export default function ProfileComponent() {
         }
         fetchCourses();
     }, []);
+
+    const handleCourseReset = (courseId: number) => {
+        setCourses(prevCourses => prevCourses.filter(c => c.id !== courseId));
+    };
 
     if (!user) return null;
 
@@ -72,7 +76,7 @@ export default function ProfileComponent() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {courses.map(course => (
-                            <CourseProgressPreview key={course.id} course={course} />
+                            <CourseProgressPreview key={course.id} course={course} onReset={handleCourseReset} />
                         ))}
                     </div>
                 ) : (
@@ -127,27 +131,6 @@ export default function ProfileComponent() {
                             </button>
                         </div>
                         {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
-                    </div>
-
-                    {/* Reset Progress */}
-                    <div>
-                        <h4 className="text-sm font-medium text-gray-700">Course Progress</h4>
-                        <button
-                            onClick={async () => {
-                                if (window.confirm('Are you sure you want to reset all your course progress? This cannot be undone.')) {
-                                    try {
-                                        await resetAllProgress();
-                                        setMessage({ text: 'All course progress has been reset.', type: 'success' });
-                                        setCourses([]); // Visually clear the courses
-                                    } catch (e) {
-                                        setMessage({ text: 'Failed to reset progress.', type: 'error' });
-                                    }
-                                }
-                            }}
-                            className="mt-1 px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
-                        >
-                            Reset All Progress
-                        </button>
                     </div>
 
                     {/* Membership Type */}

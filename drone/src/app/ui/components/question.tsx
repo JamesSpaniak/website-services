@@ -27,34 +27,38 @@ export default function QuestionComponent({id, question, answers, onAnswerSelect
     const wasCorrect = isAnswered && selectedAnswerId === correctAnswerId;
 
     return (
-        <div key={id} className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-            <div className="p-4">
-                <h2 className="text-xl font-bold justify-center">{question}</h2>
-                <div className="mx-auto space-y-2 inline">
-                    {answers.map((option: AnswerData) => {
-                        const buttonStyles = !isSubmitted ? 
-                            (selectedAnswerId === option.id ? 'bg-blue-500' : 'bg-gray-500 hover:bg-blue-400') : 
-                            (option.correct ? 'bg-green-500' : (selectedAnswerId === option.id ? 'bg-red-500' : 'bg-gray-400'));
+        <div key={id} className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0">
+            <h4 className="text-md font-semibold text-gray-800">{question}</h4>
+            <div className="mt-3 space-y-2">
+                {answers.map((option: AnswerData) => {
+                    const isSelected = selectedAnswerId === option.id;
+                    const isCorrect = option.correct;
 
-                        return (
-                            <button
-                                key={option.id}
-                                onClick={() => handleAnswerClick(option)}
-                                disabled={isSubmitted}
-                                className={`w-full py-2 px-4 my-1 rounded-lg text-white transition duration-300 ${buttonStyles} ${!isSubmitted && 'hover:bg-opacity-75'}`}
-                            >
-                                {option.text}
-                            </button>
-                        );
-                    })}
-                </div>
-                {isSubmitted && isAnswered && (
-                    <div className="p-2 text-center font-bold">
-                        {wasCorrect ? <p className="text-green-600">Correct</p> : <p className="text-red-600">Incorrect</p>}
-                    </div>
-                )}
+                    let buttonStyles = 'bg-white text-gray-700 border-gray-300'; // Default
+                    if (!isSubmitted) {
+                        buttonStyles = isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
+                    } else {
+                        if (isCorrect) {
+                            buttonStyles = 'bg-green-100 text-green-800 border-green-300';
+                        } else if (isSelected && !isCorrect) {
+                            buttonStyles = 'bg-red-100 text-red-800 border-red-300';
+                        } else {
+                            buttonStyles = 'bg-gray-100 text-gray-500 border-gray-200';
+                        }
+                    }
+
+                    return (
+                        <button
+                            key={option.id}
+                            onClick={() => handleAnswerClick(option)}
+                            disabled={isSubmitted}
+                            className={`w-full text-left py-2 px-4 my-1 rounded-lg border text-sm font-medium transition-colors ${buttonStyles}`}
+                        >
+                            {option.text}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     )
 }
-

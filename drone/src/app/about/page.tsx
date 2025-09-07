@@ -33,7 +33,7 @@ export default function AboutPage() {
                 <div className="mx-auto mt-16 max-w-2xl border-t border-gray-200 pt-10 sm:pt-16">
                     <h3 className="text-2xl font-bold tracking-tight text-center text-gray-900">Connect With Us</h3>
                     <p className="mt-4 text-center text-gray-600">
-                        Have questions or want to learn more? Reach out to us at <a href="mailto:contact@dronetraining.pro" className="font-semibold text-blue-600 hover:text-blue-500">contact@dronetraining.pro</a>.
+                        Have questions or want to learn more? <a href="/contact" className="font-semibold text-blue-600 hover:text-blue-500">Send us a message</a> or find us on social media.
                     </p>
                     <div className="mt-8">
                         <SocialMediaLinks />
