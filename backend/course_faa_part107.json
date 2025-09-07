@@ -1,0 +1,620 @@
+{
+    "title": "FAA Part 107 Drone Certification",
+    "sub_title": "Comprehensive Study Guide and Practice Exams",
+    "description": "Master the material needed to pass the FAA Part 107 exam and become a certified commercial drone pilot. This course covers all essential knowledge areas, from regulations and airspace to weather and emergency procedures.",
+    "image_url": "/images/course/drone_hero.jpg",
+    "video_url": "https://www.youtube.com/watch?v=example",
+    "units": [
+        {
+            "id": 1,
+            "title": "Unit 1: Regulations & Airspace",
+            "text_content": "### Key Regulations\n\n*   **14 CFR Part 107**: The primary set of rules governing commercial drone operations.\n*   **Remote Pilot Certificate**: Required for all commercial operators.\n*   **Visual Line of Sight (VLOS)**: The drone must remain within the pilot's sight at all times.",
+            "description": "Understanding the fundamental rules and classifications of the sky is critical for safe and legal drone operation. This unit covers the core of FAA Part 107, including pilot certification requirements, operational limitations, and the structure of the National Airspace System. Mastering these concepts is the first and most important step to becoming a responsible remote pilot.",
+            "image_url": "/images/units/regulations.jpg",
+            "video_url": "https://www.youtube.com/watch?v=unit1",
+            "sub_units": [
+                {
+                    "id": 101,
+                    "title": "Section 1: Applicability of Part 107",
+                    "text_content": "This section will also cover the process for obtaining waivers for certain operations, such as flying over people or at night without anti-collision lights. We will detail the documentation that must be available during flight, including registration and pilot certification.",
+                    "description": "This section defines the scope of Part 107. A small Unmanned Aircraft System (sUAS) is defined as an unmanned aircraft weighing less than 55 pounds (25 kg) on takeoff, including everything that is on board or otherwise attached to the aircraft. We will cover who is required to obtain a Remote Pilot Certificate for commercial operations, the roles and responsibilities of the Remote Pilot in Command (PIC), the visual observer, and the person manipulating the controls. You will also learn about the aircraft registration requirements and what constitutes a 'commercial' operation versus a recreational one.",
+                    "image_url": "/images/sections/applicability.jpg",
+                    "video_url": "https://www.youtube.com/watch?v=section1-1",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 1,
+                                "question": "What is the maximum weight of a small Unmanned Aircraft System (sUAS) under Part 107?",
+                                "answers": [
+                                    {"id": 1, "text": "55 lbs (25 kg)", "correct": true},
+                                    {"id": 2, "text": "25 lbs (11 kg)", "correct": false},
+                                    {"id": 3, "text": "107 lbs (48 kg)", "correct": false},
+                                    {"id": 4, "text": "There is no weight limit.", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 2,
+                                "question": "Who is ultimately responsible for the safe operation of an sUAS?",
+                                "answers": [
+                                    {"id": 1, "text": "The visual observer", "correct": false},
+                                    {"id": 2, "text": "The person manipulating the controls", "correct": false},
+                                    {"id": 3, "text": "The Remote Pilot in Command (PIC)", "correct": true},
+                                    {"id": 4, "text": "The owner of the drone", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 3,
+                                "question": "A Remote Pilot Certificate is required to operate an sUAS for which purpose?",
+                                "answers": [
+                                    {"id": 1, "text": "Purely for recreation or hobby", "correct": false},
+                                    {"id": 2, "text": "For commercial purposes", "correct": true},
+                                    {"id": 3, "text": "Indoors for any purpose", "correct": false},
+                                    {"id": 4, "text": "Only for government operations", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 4,
+                                "question": "How often must a Part 107 Remote Pilot Certificate be renewed?",
+                                "answers": [
+                                    {"id": 1, "text": "Every 12 calendar months", "correct": false},
+                                    {"id": 2, "text": "Every 24 calendar months", "correct": true},
+                                    {"id": 3, "text": "Every 36 calendar months", "correct": false},
+                                    {"id": 4, "text": "It never expires", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 5,
+                                "question": "Which of the following operations is permitted under Part 107 without a waiver?",
+                                "answers": [
+                                    {"id": 1, "text": "Flying over a moving vehicle", "correct": false},
+                                    {"id": 2, "text": "Flying at night with anti-collision lights", "correct": true},
+                                    {"id": 3, "text": "Flying from a moving boat in a populated area", "correct": false},
+                                    {"id": 4, "text": "Flying beyond visual line of sight (BVLOS)", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": 102,
+                    "title": "Section 2: Airspace Classification",
+                    "description": "The National Airspace System is divided into different classes to manage air traffic. As a remote pilot, you must be able to identify these classes on an aeronautical chart and know the rules for operating within them. Class G airspace is uncontrolled and generally does not require authorization. Classes B, C, and D are controlled airspaces surrounding busy airports and require prior authorization from Air Traffic Control (ATC) before you can operate. Class E airspace is also controlled but has different rules depending on the altitude and location. This section will teach you how to read charts to identify these zones and obtain the necessary permissions.",
+                    "image_url": "/images/sections/airspace.jpg",
+                    "video_url": "https://www.youtube.com/watch?v=section1-2",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 6,
+                                "question": "What is generally required to operate an sUAS in Class B airspace?",
+                                "answers": [
+                                    {"id": 1, "text": "No authorization is needed", "correct": false},
+                                    {"id": 2, "text": "Prior authorization from Air Traffic Control (ATC)", "correct": true},
+                                    {"id": 3, "text": "A special waiver from the FAA headquarters", "correct": false},
+                                    {"id": 4, "text": "sUAS operations are prohibited in Class B", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 7,
+                                "question": "Which airspace class is typically uncontrolled and does not require ATC authorization for sUAS operations?",
+                                "answers": [
+                                    {"id": 1, "text": "Class C", "correct": false},
+                                    {"id": 2, "text": "Class D", "correct": false},
+                                    {"id": 3, "text": "Class E", "correct": false},
+                                    {"id": 4, "text": "Class G", "correct": true}
+                                ]
+                            },
+                            {
+                                "id": 8,
+                                "question": "On a sectional chart, what does a solid magenta line indicate?",
+                                "answers": [
+                                    {"id": 1, "text": "The boundary of Class C airspace", "correct": false},
+                                    {"id": 2, "text": "The floor of Class E airspace at 700 ft AGL", "correct": true},
+                                    {"id": 3, "text": "A Military Operations Area (MOA)", "correct": false},
+                                    {"id": 4, "text": "The boundary of Class B airspace", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 9,
+                                "question": "What are the standard dimensions of Class D airspace?",
+                                "answers": [
+                                    {"id": 1, "text": "A 10-nautical mile radius, up to 10,000 ft MSL", "correct": false},
+                                    {"id": 2, "text": "A surface area with a 4-nautical mile radius, up to 2,500 ft AGL", "correct": true},
+                                    {"id": 3, "text": "A 5-nautical mile radius, up to 1,200 ft AGL", "correct": false},
+                                    {"id": 4, "text": "It has no standard dimensions", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 10,
+                                "question": "A blue segmented circle on a sectional chart depicts which class of airspace?",
+                                "answers": [
+                                    {"id": 1, "text": "Class B", "correct": false},
+                                    {"id": 2, "text": "Class C", "correct": false},
+                                    {"id": 3, "text": "Class D", "correct": true},
+                                    {"id": 4, "text": "Class E (surface)", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "exam": {
+                "retries_allowed": 2,
+                "questions": [
+                    {
+                        "id": 11,
+                        "question": "What is the minimum visibility requirement for sUAS operations under Part 107?",
+                        "answers": [
+                            {"id": 1, "text": "1 statute mile", "correct": false},
+                            {"id": 2, "text": "3 statute miles", "correct": true},
+                            {"id": 3, "text": "5 statute miles", "correct": false},
+                            {"id": 4, "text": "Clear of clouds", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 12,
+                        "question": "An accident must be reported to the FAA within 10 days if it results in:",
+                        "answers": [
+                            {"id": 1, "text": "Any damage to the sUAS", "correct": false},
+                            {"id": 2, "text": "A minor scratch to a person", "correct": false},
+                            {"id": 3, "text": "Serious injury or property damage over $500", "correct": true},
+                            {"id": 4, "text": "Loss of the visual observer's contact lenses", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 13,
+                        "question": "What is the maximum legal altitude for an sUAS under Part 107, unless otherwise authorized?",
+                        "answers": [
+                            {"id": 1, "text": "1,200 feet AGL", "correct": false},
+                            {"id": 2, "text": "400 feet AGL", "correct": true},
+                            {"id": 3, "text": "10,000 feet MSL", "correct": false},
+                            {"id": 4, "text": "500 feet above any obstacle", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 14,
+                        "question": "To operate in Class C airspace, a remote pilot must have:",
+                        "answers": [
+                            {"id": 1, "text": "A two-way radio", "correct": false},
+                            {"id": 2, "text": "A transponder", "correct": false},
+                            {"id": 3, "text": "Prior authorization from ATC", "correct": true},
+                            {"id": 4, "text": "A co-pilot", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 15,
+                        "question": "The 'upside-down wedding cake' is a common depiction of which airspace?",
+                        "answers": [
+                            {"id": 1, "text": "Class B", "correct": true},
+                            {"id": 2, "text": "Class G", "correct": false},
+                            {"id": 3, "text": "A Prohibited Area", "correct": false},
+                            {"id": 4, "text": "Class D", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 16,
+                        "question": "How far must an sUAS remain below clouds?",
+                        "answers": [
+                            {"id": 1, "text": "100 feet", "correct": false},
+                            {"id": 2, "text": "500 feet", "correct": true},
+                            {"id": 3, "text": "1,000 feet", "correct": false},
+                            {"id": 4, "text": "2,000 feet", "correct": false}
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "title": "Unit 2: Weather & Micrometeorology",
+            "text_content": "This unit will provide you with the skills to read and interpret critical weather reports like METARs and TAFs, and to understand how atmospheric conditions like density altitude, wind shear, and temperature inversions affect drone performance and safety.",
+            "description": "Weather is a major factor in aviation safety. For drone pilots, understanding micrometeorology—weather on a small scale—is essential. This unit covers how to source and interpret aviation weather reports, and how to understand atmospheric conditions like stability, wind, and density altitude, all of which can have a significant impact on the performance and safety of your flight.",
+            "image_url": "/images/units/weather.jpg",
+            "video_url": "https://www.youtube.com/watch?v=unit2",
+            "sub_units": [
+                {
+                    "id": 201,
+                    "title": "Section 1: Reading Weather Reports",
+                    "description": "Pilots rely on standardized weather products for flight planning. The two most important are METARs (Aviation Routine Weather Reports) and TAFs (Terminal Aerodrome Forecasts). A METAR provides a snapshot of the current weather at an airport, while a TAF provides a forecast for a specific period. You will learn to decode these reports, understanding terms for wind, visibility, cloud cover (like 'OVC' for overcast), and precipitation. This skill is non-negotiable for making go/no-go decisions.",
+                    "image_url": "/images/sections/metar.jpg",
+                    "video_url": "https://www.youtube.com/watch?v=section2-1",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 17,
+                                "question": "In a METAR, what does 'OVC025' indicate?",
+                                "answers": [
+                                    {"id": 1, "text": "Overcast clouds at 250 feet AGL", "correct": false},
+                                    {"id": 2, "text": "Visibility of 25 statute miles", "correct": false},
+                                    {"id": 3, "text": "Overcast clouds at 2,500 feet AGL", "correct": true},
+                                    {"id": 4, "text": "Wind from 025 degrees", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 18,
+                                "question": "A TAF is a forecast for a specific airport and is typically valid for how long?",
+                                "answers": [
+                                    {"id": 1, "text": "6 hours", "correct": false},
+                                    {"id": 2, "text": "12 hours", "correct": false},
+                                    {"id": 3, "text": "24 to 30 hours", "correct": true},
+                                    {"id": 4, "text": "72 hours", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 19,
+                                "question": "What weather phenomenon is implied by the term 'CB' in a weather report?",
+                                "answers": [
+                                    {"id": 1, "text": "Clear Below", "correct": false},
+                                    {"id": 2, "text": "Cumulonimbus clouds (thunderstorms)", "correct": true},
+                                    {"id": 3, "text": "Cloud Base", "correct": false},
+                                    {"id": 4, "text": "Ceiling Broken", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 20,
+                                "question": "What does 'VRB' in the wind section of a METAR indicate?",
+                                "answers": [
+                                    {"id": 1, "text": "Very rough breezes", "correct": false},
+                                    {"id": 2, "text": "Wind direction is variable", "correct": true},
+                                    {"id": 3, "text": "Vertical visibility", "correct": false},
+                                    {"id": 4, "text": "Visibility restricted by rain", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": 202,
+                    "title": "Section 2: Atmospheric Conditions",
+                    "description": "The atmosphere's properties directly affect aircraft performance. Density altitude, a measure of air density, is a critical concept; high density altitude (found on hot, humid days or at high elevations) means thinner air and reduced drone performance. We will also cover atmospheric stability, where unstable air can lead to turbulence and thunderstorms, while stable air is smooth but can trap fog and haze. Understanding temperature inversions, where temperature increases with altitude, is also key, as they can create hazardous wind shear and visibility issues.",
+                    "image_url": "/images/sections/atmosphere.jpg",
+                    "video_url": "https://www.youtube.com/watch?v=section2-2",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 21,
+                                "question": "High density altitude means:",
+                                "answers": [
+                                    {"id": 1, "text": "The air is dense, and performance is increased.", "correct": false},
+                                    {"id": 2, "text": "The air is thin, and performance is decreased.", "correct": true},
+                                    {"id": 3, "text": "The air is heavy with moisture.", "correct": false},
+                                    {"id": 4, "text": "The altitude is high, but it has no effect on performance.", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 22,
+                                "question": "What condition is necessary for the formation of a thunderstorm?",
+                                "answers": [
+                                    {"id": 1, "text": "Stable air and low humidity", "correct": false},
+                                    {"id": 2, "text": "Sufficient moisture, unstable air, and a lifting action", "correct": true},
+                                    {"id": 3, "text": "Cold temperatures and high winds", "correct": false},
+                                    {"id": 4, "text": "A temperature inversion", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 23,
+                                "question": "A temperature inversion can lead to which hazardous condition?",
+                               "answers": [
+                                    {"id": 1, "text": "Poor visibility and trapped pollutants", "correct": true},
+                                    {"id": 2, "text": "Clear skies and high winds", "correct": false},
+                                    {"id": 3, "text": "Rapidly forming thunderstorms", "correct": false},
+                                    {"id": 4, "text": "Increased engine performance", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 24,
+                                "question": "What type of clouds are associated with stable air?",
+                                "answers": [
+                                    {"id": 1, "text": "Cumulus", "correct": false},
+                                    {"id": 2, "text": "Stratiform clouds and fog", "correct": true},
+                                    {"id": 3, "text": "Cumulonimbus", "correct": false},
+                                    {"id": 4, "text": "Cirrus", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "exam": {
+                "retries_allowed": 2,
+                "questions": [
+                    {
+                        "id": 25,
+                        "question": "What effect does high humidity have on aircraft performance?",
+                        "answers": [
+                            {"id": 1, "text": "It increases performance", "correct": false},
+                            {"id": 2, "text": "It decreases performance", "correct": true},
+                            {"id": 3, "text": "It has no effect on performance", "correct": false},
+                            {"id": 4, "text": "It only affects performance at night", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 26,
+                        "question": "The suffix 'nimbus' added to a cloud name means:",
+                        "answers": [
+                            {"id": 1, "text": "High-level cloud", "correct": false},
+                            {"id": 2, "text": "Wispy or feathery", "correct": false},
+                            {"id": 3, "text": "Rain-producing", "correct": true},
+                            {"id": 4, "text": "Puffy or cotton-like", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 27,
+                        "question": "What is 'wind shear'?",
+                        "answers": [
+                            {"id": 1, "text": "A sudden, drastic change in wind speed and/or direction over a small area", "correct": true},
+                            {"id": 2, "text": "A steady wind from the north", "correct": false},
+                            {"id": 3, "text": "The process of wind eroding a surface", "correct": false},
+                            {"id": 4, "text": "A tool for measuring wind speed", "correct": false}
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 3,
+            "title": "Unit 3: sUAS Loading & Performance",
+            "description": "Every aircraft has performance limitations that are dictated by its design, weight, and the environment it's operating in. This unit explores how to calculate and respect these limitations. We will cover the critical concepts of weight and balance, ensuring your drone's center of gravity is within the acceptable range for stable flight. You will also learn how factors like high density altitude or an overweight condition can drastically reduce your drone's ability to climb and maneuver.",
+            "image_url": "/images/units/performance.jpg",
+            "video_url": "https://www.youtube.com/watch?v=unit3",
+            "sub_units": [
+                {
+                    "id": 301,
+                    "title": "Section 1: Weight and Balance",
+                    "description": "Weight and balance are fundamental to aircraft stability and control. The center of gravity (CG) is the point where the aircraft's entire weight is considered to be concentrated. If the CG is too far forward, the aircraft will be nose-heavy and difficult to pitch up. If it's too far aft (behind the center of lift), the aircraft can become dangerously unstable and difficult to control, especially during stalls. You must always operate within the manufacturer's specified weight and CG limits.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 28,
+                                "question": "An aircraft is loaded with the center of gravity (CG) too far aft. What is a likely result?",
+                                "answers": [
+                                    {"id": 1, "text": "The aircraft will be excessively stable", "correct": false},
+                                    {"id": 2, "text": "The aircraft may be unstable and difficult to recover from a stall", "correct": true},
+                                    {"id": 3, "text": "The aircraft will require less power for takeoff", "correct": false},
+                                    {"id": 4, "text": "The aircraft will have a higher stall speed", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 29,
+                                "question": "Exceeding the maximum takeoff weight of an sUAS will result in:",
+                                "answers": [
+                                    {"id": 1, "text": "Longer endurance", "correct": false},
+                                    {"id": 2, "text": "Improved maneuverability", "correct": false},
+                                    {"id": 3, "text": "Reduced performance and a higher stall speed", "correct": true},
+                                    {"id": 4, "text": "A more stable flight profile", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": 302,
+                    "title": "Section 2: Aerodynamic Principles",
+                    "description": "All flight is a balance of four fundamental forces. Lift is the upward force generated by the propellers that opposes the downward force of weight. Thrust is the forward force generated by the propellers that opposes the rearward force of drag, which is the resistance of the air. In straight-and-level, unaccelerated flight, these forces are in equilibrium. Understanding how they interact, especially how turning or climbing affects them (e.g., increasing the load factor), is key to predicting and controlling your aircraft's performance.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 30,
+                                "question": "What force counteracts the downward pull of weight?",
+                                "answers": [
+                                    {"id": 1, "text": "Thrust", "correct": false},
+                                    {"id": 2, "text": "Drag", "correct": false},
+                                    {"id": 3, "text": "Lift", "correct": true},
+                                    {"id": 4, "text": "Inertia", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 31,
+                                "question": "What happens to lift when the angle of attack is increased beyond the critical angle of attack?",
+                                "answers": [
+                                    {"id": 1, "text": "Lift increases rapidly", "correct": false},
+                                    {"id": 2, "text": "Lift is dramatically reduced, causing a stall", "correct": true},
+                                    {"id": 3, "text": "Drag is eliminated", "correct": false},
+                                    {"id": 4, "text": "Thrust doubles", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "exam": {
+                "retries_allowed": 2,
+                "questions": [
+                    {
+                        "id": 32,
+                        "question": "What is the primary purpose of load factor?",
+                        "answers": [
+                            {"id": 1, "text": "To measure the stress on the aircraft structure", "correct": true},
+                            {"id": 2, "text": "To calculate fuel consumption", "correct": false},
+                            {"id": 3, "text": "To determine the maximum altitude", "correct": false},
+                            {"id": 4, "text": "To measure the weight of the payload", "correct": false}
+                        ]
+                    },
+                    {
+                        "id": 33,
+                        "question": "Load factor is the lift generated by the wings divided by the total:",
+                        "answers": [
+                            {"id": 1, "text": "Thrust of the engines", "correct": false},
+                            {"id": 2, "text": "Weight of the aircraft", "correct": true},
+                            {"id": 3, "text": "Drag of the airframe", "correct": false},
+                            {"id": 4, "text": "Surface area of the wings", "correct": false}
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "title": "Unit 4: Airport Operations",
+            "description": "Even if you don't plan to fly directly at an airport, you will often operate in the airspace surrounding them. This unit teaches you how to operate safely in this environment. You will learn to read aeronautical charts to identify airport traffic patterns, runway layouts, and potential hazards. We will also cover standard radio communication phraseology and the phonetic alphabet, which are essential for communicating your intentions to other pilots and air traffic controllers when required.",
+            "image_url": "/images/units/airport.jpg",
+            "video_url": "https://www.youtube.com/watch?v=unit4",
+            "sub_units": [
+                {
+                    "id": 401,
+                    "title": "Section 1: Reading Sectional Charts",
+                    "description": "Aeronautical charts are the maps of the sky. They contain a vast amount of information critical for flight planning. This section focuses on interpreting these charts. You will learn to identify different types of airports (towered vs. non-towered, public vs. private), understand the symbols for obstacles and their heights in Mean Sea Level (MSL), and recognize various types of special use airspace like Military Operations Areas (MOAs) and Restricted Areas.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 34,
+                                "question": "On a sectional chart, what does the number in a box next to an obstacle represent?",
+                                "answers": [
+                                    {"id": 1, "text": "The height of the obstacle in feet AGL", "correct": false},
+                                    {"id": 2, "text": "The height of the obstacle in feet MSL", "correct": true},
+                                    {"id": 3, "text": "The frequency for a nearby VOR", "correct": false},
+                                    {"id": 4, "text": "The year the obstacle was built", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 35,
+                                "question": "An 'R' inside a circle on a chart indicates what type of airport?",
+                                "answers": [
+                                    {"id": 1, "text": "A restricted, military-only airport", "correct": false},
+                                    {"id": 2, "text": "A private airport, not for public use", "correct": true},
+                                    {"id": 3, "text": "A regional airport", "correct": false},
+                                    {"id": 4, "text": "An airport with radar services", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": 402,
+                    "title": "Section 2: Radio Communications",
+                    "description": "Clear and concise communication is vital for aviation safety. This section covers the basics of aviation radio communication. You will learn the NATO phonetic alphabet (Alpha, Bravo, Charlie...) to ensure letters are understood clearly. We will also cover how to announce your position and intentions on a Common Traffic Advisory Frequency (CTAF) at non-towered airports, and how to understand and respond to instructions from Air Traffic Control (ATC) when operating in controlled airspace.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 36,
+                                "question": "What is the phonetic alphabet word for the letter 'N'?",
+                                "answers": [
+                                    {"id": 1, "text": "Nancy", "correct": false},
+                                    {"id": 2, "text": "November", "correct": true},
+                                    {"id": 3, "text": "Nectar", "correct": false},
+                                    {"id": 4, "text": "Niner", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 37,
+                                "question": "The frequency for UNICOM, used at airports without a control tower, is typically:",
+                                "answers": [
+                                    {"id": 1, "text": "121.5 MHz", "correct": false},
+                                    {"id": 2, "text": "122.8 MHz", "correct": true},
+                                    {"id": 3, "text": "118.0 MHz", "correct": false},
+                                    {"id": 4, "text": "135.5 MHz", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "exam": {
+                "retries_allowed": 2,
+                "questions": [
+                    {
+                        "id": 38,
+                        "question": "What does CTAF stand for?",
+                        "answers": [
+                            {"id": 1, "text": "Common Traffic Advisory Frequency", "correct": true},
+                            {"id": 2, "text": "Central Tower Air Frequency", "correct": false},
+                            {"id": 3, "text": "Controlled Traffic Area Frequency", "correct": false},
+                            {"id": 4, "text": "Common Terminal Approach Frequency", "correct": false}
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "title": "Unit 5: Emergency Procedures & Human Factors",
+            "description": "A safe pilot is a prepared pilot. This unit focuses on two critical aspects of safety: handling in-flight emergencies and understanding the psychological factors that can affect pilot performance. We will cover standard procedures for common issues like lost communication links or battery failures. We will also delve into Aeronautical Decision-Making (ADM) and Crew Resource Management (CRM) to help you develop a structured, professional approach to risk mitigation.",
+            "image_url": "/images/units/emergency.jpg",
+            "video_url": "https://www.youtube.com/watch?v=unit5",
+            "sub_units": [
+                {
+                    "id": 501,
+                    "title": "Section 1: Aeronautical Decision-Making (ADM)",
+                    "description": "Aeronautical Decision-Making (ADM) is a systematic approach to consistently determining the best course of action in response to a given set of circumstances. A key part of ADM is recognizing and mitigating hazardous attitudes, such as 'Anti-authority' or 'Invulnerability'. We will also cover practical risk management tools like the PAVE checklist (Pilot, Aircraft, enVironment, External pressures) and the IMSAFE checklist (Illness, Medication, Stress, Alcohol, Fatigue, Emotion) to ensure you are always fit and prepared for flight.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 39,
+                                "question": "What is 'hazardous attitudes' in the context of ADM?",
+                                "answers": [
+                                    {"id": 1, "text": "A positive and confident mindset", "correct": false},
+                                    {"id": 2, "text": "Five attitudes (anti-authority, impulsivity, etc.) that can lead to poor decisions", "correct": true},
+                                    {"id": 3, "text": "The physical attitude of the aircraft", "correct": false},
+                                    {"id": 4, "text": "A fear of flying", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 40,
+                                "question": "The 'IMSAFE' checklist is used to assess:",
+                                "answers": [
+                                    {"id": 1, "text": "The airworthiness of the drone", "correct": false},
+                                    {"id": 2, "text": "The pilot's fitness to fly", "correct": true},
+                                    {"id": 3, "text": "The weather conditions", "correct": false},
+                                    {"id": 4, "text": "The security of the launch site", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": 502,
+                    "title": "Section 2: Emergency Procedures",
+                    "description": "Even with careful planning, emergencies can occur. This section covers the appropriate responses to common sUAS emergencies. For a 'lost link' situation, where the controller loses connection with the drone, you should follow the pre-programmed procedure, which is often to return-to-home (RTH), land, or hover. For a 'flyaway,' where the drone is unresponsive and not following its flight plan, the priority is to monitor its location and alert ATC if it enters controlled airspace. We will discuss these scenarios to ensure you can react calmly and effectively.",
+                    "exam": {
+                        "retries_allowed": 3,
+                        "questions": [
+                            {
+                                "id": 41,
+                                "question": "What is the most common first action for a 'flyaway' sUAS?",
+                                "answers": [
+                                    {"id": 1, "text": "Immediately turn off the controller", "correct": false},
+                                    {"id": 2, "text": "Attempt to re-establish the link or initiate a return-to-home (RTH) command", "correct": true},
+                                    {"id": 3, "text": "Run after the drone", "correct": false},
+                                    {"id": 4, "text": "Call the FAA immediately", "correct": false}
+                                ]
+                            },
+                            {
+                                "id": 42,
+                                "question": "A remote pilot has a lost link situation. What should they do?",
+                                "answers": [
+                                    {"id": 1, "text": "Follow the pre-programmed lost link procedures", "correct": true},
+                                    {"id": 2, "text": "Assume the drone has crashed", "correct": false},
+                                    {"id": 3, "text": "Switch to a different frequency", "correct": false},
+                                    {"id": 4, "text": "Nothing, the drone will land itself", "correct": false}
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "exam": {
+                "retries_allowed": 2,
+                "questions": [
+                    {
+                        "id": 43,
+                        "question": "What is the antidote for the 'Macho' hazardous attitude?",
+                        "answers": [
+                            {"id": 1, "text": "It's not that serious.", "correct": false},
+                            {"id": 2, "text": "Taking chances is foolish.", "correct": true},
+                            {"id": 3, "text": "Follow the rules.", "correct": false},
+                            {"id": 4, "text": "Not so fast, think first.", "correct": false}
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

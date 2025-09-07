@@ -1,4 +1,4 @@
-import { CreateUserDto, UserDto } from "./types/profile";
+import { ContactPayload, CreateUserDto, UserDto } from "./types/profile";
 import { CourseData, UnitData } from "./types/course";
 import { ArticleFull, ArticleSlim } from "./types/article";
 
@@ -105,9 +105,9 @@ async function updateUser(userData: Partial<UserDto>): Promise<UserDto> {
     });
 }
 
-async function resetAllProgress(): Promise<void> {
+async function resetCourseProgress(courseId: number): Promise<void> {
     // Assuming this endpoint returns 204 No Content on success
-    await makeAuthenticatedRequest('progress/reset', { method: 'POST' });
+    await makeAuthenticatedRequest(`progress/courses/${courseId}/reset`, { method: 'POST' });
 }
 
 async function getCoursesWithProgress(): Promise<CourseData[]> {
@@ -138,12 +138,22 @@ async function updateUnitProgress(courseId: number, unitId: string, status: stri
     });
 }
 
+async function sendContactMessage(payload: ContactPayload): Promise<{ success: boolean; message: string }> {
+    // This is a public endpoint, so no auth needed.
+    const response = await fetch(`${BASE_URL}/email/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    return response.json();
+}
+
 
 export {
     getArticleById,
     createUser,
     updateUser,
-    resetAllProgress,
+    resetCourseProgress,
     getCoursesWithProgress,
     updateCourseProgress,
     updateUnitProgress,
@@ -155,4 +165,5 @@ export {
     login,
     logout,
     forgotPassword,
+    sendContactMessage
 }

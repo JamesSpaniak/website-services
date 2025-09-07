@@ -7,7 +7,6 @@ import { useAuth } from '@/app/lib/auth-context';
 import UnitComponent from '@/app/ui/components/unit';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
-import ExamComponent from '@/app/ui/components/exam';
 import { CourseData, UnitData } from '@/app/lib/types/course';
 
 export default function SingleUnitPage() {
@@ -31,7 +30,7 @@ export default function SingleUnitPage() {
                 if(courseData.units!=undefined) {
                     for(let i=0; i<courseData?.units.length; i++) {
                         const unit: UnitData = courseData.units[i];
-                        if (unit.id === unitId) {
+                        if (parseInt(unitId as string) === parseInt(unit.id)) {
                             foundUnit = unit;
                             setUnit(foundUnit);
                         }
@@ -66,9 +65,6 @@ export default function SingleUnitPage() {
     }
 
     return (
-        <div>
-            <UnitComponent unitData={unit} courseId={parseInt(courseId as string)} />
-            {unit.exam && unit.exam.questions && <ExamComponent {...unit.exam} />}
-        </div>
+        <UnitComponent unitData={unit} courseId={parseInt(courseId as string)} />
     );
 }

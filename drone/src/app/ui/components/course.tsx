@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import Link from "next/link";
 import Image from "next/image";
-import { CourseData, ProgressStatus } from "@/app/lib/types/course";
+import { CourseData, ProgressStatus, UnitData } from "@/app/lib/types/course";
 import { getCourseById, updateCourseProgress, updateUnitProgress } from '@/app/lib/api-client';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
+import UnitPreviewComponent from './unit-preview';
 
 export default function CourseComponent(props: CourseData) {
     const [course, setCourse] = useState<CourseData>(props);
@@ -14,14 +15,14 @@ export default function CourseComponent(props: CourseData) {
 
     const handleCourseStatusUpdate = async (newStatus: ProgressStatus) => {
         await updateCourseProgress(courseId, newStatus);
-        const updatedCourse = await getCourseById(courseId);
-        setCourse(updatedCourse);
+        const course = await getCourseById(courseId);
+        setCourse(course);
     };
 
     const handleUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
-        await updateUnitProgress(courseId, unitId, newStatus);
-        const updatedCourse = await getCourseById(courseId);
-        setCourse(updatedCourse);
+        const updatedUnit = await updateUnitProgress(courseId, unitId, newStatus);
+        console.log(updatedUnit);
+        setCourse(prev => updateUnitInState(prev, updatedUnit));
     };
 
     return (
@@ -29,27 +30,22 @@ export default function CourseComponent(props: CourseData) {
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
                 {/* Main Content */}
                 <div className="lg:col-span-2">
-                    <div className="p-6 bg-white rounded-2xl shadow-sm">
-                        {image_url && (
-                            <div className="relative w-full h-64 mb-6 rounded-lg overflow-hidden">
-                                <Image src="/file.svg"/*{image_url} TODO*/ alt={title} layout="fill" objectFit="cover" />
-                            </div>
-                        )}
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{title}</h1>
-                        </div>
-                        {sub_title && <p className="text-lg leading-8 text-gray-600">{sub_title}</p>}
-                        
-                        <div className="mt-8 prose lg:prose-lg max-w-none text-gray-600">
-                            {description && <p>{description}</p>}
-                        </div>
+                    <div className="space-y-8">
+                        {units?.map((unit) => (
+                            <UnitPreviewComponent key={unit.id} unit={unit} courseId={courseId} onStatusUpdate={handleUnitStatusUpdate} />
+                        ))}
                     </div>
                 </div>
 
                 {/* Sidebar */}
                 <div className="mt-8 lg:mt-0">
                     <div className="p-6 bg-white rounded-2xl shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-900">Course Information</h3>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-2xl font-bold tracking-tight text-gray-900">{title}</h1>
+                        </div>
+                        {sub_title && <p className="text-md leading-7 text-gray-600">{sub_title}</p>}
+
+                        <h3 className="mt-6 pt-6 border-t text-lg font-semibold text-gray-900">Course Information</h3>
                         <div className="mt-4 space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium text-gray-600">Status</span>
@@ -78,4 +74,20 @@ export default function CourseComponent(props: CourseData) {
             </div>
         </div>
     )
+}
+
+// Helper function to recursively update a unit in the state without re-fetching
+function updateUnitInState(course: CourseData, updatedUnit: UnitData): CourseData {
+    const update = (units: UnitData[]): UnitData[] => {
+        return units.map(unit => {
+            if (unit.id === updatedUnit.id) {
+                return { ...unit, status: updatedUnit.status };
+            }
+            if (unit.sub_units) {
+                return { ...unit, sub_units: update(unit.sub_units) };
+            }
+            return unit;
+        });
+    };
+    return { ...course, units: update(course.units || []) };
 }

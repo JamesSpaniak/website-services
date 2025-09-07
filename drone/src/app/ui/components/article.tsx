@@ -36,7 +36,7 @@ export default function ArticleComponent({ article }: ArticleProps) {
           )}
           <div
             className="mt-10 prose lg:prose-lg max-w-none text-gray-600"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: article.body }}
           />
         </div>
       </div>

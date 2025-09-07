@@ -17,7 +17,14 @@ interface CreateUserDto {
     last_name?: string;
 }
 
+interface ContactPayload {
+    name: string;
+    contact: string;
+    message: string;
+}
+
 export type {
     CreateUserDto,
+    ContactPayload,
     UserDto
 }

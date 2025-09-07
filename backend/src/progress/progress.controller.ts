@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProgressService } from './progress.service';
-import { UpdateProgressDto, SubmitExamDto } from '../courses/types/course.dto';
+import { UpdateProgressDto, SubmitExamDto, ProgressStatus } from '../courses/types/course.dto';
 
 @Controller('progress')
 @UseGuards(JwtAuthGuard)
@@ -23,9 +23,13 @@ export class ProgressController {
     return this.progressService.getAllCoursesWithProgress(req.user.userId);
   }
 
-  @Post('reset')
-  async resetAllProgress(@Request() req) {
-    return this.progressService.resetAllProgress(req.user.userId);
+  @Post('courses/:courseId/reset')
+  async resetCourseProgress(
+    @Request() req,
+    @Param('courseId', ParseIntPipe) courseId: number,
+  ): Promise<UpdateProgressDto> {
+    await this.progressService.resetCourseProgress(req.user.userId, courseId);
+    return { status: ProgressStatus.NOT_STARTED };
   }
 
   @Patch('courses/:courseId')

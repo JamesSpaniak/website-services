@@ -9,6 +9,7 @@ interface CourseData {
     title: string;
     sub_title: string;
     description: string;
+    text_content?: string;
     image_url?: string;
     video_url?: string;
     units?: UnitData[];
@@ -25,6 +26,7 @@ interface UnitData {
     id: string;
     title: string;
     description?: string;
+    text_content?: string;
     video_url?: string;
     image_url?: string;
     sub_units?: UnitData[]; // Can have optional nested subunits defined

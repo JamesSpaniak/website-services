@@ -19,6 +19,7 @@ class Unit {
     id: string;
     title: string;
     description: string;
+    text_content?: string;
     image_url?: string;
     video_url?: string;
     exam?: Exam
