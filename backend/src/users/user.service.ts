@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './types/user.entity';
 import { UpdateUserDto, UserDto, UserFull } from './types/user.dto';
 import { Role } from './types/role.enum';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +29,18 @@ export class UsersService {
     }
   }
 
+  async getUserById(id: number): Promise<User> {
+    return this.userRepository.findOne({
+        where: { id: id },
+        join: {
+            alias: 'user',
+            leftJoinAndSelect: {
+                purchasedCourses: 'user.purchased_courses',
+            },}
+    });
+  }
+
+
   async getUserByUsername(username: string): Promise<UserFull | undefined> {
     const repRes = await this.userRepository.findOne({
         where: { username: username }
@@ -43,6 +57,12 @@ export class UsersService {
     return res;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return this.userRepository.findOne({
+        where: { email: email }
+    });
+  }
+
   async getUsers(): Promise<User[]> {
     return this.userRepository.find();
   }
@@ -56,7 +76,7 @@ export class UsersService {
         pro_membership_expires_at: undefined,
         purchased_courses: undefined
     }
-    return this.userRepository.save(user);
+    return this.userRepository.save(user); // TODO add unique constraint on email
   }
 
   async updateUser(id: number, data: UpdateUserDto): Promise<User> {
@@ -67,6 +87,15 @@ export class UsersService {
     // Merge the validated DTO into the user entity
     this.userRepository.merge(user, data);
     return this.userRepository.save(user);
+  }
+
+  async updatePassword(id: number, password: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    user.password = password; // The password should already be hashed
+    await this.userRepository.save(user);
   }
 
   async deleteUser(id: string): Promise<void> {

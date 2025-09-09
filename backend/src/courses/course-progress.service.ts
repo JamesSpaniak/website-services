@@ -15,6 +15,9 @@ import {
     UserAnswer,
     ExamResult,
   } from '../courses/types/course.dto';
+import { CourseService } from './course.service';
+import { Role } from 'src/users/types/role.enum';
+import { Trace } from 'src/common/tracing.decorator';
   
   @Injectable()
   export class CourseProgressService {
@@ -23,6 +26,7 @@ import {
       private progressRepository: Repository<Progress>,
       @InjectRepository(Course)
       private courseRepository: Repository<Course>,
+      private courseService: CourseService,
     ) {}
   
     /**
@@ -96,27 +100,71 @@ import {
       payload.status = ProgressStatus.NOT_STARTED;
     }
   
+    @Trace()
     async getCourseWithProgress(
-      userId: number,
+      userFromJwt: { userId: number; role: Role; username: string },
       courseId: number,
     ): Promise<CourseDetails> {
-      const existingProgress = await this.progressRepository.findOne({
-        where: { userId, courseId },
-      });
-  
-      if (existingProgress) {
-        const progressPayload = existingProgress.payload as CourseDetails;
-        progressPayload.id = courseId;
-        return progressPayload;
-      }
   
       const course = await this.courseRepository.findOneBy({ id: courseId });
       if (!course) {
         throw new NotFoundException(`Course with ID ${courseId} not found`);
       }
-      const progress = await this.getOrCreateProgress(userId, courseId);
 
-      return progress.payload;
+      const hasAccess = await this.courseService.hasAccess(courseId, userFromJwt);
+      const coursePayload: CourseDetails = JSON.parse(course.payload);
+      coursePayload.id = course.id;
+      // Assuming price is stored in the payload JSON. If it's a column on Course, use course.price
+      coursePayload.price = coursePayload.price || 49.95; // Fallback price
+      coursePayload.has_access = hasAccess;
+
+      if (hasAccess) {
+        // If user has access, get or create their progress and merge it.
+        const progress = await this.getOrCreateProgress(userFromJwt.userId, courseId);
+        this.mergeProgressAndCourse(progress.payload as CourseDetails, coursePayload);
+      } else {
+        // If no access, initialize a clean payload but redact sensitive content.
+        // This ensures the frontend can show course info without giving away the content.
+        this.initializeProgressPayload(coursePayload);
+        coursePayload.units.forEach(unit => {
+            unit.text_content = undefined;
+            unit.video_url = undefined;
+            unit.exam = undefined;
+            if (unit.sub_units) {
+                unit.sub_units.forEach(sub => {
+                    sub.text_content = undefined;
+                    sub.video_url = undefined;
+                    sub.exam = undefined;
+                });
+            }
+        });
+      }
+      
+      return coursePayload;
+    }
+
+    mergeProgressAndCourse(progress: CourseDetails, course: CourseDetails): void {
+        course.status = progress.status;
+        const merge = (progressUnits: Unit[], courseUnits: Unit[]) => {
+            if (!progressUnits || !courseUnits) return;
+            for(let i: number = 0; i<courseUnits.length; i++) {
+                courseUnits[i].status = i>=progressUnits.length
+                    ? ProgressStatus.NOT_STARTED : progressUnits[i].status;
+                if(courseUnits[i].exam) {
+                    if(i>=progressUnits.length) {
+                        courseUnits[i].exam.status = ProgressStatus.NOT_STARTED;
+                    } else {
+                        courseUnits[i].exam.status = progressUnits[i].exam.status;
+                        courseUnits[i].exam.result = progressUnits[i].exam.result;
+                        courseUnits[i].exam.previous_results = progressUnits[i].exam.previous_results;
+                    }
+                }
+                if(courseUnits[i].sub_units) {
+                    merge(progressUnits[i].sub_units ? progressUnits[i].sub_units : [], courseUnits[i].sub_units)
+                }
+            }
+          };
+        merge(progress.units, course.units);
     }
   
     async updateUnitProgress(

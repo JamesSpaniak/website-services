@@ -1,22 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import Link from "next/link";
-import Image from "next/image";
 import { CourseData, ProgressStatus, UnitData } from "@/app/lib/types/course";
-import { getCourseById, updateCourseProgress, updateUnitProgress } from '@/app/lib/api-client';
+import { updateCourseProgress, updateUnitProgress } from '@/app/lib/api-client';
+import PurchaseFlow from './purchase-flow';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import UnitPreviewComponent from './unit-preview';
+import ImageComponent from './image';
+import Link from 'next/link';
 
 export default function CourseComponent(props: CourseData) {
     const [course, setCourse] = useState<CourseData>(props);
-    const { id: courseId, title, sub_title, description, image_url, units, status } = course;
+    let { id, title, sub_title, image_url, units, status, price, has_access } = course;
+    const courseId = id;
+    const handlePurchaseSuccess = () => {
+        setCourse(prevCourse => ({ ...prevCourse, hasAccess: true }));
+    };
+
+    if (has_access === false && price && price > 0) {
+        return <PurchaseFlow course={course} onPurchaseSuccess={handlePurchaseSuccess} />;
+    }
 
     const handleCourseStatusUpdate = async (newStatus: ProgressStatus) => {
         await updateCourseProgress(courseId, newStatus);
-        const course = await getCourseById(courseId);
-        setCourse(course);
+        setCourse(prevCourse => ({ ...prevCourse, status: newStatus }));
     };
 
     const handleUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
@@ -30,6 +38,12 @@ export default function CourseComponent(props: CourseData) {
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
                 {/* Main Content */}
                 <div className="lg:col-span-2">
+                    <div className="mb-8">
+                        <ImageComponent 
+                            src={image_url} alt={title} width={1200} height={675} 
+                            className="aspect-video w-full rounded-2xl bg-gray-100 object-cover"
+                        />
+                    </div>
                     <div className="space-y-8">
                         {units?.map((unit) => (
                             <UnitPreviewComponent key={unit.id} unit={unit} courseId={courseId} onStatusUpdate={handleUnitStatusUpdate} />

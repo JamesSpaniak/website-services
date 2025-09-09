@@ -50,7 +50,7 @@ function SingleCoursePage() {
     if (!course) {
         return <ErrorComponent message="Course not found." />;
     }
-
+    course.id = parseInt(courseId as string);
     return <CourseComponent {...course} />;
 }
 

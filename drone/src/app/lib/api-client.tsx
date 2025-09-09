@@ -1,44 +1,65 @@
 import { ContactPayload, CreateUserDto, UserDto } from "./types/profile";
 import { CourseData, UnitData } from "./types/course";
 import { ArticleFull, ArticleSlim } from "./types/article";
+import { v4 as uuidv4 } from 'uuid';
+import { logger } from "./logger";
 
 const BASE_URL: string = "http://localhost:3000"
+
+interface ResetPasswordPayload {
+    token: string;
+    password: string;
+}
+
+// A generic request handler that adds a unique request ID for tracing
+const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const requestId = uuidv4();
+    try {
+        const response = await fetch(`${BASE_URL}/${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Request-Id': requestId,
+                ...options.headers,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        // Handle responses with no content
+        if (response.status === 204 || response.headers.get('Content-Length') === '0') {
+            return;
+        }
+
+        return response.json();
+    } catch (error) {
+        // Log the API error before re-throwing it to the calling component
+        logger.error(error as Error, { endpoint, options, requestId });
+        throw error;
+    }
+};
 
 const login = async (username: string, password: string) => {
     const params = new URLSearchParams({
         username: username,
         password: password,
     });
-    const response = await fetch(`${BASE_URL}/auth/login?${params.toString()}`, {
+    // The cookie is set in the browser for subsequent requests.
+    return makeRequest(`auth/login?${params.toString()}`, {
         method: 'POST',
         credentials: 'include',
     });
-    // The cookie is now set in the browser for subsequent requests.
-    if (!response.ok) {
-        throw new Error('Authentication failed');
-    }
-    return response.json(); // body contains the user profile
-    
 };
 
 // A helper to ensure we're authenticated before making a call
 const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
-    // The 'credentials: "include"' option tells the browser to send cookies
-    // with the request to the same origin.
-    const response = await fetch(`${BASE_URL}/${endpoint}`, {
+    return makeRequest(endpoint, {
         ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
         credentials: 'include',
     });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: response.statusText }));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-    return response.json();
 };
 
 async function logout() {
@@ -46,82 +67,69 @@ async function logout() {
 }
 
 async function getArticles(): Promise<ArticleSlim[]> {
-    // This endpoint is public, so we can use fetch directly.
-    const response = await fetch(`${BASE_URL}/articles`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch articles');
-    }
-    return response.json();
+    return makeRequest('articles');
 }
 
 async function getArticleById(id: number): Promise<ArticleFull> {
-    const response = await fetch(`${BASE_URL}/articles/${id}`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch article with id ${id}`);
-    }
-    return response.json();
+    return makeRequest(`articles/${id}`);
 }
 
-async function getCourses(): Promise<CourseData[] | Error> { // Adjust 'any[]' to your article data type
-    try {
-        return await makeAuthenticatedRequest('courses', { method: 'GET' }); // TODO
-    } catch (error) {
-        console.error('Operation failed:', error);
-        return new Error("Courses API Call Failed.");
-    }
+async function getCourses(): Promise<CourseData[]> { // Adjust 'any[]' to your article data type
+    // This endpoint is public for listing courses
+    return makeRequest('courses', { method: 'GET' });
 }
 
 async function getCourseById(id: number): Promise<CourseData> {
-    //await getAuthCookie('james', 'password');
     return makeAuthenticatedRequest(`courses/${id}`, { method: 'GET' });
 }
 
 async function getUser(username: string): Promise<UserDto | Error> {
-    return await makeAuthenticatedRequest(`users/${username}`, { method: 'GET' });
+    return makeAuthenticatedRequest(`users/${username}`, { method: 'GET' });
 }
 
 async function getProfile() {
-    return await makeAuthenticatedRequest('auth/profile', { method: 'GET' });
+    return makeAuthenticatedRequest('auth/profile', { method: 'GET' });
 }
 
 async function createUser(userData: CreateUserDto): Promise<UserDto> { // TODO
-    // This endpoint is public, so no auth token needed, and no `makeAuthenticatedRequest`
-    const response = await fetch(`${BASE_URL}/users`, {
+    return makeRequest('users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: response.statusText }));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-    return response.json();
 }
 
 async function updateUser(userData: Partial<UserDto>): Promise<UserDto> {
-    return await makeAuthenticatedRequest('users/me', {
+    return makeAuthenticatedRequest('users/me', {
         method: 'PATCH',
         body: JSON.stringify(userData),
     });
 }
 
 async function resetCourseProgress(courseId: number): Promise<void> {
-    // Assuming this endpoint returns 204 No Content on success
     await makeAuthenticatedRequest(`progress/courses/${courseId}/reset`, { method: 'POST' });
 }
 
 async function getCoursesWithProgress(): Promise<CourseData[]> {
-    return makeAuthenticatedRequest('progress/courses', { method: 'GET' });
+    return makeAuthenticatedRequest('progress/courses');
 }
 
 async function forgotPassword(email: string): Promise<void> {
-    // This is a public endpoint, so no auth needed.
-    await fetch(`${BASE_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-    });
-    // We don't throw an error if it fails, for security reasons (to not reveal if an email exists).
+    const requestId = uuidv4();
+    try {
+        // This is a public endpoint, but we still want to trace it.
+        // We don't use makeRequest because we don't want to throw an error on failure for security reasons.
+        await fetch(`${BASE_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Request-Id': requestId,
+            },
+            body: JSON.stringify({ email }),
+        });
+    } catch (error) {
+        // Log the error but don't re-throw to the UI.
+        logger.error(error as Error, { endpoint: 'auth/forgot-password', requestId });
+    }
 }
 
 async function updateCourseProgress(courseId: number, status: string): Promise<void> {
@@ -132,7 +140,7 @@ async function updateCourseProgress(courseId: number, status: string): Promise<v
 }
 
 async function updateUnitProgress(courseId: number, unitId: string, status: string): Promise<UnitData> {
-    return await makeAuthenticatedRequest(`progress/courses/${courseId}/units/${unitId}`, {
+    return makeAuthenticatedRequest(`progress/courses/${courseId}/units/${unitId}`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
@@ -140,14 +148,42 @@ async function updateUnitProgress(courseId: number, unitId: string, status: stri
 
 async function sendContactMessage(payload: ContactPayload): Promise<{ success: boolean; message: string }> {
     // This is a public endpoint, so no auth needed.
-    const response = await fetch(`${BASE_URL}/email/contact`, {
+    return makeRequest('email/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
-    return response.json();
 }
 
+async function resetPassword(payload: ResetPasswordPayload) {
+    return makeRequest('auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+}
+async function purchaseCourse(courseId: number): Promise<void> {
+    await makeAuthenticatedRequest('purchases/course', {
+        method: 'POST',
+        body: JSON.stringify({ courseId }),
+    });
+}
+
+async function logToServer(level: string, message: string, context: object) {
+    const requestId = uuidv4(); // A unique ID for the log submission request itself.
+    // This is a fire-and-forget call. We don't await it or handle errors
+    // to prevent the logger from causing issues in the main application flow.
+    fetch(`${BASE_URL}/logs`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Request-Id': requestId,
+        },
+        body: JSON.stringify({ level, message, context }),
+        // keepalive allows the request to complete even if the page is unloading.
+        keepalive: true,
+    }).catch(() => { 
+        console.error("Error logging to server. Please notify admin.");
+    });
+}
 
 export {
     getArticleById,
@@ -165,5 +201,8 @@ export {
     login,
     logout,
     forgotPassword,
-    sendContactMessage
+    sendContactMessage,
+    resetPassword,
+    purchaseCourse,
+    logToServer
 }

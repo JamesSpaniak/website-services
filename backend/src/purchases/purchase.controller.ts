@@ -8,15 +8,27 @@ import { PurchaseService } from './purchase.service';
 export class PurchaseController {
   constructor(private readonly purchasesService: PurchaseService) {}
 
+  /**
+   * Grants a user access to a specific course.
+   * In a real application, this would be called after a successful payment transaction.
+   * @param req The Express request object, containing user details from the JWT.
+   * @param purchaseDto DTO containing the courseId to purchase.
+   * @returns The updated user object without the password.
+   */
   @Post('course')
   async purchaseCourse(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
-    // In a real app, here you would integrate with a payment gateway like Stripe.
-    // For this example, we'll assume payment is successful and grant access.
     const updatedUser = await this.purchasesService.purchaseCourse(req.user.userId, purchaseDto.courseId);
     const { password, ...result } = updatedUser;
     return result;
   }
 
+  /**
+   * Upgrades a user's role to 'Pro' and sets their membership expiry date.
+   * In a real application, this would be called after a successful subscription payment.
+   * @param req The Express request object, containing user details from the JWT.
+   * @param upgradeDto DTO containing the membership duration (e.g., 'monthly', 'yearly').
+   * @returns The updated user object without the password.
+   */
   @Post('pro-membership')
   async upgradeToPro(@Request() req, @Body() upgradeDto: UpgradeToProDto) {
     const updatedUser = await this.purchasesService.upgradeToPro(req.user.userId, upgradeDto.duration);

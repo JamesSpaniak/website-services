@@ -7,6 +7,8 @@ import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import ExamComponent from './exam';
 import { ChevronRightIcon, DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
+import ImageComponent from './image';
+import VideoComponent from './video';
 
 interface SectionProps {
   section: UnitData;
@@ -52,6 +54,10 @@ export default function SectionComponent({ section, courseId, onStatusUpdate, le
             >
               <div className="px-6 pb-6 border-t">
                 {description && <div className="mt-4 prose prose-lg max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }} />}
+                <div className="my-6 space-y-6">
+                    {image_url && <ImageComponent src={image_url} alt={title} width={800} height={450} className="w-full rounded-xl" />}
+                    {video_url && <VideoComponent src={video_url} />}
+                </div>
                 {text_content && <div className="mt-4 prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
                 
                 {exam && exam.questions && (

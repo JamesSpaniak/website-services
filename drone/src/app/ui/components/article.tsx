@@ -1,7 +1,7 @@
 'use client';
 
 import { ArticleFull } from '@/app/lib/types/article';
-import Image from 'next/image';
+import ImageComponent from './image';
 
 interface ArticleProps {
   article: ArticleFull;
@@ -25,7 +25,7 @@ export default function ArticleComponent({ article }: ArticleProps) {
         <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
           {article.image_url && (
               <div className="my-8">
-                  <Image
+                  <ImageComponent
                       src={article.image_url}
                       alt={article.title}
                       width={1200}
