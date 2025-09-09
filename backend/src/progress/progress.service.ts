@@ -81,7 +81,7 @@ export class ProgressService {
   private initializeProgressPayload(payload: CourseDetails): void {
     const initialize = (units: Unit[]) => {
       if (!units) return;
-      units.forEach((unit) => {
+      units.forEach((unit: Unit) => {
         unit.status = ProgressStatus.NOT_STARTED;
         if (unit.exam) {
           unit.exam.status = ProgressStatus.NOT_STARTED;
@@ -89,6 +89,12 @@ export class ProgressService {
           unit.exam.result = undefined;
           unit.exam.previous_results = [];
         }
+        payload.status = ProgressStatus.NOT_STARTED;
+        unit.title=undefined;
+        unit.description=undefined;
+        unit.video_url=undefined;
+        unit.image_url=undefined;
+        unit.text_content=undefined;
         if (unit.sub_units) {
           initialize(unit.sub_units);
         }
@@ -96,6 +102,11 @@ export class ProgressService {
     };
     initialize(payload.units);
     payload.status = ProgressStatus.NOT_STARTED;
+    payload.title=undefined;
+    payload.sub_title=undefined;
+    payload.description=undefined;
+    payload.video_url=undefined;
+    payload.image_url=undefined;
   }
 
   async getCourseWithProgress(

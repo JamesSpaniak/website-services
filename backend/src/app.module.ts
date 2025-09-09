@@ -8,12 +8,23 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CourseModule } from './courses/course.module';
 import { PurchaseModule } from './purchases/purchase.module';
 import { ProgressModule } from './progress/progress.module';
+import { OpenTelemetryModule } from 'nestjs-otel';
 import { EmailModule } from './email/email.module';
+import { RequestIdMiddleware } from './common/request-id.middleware';
 
 @Module({
   imports: [
     ArticleModule,
     AuthModule,
+    OpenTelemetryModule.forRoot({
+      metrics: {
+        hostMetrics: true,
+        apiMetrics: {
+          enable: true,
+          defaultAttributes: { app: 'backend-service' },
+        },
+      },
+    }),
     CourseModule,
     EmailModule,
     TypeOrmModule.forRoot({
@@ -30,6 +41,6 @@ import { EmailModule } from './email/email.module';
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-
+        consumer.apply(RequestIdMiddleware).forRoutes('*');
     }
 }

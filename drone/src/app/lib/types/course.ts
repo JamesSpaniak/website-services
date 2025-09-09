@@ -14,7 +14,8 @@ interface CourseData {
     video_url?: string;
     units?: UnitData[];
     status?: ProgressStatus;
-
+    price: number;
+    has_access: boolean;
 }
 interface ExamData {
     questions: QuestionData[]

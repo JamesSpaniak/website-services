@@ -2,7 +2,7 @@
     "title": "FAA Part 107 Drone Certification",
     "sub_title": "Comprehensive Study Guide and Practice Exams",
     "description": "Master the material needed to pass the FAA Part 107 exam and become a certified commercial drone pilot. This course covers all essential knowledge areas, from regulations and airspace to weather and emergency procedures.",
-    "image_url": "/images/course/drone_hero.jpg",
+    "image_url": "/globe.svg",
     "video_url": "https://www.youtube.com/watch?v=example",
     "units": [
         {
@@ -10,7 +10,7 @@
             "title": "Unit 1: Regulations & Airspace",
             "text_content": "### Key Regulations\n\n*   **14 CFR Part 107**: The primary set of rules governing commercial drone operations.\n*   **Remote Pilot Certificate**: Required for all commercial operators.\n*   **Visual Line of Sight (VLOS)**: The drone must remain within the pilot's sight at all times.",
             "description": "Understanding the fundamental rules and classifications of the sky is critical for safe and legal drone operation. This unit covers the core of FAA Part 107, including pilot certification requirements, operational limitations, and the structure of the National Airspace System. Mastering these concepts is the first and most important step to becoming a responsible remote pilot.",
-            "image_url": "/images/units/regulations.jpg",
+            "image_url": "/globe.svg",
             "video_url": "https://www.youtube.com/watch?v=unit1",
             "sub_units": [
                 {
@@ -18,7 +18,7 @@
                     "title": "Section 1: Applicability of Part 107",
                     "text_content": "This section will also cover the process for obtaining waivers for certain operations, such as flying over people or at night without anti-collision lights. We will detail the documentation that must be available during flight, including registration and pilot certification.",
                     "description": "This section defines the scope of Part 107. A small Unmanned Aircraft System (sUAS) is defined as an unmanned aircraft weighing less than 55 pounds (25 kg) on takeoff, including everything that is on board or otherwise attached to the aircraft. We will cover who is required to obtain a Remote Pilot Certificate for commercial operations, the roles and responsibilities of the Remote Pilot in Command (PIC), the visual observer, and the person manipulating the controls. You will also learn about the aircraft registration requirements and what constitutes a 'commercial' operation versus a recreational one.",
-                    "image_url": "/images/sections/applicability.jpg",
+                    "image_url": "/globe.svg",
                     "video_url": "https://www.youtube.com/watch?v=section1-1",
                     "exam": {
                         "retries_allowed": 3,
@@ -80,7 +80,7 @@
                     "id": 102,
                     "title": "Section 2: Airspace Classification",
                     "description": "The National Airspace System is divided into different classes to manage air traffic. As a remote pilot, you must be able to identify these classes on an aeronautical chart and know the rules for operating within them. Class G airspace is uncontrolled and generally does not require authorization. Classes B, C, and D are controlled airspaces surrounding busy airports and require prior authorization from Air Traffic Control (ATC) before you can operate. Class E airspace is also controlled but has different rules depending on the altitude and location. This section will teach you how to read charts to identify these zones and obtain the necessary permissions.",
-                    "image_url": "/images/sections/airspace.jpg",
+                    "image_url": "/globe.svg",
                     "video_url": "https://www.youtube.com/watch?v=section1-2",
                     "exam": {
                         "retries_allowed": 3,
@@ -210,14 +210,14 @@
             "title": "Unit 2: Weather & Micrometeorology",
             "text_content": "This unit will provide you with the skills to read and interpret critical weather reports like METARs and TAFs, and to understand how atmospheric conditions like density altitude, wind shear, and temperature inversions affect drone performance and safety.",
             "description": "Weather is a major factor in aviation safety. For drone pilots, understanding micrometeorology—weather on a small scale—is essential. This unit covers how to source and interpret aviation weather reports, and how to understand atmospheric conditions like stability, wind, and density altitude, all of which can have a significant impact on the performance and safety of your flight.",
-            "image_url": "/images/units/weather.jpg",
+            "image_url": "/globe.svg",
             "video_url": "https://www.youtube.com/watch?v=unit2",
             "sub_units": [
                 {
                     "id": 201,
                     "title": "Section 1: Reading Weather Reports",
                     "description": "Pilots rely on standardized weather products for flight planning. The two most important are METARs (Aviation Routine Weather Reports) and TAFs (Terminal Aerodrome Forecasts). A METAR provides a snapshot of the current weather at an airport, while a TAF provides a forecast for a specific period. You will learn to decode these reports, understanding terms for wind, visibility, cloud cover (like 'OVC' for overcast), and precipitation. This skill is non-negotiable for making go/no-go decisions.",
-                    "image_url": "/images/sections/metar.jpg",
+                    "image_url": "/globe.svg",
                     "video_url": "https://www.youtube.com/watch?v=section2-1",
                     "exam": {
                         "retries_allowed": 3,
@@ -269,7 +269,7 @@
                     "id": 202,
                     "title": "Section 2: Atmospheric Conditions",
                     "description": "The atmosphere's properties directly affect aircraft performance. Density altitude, a measure of air density, is a critical concept; high density altitude (found on hot, humid days or at high elevations) means thinner air and reduced drone performance. We will also cover atmospheric stability, where unstable air can lead to turbulence and thunderstorms, while stable air is smooth but can trap fog and haze. Understanding temperature inversions, where temperature increases with altitude, is also key, as they can create hazardous wind shear and visibility issues.",
-                    "image_url": "/images/sections/atmosphere.jpg",
+                    "image_url": "/globe.svg",
                     "video_url": "https://www.youtube.com/watch?v=section2-2",
                     "exam": {
                         "retries_allowed": 3,
@@ -358,7 +358,7 @@
             "id": 3,
             "title": "Unit 3: sUAS Loading & Performance",
             "description": "Every aircraft has performance limitations that are dictated by its design, weight, and the environment it's operating in. This unit explores how to calculate and respect these limitations. We will cover the critical concepts of weight and balance, ensuring your drone's center of gravity is within the acceptable range for stable flight. You will also learn how factors like high density altitude or an overweight condition can drastically reduce your drone's ability to climb and maneuver.",
-            "image_url": "/images/units/performance.jpg",
+            "image_url": "/globe.svg",
             "video_url": "https://www.youtube.com/watch?v=unit3",
             "sub_units": [
                 {
@@ -452,7 +452,7 @@
             "id": 4,
             "title": "Unit 4: Airport Operations",
             "description": "Even if you don't plan to fly directly at an airport, you will often operate in the airspace surrounding them. This unit teaches you how to operate safely in this environment. You will learn to read aeronautical charts to identify airport traffic patterns, runway layouts, and potential hazards. We will also cover standard radio communication phraseology and the phonetic alphabet, which are essential for communicating your intentions to other pilots and air traffic controllers when required.",
-            "image_url": "/images/units/airport.jpg",
+            "image_url": "/globe.svg",
             "video_url": "https://www.youtube.com/watch?v=unit4",
             "sub_units": [
                 {
@@ -536,7 +536,7 @@
             "id": 5,
             "title": "Unit 5: Emergency Procedures & Human Factors",
             "description": "A safe pilot is a prepared pilot. This unit focuses on two critical aspects of safety: handling in-flight emergencies and understanding the psychological factors that can affect pilot performance. We will cover standard procedures for common issues like lost communication links or battery failures. We will also delve into Aeronautical Decision-Making (ADM) and Crew Resource Management (CRM) to help you develop a structured, professional approach to risk mitigation.",
-            "image_url": "/images/units/emergency.jpg",
+            "image_url": "/globe.svg",
             "video_url": "https://www.youtube.com/watch?v=unit5",
             "sub_units": [
                 {

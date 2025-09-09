@@ -36,6 +36,8 @@ export class CourseService {
     if (!user) return false; // Should not happen if JWT is valid.
 
     // 3. Pro members can see any course if their membership is active.
+    if(user.role === Role.Admin)
+        return true;
     if (user.role === Role.Pro && user.pro_membership_expires_at && user.pro_membership_expires_at > new Date()) {
         return true;
     }
@@ -51,7 +53,7 @@ export class CourseService {
   }
 
   async getCourses(): Promise<Course[]> {
-    return this.courseRepository.find();
+    return (await this.courseRepository.find()).filter(course => !course.hidden)
   }
 
   async saveCourse(course: Course): Promise<Course> {

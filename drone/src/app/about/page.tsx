@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import ImageComponent from '../ui/components/image';
 import SocialMediaLinks from '../ui/components/socials';
 
 export default function AboutPage() {
@@ -22,9 +22,9 @@ export default function AboutPage() {
                         </p>
                     </div>
                     <div className="relative h-80 w-full lg:h-full">
-                        <Image
+                        <ImageComponent
                             className="rounded-2xl bg-gray-50 object-cover"
-                            src="/globe.svg" // NOTE: You will need to add an image
+                            src="/about-placeholder.jpg"
                             alt="A drone flying over a modern city skyline"
                             layout="fill"
                         />

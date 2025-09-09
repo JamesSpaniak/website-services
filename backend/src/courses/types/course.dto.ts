@@ -13,6 +13,8 @@ class CourseDetails {
     video_url?: string;
     units?: Unit[]
     status?: ProgressStatus;
+    price: number;
+    has_access: boolean;
 }
 
 class Unit {

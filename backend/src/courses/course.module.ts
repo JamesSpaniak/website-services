@@ -6,13 +6,15 @@ import { Module } from "@nestjs/common";
 import { User } from "src/users/types/user.entity";
 import { Progress } from "../progress/types/progress.entity";
 import { CourseProgressService } from "./course-progress.service";
+import { UsersModule } from "src/users/user.module";
 
 
 
 
 @Module({
     imports: [
-      TypeOrmModule.forFeature([Course, User, Progress])
+        UsersModule,
+        TypeOrmModule.forFeature([Course, User, Progress])
     ],
     controllers: [CourseController],
     providers: [CourseService, CourseProgressService],
