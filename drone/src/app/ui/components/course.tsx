@@ -29,7 +29,6 @@ export default function CourseComponent(props: CourseData) {
 
     const handleUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
         const updatedUnit = await updateUnitProgress(courseId, unitId, newStatus);
-        console.log(updatedUnit);
         setCourse(prev => updateUnitInState(prev, updatedUnit));
     };
 

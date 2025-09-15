@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@stripe/react-stripe-js": "^4.0.1",
+    "@stripe/stripe-js": "^7.9.0",
     "framer-motion": "^12.23.12",
     "next": "^15.5.2",
     "react": "19.1.0",

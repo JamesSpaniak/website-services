@@ -14,6 +14,9 @@ export class User {
     @Column({ type: 'varchar' })
     password: string;
 
+    @Column({ type: 'varchar'})
+    email: string;
+
     @CreateDateColumn({ type: 'timestamptz' })
     submitted_at?: Date;
 
@@ -27,9 +30,6 @@ export class User {
     last_name?: string | undefined;
 
     @Column({ type: 'varchar', nullable: true })
-    email?: string | undefined;
-
-    @Column({ type: 'varchar', nullable: true })
     picture_url?: string | undefined;
 
     @Column({
@@ -38,6 +38,9 @@ export class User {
         default: Role.User,
     })
     role: Role;
+
+    @Column({ type: 'int', default: 0 })
+    token_version: number;
 
     @Column({ type: 'timestamp', nullable: true })
     pro_membership_expires_at: Date | null;

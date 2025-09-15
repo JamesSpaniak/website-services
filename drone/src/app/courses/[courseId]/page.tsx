@@ -8,6 +8,12 @@ import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import { CourseData } from '@/app/lib/types/course';
 import AuthGuard from '@/app/lib/auth-guard';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+
+// Load the Stripe object. This is done outside of a component's render to avoid
+// recreating the Stripe object on every render.
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 function SingleCoursePage() {
     const { courseId } = useParams();
@@ -51,7 +57,11 @@ function SingleCoursePage() {
         return <ErrorComponent message="Course not found." />;
     }
     course.id = parseInt(courseId as string);
-    return <CourseComponent {...course} />;
+    return (
+        <Elements stripe={stripePromise}>
+            <CourseComponent {...course} />
+        </Elements>
+    );
 }
 
 /**

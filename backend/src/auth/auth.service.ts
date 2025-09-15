@@ -17,15 +17,21 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.getUserByUsername(username);
-    if (user && (await UsersService.comparePassword(pass, user.password))) {
-      const { password, ...result } = user;
-      return result;
+    if (user && (await UsersService.comparePassword(pass, user.password))) {      
+      // Return the full user object, including password and token_version, for internal use.
+      // The controller will be responsible for creating a safe DTO for the response.
+      return user;
     }
     return null;
   }
 
-  async login(user: Pick<User, 'username' | 'id' | 'role'>) {
-    const payload = { username: user.username, sub: user.id, role: user.role };
+  async login(user: User) {
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      role: user.role,
+      token_version: user.token_version,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -71,5 +77,13 @@ export class AuthService {
       // Catches JWT errors like token expired or invalid signature
       throw new UnauthorizedException('Invalid or expired password reset token.');
     }
+  }
+
+  /**
+   * Invalidates all current JWTs for a user by incrementing the token version.
+   * @param userId The ID of the user to log out from all devices.
+   */
+  async logout(userId: number): Promise<void> {
+    await this.usersService.incrementTokenVersion(userId);
   }
 }

@@ -1,0 +1,73 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1 # Or your preferred region
+  ECR_API_REPO: personal-site-api-server
+  ECR_DRONE_REPO: personal-site-drone-frontend
+
+jobs:
+  deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole # Assumes you created an IAM role for GitHub Actions
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push api_server image to Amazon ECR
+        id: build-image-api
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG -f backend/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG
+          echo "api_image=$ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push drone image to Amazon ECR
+        id: build-image-drone
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG -f drone/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG
+          echo "drone_image=$ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: terraform plan -var="api_server_image_uri=${{ steps.build-image-api.outputs.api_image }}"
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="api_server_image_uri=${{ steps.build-image-api.outputs.api_image }}"
+        working-directory: ./terraform
+
+      # Optional: Add a step to run database migrations using an ECS task
+      # - name: Run Database Migrations
+      #   run: |
+      #     aws ecs run-task --cluster <your-cluster-name> --task-definition <your-migration-task-def> --launch-type FARGATE --network-configuration ...

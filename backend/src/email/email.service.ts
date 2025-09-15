@@ -78,7 +78,6 @@ export class EmailService {
 
     // In a real app, use a bulk-sending service or a queue to avoid long-running requests.
     for (const email of emails) {
-        console.log(email);
       await this.transporter.sendMail({
         from: this.configService.get<string>('EMAIL_FROM'),
         to: email,
