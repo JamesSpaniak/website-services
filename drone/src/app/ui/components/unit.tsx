@@ -20,13 +20,11 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
     const handleStatusUpdate = async (newStatus: ProgressStatus) => {
         const updatedUnitFromApi = await updateUnitProgress(courseId, id, newStatus);
         setUnit(prevUnit => ({ ...prevUnit, status: updatedUnitFromApi.status }));
-        console.log(unit);
     };
 
     const handleSubUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
         const updatedSubUnit = await updateUnitProgress(courseId, unitId, newStatus);
         setUnit(prevUnit => updateUnitInState(prevUnit, updatedSubUnit));
-        console.log(unit);
     };
 
     return (

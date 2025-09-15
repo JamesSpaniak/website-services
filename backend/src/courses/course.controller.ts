@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Logger, Param, ParseIntPipe, Patch, Post, Put, Request, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Logger, Param, ParseIntPipe, Patch, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CourseService } from "./course.service";
 import { CourseDetails, SubmitExamDto, UpdateProgressDto } from "./types/course.dto";
 import { Course } from "./types/course.entity";
@@ -7,9 +7,13 @@ import { RolesGuard } from "src/users/role.guard";
 import { Roles } from "src/users/role.decorator";
 import { Role } from "src/users/types/role.enum";
 import { CourseProgressService } from "./course-progress.service";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { plainToInstance } from "class-transformer";
+import { OptionalJwtAuthGuard } from "src/auth/optional-jwt-auth.guard";
 
-
+@ApiTags('Courses')
 @Controller('courses')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CourseController {
   private readonly logger = new Logger(CourseController.name);
 
@@ -23,25 +27,36 @@ export class CourseController {
      * This endpoint is for public consumption and redacts sensitive/detailed content.
      * @returns A list of simplified course details.
      */
+    @ApiOperation({ summary: 'Get a list of all public courses' })
+    @ApiResponse({ status: 200, description: 'A list of simplified course details.', type: [CourseDetails] })
+    @SerializeOptions({ groups: ['COURSE_LIST'] })
+    @UseGuards(OptionalJwtAuthGuard)
     @Get()
-    async getCourses(): Promise<CourseDetails[]> {
-      // Note: This implementation manually parses and strips data.
-      // A more robust solution might use different DTOs or Class-Transformer groups.
-      let courses: Course[] = await this.courseService.getCourses();
-      // For the public listing, filter out any courses marked as hidden.
-      // An admin-specific endpoint could be created to view hidden courses.
-      courses = courses.filter(course => !course.hidden);
-      const coursesRes = [];
-      courses.forEach((course) => {
-        let coursePayload: CourseDetails = JSON.parse(course.payload);
-        coursePayload.units.forEach((unit) => {
-            unit.sub_units=[]
-            unit.exam=undefined;
-        });
-        coursePayload.id = course.id;
-        coursesRes.push(coursePayload);
+    async getCourses(@Request() req): Promise<CourseDetails[]> {
+      const courses: Course[] = await this.courseService.getCourses();
+      
+      const courseDetailsPromises = courses.map(async (course) => {
+        const payload: CourseDetails = JSON.parse(course.payload);
+        payload.units.forEach((unit) => {
+            unit.sub_units = []
+            unit.exam = undefined
+            unit.text_content = undefined
+        })
+
+        // Determine access rights for the user, if they are logged in.
+        const hasAccess = req.user
+          ? await this.courseService.hasAccess(course.id, req.user)
+          : false;
+
+        return {
+          ...payload,
+          id: course.id,
+          price: course.price,
+          has_access: hasAccess,
+        };
       });
-      return coursesRes;
+
+      return Promise.all(courseDetailsPromises);
     }
 
     /**
@@ -51,6 +66,12 @@ export class CourseController {
      * @param req The Express request object, containing user details from the JWT.
      * @returns Full course details, including an `has_access` flag and progress data if applicable.
      */
+    @ApiOperation({ summary: 'Get full details for a specific course' })
+    @ApiResponse({ status: 200, description: 'Full course details with user progress.', type: CourseDetails })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @ApiResponse({ status: 404, description: 'Course not found.' })
+    @SerializeOptions({ groups: ['COURSE_DETAILS'] })
+    @ApiBearerAuth()
     @Get(':id')
     @UseGuards(JwtAuthGuard)
     async getCourseById(@Param('id', ParseIntPipe) id: number, @Request() req): Promise<CourseDetails> {
@@ -69,6 +90,9 @@ export class CourseController {
      * @returns The newly created course entity.
      * @requires Admin role.
      */
+    @ApiOperation({ summary: 'Create a new course (Admin only)' })
+    @ApiResponse({ status: 201, description: 'The course has been successfully created.', type: Course })
+    @ApiBearerAuth()
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
@@ -79,7 +103,8 @@ export class CourseController {
             payload: JSON.stringify(course),
             title: course.title,
             hidden: false,
-            purchased_by_users: []
+            purchased_by_users: [],
+            price: course.price
         }
       return this.courseService.saveCourse(courseEntity)
     }
@@ -89,10 +114,13 @@ export class CourseController {
      * @param id The ID of the course to delete.
      * @requires Admin role.
      */
+    @ApiOperation({ summary: 'Delete a course (Admin only)' })
+    @ApiResponse({ status: 200, description: 'The course has been successfully deleted.' })
+    @ApiBearerAuth()
     @Delete(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
-    async deleteCourse(@Param('id') id: string) {
+    async deleteCourse(@Param('id', ParseIntPipe) id: number) {
       await this.courseService.deleteCourse(id);
     }
 
@@ -103,21 +131,25 @@ export class CourseController {
      * @returns The updated course entity.
      * @requires Admin role.
      */
+    @ApiOperation({ summary: 'Update an existing course (Admin only)' })
+    @ApiResponse({ status: 200, description: 'The course has been successfully updated.', type: Course })
+    @ApiBearerAuth()
     @Put(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
     async updateCourse(
-      @Param('id') id: string,
+      @Param('id', ParseIntPipe) id: number,
       @Body() course: CourseDetails
     ): Promise<Course> {
-        let existingCourse: Course = await this.courseService.getCourseByTitle(course.title);
-        let updatedCourse: Course = {
-            ...existingCourse,
+        const updatedCourseData: Course = {
+            title: course.title,
             payload: JSON.stringify(course),
-            updated_at: new Date()
+            updated_at: new Date(),
+            hidden: undefined,
+            purchased_by_users: undefined,
+            price: course.price
         }
-        await this.courseService.updateCourse(id, updatedCourse);
-        return updatedCourse;
+        return this.courseService.updateCourse(id, updatedCourseData);
     }
 
     /**
@@ -128,7 +160,10 @@ export class CourseController {
      * @param updateProgressDto DTO containing the new status.
      * @returns The updated unit data.
      */
+    @ApiOperation({ summary: "Update a user's progress for a specific unit" })
+    @ApiResponse({ status: 200, description: 'The unit progress has been updated.'})
     @Patch(':courseId/units/:unitId')
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     async updateUnitProgress(
       @Request() req,
@@ -152,7 +187,10 @@ export class CourseController {
      * @param submitExamDto DTO containing the user's answers.
      * @returns The result of the exam submission.
      */
+    @ApiOperation({ summary: 'Submit answers for a unit exam' })
+    @ApiResponse({ status: 201, description: 'Exam results.' })
     @Post(':courseId/units/:unitId/exam/submit')
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     async submitExam(
       @Request() req,

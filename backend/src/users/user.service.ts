@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './types/user.entity';
 import { UpdateUserDto, UserDto, UserFull } from './types/user.dto';
 import { Role } from './types/role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,7 @@ export class UsersService {
         @InjectRepository(User)
         private userRepository: Repository<User>
   ) {}
+  private readonly logger = new Logger(UsersService.name);
 
   static async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
@@ -41,20 +43,11 @@ export class UsersService {
   }
 
 
-  async getUserByUsername(username: string): Promise<UserFull | undefined> {
-    const repRes = await this.userRepository.findOne({
-        where: { username: username }
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.userRepository.findOne({
+        where: { username: username },
+        relations: ['purchased_courses'],
     });
-    if(repRes.purchased_courses === undefined)
-        repRes.purchased_courses = []
-    const res: UserFull = {
-        ...repRes,
-        role: repRes.role.toString(),
-        pro_membership_expires_at: repRes.pro_membership_expires_at,
-        courses: repRes.purchased_courses.map((course) => course.id.toString()),
-    }
-
-    return res;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
@@ -74,7 +67,8 @@ export class UsersService {
         password: hashedPassword,
         role: Role.User,
         pro_membership_expires_at: undefined,
-        purchased_courses: undefined
+        purchased_courses: undefined,
+        token_version: 0,
     }
     return this.userRepository.save(user); // TODO add unique constraint on email
   }
@@ -86,6 +80,7 @@ export class UsersService {
     }
     // Merge the validated DTO into the user entity
     this.userRepository.merge(user, data);
+    user.token_version = (user.token_version || 0) + 1;
     return this.userRepository.save(user);
   }
 
@@ -95,10 +90,45 @@ export class UsersService {
         throw new NotFoundException(`User with ID ${id} not found`);
     }
     user.password = password; // The password should already be hashed
+    user.token_version = (user.token_version || 0) + 1;
     await this.userRepository.save(user);
   }
 
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: number): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async incrementTokenVersion(userId: number): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (user) {
+      user.token_version = (user.token_version || 0) + 1;
+      await this.userRepository.save(user);
+    }
+  }
+
+  /**
+   * A scheduled job that runs daily to deactivate expired Pro memberships.
+   */
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async handleExpiredProMemberships() {
+    this.logger.log('Running scheduled job: Deactivating expired Pro memberships...');
+    const expiredUsers = await this.userRepository.find({
+      where: {
+        role: Role.Pro,
+        pro_membership_expires_at: LessThan(new Date()),
+      },
+    });
+
+    if (expiredUsers.length > 0) {
+      for (const user of expiredUsers) {
+        user.role = Role.User;
+        user.pro_membership_expires_at = null;
+        user.token_version = (user.token_version || 0) + 1; // Invalidate tokens
+      }
+      await this.userRepository.save(expiredUsers);
+      this.logger.log(`Deactivated ${expiredUsers.length} expired Pro memberships.`);
+    } else {
+      this.logger.log('No expired Pro memberships found.');
+    }
   }
 }

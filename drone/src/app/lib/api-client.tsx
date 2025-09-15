@@ -14,6 +14,9 @@ interface ResetPasswordPayload {
 // A generic request handler that adds a unique request ID for tracing
 const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
     const requestId = uuidv4();
+    const startTime = Date.now();
+    const shouldLogTimings = process.env.NEXT_PUBLIC_LOG_API_TIMINGS === 'true';
+
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, {
             ...options,
@@ -23,6 +26,17 @@ const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
                 ...options.headers,
             },
         });
+
+        if (shouldLogTimings) {
+            const duration = Date.now() - startTime;
+            logger.info(`API Request: ${options.method || 'GET'} ${endpoint} - ${response.status}`, {
+                endpoint,
+                method: options.method || 'GET',
+                status: response.status,
+                durationMs: duration,
+                requestId,
+            });
+        }
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: response.statusText }));
@@ -36,8 +50,14 @@ const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
 
         return response.json();
     } catch (error) {
+        const duration = Date.now() - startTime;
         // Log the API error before re-throwing it to the calling component
-        logger.error(error as Error, { endpoint, options, requestId });
+        logger.error(error as Error, {
+            endpoint,
+            options,
+            requestId,
+            durationMs: duration,
+        });
         throw error;
     }
 };
@@ -167,6 +187,13 @@ async function purchaseCourse(courseId: number): Promise<void> {
     });
 }
 
+async function createPaymentIntent(courseId: number): Promise<{ clientSecret: string }> {
+    return makeAuthenticatedRequest('purchases/create-payment-intent', {
+        method: 'POST',
+        body: JSON.stringify({ courseId }),
+    });
+}
+
 async function logToServer(level: string, message: string, context: object) {
     const requestId = uuidv4(); // A unique ID for the log submission request itself.
     // This is a fire-and-forget call. We don't await it or handle errors
@@ -204,5 +231,6 @@ export {
     sendContactMessage,
     resetPassword,
     purchaseCourse,
-    logToServer
+    logToServer,
+    createPaymentIntent
 }

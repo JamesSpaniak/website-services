@@ -9,11 +9,10 @@ import {
   import { Course } from '../courses/types/course.entity';
   import {
     CourseDetails,
-    Unit,
-    Exam,
     ProgressStatus,
     UserAnswer,
     ExamResult,
+    UnitData,
   } from '../courses/types/course.dto';
 import { CourseService } from './course.service';
 import { Role } from 'src/users/types/role.enum';
@@ -64,7 +63,7 @@ import { Trace } from 'src/common/tracing.decorator';
     /**
      * Recursively finds a unit or sub-unit by its ID within a list of units.
      */
-    private findUnit(units: Unit[], unitId: string): Unit | null {
+    private findUnit(units: UnitData[], unitId: string): UnitData | null {
       for (const unit of units) {
         if (unit.id === unitId) {
           return unit;
@@ -81,7 +80,7 @@ import { Trace } from 'src/common/tracing.decorator';
      * Sets the initial status for all trackable items in a course payload.
      */
     private initializeProgressPayload(payload: CourseDetails): void {
-      const initialize = (units: Unit[]) => {
+      const initialize = (units: UnitData[]) => {
         if (!units) return;
         units.forEach((unit) => {
           unit.status = ProgressStatus.NOT_STARTED;
@@ -106,7 +105,7 @@ import { Trace } from 'src/common/tracing.decorator';
       courseId: number,
     ): Promise<CourseDetails> {
   
-      const course = await this.courseRepository.findOneBy({ id: courseId });
+      const course: Course = await this.courseRepository.findOneBy({ id: courseId });
       if (!course) {
         throw new NotFoundException(`Course with ID ${courseId} not found`);
       }
@@ -115,7 +114,7 @@ import { Trace } from 'src/common/tracing.decorator';
       const coursePayload: CourseDetails = JSON.parse(course.payload);
       coursePayload.id = course.id;
       // Assuming price is stored in the payload JSON. If it's a column on Course, use course.price
-      coursePayload.price = coursePayload.price || 49.95; // Fallback price
+      coursePayload.price = course.price || 49.95; // Fallback price
       coursePayload.has_access = hasAccess;
 
       if (hasAccess) {
@@ -145,7 +144,7 @@ import { Trace } from 'src/common/tracing.decorator';
 
     mergeProgressAndCourse(progress: CourseDetails, course: CourseDetails): void {
         course.status = progress.status;
-        const merge = (progressUnits: Unit[], courseUnits: Unit[]) => {
+        const merge = (progressUnits: UnitData[], courseUnits: UnitData[]) => {
             if (!progressUnits || !courseUnits) return;
             for(let i: number = 0; i<courseUnits.length; i++) {
                 courseUnits[i].status = i>=progressUnits.length
@@ -172,7 +171,7 @@ import { Trace } from 'src/common/tracing.decorator';
       courseId: number,
       unitId: string,
       status: ProgressStatus,
-    ): Promise<Unit> {
+    ): Promise<UnitData> {
       const progress = await this.getOrCreateProgress(userId, courseId);
       const progressPayload = progress.payload as CourseDetails;
   

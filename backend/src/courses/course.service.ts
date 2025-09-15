@@ -60,11 +60,17 @@ export class CourseService {
     return this.courseRepository.save(course);
   }
 
-  async deleteCourse(id: string): Promise<void> {
+  async deleteCourse(id: number): Promise<void> {
     await this.courseRepository.delete(id);
   }
 
-  async updateCourse(id: string, course: Course): Promise<Course> {
+  async updateCourse(id: number, course: Course): Promise<Course> {
+    const existing = await this.courseRepository.findOne({ where: { id: id } });
+    course.submitted_at = existing.submitted_at;
+    course.hidden = existing.hidden;
+    course.purchased_by_users = existing.purchased_by_users;
+    course.updated_at = new Date();
+
     await this.courseRepository.update(id, course);
     return course;
   }

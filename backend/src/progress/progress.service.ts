@@ -9,8 +9,7 @@ import { Progress } from './types/progress.entity';
 import { Course } from '../courses/types/course.entity';
 import {
   CourseDetails,
-  Unit,
-  Exam,
+  UnitData,
   ProgressStatus,
   UserAnswer,
   ExamResult,
@@ -60,10 +59,8 @@ export class ProgressService {
   /**
    * Recursively finds a unit or sub-unit by its ID within a list of units.
    */
-  private findUnit(units: Unit[], unitId: number): Unit | null {
+  private findUnit(units: UnitData[], unitId: number): UnitData | null {
     for (const unit of units) {
-        console.log(unit.id, unitId);
-      
       if (parseInt(unit.id) === unitId) {
         return unit;
       }
@@ -79,9 +76,9 @@ export class ProgressService {
    * Sets the initial status for all trackable items in a course payload.
    */
   private initializeProgressPayload(payload: CourseDetails): void {
-    const initialize = (units: Unit[]) => {
+    const initialize = (units: UnitData[]) => {
       if (!units) return;
-      units.forEach((unit: Unit) => {
+      units.forEach((unit: UnitData) => {
         unit.status = ProgressStatus.NOT_STARTED;
         if (unit.exam) {
           unit.exam.status = ProgressStatus.NOT_STARTED;
@@ -165,7 +162,7 @@ export class ProgressService {
     courseId: number,
     unitId: string,
     status: ProgressStatus,
-  ): Promise<Unit> {
+  ): Promise<UnitData> {
     const progress = await this.getOrCreateProgress(userId, courseId);
     const progressPayload = progress.payload as CourseDetails;
 

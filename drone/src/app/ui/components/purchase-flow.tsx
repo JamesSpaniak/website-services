@@ -2,11 +2,19 @@
 
 import { useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
-import { purchaseCourse } from '@/app/lib/api-client';
+import { createPaymentIntent, getCourseById } from '@/app/lib/api-client';
 import ImageComponent from './image';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { logger } from '@/app/lib/logger';
 
+// NOTE: The parent component rendering this flow must be wrapped in Stripe's <Elements> provider.
+// Example in a layout or page:
+// import { loadStripe } from '@stripe/stripe-js';
+// import { Elements } from '@stripe/react-stripe-js';
+// const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// <Elements stripe={stripePromise}><PurchaseFlow ... /></Elements>
 interface PurchaseFlowProps {
     course: CourseData;
     onPurchaseSuccess: () => void;
@@ -14,24 +22,64 @@ interface PurchaseFlowProps {
 
 export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlowProps) {
     const { user } = useAuth();
+    const stripe = useStripe();
+    const elements = useElements();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handlePurchase = async () => {
+        if (!stripe || !elements) {
+            // Stripe.js has not yet loaded.
+            // Make sure to disable form submission until Stripe.js has loaded.
+            setError("Stripe is not ready. Please try again in a moment.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
-        try {
-            // In a real app, this is where you would trigger the Stripe/Plaid checkout flow.
-            // For this example, we'll simulate a successful payment.
-            console.log('Simulating payment for course:', course.title);
-            
-            // After simulated successful payment, call the backend to record the purchase.
-            await purchaseCourse(course.id);
 
-            // Notify the parent component of success.
+        try {
+            // 1. Create a Payment Intent on the server
+            const { clientSecret } = await createPaymentIntent(course.id);
+
+            // 2. Confirm the payment on the client
+            const cardElement = elements.getElement(CardElement);
+            if (!cardElement) {
+                throw new Error("Card element not found.");
+            }
+
+            const paymentResult = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: { card: cardElement },
+            });
+
+            if (paymentResult.error) {
+                throw new Error(paymentResult.error.message);
+            }
+            
+            // 3. Payment succeeded on the client. Now, poll the backend to wait for webhook processing.
+            logger.info('Stripe payment confirmed on client. Awaiting server-side fulfillment via webhook.', { courseId: course.id, paymentIntentId: paymentResult.paymentIntent.id });
+
+            const pollForPurchase = (retries = 15, interval = 2000): Promise<void> => {
+                return new Promise(async (resolve, reject) => {
+                    if (retries === 0) {
+                        return reject(new Error("Purchase confirmation timed out. Please check your profile or contact support if the issue persists."));
+                    }
+
+                    const updatedCourse = await getCourseById(course.id);
+                    if (updatedCourse.has_access) {
+                        logger.info('Purchase confirmed on backend via webhook.', { courseId: course.id });
+                        return resolve();
+                    } else {
+                        setTimeout(() => pollForPurchase(retries - 1, interval).then(resolve).catch(reject), interval);
+                    }
+                });
+            };
+
+            await pollForPurchase();
             onPurchaseSuccess();
         } catch (err) {
             const message = err instanceof Error ? err.message : 'An unknown error occurred.';
+            logger.error(err as Error, { context: 'Stripe Purchase Flow' });
             setError(`Purchase failed: ${message}`);
         } finally {
             setIsLoading(false);
@@ -75,10 +123,23 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
                     </div>
                 </div>
 
+                <div className="mt-8">
+                    <h2 className="text-xl font-semibold text-gray-800">Payment Information</h2>
+                    <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                        {/* This is the Stripe Card Element for securely collecting card details */}
+                        <CardElement options={{
+                            style: {
+                                base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } },
+                                invalid: { color: '#9e2146' },
+                            }
+                        }} />
+                    </div>
+                </div>
+
                 <div className="mt-8 text-center">
                     <p className="text-sm text-gray-500">This is a one-time payment for lifetime access.</p>
                     <div className="mt-4 flex justify-center gap-4">
-                        <button onClick={handlePurchase} disabled={isLoading} className="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400">
+                        <button onClick={handlePurchase} disabled={isLoading || !stripe} className="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400">
                             {isLoading ? 'Processing...' : 'Purchase with Stripe'}
                         </button>
                     </div>

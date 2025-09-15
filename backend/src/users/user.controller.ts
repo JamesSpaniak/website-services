@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UpdateUserDto, UserDto, UserFull, UserSlim } from './types/user.dto';
 import { UsersService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from './role.guard';
 import { Roles } from './role.decorator';
 import { Role } from './types/role.enum';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 
+@ApiTags('Users') // Groups all endpoints from this controller under "Users" in the Swagger UI
+@ApiBearerAuth() // Indicates that all endpoints in this controller may require authentication
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(
       private readonly userService: UsersService
@@ -21,14 +26,12 @@ export class UsersController {
    */
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Get a list of all users (Admin only)' })
+  @ApiResponse({ status: 200, description: 'A list of slim user profiles.', type: [UserSlim] })
   @Roles(Role.Admin)
   async getUsers(): Promise<UserSlim[]> {
     const users = await this.userService.getUsers();
-    const slimUsers = [];
-    users.forEach((user) => {
-        slimUsers.push({ username: user.username })
-    });
-    return slimUsers;
+    return plainToInstance(UserSlim, users);
   }
 
   /**
@@ -38,9 +41,16 @@ export class UsersController {
    */
   @Get(':username')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get a user profile by username' })
+  @ApiParam({ name: 'username', description: 'The username of the user to retrieve.', type: String })
+  @ApiResponse({ status: 200, description: 'The full public user profile.', type: UserFull })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   async getUser(@Param('username') username: string): Promise<UserFull> {
-    let res = await this.userService.getUserByUsername(username);
-    return res;
+    const user = await this.userService.getUserByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found.`);
+    }
+    return plainToInstance(UserFull, user);
   }
   
   /**
@@ -53,16 +63,15 @@ export class UsersController {
    */
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Create a new user (Admin only)' })
+  @ApiResponse({ status: 201, description: 'The user has been successfully created.', type: UserFull })
   @Roles(Role.Admin)
   async createUser(
     @Body() user: UserDto
-  ): Promise<UserDto> {
+  ): Promise<UserFull> {
     const userEntity = await this.userService.saveUser(user);
-
-    return {
-        ...userEntity,
-        courses: userEntity.purchased_courses.map(course => course.toString())
-    }
+    const fullUser = await this.userService.getUserByUsername(userEntity.username);
+    return plainToInstance(UserFull, fullUser);
   }
 
   /**
@@ -73,18 +82,18 @@ export class UsersController {
    * @param updateUserDto The data to update.
    * @returns The updated full user profile.
    */
-  @Patch(':id')
+  @Patch('me')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update the current user\'s profile' })
+  @ApiResponse({ status: 200, description: 'The user profile has been successfully updated.', type: UserFull })
+  @ApiResponse({ status: 403, description: 'Forbidden. You can only update your own profile.' })
   async updateCurrentUser(
-    @Param('id', ParseIntPipe) userId: number,
     @Request() req,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserFull> {
-    if (req.user.userId !== userId) {
-      throw new ForbiddenException('You can only update your own profile.');
-    }
     const updatedUser = await this.userService.updateUser(req.user.userId, updateUserDto);
-    return this.userService.getUserByUsername(updatedUser.username);
+    const fullUser = await this.userService.getUserByUsername(updatedUser.username);
+    return plainToInstance(UserFull, fullUser);
   }
 
   /**
@@ -94,8 +103,10 @@ export class UsersController {
    */
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Delete a user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'The user has been successfully deleted.' })
   @Roles(Role.Admin)
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id', ParseIntPipe) id: number) {
     await this.userService.deleteUser(id);
   }
 }

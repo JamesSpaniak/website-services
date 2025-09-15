@@ -11,7 +11,10 @@ export class Course {
     title: string;
 
     @Column({ type: 'varchar' })
-    payload: string; // TODO
+    payload: string;
+
+    @Column({ type: 'decimal', nullable: true })
+    price: number;
 
     @CreateDateColumn({ type: 'timestamptz' })
     submitted_at?: Date;
