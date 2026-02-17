@@ -18,7 +18,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // redirect to the login page.
     if (!isLoading && !user) {
       // Using `replace` prevents the user from navigating "back" to the protected page.
-      router.replace('/profile'); // Assuming '/login' is your login route
+      router.replace('/login');
     }
   }, [isLoading, user, router]);
 
@@ -35,4 +35,3 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   // If there's no user, the redirect is in progress. Show a loading screen to prevent content flicker.
   return <LoadingComponent />;
 }
-

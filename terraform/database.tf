@@ -38,7 +38,6 @@ resource "aws_rds_cluster" "aurora_cluster" {
   cluster_identifier      = "${var.project_name}-aurora-cluster"
   engine                  = "aurora-postgresql"
   engine_mode             = "provisioned"
-  engine_version          = "14.10"
   database_name           = "blog"
   master_username         = jsondecode(aws_secretsmanager_secret_version.db_credentials.secret_string).username
   master_password         = jsondecode(aws_secretsmanager_secret_version.db_credentials.secret_string).password
@@ -51,4 +50,14 @@ resource "aws_rds_cluster" "aurora_cluster" {
     min_capacity = 0.5
     max_capacity = 2
   }
+}
+
+resource "aws_rds_cluster_instance" "aurora_instance" {
+  count               = 1
+  identifier          = "${var.project_name}-aurora-instance-${count.index + 1}"
+  cluster_identifier  = aws_rds_cluster.aurora_cluster.id
+  engine              = aws_rds_cluster.aurora_cluster.engine
+  instance_class      = "db.serverless"
+  publicly_accessible = false
+  db_subnet_group_name = aws_db_subnet_group.aurora_sng.name
 }

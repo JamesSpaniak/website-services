@@ -8,13 +8,15 @@ interface ImageComponentProps extends Omit<NextImageProps, 'src' | 'alt'> {
   fallbackSrc?: string;
 }
 
-export default function ImageComponent({ src, alt, fallbackSrc = '/about-placeholder.jpg', ...props }: ImageComponentProps) {
+export default function ImageComponent({ src, alt, fallbackSrc = '/about-placeholder.svg', ...props }: ImageComponentProps) {
   const imageSrc = src || fallbackSrc;
+  const isSvg = imageSrc.endsWith('.svg');
 
   return (
     <NextImage
       src={imageSrc}
       alt={alt}
+      unoptimized={props.unoptimized ?? isSvg}
       {...props}
     />
   );

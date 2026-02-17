@@ -1,7 +1,9 @@
 import { DataSource } from 'typeorm';
 import { defaultConnection } from './app.config';
 
-export default new DataSource({
+const dataSource = new DataSource({
     ...defaultConnection,
     logging: true,
 });
+
+export default dataSource;

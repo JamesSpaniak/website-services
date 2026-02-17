@@ -55,11 +55,8 @@ export class UsersController {
   
   /**
    * Creates a new user.
-   * Note: This endpoint is currently configured to only allow Admins to create users.
-   * For public registration, this guard should be removed.
    * @param user The user data for creation.
    * @returns The created user DTO.
-   * @requires Admin role.
    */
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)

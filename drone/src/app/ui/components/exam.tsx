@@ -48,7 +48,7 @@ export default function ExamComponent({ questions }: ExamData) {
             <h3 className="text-lg font-semibold text-gray-900 border-b pb-3">Practice Exam</h3>
             
             <div className="mt-4 space-y-6">
-                {questions.map((item: QuestionData, index: number) => (
+                {questions.map((item: QuestionData) => (
                     <QuestionComponent 
                         key={item.id} 
                         {...item}

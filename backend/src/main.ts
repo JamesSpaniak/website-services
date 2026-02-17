@@ -66,7 +66,7 @@ async function bootstrap() {
   // Add CloudWatch transport only in production environments
   if (process.env.NODE_ENV === 'production') {
     transports.push(
-      new WinstonCloudWatch({
+      new WinstonCloudWatch({ // TODO add secrets
         logGroupName: process.env.CLOUDWATCH_LOG_GROUP_NAME,
         logStreamName: `${process.env.CLOUDWATCH_LOG_STREAM_NAME}-${Date.now()}`,
         awsRegion: process.env.AWS_REGION,

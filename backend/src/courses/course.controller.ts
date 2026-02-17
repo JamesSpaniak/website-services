@@ -38,9 +38,9 @@ export class CourseController {
       const courseDetailsPromises = courses.map(async (course) => {
         const payload: CourseDetails = JSON.parse(course.payload);
         payload.units.forEach((unit) => {
-            unit.sub_units = []
-            unit.exam = undefined
-            unit.text_content = undefined
+            unit.sub_units = [];
+            unit.exam = undefined;
+            unit.text_content = undefined;
         })
 
         // Determine access rights for the user, if they are logged in.
@@ -99,7 +99,7 @@ export class CourseController {
     async createCourse(
       @Body() course: CourseDetails
     ): Promise<Course> {
-        let courseEntity: Course  = {
+        const courseEntity: Course  = {
             payload: JSON.stringify(course),
             title: course.title,
             hidden: false,

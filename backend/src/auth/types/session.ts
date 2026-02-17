@@ -1,4 +1,4 @@
-class Session {
+class SessionPayload {
     user_id: number;
 
     user_username: string;
@@ -9,5 +9,5 @@ class Session {
 }
 
 export {
-    Session
+    SessionPayload
 }

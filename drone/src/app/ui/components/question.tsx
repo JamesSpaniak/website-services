@@ -14,7 +14,6 @@ function getCorrectAnswerId(answers: AnswerData[]): number {
 }
 
 export default function QuestionComponent({id, question, answers, onAnswerSelect, selectedAnswerId, isSubmitted}: QuestionComponentProps) {
-    const isAnswered = selectedAnswerId !== null;
     const correctAnswerId = getCorrectAnswerId(answers);
 
     const handleAnswerClick = (answer: AnswerData) => {
@@ -23,8 +22,6 @@ export default function QuestionComponent({id, question, answers, onAnswerSelect
             onAnswerSelect(id, answer.id, wasCorrect);
         }
     }
-
-    const wasCorrect = isAnswered && selectedAnswerId === correctAnswerId;
 
     return (
         <div key={id} className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0">

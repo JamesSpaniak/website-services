@@ -21,13 +21,6 @@ const signupSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters long." }),
 });
 
-// This can be simplified as Zod will provide structured errors
-type ValidationErrors = {
-    username?: string;
-    email?: string;
-    password?: string;
-}
-
 export default function LoginComponent() {
     const { login } = useAuth();
     const [mode, setMode] = useState<AuthMode>('login');
@@ -38,8 +31,9 @@ export default function LoginComponent() {
         firstName: '',
         lastName: '',
     });
-    const [validationErrors, setValidationErrors] = useState<z.ZodFormattedError<any> | null>(null);
+    const [validationErrors, setValidationErrors] = useState<z.ZodFormattedError<typeof formData> | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const validate = (): boolean => {
@@ -65,6 +59,7 @@ export default function LoginComponent() {
 
         setLoading(true);
         setError(null);
+        setInfoMessage(null);
         try {
             await login(formData.username, formData.password);
             // On success, the AuthProvider will update the state and this component will be unmounted.
@@ -85,6 +80,7 @@ export default function LoginComponent() {
 
         setLoading(true);
         setError(null);
+        setInfoMessage(null);
         try {
             await createUser({ 
                 username: formData.username, 
@@ -93,8 +89,7 @@ export default function LoginComponent() {
                 first_name: formData.firstName, 
                 last_name: formData.lastName 
             });
-            // After successful sign-up, automatically log the user in
-            await login(formData.username, formData.password);
+            setInfoMessage('Registration successful. Please verify your email before logging in.');
         } catch (err) {
             if (err instanceof Error) {
                 setError(`Sign-up failed: ${err.message}`);
@@ -108,6 +103,7 @@ export default function LoginComponent() {
 
     const toggleMode = () => {
         setError(null);
+        setInfoMessage(null);
         setValidationErrors(null);
         setMode(mode === 'login' ? 'signup' : 'login');
     };
@@ -117,6 +113,11 @@ export default function LoginComponent() {
             <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="p-8 bg-white rounded-lg shadow-xl w-full max-w-md">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">{mode === 'login' ? 'Login' : 'Create Account'}</h2>
                 {error && <div className="mb-4"><ErrorComponent message={error} /></div>} {/* This is for API errors */}
+                {infoMessage && (
+                    <div className="mb-4 p-4 rounded-md bg-green-100 border border-green-300 text-green-700 text-sm">
+                        {infoMessage}
+                    </div>
+                )}
                 
                 {mode === 'signup' && (
                     <>

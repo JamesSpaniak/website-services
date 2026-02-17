@@ -104,7 +104,7 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="bg-white rounded-2xl shadow-lg p-8">
                 <h1 className="text-3xl font-bold text-gray-900">Purchase Course</h1>
-                <p className="text-lg text-gray-600 mt-2">You're about to unlock full access to:</p>
+                <p className="text-lg text-gray-600 mt-2">You&apos;re about to unlock full access to:</p>
                 
                 <div className="mt-6 flex flex-col md:flex-row gap-8 items-center bg-gray-50 p-6 rounded-lg">
                     <ImageComponent 

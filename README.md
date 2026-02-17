@@ -13,7 +13,8 @@ Backend -- backend, Frontend -- drone
     - Course/Unit/Section/Exam needs enhancements around nested boxes
     - Dark mode / theme unification across pages
 ### Backend
-- Logging and metrics collection
+- Shorten JWT token and add refresh token -- check
+- Move sessions to postgres
 - Setup infra for everything together + Validate migrations all work
 - Usability
     - Article content enhancement to support images within text

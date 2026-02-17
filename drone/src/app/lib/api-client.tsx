@@ -4,28 +4,96 @@ import { ArticleFull, ArticleSlim } from "./types/article";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
 
-const BASE_URL: string = "http://localhost:3000"
+const getApiBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+        return '/api';
+    }
+    return process.env.API_INTERNAL_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+};
+
+const buildUrl = (endpoint: string) => {
+    const base = getApiBaseUrl().replace(/\/$/, '');
+    return `${base}/${endpoint}`;
+};
 
 interface ResetPasswordPayload {
     token: string;
     password: string;
 }
 
-// A generic request handler that adds a unique request ID for tracing
-const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
+// --- Token Management ---
+const getTokens = () => {
+    if (typeof window === 'undefined') return null;
+    const access_token = localStorage.getItem('access_token');
+    const refresh_token = localStorage.getItem('refresh_token');
+    return { access_token, refresh_token };
+};
+
+const setTokens = (access_token: string, refresh_token: string) => {
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+};
+
+const clearTokens = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+};
+
+// --- Core API Function ---
+const apiClient = async (endpoint: string, options: RequestInit = {}) => {
     const requestId = uuidv4();
     const startTime = Date.now();
     const shouldLogTimings = process.env.NEXT_PUBLIC_LOG_API_TIMINGS === 'true';
 
+    const tokens = getTokens();
+
+    const headers = new Headers(options.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.set('X-Request-Id', requestId);
+
+    if (tokens?.access_token) {
+        headers.set('Authorization', `Bearer ${tokens.access_token}`);
+    }
+    options.headers = headers;
+
     try {
-        const response = await fetch(`${BASE_URL}/${endpoint}`, {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Request-Id': requestId,
-                ...options.headers,
-            },
-        });
+        let response = await fetch(buildUrl(endpoint), options);
+
+        if (response.status === 401) {
+            const { refresh_token } = tokens || {};
+            if (!refresh_token) {
+                clearTokens();
+                throw new Error("Session expired. Please log in again.");
+            }
+
+            try {
+                const refreshResponse = await fetch(buildUrl('auth/refresh'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Request-Id': uuidv4() },
+                    body: JSON.stringify({ refresh_token }),
+                });
+
+                if (!refreshResponse.ok) {
+                    clearTokens();
+                    throw new Error("Session expired. Please log in again.");
+                }
+
+                const newTokens = (await refreshResponse.json()) as {
+                    access_token: string;
+                    refresh_token: string;
+                };
+                setTokens(newTokens.access_token, newTokens.refresh_token);
+
+                // Retry original request with new token
+                headers.set('Authorization', `Bearer ${newTokens.access_token}`);
+                response = await fetch(buildUrl(endpoint), options);
+
+            } catch (e) {
+                clearTokens();
+                logger.error(e as Error, { message: 'Failed to refresh token' });
+                throw new Error("Session expired. Please log in again.");
+            }
+        }
 
         if (shouldLogTimings) {
             const duration = Date.now() - startTime;
@@ -39,11 +107,12 @@ const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
         }
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            const errorData = (await response.json().catch(() => ({ message: response.statusText }))) as {
+                message?: string;
+            };
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
 
-        // Handle responses with no content
         if (response.status === 204 || response.headers.get('Content-Length') === '0') {
             return;
         }
@@ -51,7 +120,6 @@ const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
         return response.json();
     } catch (error) {
         const duration = Date.now() - startTime;
-        // Log the API error before re-throwing it to the calling component
         logger.error(error as Error, {
             endpoint,
             options,
@@ -63,153 +131,149 @@ const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 const login = async (username: string, password: string) => {
-    const params = new URLSearchParams({
-        username: username,
-        password: password,
-    });
-    // The cookie is set in the browser for subsequent requests.
-    return makeRequest(`auth/login?${params.toString()}`, {
+    const response = await apiClient('auth/login', {
         method: 'POST',
-        credentials: 'include',
+        body: JSON.stringify({ username, password }),
     });
-};
-
-// A helper to ensure we're authenticated before making a call
-const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
-    return makeRequest(endpoint, {
-        ...options,
-        credentials: 'include',
-    });
+    setTokens(response.access_token, response.refresh_token);
+    return response.user;
 };
 
 async function logout() {
-    await makeAuthenticatedRequest('auth/logout', { method: 'POST' });
+    const { refresh_token } = getTokens() || {};
+    if (refresh_token) {
+        try {
+            await apiClient('auth/logout', {
+                method: 'POST',
+                body: JSON.stringify({ refresh_token }),
+            });
+        } catch (error) {
+            logger.error(error as Error, { message: 'Logout failed on server' });
+        }
+    }
+    clearTokens();
 }
 
 async function getArticles(): Promise<ArticleSlim[]> {
-    return makeRequest('articles');
+    return apiClient('articles');
 }
 
 async function getArticleById(id: number): Promise<ArticleFull> {
-    return makeRequest(`articles/${id}`);
+    return apiClient(`articles/${id}`);
 }
 
-async function getCourses(): Promise<CourseData[]> { // Adjust 'any[]' to your article data type
-    // This endpoint is public for listing courses
-    return makeRequest('courses', { method: 'GET' });
+async function getCourses(): Promise<CourseData[]> {
+    return apiClient('courses', { method: 'GET' });
 }
 
 async function getCourseById(id: number): Promise<CourseData> {
-    return makeAuthenticatedRequest(`courses/${id}`, { method: 'GET' });
+    return apiClient(`courses/${id}`, { method: 'GET' });
 }
 
 async function getUser(username: string): Promise<UserDto | Error> {
-    return makeAuthenticatedRequest(`users/${username}`, { method: 'GET' });
+    return apiClient(`users/${username}`, { method: 'GET' });
 }
 
 async function getProfile() {
-    return makeAuthenticatedRequest('auth/profile', { method: 'GET' });
+    return apiClient('auth/profile', { method: 'GET' });
 }
 
-async function createUser(userData: CreateUserDto): Promise<UserDto> { // TODO
-    return makeRequest('users', {
+async function createUser(userData: CreateUserDto): Promise<{ message: string }> {
+    return apiClient('auth/register', {
         method: 'POST',
         body: JSON.stringify(userData),
     });
 }
 
 async function updateUser(userData: Partial<UserDto>): Promise<UserDto> {
-    return makeAuthenticatedRequest('users/me', {
+    return apiClient('users/me', {
         method: 'PATCH',
         body: JSON.stringify(userData),
     });
 }
 
 async function resetCourseProgress(courseId: number): Promise<void> {
-    await makeAuthenticatedRequest(`progress/courses/${courseId}/reset`, { method: 'POST' });
+    await apiClient(`progress/courses/${courseId}/reset`, { method: 'POST' });
 }
 
 async function getCoursesWithProgress(): Promise<CourseData[]> {
-    return makeAuthenticatedRequest('progress/courses');
+    return apiClient('progress/courses');
 }
 
 async function forgotPassword(email: string): Promise<void> {
-    const requestId = uuidv4();
     try {
-        // This is a public endpoint, but we still want to trace it.
-        // We don't use makeRequest because we don't want to throw an error on failure for security reasons.
-        await fetch(`${BASE_URL}/auth/forgot-password`, {
+        await apiClient('auth/forgot-password', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Request-Id': requestId,
-            },
             body: JSON.stringify({ email }),
         });
     } catch (error) {
-        // Log the error but don't re-throw to the UI.
-        logger.error(error as Error, { endpoint: 'auth/forgot-password', requestId });
+        logger.error(error as Error, { endpoint: 'auth/forgot-password' });
     }
 }
 
 async function updateCourseProgress(courseId: number, status: string): Promise<void> {
-    await makeAuthenticatedRequest(`progress/courses/${courseId}`, {
+    await apiClient(`progress/courses/${courseId}`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
 }
 
 async function updateUnitProgress(courseId: number, unitId: string, status: string): Promise<UnitData> {
-    return makeAuthenticatedRequest(`progress/courses/${courseId}/units/${unitId}`, {
+    return apiClient(`progress/courses/${courseId}/units/${unitId}`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
 }
 
 async function sendContactMessage(payload: ContactPayload): Promise<{ success: boolean; message: string }> {
-    // This is a public endpoint, so no auth needed.
-    return makeRequest('email/contact', {
+    return apiClient('email/contact', {
         method: 'POST',
         body: JSON.stringify(payload),
     });
 }
 
 async function resetPassword(payload: ResetPasswordPayload) {
-    return makeRequest('auth/reset-password', {
+    return apiClient('auth/reset-password', {
         method: 'POST',
         body: JSON.stringify(payload),
     });
 }
+
+async function verifyEmail(token: string): Promise<{ message: string }> {
+    return apiClient('auth/verify-email', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+    });
+}
+
 async function purchaseCourse(courseId: number): Promise<void> {
-    await makeAuthenticatedRequest('purchases/course', {
+    await apiClient('purchases/course', {
         method: 'POST',
         body: JSON.stringify({ courseId }),
     });
 }
 
 async function createPaymentIntent(courseId: number): Promise<{ clientSecret: string }> {
-    return makeAuthenticatedRequest('purchases/create-payment-intent', {
+    return apiClient('purchases/create-payment-intent', {
         method: 'POST',
         body: JSON.stringify({ courseId }),
     });
 }
 
 async function logToServer(level: string, message: string, context: object) {
-    const requestId = uuidv4(); // A unique ID for the log submission request itself.
-    // This is a fire-and-forget call. We don't await it or handle errors
-    // to prevent the logger from causing issues in the main application flow.
-    fetch(`${BASE_URL}/logs`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Request-Id': requestId,
-        },
-        body: JSON.stringify({ level, message, context }),
-        // keepalive allows the request to complete even if the page is unloading.
-        keepalive: true,
-    }).catch(() => { 
+    try {
+        await fetch(buildUrl('logs'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Request-Id': uuidv4(),
+            },
+            body: JSON.stringify({ level, message, context }),
+            keepalive: true,
+        });
+    } catch {
         console.error("Error logging to server. Please notify admin.");
-    });
+    }
 }
 
 export {
@@ -230,7 +294,10 @@ export {
     forgotPassword,
     sendContactMessage,
     resetPassword,
+    verifyEmail,
     purchaseCourse,
     logToServer,
-    createPaymentIntent
+    createPaymentIntent,
+    getTokens, // Export token helpers for use in UI components
+    clearTokens
 }

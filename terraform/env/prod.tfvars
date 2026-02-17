@@ -1,0 +1,5 @@
+aws_region = "us-east-1"
+project_name = "droneedge"
+domain_name = "thedroneedge.com"
+api_subdomain = "api"
+frontend_subdomain = "app"

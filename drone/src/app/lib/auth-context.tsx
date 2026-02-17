@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getProfile, login as apiLogin, logout as apiLogout, logToServer } from './api-client';
+import { getProfile, login as apiLogin, logout as apiLogout } from './api-client';
 import { UserDto } from '@/app/lib/types/profile';
 
 interface AuthContextType {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
                 const userData = await getProfile();
                 setUser(userData);
-            } catch (error) {
+            } catch {
                 console.log('No active session found.');
                 setUser(null);
             }

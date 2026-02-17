@@ -22,7 +22,7 @@ export class PurchaseController {
    * @param purchaseDto DTO containing the courseId to purchase.
    * @returns The updated user object without the password.
    */
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Purchase a course for the current user' })
   @ApiResponse({ status: 201, description: 'Course purchased successfully.', type: UserFull })
@@ -30,7 +30,7 @@ export class PurchaseController {
   @Post('course')
   async purchaseCourse(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
     const updatedUser = await this.purchasesService.purchaseCourse(req.user.userId, purchaseDto.courseId);
-    return updatedUser;
+    return plainToInstance(UserFull, updatedUser);
   }
 
   /**
@@ -40,8 +40,7 @@ export class PurchaseController {
    * @param purchaseDto DTO containing the courseId.
    * @returns An object containing the clientSecret for the Payment Intent.
    */
-  @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a Stripe Payment Intent for a course purchase' })
   @ApiResponse({ status: 201, description: 'Payment Intent created successfully.' })
@@ -70,8 +69,7 @@ export class PurchaseController {
    * @param upgradeDto DTO containing the membership duration (e.g., 'monthly', 'yearly').
    * @returns The updated user object without the password.
    */
-  @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upgrade the current user to a Pro membership' })
   @ApiResponse({ status: 201, description: 'User upgraded to Pro successfully.', type: UserFull })
@@ -79,6 +77,6 @@ export class PurchaseController {
   @Post('pro-membership')
   async upgradeToPro(@Request() req, @Body() upgradeDto: UpgradeToProDto) {
     const updatedUser = await this.purchasesService.upgradeToPro(req.user.userId, upgradeDto.duration);
-    return updatedUser;
+    return plainToInstance(UserFull, updatedUser);
   }
 }

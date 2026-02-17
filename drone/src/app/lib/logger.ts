@@ -2,10 +2,16 @@
 
 import { logToServer } from './api-client';
 
-const log = (level: 'log' | 'warn' | 'error', message: string, context: Record<string, any> = {}) => {
+const log = (level: 'log' | 'warn' | 'error', message: string, context: Record<string, unknown> = {}) => {
     // Always log to console for immediate feedback during development
     if (process.env.NODE_ENV === 'development') {
-        console[level](`[${level.toUpperCase()}] ${message}`, context);
+        // For better readability in the browser console, we can group the logs.
+        console.groupCollapsed(`[${level.toUpperCase()}] ${message}`);
+        console.log('Context:', context);
+        if ('stack' in context && typeof context.stack === 'string') {
+            console.error(context.stack);
+        }
+        console.groupEnd();
     }
 
     // Send logs to the backend. This can be done in all environments.
@@ -23,9 +29,9 @@ const log = (level: 'log' | 'warn' | 'error', message: string, context: Record<s
 };
 
 export const logger = {
-    info: (message: string, context?: Record<string, any>) => log('log', message, context),
-    warn: (message: string, context?: Record<string, any>) => log('warn', message, context),
-    error: (error: Error, context?: Record<string, any>) => {
+    info: (message: string, context?: Record<string, unknown>) => log('log', message, context),
+    warn: (message: string, context?: Record<string, unknown>) => log('warn', message, context),
+    error: (error: Error, context?: Record<string, unknown>) => {
         log('error', error.message, { ...context, stack: error.stack });
     },
 };
