@@ -153,9 +153,9 @@ import { Trace } from 'src/common/tracing.decorator';
                     if(i>=progressUnits.length) {
                         courseUnits[i].exam.status = ProgressStatus.NOT_STARTED;
                     } else {
-                        courseUnits[i].exam.status = progressUnits[i].exam.status;
-                        courseUnits[i].exam.result = progressUnits[i].exam.result;
-                        courseUnits[i].exam.previous_results = progressUnits[i].exam.previous_results;
+                        courseUnits[i].exam.status = progressUnits[i].exam?.status;
+                        courseUnits[i].exam.result = progressUnits[i].exam?.result;
+                        courseUnits[i].exam.previous_results = progressUnits[i].exam?.previous_results;
                     }
                 }
                 if(courseUnits[i].sub_units) {

@@ -18,13 +18,13 @@ export default function AboutPage() {
                             At Drone Training Pro, we believe that mastering technology grants individuals greater control and freedom in their personal and professional lives. Our mission is to provide clear, concise, and practical learning paths in complex technical fields.
                         </p>
                         <p className="mt-4 text-base text-gray-600">
-                            Whether you're studying for a certification, seeking to understand industry regulations, or enhancing your skills for a project, our courses and articles are designed to support your growth. We break down intricate topics into manageable components, ensuring you gain the knowledge and confidence to succeed.
+                            Whether you&apos;re studying for a certification, seeking to understand industry regulations, or enhancing your skills for a project, our courses and articles are designed to support your growth. We break down intricate topics into manageable components, ensuring you gain the knowledge and confidence to succeed.
                         </p>
                     </div>
                     <div className="relative h-80 w-full lg:h-full">
                         <ImageComponent
                             className="rounded-2xl bg-gray-50 object-cover"
-                            src="/about-placeholder.jpg"
+                            src="/about-placeholder.svg"
                             alt="A drone flying over a modern city skyline"
                             layout="fill"
                         />

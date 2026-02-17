@@ -13,6 +13,7 @@ import { OpenTelemetryModule } from 'nestjs-otel';
 import { EmailModule } from './email/email.module';
 import { RequestIdMiddleware } from './common/request-id.middleware';
 import { LoggingModule } from './logging/logging.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LoggingModule } from './logging/logging.module';
         migrationsRun: true,
     }),
     LoggingModule,
+    HealthModule,
     UsersModule,
     PurchaseModule,
     ProgressModule,

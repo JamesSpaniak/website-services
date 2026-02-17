@@ -26,7 +26,7 @@ export class UsersService {
         return false;
     try {
         return bcrypt.compare(password, expectedPassword);
-    } catch(err) {
+    } catch {
         return false;
     }
   }
@@ -56,6 +56,12 @@ export class UsersService {
     });
   }
 
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    return this.userRepository.findOne({
+      where: { email_verification_token: token },
+    });
+  }
+
   async getUsers(): Promise<User[]> {
     return this.userRepository.find();
   }
@@ -66,11 +72,30 @@ export class UsersService {
         ...userDto,
         password: hashedPassword,
         role: Role.User,
+        is_email_verified: true,
+        email_verification_token: null,
+        email_verification_expires_at: null,
         pro_membership_expires_at: undefined,
         purchased_courses: undefined,
         token_version: 0,
     }
     return this.userRepository.save(user); // TODO add unique constraint on email
+  }
+
+  async createUnverifiedUser(userDto: UserDto, verificationToken: string, expiresAt: Date): Promise<User> {
+    const hashedPassword = await UsersService.hashPassword(userDto.password);
+    const user: User = {
+      ...userDto,
+      password: hashedPassword,
+      role: Role.User,
+      is_email_verified: false,
+      email_verification_token: verificationToken,
+      email_verification_expires_at: expiresAt,
+      pro_membership_expires_at: undefined,
+      purchased_courses: undefined,
+      token_version: 0,
+    };
+    return this.userRepository.save(user);
   }
 
   async updateUser(id: number, data: UpdateUserDto): Promise<User> {

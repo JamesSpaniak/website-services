@@ -9,24 +9,43 @@ import { BroadcastDto } from './types/broadcast.dto';
 
 @Injectable()
 export class EmailService {
-  private transporter: Transporter;
+  private transporter: Transporter | null;
   private readonly logger = new Logger(EmailService.name);
+  private readonly emailEnabled: boolean;
 
   constructor(
     private readonly configService: ConfigService,
   ) {
-    this.transporter = nodemailer.createTransport({ // TODO dns lookup fails
-      host: this.configService.get<string>('EMAIL_HOST'),
-      port: this.configService.get<number>('EMAIL_PORT'),
-      secure: this.configService.get<number>('EMAIL_PORT') === 465, // true for 465, false for other ports
-      auth: {
-        user: this.configService.get<string>('EMAIL_USER'),
-        pass: this.configService.get<string>('EMAIL_PASS'),
-      },
-    });
+    this.emailEnabled = this.configService.get<string>('EMAIL_ENABLED') !== 'false';
+    if (this.emailEnabled) {
+      const host = this.configService.get<string>('EMAIL_HOST');
+      const port = this.configService.get<number>('EMAIL_PORT');
+      const user = this.configService.get<string>('EMAIL_USER');
+      const pass = this.configService.get<string>('EMAIL_PASS');
+
+      const transportOptions: nodemailer.TransportOptions = {
+        host,
+        port,
+        secure: port === 465, // true for 465, false for other ports
+      };
+
+      if (user && pass) {
+        transportOptions.auth = { user, pass };
+      } else {
+        this.logger.warn('EMAIL_USER/EMAIL_PASS not set; using unauthenticated SMTP relay.');
+      }
+
+      this.transporter = nodemailer.createTransport(transportOptions);
+    } else {
+      this.transporter = null;
+      this.logger.warn('EMAIL_ENABLED=false; email sending is disabled.');
+    }
   }
 
   async sendContactMessage(contactDto: ContactDto): Promise<{ success: boolean; message: string }> {
+    if (!this.emailEnabled || !this.transporter) {
+      return { success: true, message: 'Email sending disabled in this environment.' };
+    }
     // Sanitize all user input to prevent XSS attacks.
     // We configure it to allow no HTML tags or attributes.
     const sanitizeOptions = {
@@ -56,6 +75,10 @@ export class EmailService {
   }
 
   async sendPasswordResetEmail(user: User, resetLink: string): Promise<void> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn(`Email disabled; skipping password reset email for ${user.email}.`);
+      return;
+    }
     const mailOptions = {
       from: this.configService.get<string>('EMAIL_FROM'),
       to: user.email,
@@ -71,7 +94,31 @@ export class EmailService {
     await this.transporter.sendMail(mailOptions);
   }
 
+  async sendEmailVerification(user: User, verifyLink: string): Promise<void> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn(`Email disabled; verification link: ${verifyLink}`);
+      return;
+    }
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_FROM'),
+      to: user.email,
+      subject: 'Verify your email address',
+      html: `
+        <p>Hello ${user.username},</p>
+        <p>Please verify your email address by clicking the link below:</p>
+        <p><a href="${verifyLink}">Verify Email</a></p>
+        <p>If you did not create this account, please ignore this email.</p>
+      `,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
+
   async sendBroadcastEmail(broadcastDto: BroadcastDto): Promise<{ success: boolean; count: number }> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn('Email disabled; skipping broadcast email.');
+      return { success: true, count: 0 };
+    }
     // This service no longer has UsersService, you would inject it if needed for broadcast
     const users: User[] = []; // Placeholder: const users = await this.usersService.getUsers();
     const emails = users.map(user => user.email).filter(email => !!email);

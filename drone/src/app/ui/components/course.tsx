@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 export default function CourseComponent(props: CourseData) {
     const [course, setCourse] = useState<CourseData>(props);
-    let { id, title, sub_title, image_url, units, status, price, has_access } = course;
+    const { id, title, sub_title, image_url, units, status, price, has_access } = course;
     const courseId = id;
     const handlePurchaseSuccess = () => {
         setCourse(prevCourse => ({ ...prevCourse, hasAccess: true }));

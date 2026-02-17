@@ -39,6 +39,15 @@ export class User {
     })
     role: Role;
 
+    @Column({ type: 'boolean', default: false })
+    is_email_verified: boolean;
+
+    @Column({ type: 'varchar', nullable: true })
+    email_verification_token?: string | null;
+
+    @Column({ type: 'timestamptz', nullable: true })
+    email_verification_expires_at?: Date | null;
+
     @Column({ type: 'int', default: 0 })
     token_version: number;
 

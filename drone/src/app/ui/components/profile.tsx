@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { updateUser, getCoursesWithProgress } from '@/app/lib/api-client';
 import { useAuth } from '@/app/lib/auth-context';
 import { CourseData } from '@/app/lib/types/course';
@@ -19,6 +20,12 @@ export default function ProfileComponent() {
     const [coursesLoading, setCoursesLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) {
+            setCourses([]);
+            setCoursesLoading(false);
+            return;
+        }
+
         async function fetchCourses() {
             try {
                 const data = await getCoursesWithProgress();
@@ -30,7 +37,7 @@ export default function ProfileComponent() {
             }
         }
         fetchCourses();
-    }, []);
+    }, [user]);
 
     const handleCourseReset = (courseId: number) => {
         setCourses(prevCourses => prevCourses.filter(c => c.id !== courseId));
@@ -81,7 +88,10 @@ export default function ProfileComponent() {
                     </div>
                 ) : (
                     <div className="p-4 bg-gray-50 rounded-lg">
-                        <p className="text-gray-600">You have not started any courses yet. <a href="/courses" className="text-blue-600 hover:underline">Browse courses</a> to get started.</p>
+                        <p className="text-gray-600">
+                            You have not started any courses yet.{' '}
+                            <Link href="/courses" className="text-blue-600 hover:underline">Browse courses</Link> to get started.
+                        </p>
                     </div>
                 )}
             </div>

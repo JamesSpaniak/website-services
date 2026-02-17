@@ -50,7 +50,7 @@ export default function ContactFormComponent() {
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Contact Us</h2>
         <p className="mt-2 text-lg leading-8 text-gray-600">
-          We'd love to hear from you. Send us a message and we'll get back to you as soon as possible.
+          We&apos;d love to hear from you. Send us a message and we&apos;ll get back to you as soon as possible.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="mx-auto mt-16 max-w-xl sm:mt-20">
@@ -84,7 +84,7 @@ export default function ContactFormComponent() {
         </div>
         <div className="mt-10">
           <button type="submit" disabled={loading} className="block w-full rounded-md bg-blue-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:bg-gray-400">
-            {loading ? 'Sending...' : 'Let\'s talk'}
+            {loading ? 'Sending...' : 'Let&apos;s talk'}
           </button>
         </div>
       </form>
