@@ -1,5 +1,15 @@
+import { Metadata } from 'next';
 import ImageComponent from '../ui/components/image';
 import SocialMediaLinks from '../ui/components/socials';
+
+export const metadata: Metadata = {
+  title: 'About',
+  description: 'Empowering professionals through accessible, high-quality technical education in drone technology and certification.',
+  openGraph: {
+    title: 'About — Drone Training Pro',
+    description: 'Empowering professionals through accessible, high-quality technical education in drone technology and certification.',
+  },
+};
 
 export default function AboutPage() {
     return (
@@ -21,12 +31,12 @@ export default function AboutPage() {
                             Whether you&apos;re studying for a certification, seeking to understand industry regulations, or enhancing your skills for a project, our courses and articles are designed to support your growth. We break down intricate topics into manageable components, ensuring you gain the knowledge and confidence to succeed.
                         </p>
                     </div>
-                    <div className="relative h-80 w-full lg:h-full">
+                    <div className="relative h-64 sm:h-80 w-full lg:h-full">
                         <ImageComponent
                             className="rounded-2xl bg-gray-50 object-cover"
                             src="/about-placeholder.svg"
                             alt="A drone flying over a modern city skyline"
-                            layout="fill"
+                            fill
                         />
                     </div>
                 </div>

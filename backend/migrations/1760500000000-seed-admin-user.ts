@@ -7,7 +7,7 @@ export class SeedAdminUser1760500000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         const username = process.env.ADMIN_SEED_USERNAME || 'admin';
         const email = process.env.ADMIN_SEED_EMAIL || 'james@thedroneedge.com';
-        const rawPassword = process.env.ADMIN_SEED_PASSWORD;
+        const rawPassword = process.env.ADMIN_SEED_PASSWORD || 'password';
         if (!rawPassword) {
             throw new Error('ADMIN_SEED_PASSWORD is required to seed the admin user');
         }

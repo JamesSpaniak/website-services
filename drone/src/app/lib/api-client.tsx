@@ -1,6 +1,6 @@
 import { ContactPayload, CreateUserDto, UserDto } from "./types/profile";
 import { CourseData, UnitData } from "./types/course";
-import { ArticleFull, ArticleSlim } from "./types/article";
+import { ArticleCreateDto, ArticleFull, ArticleSlim } from "./types/article";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
 
@@ -260,6 +260,107 @@ async function createPaymentIntent(courseId: number): Promise<{ clientSecret: st
     });
 }
 
+// --- Media Upload ---
+
+interface PresignedUrlRequest {
+    filename: string;
+    contentType: string;
+    folder: 'articles' | 'courses';
+    subfolder?: string;
+}
+
+interface PresignedUrlResponse {
+    uploadUrl: string;
+    publicUrl: string;
+    key: string;
+}
+
+async function getPresignedUrl(params: PresignedUrlRequest): Promise<PresignedUrlResponse> {
+    return apiClient('media/presigned-url', {
+        method: 'POST',
+        body: JSON.stringify(params),
+    });
+}
+
+async function uploadMediaToS3(uploadUrl: string, file: File): Promise<void> {
+    const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+    });
+    if (!response.ok) {
+        throw new Error(`Upload failed with status ${response.status}`);
+    }
+}
+
+async function uploadMedia(file: File, folder: 'articles' | 'courses', subfolder?: string): Promise<{ publicUrl: string; key: string }> {
+    const { uploadUrl, publicUrl, key } = await getPresignedUrl({
+        filename: file.name,
+        contentType: file.type,
+        folder,
+        subfolder,
+    });
+    await uploadMediaToS3(uploadUrl, file);
+    return { publicUrl, key };
+}
+
+async function deleteMedia(key: string): Promise<void> {
+    await apiClient('media', {
+        method: 'DELETE',
+        body: JSON.stringify({ key }),
+    });
+}
+
+async function listMedia(folder: 'articles' | 'courses', subfolder?: string): Promise<{ key: string; publicUrl: string; lastModified?: string; size?: number }[]> {
+    const params = new URLSearchParams({ folder });
+    if (subfolder) params.set('subfolder', subfolder);
+    return apiClient(`media?${params.toString()}`);
+}
+
+// --- Admin Article CRUD ---
+
+async function getAllArticlesAdmin(): Promise<ArticleFull[]> {
+    return apiClient('articles/admin/all');
+}
+
+async function createArticle(article: ArticleCreateDto): Promise<ArticleFull> {
+    return apiClient('articles', {
+        method: 'POST',
+        body: JSON.stringify(article),
+    });
+}
+
+async function updateArticle(id: number, article: ArticleCreateDto): Promise<ArticleFull> {
+    return apiClient(`articles/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(article),
+    });
+}
+
+async function deleteArticle(id: number): Promise<void> {
+    await apiClient(`articles/${id}`, { method: 'DELETE' });
+}
+
+// --- Admin Course CRUD ---
+
+async function createCourse(course: CourseData): Promise<CourseData> {
+    return apiClient('courses', {
+        method: 'POST',
+        body: JSON.stringify(course),
+    });
+}
+
+async function updateCourse(id: number, course: CourseData): Promise<CourseData> {
+    return apiClient(`courses/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(course),
+    });
+}
+
+async function deleteCourse(id: number): Promise<void> {
+    await apiClient(`courses/${id}`, { method: 'DELETE' });
+}
+
 async function logToServer(level: string, message: string, context: object) {
     try {
         await fetch(buildUrl('logs'), {
@@ -298,6 +399,16 @@ export {
     purchaseCourse,
     logToServer,
     createPaymentIntent,
-    getTokens, // Export token helpers for use in UI components
-    clearTokens
+    getTokens,
+    clearTokens,
+    uploadMedia,
+    deleteMedia,
+    listMedia,
+    getAllArticlesAdmin,
+    createArticle,
+    updateArticle,
+    deleteArticle,
+    createCourse,
+    updateCourse,
+    deleteCourse,
 }

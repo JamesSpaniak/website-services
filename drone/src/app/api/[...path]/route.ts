@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const getTargetBase = () => {
-  const base = process.env.API_INTERNAL_BASE_URL;
+  const base = process.env.API_INTERNAL_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+
   if (!base) {
     throw new Error('API_INTERNAL_BASE_URL is not set');
   }

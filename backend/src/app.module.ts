@@ -14,6 +14,7 @@ import { EmailModule } from './email/email.module';
 import { RequestIdMiddleware } from './common/request-id.middleware';
 import { LoggingModule } from './logging/logging.module';
 import { HealthModule } from './health/health.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HealthModule } from './health/health.module';
     }),
     LoggingModule,
     HealthModule,
+    MediaModule,
     UsersModule,
     PurchaseModule,
     ProgressModule,

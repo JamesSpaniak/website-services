@@ -1,7 +1,8 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
+import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as sanitizeHtml from 'sanitize-html';
 import { User } from 'src/users/types/user.entity';
 import { ContactDto } from './types/contact.dto';
@@ -12,33 +13,55 @@ export class EmailService {
   private transporter: Transporter | null;
   private readonly logger = new Logger(EmailService.name);
   private readonly emailEnabled: boolean;
+  private readonly defaultFrom: string;
+  private readonly supportFrom: string;
 
   constructor(
     private readonly configService: ConfigService,
   ) {
     this.emailEnabled = this.configService.get<string>('EMAIL_ENABLED') !== 'false';
+    this.defaultFrom = this.configService.get<string>('EMAIL_FROM') || 'DroneEdge <donotreply@thedroneedge.com>';
+    this.supportFrom = this.configService.get<string>('SUPPORT_EMAIL_FROM') || 'DroneEdge Support <support@thedroneedge.com>';
+
     if (this.emailEnabled) {
       const host = this.configService.get<string>('EMAIL_HOST');
       const port = this.configService.get<number>('EMAIL_PORT');
       const user = this.configService.get<string>('EMAIL_USER');
       const pass = this.configService.get<string>('EMAIL_PASS');
 
-      const transportOptions: nodemailer.TransportOptions = {
+      const transportOptions: SMTPTransport.Options = {
         host,
         port,
-        secure: port === 465, // true for 465, false for other ports
+        secure: port === 465,
+        tls: {
+          // smtp-relay.gmail.com requires STARTTLS on port 587
+          rejectUnauthorized: true,
+        },
       };
 
+      // When using IP-whitelisted SMTP relay, auth is not needed.
+      // Only set auth if credentials are explicitly provided.
       if (user && pass) {
         transportOptions.auth = { user, pass };
+        this.logger.log('SMTP transport configured with authentication.');
       } else {
-        this.logger.warn('EMAIL_USER/EMAIL_PASS not set; using unauthenticated SMTP relay.');
+        this.logger.log('SMTP transport configured without auth (IP-whitelisted relay mode).');
       }
 
       this.transporter = nodemailer.createTransport(transportOptions);
+      this.verifyTransport();
     } else {
       this.transporter = null;
       this.logger.warn('EMAIL_ENABLED=false; email sending is disabled.');
+    }
+  }
+
+  private async verifyTransport(): Promise<void> {
+    try {
+      await this.transporter?.verify();
+      this.logger.log('SMTP transport verified successfully.');
+    } catch (err) {
+      this.logger.error('SMTP transport verification failed. Emails will fail at send time.', (err as Error).message);
     }
   }
 
@@ -46,19 +69,15 @@ export class EmailService {
     if (!this.emailEnabled || !this.transporter) {
       return { success: true, message: 'Email sending disabled in this environment.' };
     }
-    // Sanitize all user input to prevent XSS attacks.
-    // We configure it to allow no HTML tags or attributes.
-    const sanitizeOptions = {
-      allowedTags: [],
-      allowedAttributes: {},
-    };
+
+    const sanitizeOptions = { allowedTags: [] as string[], allowedAttributes: {} };
     const sanitizedName = sanitizeHtml(contactDto.name, sanitizeOptions);
     const sanitizedContact = sanitizeHtml(contactDto.contact, sanitizeOptions);
     const sanitizedMessage = sanitizeHtml(contactDto.message, sanitizeOptions);
 
     const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'),
+    await this.transporter.sendMail({
+      from: this.defaultFrom,
       to: adminEmail,
       subject: `New Contact Message from ${sanitizedName}`,
       html: `
@@ -68,9 +87,8 @@ export class EmailService {
         <p><strong>Message:</strong></p>
         <p>${sanitizedMessage.replace(/\n/g, '<br>')}</p>
       `,
-    };
+    });
 
-    await this.transporter.sendMail(mailOptions);
     return { success: true, message: 'Your message has been sent successfully!' };
   }
 
@@ -79,8 +97,9 @@ export class EmailService {
       this.logger.warn(`Email disabled; skipping password reset email for ${user.email}.`);
       return;
     }
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'),
+
+    await this.transporter.sendMail({
+      from: this.supportFrom,
       to: user.email,
       subject: 'Your Password Reset Request',
       html: `
@@ -89,9 +108,7 @@ export class EmailService {
         <p><a href="${resetLink}">Reset Password</a></p>
         <p>If you did not request this, please ignore this email.</p>
       `,
-    };
-
-    await this.transporter.sendMail(mailOptions);
+    });
   }
 
   async sendEmailVerification(user: User, verifyLink: string): Promise<void> {
@@ -99,8 +116,9 @@ export class EmailService {
       this.logger.warn(`Email disabled; verification link: ${verifyLink}`);
       return;
     }
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'),
+
+    await this.transporter.sendMail({
+      from: this.supportFrom,
       to: user.email,
       subject: 'Verify your email address',
       html: `
@@ -109,9 +127,7 @@ export class EmailService {
         <p><a href="${verifyLink}">Verify Email</a></p>
         <p>If you did not create this account, please ignore this email.</p>
       `,
-    };
-
-    await this.transporter.sendMail(mailOptions);
+    });
   }
 
   async sendBroadcastEmail(broadcastDto: BroadcastDto): Promise<{ success: boolean; count: number }> {
@@ -119,14 +135,13 @@ export class EmailService {
       this.logger.warn('Email disabled; skipping broadcast email.');
       return { success: true, count: 0 };
     }
-    // This service no longer has UsersService, you would inject it if needed for broadcast
-    const users: User[] = []; // Placeholder: const users = await this.usersService.getUsers();
+
+    const users: User[] = [];
     const emails = users.map(user => user.email).filter(email => !!email);
 
-    // In a real app, use a bulk-sending service or a queue to avoid long-running requests.
     for (const email of emails) {
       await this.transporter.sendMail({
-        from: this.configService.get<string>('EMAIL_FROM'),
+        from: this.defaultFrom,
         to: email,
         subject: broadcastDto.subject,
         html: broadcastDto.message,

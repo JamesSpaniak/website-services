@@ -12,8 +12,14 @@ export class Article {
     @Column({ type: 'varchar' })
     sub_heading: string;
 
+    @Column({ type: 'varchar', nullable: true })
+    image_url?: string;
+
     @Column({ type: 'varchar' })
     body: string;
+
+    @Column({ type: 'jsonb', nullable: true })
+    content_blocks?: ContentBlock[];
 
     @CreateDateColumn({ type: 'timestamptz' })
     submitted_at?: Date;
@@ -23,4 +29,12 @@ export class Article {
 
     @Column({ type: 'boolean' })
     hidden: boolean;
+}
+
+export interface ContentBlock {
+    id: string;
+    type: 'text' | 'image' | 'video';
+    content: string;
+    alt?: string;
+    caption?: string;
 }

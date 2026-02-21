@@ -9,6 +9,7 @@ import StatusUpdater from './status-updater';
 import UnitPreviewComponent from './unit-preview';
 import ImageComponent from './image';
 import Link from 'next/link';
+import JsonLd, { courseJsonLd } from './json-ld';
 
 export default function CourseComponent(props: CourseData) {
     const [course, setCourse] = useState<CourseData>(props);
@@ -34,8 +35,8 @@ export default function CourseComponent(props: CourseData) {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <JsonLd data={courseJsonLd(course)} />
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-                {/* Main Content */}
                 <div className="lg:col-span-2">
                     <div className="mb-8">
                         <ImageComponent 

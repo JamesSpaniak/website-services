@@ -33,6 +33,9 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=blog
+      - S3_MEDIA_BUCKET=${S3_MEDIA_BUCKET:-droneedge-media}
+      - CLOUDFRONT_MEDIA_DOMAIN=${CLOUDFRONT_MEDIA_DOMAIN:-media.thedroneedge.com}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
     depends_on:
       - postgres
       - nginx

@@ -2,44 +2,58 @@
 
 import { ArticleFull } from '@/app/lib/types/article';
 import ImageComponent from './image';
+import ContentBlockRenderer from './content-block-renderer';
+import JsonLd, { articleJsonLd } from './json-ld';
 
 interface ArticleProps {
   article: ArticleFull;
 }
 
 export default function ArticleComponent({ article }: ArticleProps) {
+  const hasContentBlocks = article.content_blocks && article.content_blocks.length > 0;
+
   return (
-    <div className="bg-white py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:mx-0">
+    <article className="bg-white py-10 sm:py-16 lg:py-24">
+      <JsonLd data={articleJsonLd(article)} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
           <h2 className="text-base font-semibold leading-7 text-blue-600">
-            {new Date(article.submitted_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+            <time dateTime={new Date(article.submitted_at).toISOString()}>
+              {new Date(article.submitted_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </time>
           </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{article.title}</p>
-          <p className="mt-6 text-lg leading-8 text-gray-600">{article.sub_title}</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">{article.title}</h1>
+          <p className="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8">{article.sub_heading}</p>
         </div>
-        <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+        <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
           {article.image_url && (
-              <div className="my-8">
+              <div className="my-6 sm:my-8">
                   <ImageComponent
                       src={article.image_url}
                       alt={article.title}
                       width={1200}
                       height={675}
-                      className="aspect-video rounded-xl bg-gray-50 object-cover"
+                      className="w-full aspect-video rounded-xl bg-gray-50 object-cover"
                   />
               </div>
           )}
-          <div
-            className="mt-10 prose lg:prose-lg max-w-none text-gray-600"
-            dangerouslySetInnerHTML={{ __html: article.body }}
-          />
+
+          {hasContentBlocks ? (
+            <div className="mt-8 sm:mt-10">
+              <ContentBlockRenderer blocks={article.content_blocks!} />
+            </div>
+          ) : (
+            <div
+              className="mt-8 sm:mt-10 prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-600 prose-img:rounded-xl overflow-hidden break-words"
+              dangerouslySetInnerHTML={{ __html: article.body }}
+            />
+          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

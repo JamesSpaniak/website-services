@@ -109,8 +109,8 @@ export default function LoginComponent() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen -mt-32">
-            <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="p-8 bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex flex-col items-center justify-center py-12 sm:py-16 lg:py-24 px-4">
+            <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="p-6 sm:p-8 bg-white rounded-lg shadow-xl w-full max-w-md">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">{mode === 'login' ? 'Login' : 'Create Account'}</h2>
                 {error && <div className="mb-4"><ErrorComponent message={error} /></div>} {/* This is for API errors */}
                 {infoMessage && (
