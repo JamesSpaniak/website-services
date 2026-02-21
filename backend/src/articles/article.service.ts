@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArticleDto } from './types/article.dto';
 import { Article } from './types/article.entity';
+import { MediaService } from 'src/media/media.service';
 
 @Injectable()
 export class ArticleService {
+  private readonly logger = new Logger(ArticleService.name);
+
   constructor(
     @InjectRepository(Article)
-    private articleRepository: Repository<Article>
+    private articleRepository: Repository<Article>,
+    private readonly mediaService: MediaService,
   ) {}
 
   static articleDtoToEntity(article: ArticleDto): Article {
@@ -18,7 +22,16 @@ export class ArticleService {
   }
 
   async getArticles(): Promise<Article[]> {
-    return this.articleRepository.find();
+    return this.articleRepository.find({
+      where: { hidden: false },
+      order: { submitted_at: 'DESC' },
+    });
+  }
+
+  async getAllArticles(): Promise<Article[]> {
+    return this.articleRepository.find({
+      order: { submitted_at: 'DESC' },
+    });
   }
 
   async getArticle(id: string): Promise<Article> {
@@ -42,7 +55,7 @@ export class ArticleService {
 
   async updateArticle(id: string, article: Article): Promise<Article> {
     const existingArticle = await this.getArticle(id);
-    const updatedArticle = await this.articleRepository.create(
+    const updatedArticle = this.articleRepository.create(
         ArticleService.articleDtoToEntity(article)
     );
     await this.articleRepository.update(id, {
@@ -53,7 +66,41 @@ export class ArticleService {
   }
 
   async deleteArticle(id: string) {
-    await this.getArticle(id); // checks for existance
+    const article = await this.getArticle(id);
+    await this.deleteArticleMedia(article);
     await this.articleRepository.delete(+id);
+  }
+
+  private async deleteArticleMedia(article: Article): Promise<void> {
+    const urls = this.collectArticleMediaUrls(article);
+    if (urls.length === 0) return;
+
+    const keys = this.mediaService.extractKeysFromUrls(urls);
+    if (keys.length === 0) return;
+
+    try {
+      await this.mediaService.deleteMultipleMedia(keys);
+      this.logger.log(`Deleted ${keys.length} media files for article ${article.id}`);
+    } catch (err) {
+      this.logger.error(`Failed to delete media for article ${article.id}: ${(err as Error).message}`);
+    }
+  }
+
+  private collectArticleMediaUrls(article: Article): string[] {
+    const urls: string[] = [];
+
+    if (article.image_url) {
+      urls.push(article.image_url);
+    }
+
+    if (article.content_blocks) {
+      for (const block of article.content_blocks) {
+        if ((block.type === 'image' || block.type === 'video') && block.content) {
+          urls.push(block.content);
+        }
+      }
+    }
+
+    return urls;
   }
 }

@@ -4,8 +4,8 @@ const nextConfig = {
     images: {
       remotePatterns: [
         {
-          protocol: 'https', // Your CloudFront distribution hostname
-          hostname: process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || 'localhost',
+          protocol: 'https',
+          hostname: 'media.thedroneedge.com',
           port: '',
           pathname: '/**',
         },

@@ -112,7 +112,8 @@ resource "aws_ecs_task_definition" "frontend" {
       }
       environment = [
         { name = "API_INTERNAL_BASE_URL", value = "http://${aws_lb.backend_internal.dns_name}" },
-        { name = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", value = var.stripe_publishable_key }
+        { name = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", value = var.stripe_publishable_key },
+        { name = "NEXT_PUBLIC_CLOUDFRONT_DOMAIN", value = "media.thedroneedge.com"  }
       ]
     }
   ])

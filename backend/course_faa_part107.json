@@ -1,9 +1,12 @@
 {
+    "id": 0,
     "title": "FAA Part 107 Drone Certification",
     "sub_title": "Comprehensive Study Guide and Practice Exams",
     "description": "Master the material needed to pass the FAA Part 107 exam and become a certified commercial drone pilot. This course covers all essential knowledge areas, from regulations and airspace to weather and emergency procedures.",
     "image_url": "/globe.svg",
     "video_url": "https://www.youtube.com/watch?v=example",
+    "has_access": true,
+    "price": 0,
     "units": [
         {
             "id": 1,

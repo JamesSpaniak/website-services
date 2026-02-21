@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArticleSlim } from '@/app/lib/types/article';
+import ImageComponent from './image';
 
 interface ArticlePreviewProps {
   article: ArticleSlim;
@@ -10,12 +10,12 @@ interface ArticlePreviewProps {
 
 export default function ArticlePreviewComponent({ article }: ArticlePreviewProps) {
   return (
-    <Link href={`/articles/${article.id}`} className="group relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80">
-      <Image 
+    <Link href={`/articles/${article.id}`} className="group relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-6 pb-6 pt-48 sm:px-8 sm:pb-8 sm:pt-56 lg:pt-72">
+      <ImageComponent 
         src={article.image_url || '/globe.svg'} 
-        alt="" 
-        className="absolute inset-0 -z-10 h-full w-full object-cover"
-        layout="fill"
+        alt={article.title}
+        className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        fill
       />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40" />
       <div className="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10" />

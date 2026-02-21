@@ -1,41 +1,47 @@
-'use client';
+import { Metadata } from 'next';
+import ArticlePageClient from './article-page-client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { getArticleById } from '@/app/lib/api-client';
-import LoadingComponent from '@/app/ui/components/loading';
-import ErrorComponent from '@/app/ui/components/error';
-import { ArticleFull } from '@/app/lib/types/article';
-import ArticleComponent from '@/app/ui/components/article';
+const API_BASE = process.env.API_INTERNAL_BASE_URL || 'http://localhost:3000';
 
-export default function SingleArticlePage() {
-  const { articleId } = useParams();
-  const [article, setArticle] = useState<ArticleFull | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+async function getArticle(id: string) {
+  try {
+    const res = await fetch(`${API_BASE}/articles/${id}`, { next: { revalidate: 300 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
 
-  useEffect(() => {
-    if (!articleId) return;
+export async function generateMetadata(
+  { params }: { params: Promise<{ articleId: string }> }
+): Promise<Metadata> {
+  const { articleId } = await params;
+  const article = await getArticle(articleId);
+  if (!article) return { title: 'Article Not Found' };
 
-    async function fetchArticle() {
-      try {
-        const id = parseInt(articleId as string);
-        if (isNaN(id)) throw new Error("Invalid article ID.");
-        
-        const articleData = await getArticleById(id);
-        setArticle(articleData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load article.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchArticle();
-  }, [articleId]);
+  return {
+    title: article.title,
+    description: article.sub_heading,
+    openGraph: {
+      title: article.title,
+      description: article.sub_heading,
+      type: 'article',
+      publishedTime: article.submitted_at,
+      ...(article.image_url && {
+        images: [{ url: article.image_url, width: 1200, height: 630, alt: article.title }],
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.sub_heading,
+      ...(article.image_url && { images: [article.image_url] }),
+    },
+  };
+}
 
-  if (loading) return <LoadingComponent />;
-  if (error) return <ErrorComponent message={error} />;
-  if (!article) return <ErrorComponent message="Article not found." />;
-
-  return <ArticleComponent article={article} />;
+export default async function ArticlePage({ params }: { params: Promise<{ articleId: string }> }) {
+  const { articleId } = await params;
+  return <ArticlePageClient articleId={articleId} />;
 }

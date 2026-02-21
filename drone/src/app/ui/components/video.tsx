@@ -24,7 +24,28 @@ function getEmbedUrl(url: string): string | null {
   return null;
 }
 
+function isSelfHostedVideo(url: string): boolean {
+  return /\.(mp4|webm|mov)(\?.*)?$/i.test(url) ||
+    url.includes('cloudfront.net') ||
+    url.includes('media.');
+}
+
 export default function VideoComponent({ src, className = '' }: VideoComponentProps) {
+  if (isSelfHostedVideo(src)) {
+    return (
+      <div className={`aspect-video w-full ${className}`}>
+        <video
+          src={src}
+          controls
+          preload="metadata"
+          className="w-full h-full rounded-xl bg-black"
+        >
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    );
+  }
+
   const embedUrl = getEmbedUrl(src);
 
   if (!embedUrl) {

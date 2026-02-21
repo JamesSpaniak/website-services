@@ -76,3 +76,9 @@ variable "admin_email" {
   type        = string
   default     = "james@thedroneedge.com"
 }
+
+variable "support_email_from" {
+  description = "From address for support/transactional emails (password resets, verifications)."
+  type        = string
+  default     = "DroneEdge Support <support@thedroneedge.com>"
+}

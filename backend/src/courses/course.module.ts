@@ -7,17 +7,16 @@ import { User } from "src/users/types/user.entity";
 import { Progress } from "../progress/types/progress.entity";
 import { CourseProgressService } from "./course-progress.service";
 import { UsersModule } from "src/users/user.module";
-
-
-
+import { MediaModule } from "src/media/media.module";
 
 @Module({
     imports: [
         UsersModule,
+        MediaModule,
         TypeOrmModule.forFeature([Course, User, Progress])
     ],
     controllers: [CourseController],
     providers: [CourseService, CourseProgressService],
+    exports: [CourseService],
   })
   export class CourseModule {}
-  

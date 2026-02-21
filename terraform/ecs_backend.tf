@@ -120,6 +120,34 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_cloudwatch_attachment" 
   policy_arn = aws_iam_policy.cloudwatch_logs_policy.arn
 }
 
+resource "aws_iam_policy" "s3_media_policy" {
+  name        = "${var.project_name}-s3-media-policy"
+  description = "Allow ECS backend tasks to manage objects in the media S3 bucket"
+
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          aws_s3_bucket.media.arn,
+          "${aws_s3_bucket.media.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_role_s3_media_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.s3_media_policy.arn
+}
+
 resource "aws_ecs_task_definition" "api_server" {
   family                   = "${var.project_name}-api-server-task"
   network_mode             = "awsvpc"
@@ -182,7 +210,10 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "EMAIL_HOST", value = var.email_host },
         { name = "EMAIL_PORT", value = tostring(var.email_port) },
         { name = "EMAIL_FROM", value = var.email_from },
-        { name = "ADMIN_EMAIL", value = var.admin_email }
+        { name = "SUPPORT_EMAIL_FROM", value = var.support_email_from },
+        { name = "ADMIN_EMAIL", value = var.admin_email },
+        { name = "S3_MEDIA_BUCKET", value = aws_s3_bucket.media.bucket },
+        { name = "CLOUDFRONT_MEDIA_DOMAIN", value = "${var.media_subdomain}.${var.domain_name}" }
       ]
     }
   ])
