@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UnitData, ProgressStatus } from '@/app/lib/types/course';
 import StatusIcon from './status-icon';
@@ -9,6 +9,7 @@ import ExamComponent from './exam';
 import { ChevronRightIcon, DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
 import ImageComponent from './image';
 import VideoComponent from './video';
+import { getUnitMedia } from '@/app/lib/api-client';
 
 interface SectionProps {
   section: UnitData;
@@ -17,9 +18,39 @@ interface SectionProps {
   level?: number;
 }
 
+function isCourseVideo(url?: string): boolean {
+  if (!url) return false;
+  return url.includes('courses/videos/') || url.endsWith('.m3u8');
+}
+
 export default function SectionComponent({ section, courseId, onStatusUpdate, level = 0 }: SectionProps) {
   const { id, title, description, text_content, image_url, video_url, status, exam, sub_units } = section;
   const [isExpanded, setIsExpanded] = useState(false);
+  const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
+
+  const needsSigning = isCourseVideo(video_url);
+
+  const fetchSignedUrl = useCallback(async () => {
+    if (!needsSigning || signedVideoUrl) return;
+    setVideoLoading(true);
+    try {
+      const { video_url: signed } = await getUnitMedia(courseId, String(id));
+      setSignedVideoUrl(signed || null);
+    } catch {
+      setSignedVideoUrl(null);
+    } finally {
+      setVideoLoading(false);
+    }
+  }, [courseId, id, needsSigning, signedVideoUrl]);
+
+  useEffect(() => {
+    if (isExpanded && needsSigning) {
+      fetchSignedUrl();
+    }
+  }, [isExpanded, needsSigning, fetchSignedUrl]);
+
+  const resolvedVideoUrl = needsSigning ? signedVideoUrl : video_url;
 
   return (
     <div className={`mt-6 ${level > 0 ? 'pl-4 border-l-2 border-gray-200' : ''}`}>
@@ -56,7 +87,12 @@ export default function SectionComponent({ section, courseId, onStatusUpdate, le
                 {description && <div className="mt-4 prose prose-lg max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }} />}
                 <div className="my-6 space-y-6">
                     {image_url && <ImageComponent src={image_url} alt={title} width={800} height={450} className="w-full rounded-xl" />}
-                    {video_url && <VideoComponent src={video_url} />}
+                    {videoLoading && (
+                      <div className="flex items-center justify-center h-64 bg-gray-100 rounded-xl">
+                        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+                      </div>
+                    )}
+                    {!videoLoading && resolvedVideoUrl && <VideoComponent src={resolvedVideoUrl} />}
                 </div>
                 {text_content && <div className="mt-4 prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
                 

@@ -130,6 +130,29 @@ export class EmailService {
     });
   }
 
+  async sendOrganizationInvite(email: string, orgName: string, signUpLink: string, role: string): Promise<void> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn(`Email disabled; invite link for ${email}: ${signUpLink}`);
+      return;
+    }
+
+    const roleLabel = role === 'manager' ? 'a course manager' : 'a student';
+
+    await this.transporter.sendMail({
+      from: this.supportFrom,
+      to: email,
+      subject: `You've been invited to join ${orgName}`,
+      html: `
+        <p>Hello,</p>
+        <p>You've been invited to join <strong>${orgName}</strong> as ${roleLabel} on Drone Training Pro.</p>
+        <p>Click the link below to create your account:</p>
+        <p><a href="${signUpLink}">Create Account</a></p>
+        <p>This invite link is single-use and will expire in 30 days.</p>
+        <p>If you did not expect this invitation, you can safely ignore this email.</p>
+      `,
+    });
+  }
+
   async sendBroadcastEmail(broadcastDto: BroadcastDto): Promise<{ success: boolean; count: number }> {
     if (!this.emailEnabled || !this.transporter) {
       this.logger.warn('Email disabled; skipping broadcast email.');

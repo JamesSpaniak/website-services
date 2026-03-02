@@ -17,5 +17,5 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /opt/backend/dist ./dist
 EXPOSE 3000
-CMD [ "node", "dist/src/main.js" ]
+CMD [ "node", "--require", "./dist/src/telemetry.js", "dist/src/main.js" ]
 

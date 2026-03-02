@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import HeaderComponent from "./ui/components/header";
 import { AuthProvider } from "./lib/auth-context";
@@ -79,6 +80,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            async
+            src={`${process.env.NEXT_PUBLIC_UMAMI_URL || 'http://localhost:3001'}/script.js`}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="afterInteractive"
+          />
+        )}
         <AuthProvider>
             <div className="flex flex-col min-h-screen">
                 <HeaderComponent />

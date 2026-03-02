@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -67,6 +67,8 @@ export class UsersService {
   }
 
   async saveUser(userDto: UserDto): Promise<User> {
+    await this.assertUniqueUsernameAndEmail(userDto.username, userDto.email);
+
     const hashedPassword = await UsersService.hashPassword(userDto.password);
     const user: User = {
         ...userDto,
@@ -79,10 +81,12 @@ export class UsersService {
         purchased_courses: undefined,
         token_version: 0,
     }
-    return this.userRepository.save(user); // TODO add unique constraint on email
+    return this.userRepository.save(user);
   }
 
   async createUnverifiedUser(userDto: UserDto, verificationToken: string, expiresAt: Date): Promise<User> {
+    await this.assertUniqueUsernameAndEmail(userDto.username, userDto.email);
+
     const hashedPassword = await UsersService.hashPassword(userDto.password);
     const user: User = {
       ...userDto,
@@ -96,6 +100,19 @@ export class UsersService {
       token_version: 0,
     };
     return this.userRepository.save(user);
+  }
+
+  private async assertUniqueUsernameAndEmail(username: string, email: string): Promise<void> {
+    const [existingUsername, existingEmail] = await Promise.all([
+      this.userRepository.findOne({ where: { username } }),
+      this.userRepository.findOne({ where: { email } }),
+    ]);
+    if (existingUsername) {
+      throw new BadRequestException(`Username "${username}" is already taken.`);
+    }
+    if (existingEmail) {
+      throw new BadRequestException(`Email "${email}" is already registered.`);
+    }
   }
 
   async updateUser(id: number, data: UpdateUserDto): Promise<User> {

@@ -1,6 +1,7 @@
 variable "api_server_image_uri" {
-  description = "The URI of the api_server Docker image in ECR."
+  description = "The URI of the api_server Docker image in ECR. Leave empty for infra-only applies."
   type        = string
+  default     = ""
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -66,7 +67,9 @@ resource "aws_iam_policy" "secrets_manager_policy" {
           aws_secretsmanager_secret.db_credentials.arn,
           aws_secretsmanager_secret.stripe_secret_key.arn,
           aws_secretsmanager_secret.jwt_secret.arn,
-          aws_secretsmanager_secret.admin_seed_password.arn
+          aws_secretsmanager_secret.admin_seed_password.arn,
+          aws_secretsmanager_secret.grafana_otel_headers.arn,
+          aws_secretsmanager_secret.cloudfront_signing_private_key.arn
         ]
       }
     ]
@@ -193,6 +196,14 @@ resource "aws_ecs_task_definition" "api_server" {
         {
           name      = "ADMIN_SEED_PASSWORD"
           valueFrom = aws_secretsmanager_secret.admin_seed_password.arn
+        },
+        {
+          name      = "OTEL_EXPORTER_OTLP_HEADERS"
+          valueFrom = aws_secretsmanager_secret.grafana_otel_headers.arn
+        },
+        {
+          name      = "CLOUDFRONT_SIGNING_PRIVATE_KEY"
+          valueFrom = aws_secretsmanager_secret.cloudfront_signing_private_key.arn
         }
       ]
       environment = [
@@ -213,10 +224,18 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "SUPPORT_EMAIL_FROM", value = var.support_email_from },
         { name = "ADMIN_EMAIL", value = var.admin_email },
         { name = "S3_MEDIA_BUCKET", value = aws_s3_bucket.media.bucket },
-        { name = "CLOUDFRONT_MEDIA_DOMAIN", value = "${var.media_subdomain}.${var.domain_name}" }
+        { name = "CLOUDFRONT_MEDIA_DOMAIN", value = "${var.media_subdomain}.${var.domain_name}" },
+        { name = "OTEL_SERVICE_NAME", value = "droneedge" },
+        { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "https://otlp-gateway-prod-us-east-2.grafana.net/otlp" },
+        { name = "OTEL_EXPORTER_OTLP_PROTOCOL", value = "http/protobuf" },
+        { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id }
       ]
     }
   ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 resource "aws_ecs_service" "api_server" {

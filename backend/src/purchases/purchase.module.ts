@@ -6,11 +6,13 @@ import { User } from 'src/users/types/user.entity';
 import { PurchaseController } from './purchase.controller';
 import { PurchaseService } from './purchase.service';
 import { Stripe } from 'stripe';
+import { AuditModule } from 'src/audit/audit.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Course]),
-    ConfigModule, // Import ConfigModule to use ConfigService
+    ConfigModule,
+    AuditModule,
   ],
   controllers: [PurchaseController],
   providers: [

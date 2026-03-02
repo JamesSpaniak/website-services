@@ -14,7 +14,8 @@ export class User {
     @Column({ type: 'varchar' })
     password: string;
 
-    @Column({ type: 'varchar'})
+    @Index()
+    @Column({ type: 'varchar', unique: true })
     email: string;
 
     @CreateDateColumn({ type: 'timestamptz' })

@@ -304,6 +304,26 @@ async function uploadMedia(file: File, folder: 'articles' | 'courses', subfolder
     return { publicUrl, key };
 }
 
+async function getProfilePicturePresignedUrl(filename: string, contentType: string): Promise<PresignedUrlResponse> {
+    return apiClient('media/profile-picture', {
+        method: 'POST',
+        body: JSON.stringify({ filename, contentType }),
+    });
+}
+
+async function uploadProfilePicture(file: File): Promise<string> {
+    const { uploadUrl, publicUrl } = await getProfilePicturePresignedUrl(file.name, file.type);
+    await uploadMediaToS3(uploadUrl, file);
+    await updateUser({ picture_url: publicUrl } as Partial<UserDto>);
+    return publicUrl;
+}
+
+async function resetMemberPicture(orgId: number, userId: number): Promise<void> {
+    await apiClient(`organizations/${orgId}/members/${userId}/picture`, {
+        method: 'DELETE',
+    });
+}
+
 async function deleteMedia(key: string): Promise<void> {
     await apiClient('media', {
         method: 'DELETE',
@@ -361,6 +381,183 @@ async function deleteCourse(id: number): Promise<void> {
     await apiClient(`courses/${id}`, { method: 'DELETE' });
 }
 
+// --- Organizations ---
+
+import type {
+    Organization,
+    OrganizationMember,
+    InviteCode,
+    InviteCodeInfo,
+    OrgCourse,
+    MemberCourseProgressSummary,
+    MemberCourseDetailedProgress,
+    UserOrganization,
+} from './types/organization';
+
+import type { AuditLogEntry, UserActivityResponse, OverviewStats, DailyMetric } from './types/audit';
+import type { CommentData } from './types/comment';
+
+async function getMyOrganization(): Promise<UserOrganization | null> {
+    return apiClient('organizations/my');
+}
+
+async function getInviteCodeInfo(code: string): Promise<InviteCodeInfo | null> {
+    return apiClient(`organizations/invite-info?code=${encodeURIComponent(code)}`);
+}
+
+async function getOrganizations(): Promise<Organization[]> {
+    return apiClient('organizations');
+}
+
+async function createOrganization(data: {
+    name: string;
+    max_students: number;
+    initial_manager_user_id?: number;
+    initial_manager_email?: string;
+    school_year?: string;
+    semester?: string;
+}): Promise<Organization> {
+    return apiClient('organizations', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+async function updateOrganization(id: number, data: {
+    name?: string;
+    max_students?: number;
+    school_year?: string;
+    semester?: string;
+}): Promise<Organization> {
+    return apiClient(`organizations/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    });
+}
+
+async function deleteOrganization(id: number): Promise<void> {
+    await apiClient(`organizations/${id}`, { method: 'DELETE' });
+}
+
+async function getOrganizationDetails(id: number): Promise<Organization> {
+    return apiClient(`organizations/${id}`);
+}
+
+async function getOrgMembers(orgId: number): Promise<OrganizationMember[]> {
+    return apiClient(`organizations/${orgId}/members`);
+}
+
+async function addOrgMember(orgId: number, data: { email: string; role?: 'manager' | 'member' }): Promise<OrganizationMember> {
+    return apiClient(`organizations/${orgId}/members`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+async function removeOrgMember(orgId: number, userId: number): Promise<void> {
+    await apiClient(`organizations/${orgId}/members/${userId}`, { method: 'DELETE' });
+}
+
+async function updateMemberRole(orgId: number, userId: number, role: 'manager' | 'member'): Promise<void> {
+    await apiClient(`organizations/${orgId}/members/${userId}/role`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role }),
+    });
+}
+
+async function generateInviteCode(orgId: number, data: { email?: string; role?: 'manager' | 'member' }): Promise<InviteCode> {
+    return apiClient(`organizations/${orgId}/invite-codes`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+async function getInviteCodes(orgId: number): Promise<InviteCode[]> {
+    return apiClient(`organizations/${orgId}/invite-codes`);
+}
+
+async function bulkGenerateInviteCodes(orgId: number, data: { emails: string[]; role?: 'manager' | 'member' }): Promise<InviteCode[]> {
+    return apiClient(`organizations/${orgId}/invite-codes/bulk`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+async function getOrgCourses(orgId: number): Promise<OrgCourse[]> {
+    return apiClient(`organizations/${orgId}/courses`);
+}
+
+async function assignOrgCourses(orgId: number, courseIds: number[]): Promise<OrgCourse[]> {
+    return apiClient(`organizations/${orgId}/courses`, {
+        method: 'POST',
+        body: JSON.stringify({ course_ids: courseIds }),
+    });
+}
+
+async function removeOrgCourse(orgId: number, courseId: number): Promise<void> {
+    await apiClient(`organizations/${orgId}/courses/${courseId}`, { method: 'DELETE' });
+}
+
+async function getOrgProgress(orgId: number): Promise<MemberCourseProgressSummary[]> {
+    return apiClient(`organizations/${orgId}/progress`);
+}
+
+async function getOrgCourseProgress(orgId: number, courseId: number): Promise<MemberCourseDetailedProgress[]> {
+    return apiClient(`organizations/${orgId}/progress/${courseId}`);
+}
+
+// ── Course Media (Signed URLs) ──
+
+async function getUnitMedia(courseId: number, unitId: string): Promise<{ video_url?: string }> {
+    return apiClient(`courses/${courseId}/units/${unitId}/media`);
+}
+
+// ── Audit / Activity ──
+
+async function getMyActivity(limit = 50, offset = 0): Promise<UserActivityResponse> {
+    return apiClient(`audit/my?limit=${limit}&offset=${offset}`);
+}
+
+async function getAnalyticsOverview(): Promise<OverviewStats> {
+    return apiClient('audit/analytics/overview');
+}
+
+async function getAnalyticsDaily(days = 30): Promise<DailyMetric[]> {
+    return apiClient(`audit/analytics/daily?days=${days}`);
+}
+
+async function getStudentActivity(userId: number, limit = 50, offset = 0): Promise<AuditLogEntry[]> {
+    return apiClient(`audit/users/${userId}?limit=${limit}&offset=${offset}`);
+}
+
+// ── Comments ──
+
+async function getArticleComments(articleId: number): Promise<CommentData[]> {
+    return apiClient(`articles/${articleId}/comments`);
+}
+
+async function createComment(articleId: number, body: string, parentId?: number): Promise<CommentData> {
+    return apiClient(`articles/${articleId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ body, parent_id: parentId }),
+    });
+}
+
+async function updateComment(commentId: number, body: string): Promise<CommentData> {
+    return apiClient(`comments/${commentId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ body }),
+    });
+}
+
+async function deleteComment(commentId: number): Promise<void> {
+    await apiClient(`comments/${commentId}`, { method: 'DELETE' });
+}
+
+async function toggleCommentUpvote(commentId: number): Promise<{ upvote_count: number; has_upvoted: boolean }> {
+    return apiClient(`comments/${commentId}/upvote`, { method: 'POST' });
+}
+
 async function logToServer(level: string, message: string, context: object) {
     try {
         await fetch(buildUrl('logs'), {
@@ -411,4 +608,35 @@ export {
     createCourse,
     updateCourse,
     deleteCourse,
+    getMyOrganization,
+    getInviteCodeInfo,
+    getOrganizations,
+    createOrganization,
+    updateOrganization,
+    deleteOrganization,
+    getOrganizationDetails,
+    getOrgMembers,
+    addOrgMember,
+    removeOrgMember,
+    updateMemberRole,
+    generateInviteCode,
+    getInviteCodes,
+    bulkGenerateInviteCodes,
+    getOrgCourses,
+    assignOrgCourses,
+    removeOrgCourse,
+    getOrgProgress,
+    getOrgCourseProgress,
+    getMyActivity,
+    getStudentActivity,
+    getAnalyticsOverview,
+    getAnalyticsDaily,
+    getArticleComments,
+    createComment,
+    updateComment,
+    deleteComment,
+    toggleCommentUpvote,
+    uploadProfilePicture,
+    resetMemberPicture,
+    getUnitMedia,
 }

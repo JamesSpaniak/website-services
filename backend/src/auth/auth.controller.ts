@@ -1,6 +1,7 @@
 import { Controller, Post, UseGuards, Request, Get, Body, UseInterceptors, ClassSerializerInterceptor, NotFoundException, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/user.service';
+import { OrganizationService } from '../organizations/organization.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Throttle } from '@nestjs/throttler';
 import { ResetPasswordDto } from './types/reset-password.dto';
@@ -19,6 +20,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private organizationService: OrganizationService,
   ) {}
 
   @ApiOperation({ summary: 'Log in a user', description: 'Authenticates a user and returns tokens and user profile.' })
@@ -32,9 +34,14 @@ export class AuthController {
       throw new UnauthorizedException('Invalid credentials');
     }
     const tokens = await this.authService.login(user);
+    const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
+    const orgMembership = await this.organizationService.getMyOrganization(user.id);
+    if (orgMembership) {
+      userFull.organization = orgMembership;
+    }
     return {
       ...tokens,
-      user: plainToInstance(UserFull, user),
+      user: userFull,
     };
   }
 
@@ -74,7 +81,12 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException('User from token not found.');
     }
-    return plainToInstance(UserFull, user);
+    const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
+    const orgMembership = await this.organizationService.getMyOrganization(user.id);
+    if (orgMembership) {
+      userFull.organization = orgMembership;
+    }
+    return userFull;
   }
 
   @ApiOperation({ summary: 'Log out the current user', description: 'Invalidates the provided refresh token.' })

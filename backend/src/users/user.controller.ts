@@ -31,7 +31,7 @@ export class UsersController {
   @Roles(Role.Admin)
   async getUsers(): Promise<UserSlim[]> {
     const users = await this.userService.getUsers();
-    return plainToInstance(UserSlim, users);
+    return plainToInstance(UserSlim, users, { excludeExtraneousValues: true });
   }
 
   /**
@@ -50,7 +50,7 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found.`);
     }
-    return plainToInstance(UserFull, user);
+    return plainToInstance(UserFull, user, { excludeExtraneousValues: true });
   }
   
   /**
@@ -68,7 +68,7 @@ export class UsersController {
   ): Promise<UserFull> {
     const userEntity = await this.userService.saveUser(user);
     const fullUser = await this.userService.getUserByUsername(userEntity.username);
-    return plainToInstance(UserFull, fullUser);
+    return plainToInstance(UserFull, fullUser, { excludeExtraneousValues: true });
   }
 
   /**
@@ -90,7 +90,7 @@ export class UsersController {
   ): Promise<UserFull> {
     const updatedUser = await this.userService.updateUser(req.user.userId, updateUserDto);
     const fullUser = await this.userService.getUserByUsername(updatedUser.username);
-    return plainToInstance(UserFull, fullUser);
+    return plainToInstance(UserFull, fullUser, { excludeExtraneousValues: true });
   }
 
   /**

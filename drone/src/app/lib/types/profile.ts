@@ -7,6 +7,7 @@ interface UserDto {
     picture_url?: string;
     role: string; // e.g., 'user', 'admin', 'pro'
     pro_membership_expires_at?: Date;
+    organization?: { id: number; name: string; role: 'manager' | 'member' };
 }
 
 interface CreateUserDto {
@@ -15,6 +16,7 @@ interface CreateUserDto {
     email: string;
     first_name?: string;
     last_name?: string;
+    invite_code?: string;
 }
 
 interface ContactPayload {

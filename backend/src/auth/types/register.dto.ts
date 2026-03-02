@@ -30,4 +30,9 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   picture_url?: string;
+
+  @ApiPropertyOptional({ description: 'One-time invite code to join an organization on registration.' })
+  @IsOptional()
+  @IsString()
+  invite_code?: string;
 }

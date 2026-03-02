@@ -15,11 +15,16 @@ import { RequestIdMiddleware } from './common/request-id.middleware';
 import { LoggingModule } from './logging/logging.module';
 import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
+import { OrganizationModule } from './organizations/organization.module';
+import { AuditModule } from './audit/audit.module';
+import { CommentModule } from './comments/comment.module';
 
 @Module({
   imports: [
     ArticleModule,
+    AuditModule,
     AuthModule,
+    CommentModule,
     OpenTelemetryModule.forRoot({
       metrics: {
         hostMetrics: true,
@@ -38,6 +43,7 @@ import { MediaModule } from './media/media.module';
     LoggingModule,
     HealthModule,
     MediaModule,
+    OrganizationModule,
     UsersModule,
     PurchaseModule,
     ProgressModule,

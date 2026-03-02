@@ -4,6 +4,7 @@ import { ArticleFull } from '@/app/lib/types/article';
 import ImageComponent from './image';
 import ContentBlockRenderer from './content-block-renderer';
 import JsonLd, { articleJsonLd } from './json-ld';
+import CommentSection from './comment-section';
 
 interface ArticleProps {
   article: ArticleFull;
@@ -52,6 +53,8 @@ export default function ArticleComponent({ article }: ArticleProps) {
               dangerouslySetInnerHTML={{ __html: article.body }}
             />
           )}
+
+          <CommentSection articleId={article.id} />
         </div>
       </div>
     </article>

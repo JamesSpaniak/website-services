@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/users/types/user.entity';
 import { Role } from 'src/users/types/role.enum';
 import { MediaService } from 'src/media/media.service';
+import { OrganizationService } from 'src/organizations/organization.service';
 import { CourseDetails, UnitData } from './types/course.dto';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class CourseService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         private readonly mediaService: MediaService,
+        private readonly organizationService: OrganizationService,
   ) {}
 
   async getCourseByTitle(title: string): Promise<Course | undefined> {
@@ -44,7 +46,11 @@ export class CourseService {
         return true;
     }
 
-    return user.purchased_courses.some(course => course.id === courseId);
+    if (user.purchased_courses.some(course => course.id === courseId)) {
+        return true;
+    }
+
+    return this.organizationService.hasOrgCourseAccess(userFromJwt.userId, courseId);
   }
 
   async getCourseById(id: number): Promise<Course | undefined> {

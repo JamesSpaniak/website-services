@@ -34,6 +34,24 @@ resource "aws_cloudfront_origin_access_control" "media" {
   signing_protocol                  = "sigv4"
 }
 
+# ── CloudFront signing key for paid course videos ──
+
+resource "aws_cloudfront_public_key" "video_signing" {
+  name        = "${var.project_name}-video-signing-key"
+  encoded_key = var.cloudfront_signing_public_key_pem
+
+  # Keep the existing CloudFront key stable across applies.
+  # Rotate intentionally via a dedicated migration/runbook, not drift.
+  lifecycle {
+    ignore_changes = [encoded_key]
+  }
+}
+
+resource "aws_cloudfront_key_group" "video_signing" {
+  name  = "${var.project_name}-video-signing-group"
+  items = [aws_cloudfront_public_key.video_signing.id]
+}
+
 resource "aws_cloudfront_distribution" "media_distribution" {
   origin {
     domain_name              = aws_s3_bucket.media.bucket_regional_domain_name
@@ -46,6 +64,24 @@ resource "aws_cloudfront_distribution" "media_distribution" {
 
   aliases = ["${var.media_subdomain}.${var.domain_name}"]
 
+  # Paid course videos require a signed URL
+  ordered_cache_behavior {
+    path_pattern           = "courses/videos/*"
+    target_origin_id       = "S3-${var.project_name}-media"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    trusted_key_groups     = [aws_cloudfront_key_group.video_signing.id]
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+  }
+
+  # Everything else (articles, profile pics, course images) is public
   default_cache_behavior {
     target_origin_id       = "S3-${var.project_name}-media"
     viewer_protocol_policy = "redirect-to-https"

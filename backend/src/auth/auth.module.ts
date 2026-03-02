@@ -9,6 +9,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailModule } from 'src/email/email.module';
+import { OrganizationModule } from 'src/organizations/organization.module';
+import { AuditModule } from 'src/audit/audit.module';
 import { Session } from './types/session.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -19,6 +21,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     PassportModule,
     ConfigModule,
     EmailModule,
+    OrganizationModule,
+    AuditModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

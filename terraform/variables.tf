@@ -82,3 +82,9 @@ variable "support_email_from" {
   type        = string
   default     = "DroneEdge Support <support@thedroneedge.com>"
 }
+
+variable "cloudfront_signing_public_key_pem" {
+  description = "RSA public key PEM for CloudFront signed URLs (course videos)."
+  type        = string
+  sensitive   = true
+}
