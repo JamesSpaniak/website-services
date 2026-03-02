@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import Hls from 'hls.js';
+
 interface VideoComponentProps {
   src: string;
   className?: string;
@@ -24,13 +27,62 @@ function getEmbedUrl(url: string): string | null {
   return null;
 }
 
+function isHlsStream(url: string): boolean {
+  return /\.m3u8(\?.*)?$/i.test(url);
+}
+
 function isSelfHostedVideo(url: string): boolean {
   return /\.(mp4|webm|mov)(\?.*)?$/i.test(url) ||
     url.includes('cloudfront.net') ||
     url.includes('media.');
 }
 
+function HlsPlayer({ src, className = '' }: VideoComponentProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src;
+      return;
+    }
+
+    if (!Hls.isSupported()) return;
+
+    const hls = new Hls({
+      startLevel: -1,
+      capLevelToPlayerSize: true,
+    });
+
+    hls.loadSource(src);
+    hls.attachMedia(video);
+
+    return () => {
+      hls.destroy();
+    };
+  }, [src]);
+
+  return (
+    <div className={`aspect-video w-full ${className}`}>
+      <video
+        ref={videoRef}
+        controls
+        preload="metadata"
+        className="w-full h-full rounded-xl bg-black"
+      >
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  );
+}
+
 export default function VideoComponent({ src, className = '' }: VideoComponentProps) {
+  if (isHlsStream(src)) {
+    return <HlsPlayer src={src} className={className} />;
+  }
+
   if (isSelfHostedVideo(src)) {
     return (
       <div className={`aspect-video w-full ${className}`}>

@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { ProMembershipDuration } from './types/purchase.dto';
 import { Stripe } from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import { AuditService } from 'src/audit/audit.service';
+import { AuditAction } from 'src/audit/types/audit-action.enum';
 
 @Injectable()
 export class PurchaseService {
@@ -20,6 +22,7 @@ export class PurchaseService {
     @Inject('STRIPE_CLIENT')
     private readonly stripe: Stripe,
     private readonly configService: ConfigService,
+    private readonly auditService: AuditService,
   ) {}
 
   async purchaseCourse(userId: number, courseId: number): Promise<User> {
@@ -40,7 +43,9 @@ export class PurchaseService {
 
     user.purchased_courses.push(course);
     user.token_version = (user.token_version || 0) + 1;
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    this.auditService.log(userId, AuditAction.COURSE_PURCHASED, { courseId, courseTitle: course.title });
+    return saved;
   }
 
   async upgradeToPro(userId: number, duration: ProMembershipDuration): Promise<User> {
@@ -56,7 +61,9 @@ export class PurchaseService {
     user.role = Role.Pro;
     user.pro_membership_expires_at = expiryDate;
     user.token_version = (user.token_version || 0) + 1;
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    this.auditService.log(userId, AuditAction.PRO_UPGRADE, { duration, expiryDate: expiryDate.toISOString() });
+    return saved;
   }
 
   async createPaymentIntent(userId: number, courseId: number): Promise<{ clientSecret: string }> {

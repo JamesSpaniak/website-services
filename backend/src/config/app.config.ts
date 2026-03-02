@@ -4,6 +4,12 @@ import { User } from '../users/types/user.entity';
 import { Course } from '../courses/types/course.entity';
 import { Progress } from '../progress/types/progress.entity';
 import { Session } from '../auth/types/session.entity';
+import { Organization } from '../organizations/types/organization.entity';
+import { OrganizationMember } from '../organizations/types/organization-member.entity';
+import { InviteCode } from '../organizations/types/invite-code.entity';
+import { AuditLog } from '../audit/types/audit-log.entity';
+import { Comment } from '../comments/types/comment.entity';
+import { CommentVote } from '../comments/types/comment-vote.entity';
 
 
 const useSsl = process.env.DB_SSL === 'true' || process.env.DB_SSL === '1';
@@ -22,7 +28,13 @@ const defaultConnection: DataSourceOptions = {
         Course,
         User,
         Progress,
-        Session
+        Session,
+        Organization,
+        OrganizationMember,
+        InviteCode,
+        AuditLog,
+        Comment,
+        CommentVote,
     ],
     migrations: [
         'dist/**/migrations/**'

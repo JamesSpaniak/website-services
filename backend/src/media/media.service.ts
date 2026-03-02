@@ -26,6 +26,7 @@ export class MediaService {
         contentType: string,
         folder: MediaFolder,
         subfolder?: string,
+        maxBytes?: number,
     ): Promise<{ uploadUrl: string; publicUrl: string; key: string }> {
         const ext = filename.substring(filename.lastIndexOf('.'));
         const uniqueName = `${uuidv4()}${ext}`;
@@ -36,6 +37,7 @@ export class MediaService {
             Bucket: this.bucketName,
             Key: key,
             ContentType: contentType,
+            ...(maxBytes ? { ContentLength: maxBytes } : {}),
         });
 
         const uploadUrl = await getSignedUrl(this.s3Client, command, {

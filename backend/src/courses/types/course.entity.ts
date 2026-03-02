@@ -1,4 +1,5 @@
 import { User } from "../../users/types/user.entity";
+import { Organization } from "../../organizations/types/organization.entity";
 import { Column, CreateDateColumn, Entity, Index, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('courses')
@@ -27,4 +28,7 @@ export class Course {
 
     @ManyToMany(() => User, (user) => user.purchased_courses)
     purchased_by_users: User[];
+
+    @ManyToMany(() => Organization, (org) => org.courses)
+    organizations?: Organization[];
 }

@@ -4,9 +4,12 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/types/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from '../email/email.service';
+import { OrganizationService } from '../organizations/organization.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from './types/session.entity';
 import { Repository } from 'typeorm';
+import { AuditService } from '../audit/audit.service';
+import { AuditAction } from '../audit/types/audit-action.enum';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -19,17 +22,35 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private emailService: EmailService,
+    private organizationService: OrganizationService,
+    private auditService: AuditService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
+    this.logger.debug(`validateUser called for username="${username}"`);
+
     const user = await this.usersService.getUserByUsername(username);
-    if (user && !user.is_email_verified) {
+    if (!user) {
+      this.logger.warn(`Login failed: no user found with username="${username}"`);
       return null;
     }
-    if (user && (await UsersService.comparePassword(pass, user.password))) {
-      return user;
+
+    this.logger.debug(`User found: id=${user.id}, email=${user.email}, verified=${user.is_email_verified}, role=${user.role}`);
+
+    if (!user.is_email_verified) {
+      this.logger.warn(`Login rejected: email not verified for user="${username}" (id=${user.id})`);
+      return null;
     }
-    return null;
+
+    const passwordMatch = await UsersService.comparePassword(pass, user.password);
+    if (!passwordMatch) {
+      this.logger.warn(`Login failed: incorrect password for user="${username}" (id=${user.id})`);
+      return null;
+    }
+
+    this.logger.log(`Login validated successfully for user="${username}" (id=${user.id})`);
+    this.auditService.log(user.id, AuditAction.LOGIN);
+    return user;
   }
 
   async registerUser(payload: {
@@ -39,13 +60,18 @@ export class AuthService {
     first_name?: string;
     last_name?: string;
     picture_url?: string;
+    invite_code?: string;
   }): Promise<{ message: string }> {
+    this.logger.debug(`registerUser called: username="${payload.username}", email="${payload.email}", hasInviteCode=${!!payload.invite_code}`);
+
     const existingUsername = await this.usersService.getUserByUsername(payload.username);
     if (existingUsername) {
+      this.logger.warn(`Registration rejected: username="${payload.username}" already taken`);
       throw new BadRequestException('Username is already taken.');
     }
     const existingEmail = await this.usersService.getUserByEmail(payload.email);
     if (existingEmail) {
+      this.logger.warn(`Registration rejected: email="${payload.email}" already registered`);
       throw new BadRequestException('Email is already registered.');
     }
 
@@ -66,18 +92,37 @@ export class AuthService {
       expiresAt,
     );
 
+    if (payload.invite_code) {
+      try {
+        await this.organizationService.validateAndConsumeInviteCode(
+          payload.invite_code,
+          user.id,
+          payload.email,
+        );
+        this.logger.log(`User ${user.username} joined organization via invite code.`);
+      } catch (err) {
+        this.logger.error(`Failed to consume invite code for user ${user.username}: ${(err as Error).message}`);
+        throw err;
+      }
+    }
+
     const verifyLink = `${this.configService.get<string>('FRONTEND_URL')}/verify-email?token=${verificationToken}`;
     await this.emailService.sendEmailVerification(user, verifyLink);
 
+    this.auditService.log(user.id, AuditAction.REGISTER, { username: payload.username, email: payload.email });
     return { message: 'Registration successful. Please verify your email.' };
   }
 
   async verifyEmail(token: string): Promise<{ message: string }> {
+    this.logger.debug(`verifyEmail called with token="${token.substring(0, 8)}..."`);
+
     const user = await this.usersService.getUserByVerificationToken(token);
     if (!user || !user.email_verification_token) {
+      this.logger.warn(`Email verification failed: no matching token found (token prefix="${token.substring(0, 8)}")`);
       throw new BadRequestException('Invalid verification token.');
     }
     if (user.email_verification_expires_at && user.email_verification_expires_at < new Date()) {
+      this.logger.warn(`Email verification failed: token expired for user="${user.username}" (id=${user.id}), expired at ${user.email_verification_expires_at.toISOString()}`);
       throw new BadRequestException('Verification token expired.');
     }
 
@@ -86,10 +131,14 @@ export class AuthService {
     user.email_verification_expires_at = null;
     await this.usersService['userRepository'].save(user);
 
+    this.logger.log(`Email verified successfully for user="${user.username}" (id=${user.id})`);
+    this.auditService.log(user.id, AuditAction.VERIFY_EMAIL);
     return { message: 'Email verified successfully.' };
   }
 
   async login(user: User): Promise<{ access_token: string; refresh_token: string }> {
+    this.logger.debug(`Creating session for user="${user.username}" (id=${user.id}, role=${user.role})`);
+
     const access_token_payload = {
       username: user.username,
       sub: user.id,
@@ -103,7 +152,7 @@ export class AuthService {
     const hashed_verifier = await UsersService.hashPassword(verifier);
 
     const expires_at = new Date();
-    expires_at.setDate(expires_at.getDate() + 1); // Expires in 24 hours
+    expires_at.setDate(expires_at.getDate() + 1);
 
     const session = this.sessionRepository.create({
       user,
@@ -113,6 +162,7 @@ export class AuthService {
     });
 
     await this.sessionRepository.save(session);
+    this.logger.log(`Session created for user="${user.username}" (id=${user.id}), expires=${expires_at.toISOString()}`);
 
     const refresh_token = `${selector}:${verifier}`;
 
@@ -125,16 +175,21 @@ export class AuthService {
   async refreshAccessToken(token: string): Promise<{ access_token: string; refresh_token: string }> {
     const [selector, verifier] = token.split(':');
     if (!selector || !verifier) {
+      this.logger.warn('Refresh token rejected: invalid format');
       throw new UnauthorizedException('Invalid refresh token format.');
     }
+
+    this.logger.debug(`Refresh attempt for selector="${selector.substring(0, 8)}..."`);
 
     const session = await this.sessionRepository.findOne({ where: { selector }, relations: ['user'] });
 
     if (!session) {
+      this.logger.warn(`Refresh failed: no session found for selector="${selector.substring(0, 8)}..."`);
       throw new UnauthorizedException('Invalid refresh token.');
     }
 
     if (session.expires_at < new Date()) {
+      this.logger.warn(`Refresh failed: session expired for user="${session.user?.username}" (expired=${session.expires_at.toISOString()})`);
       await this.sessionRepository.remove(session);
       throw new UnauthorizedException('Refresh token expired.');
     }
@@ -142,10 +197,10 @@ export class AuthService {
     const are_equal = await UsersService.comparePassword(verifier, session.hashed_verifier);
 
     if (!are_equal) {
+      this.logger.warn(`Refresh failed: verifier mismatch for user="${session.user?.username}"`);
       throw new UnauthorizedException('Invalid refresh token.');
     }
 
-    // Refresh token rotation
     const new_verifier = crypto.randomBytes(32).toString('hex');
     const new_hashed_verifier = await UsersService.hashPassword(new_verifier);
     session.hashed_verifier = new_hashed_verifier;
@@ -158,6 +213,8 @@ export class AuthService {
       role: user.role,
       token_version: user.token_version,
     };
+
+    this.logger.debug(`Token refreshed for user="${user.username}" (id=${user.id})`);
 
     const new_refresh_token = `${selector}:${new_verifier}`;
 

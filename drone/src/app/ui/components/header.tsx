@@ -83,6 +83,11 @@ export default function HeaderComponent() {
                   <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" role="menuitem" onClick={() => setIsDropdownOpen(false)}>
                     Settings
                   </Link>
+                  {user?.organization?.role === 'manager' && (
+                    <Link href="/manager" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" role="menuitem" onClick={() => setIsDropdownOpen(false)}>
+                      Manager Dashboard
+                    </Link>
+                  )}
                   {user?.role === 'admin' && (
                     <Link href="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" role="menuitem" onClick={() => setIsDropdownOpen(false)}>
                       Admin Dashboard

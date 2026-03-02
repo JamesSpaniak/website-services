@@ -1,6 +1,7 @@
 variable "frontend_image_uri" {
-  description = "The URI of the frontend Docker image in ECR."
+  description = "The URI of the frontend Docker image in ECR. Leave empty for infra-only applies."
   type        = string
+  default     = ""
 }
 
 resource "aws_ecs_cluster" "frontend" {
@@ -117,6 +118,10 @@ resource "aws_ecs_task_definition" "frontend" {
       ]
     }
   ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 resource "aws_ecs_service" "frontend" {

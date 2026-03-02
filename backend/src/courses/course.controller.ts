@@ -1,6 +1,6 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Logger, Param, ParseIntPipe, Patch, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CourseService } from "./course.service";
-import { CourseDetails, SubmitExamDto, UpdateProgressDto } from "./types/course.dto";
+import { CourseDetails, SubmitExamDto, UnitData, UpdateProgressDto } from "./types/course.dto";
 import { Course } from "./types/course.entity";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/users/role.guard";
@@ -10,6 +10,7 @@ import { CourseProgressService } from "./course-progress.service";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { plainToInstance } from "class-transformer";
 import { OptionalJwtAuthGuard } from "src/auth/optional-jwt-auth.guard";
+import { SignedUrlService } from "src/media/signed-url.service";
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -20,6 +21,7 @@ export class CourseController {
   constructor(
       private readonly courseService: CourseService,
       private readonly courseProgressService: CourseProgressService,
+      private readonly signedUrlService: SignedUrlService,
   ) {}
 
     /**
@@ -180,13 +182,52 @@ export class CourseController {
     }
   
     /**
-     * Submits answers for an exam within a unit for the authenticated user.
-     * @param req The Express request object.
-     * @param courseId The ID of the course containing the exam.
-     * @param unitId The ID of the unit containing the exam.
-     * @param submitExamDto DTO containing the user's answers.
-     * @returns The result of the exam submission.
+     * Returns a signed video URL for a specific unit in a course.
+     * Generates the URL lazily — only for the unit the user is viewing.
      */
+    @ApiOperation({ summary: 'Get signed media URL for a course unit' })
+    @ApiResponse({ status: 200, description: 'Signed video URL for the unit.' })
+    @ApiResponse({ status: 403, description: 'User does not have access to this course.' })
+    @Get(':courseId/units/:unitId/media')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    async getUnitMedia(
+      @Request() req,
+      @Param('courseId', ParseIntPipe) courseId: number,
+      @Param('unitId') unitId: string,
+    ): Promise<{ video_url?: string }> {
+      const hasAccess = await this.courseService.hasAccess(courseId, req.user);
+      if (!hasAccess) {
+        throw new ForbiddenException('You do not have access to this course.');
+      }
+
+      const course = await this.courseService.getCourseById(courseId);
+      if (!course) {
+        throw new NotFoundException(`Course with ID ${courseId} not found`);
+      }
+
+      const payload: CourseDetails = JSON.parse(course.payload);
+      const unit = this.findUnit(payload.units, unitId);
+      if (!unit) {
+        throw new NotFoundException(`Unit with ID ${unitId} not found`);
+      }
+
+      return {
+        video_url: this.signedUrlService.signVideoUrl(unit.video_url),
+      };
+    }
+
+    private findUnit(units: UnitData[], unitId: string): UnitData | null {
+      for (const unit of units) {
+        if (String(unit.id) === String(unitId)) return unit;
+        if (unit.sub_units?.length) {
+          const found = this.findUnit(unit.sub_units, unitId);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
     @ApiOperation({ summary: 'Submit answers for a unit exam' })
     @ApiResponse({ status: 201, description: 'Exam results.' })
     @Post(':courseId/units/:unitId/exam/submit')

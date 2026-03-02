@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:-replace-me-with-a-random-string}
+    depends_on:
+      umami-db-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  umami-db-init:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:-postgres}
+    entrypoint: >
+      sh -c "psql -h ${DB_HOST:-host.docker.internal} -U ${DB_USER:-postgres} -p ${DB_PORT:-5432} -tc \"SELECT 1 FROM pg_database WHERE datname = 'umami'\" | grep -q 1 || psql -h ${DB_HOST:-host.docker.internal} -U ${DB_USER:-postgres} -p ${DB_PORT:-5432} -c 'CREATE DATABASE umami'"
+    restart: "no"

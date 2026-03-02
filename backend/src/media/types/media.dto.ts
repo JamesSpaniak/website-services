@@ -4,6 +4,22 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validat
 export enum MediaFolder {
     ARTICLES = 'articles',
     COURSES = 'courses',
+    PROFILES = 'profiles',
+}
+
+export class ProfilePictureRequestDto {
+    @ApiProperty({ description: 'Original filename including extension' })
+    @IsString()
+    @IsNotEmpty()
+    filename: string;
+
+    @ApiProperty({ description: 'MIME type of the image', example: 'image/jpeg' })
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^image\/(jpeg|png|gif|webp)$/, {
+        message: 'contentType must be image/jpeg, image/png, image/gif, or image/webp',
+    })
+    contentType: string;
 }
 
 export class PresignedUrlRequestDto {

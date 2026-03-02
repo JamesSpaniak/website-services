@@ -5,10 +5,12 @@ import { ProgressService } from "./progress.service";
 import { Module } from "@nestjs/common";
 import { CourseModule } from "src/courses/course.module";
 import { Course } from "src/courses/types/course.entity";
+import { AuditModule } from "src/audit/audit.module";
 
 @Module({
     imports: [
         CourseModule,
+        AuditModule,
         TypeOrmModule.forFeature([Progress, Course]),
     ],
     controllers: [ProgressController],

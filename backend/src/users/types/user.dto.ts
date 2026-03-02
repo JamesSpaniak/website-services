@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsDate, IsArray, IsNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsDate, IsArray, IsNumber, IsUrl } from 'class-validator';
 import { Role } from './role.enum';
 
 
@@ -61,6 +61,11 @@ export class UserFull extends UserSlim {
     @ApiProperty()
     @Expose()
     updated_at?: Date;
+
+    @ApiPropertyOptional({ description: 'Organization membership info, if the user belongs to one.' })
+    @Expose()
+    @IsOptional()
+    organization?: { id: number; name: string; role: string };
 }
 
 export class UserDto {
@@ -110,4 +115,13 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     last_name?: string;
+
+    @ApiPropertyOptional({ description: "URL of the user's profile picture." })
+    @IsOptional()
+    @IsUrl()
+    picture_url?: string;
+}
+
+export class ResetPictureDto {
+    picture_url: null;
 }

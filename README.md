@@ -21,7 +21,9 @@ Backend -- backend, Frontend -- drone
     - Purchasing course flow and memberships for monthly stuff, scheduled job to update for expired memberships, emails and purchase things.
         - How will security be managed of the card?
 ### Infra
-- Test terraform
+- to run local
+cd terraform
+terraform apply -var "cloudfront_signing_public_key_pem=$(cat keys/cloudfront-public-key.pem)"
 - AWS->Github connection
     - Step 1: Create the OIDC Identity Provider in AWS
     - Step 2: Create the IAM Role for GitHub Actions
@@ -124,3 +126,8 @@ directly to S3 -> CloudFront URL is stored in article/course data.
 - S3 lifecycle rules for storage class transitions (IA after 90 days)
 - Content versioning/draft system for articles and courses
 - Bulk import/export of course JSON payloads
+
+aws secretsmanager put-secret-value \
+  --secret-id "personal-site-cloudfront-signing-private-key" \
+  --secret-string "$(cat terraform/keys/cloudfront-private-key.pem)" \
+  --region us-east-1

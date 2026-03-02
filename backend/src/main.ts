@@ -33,9 +33,13 @@ async function bootstrap() {
         winston.format.ms(),
         winston.format.colorize(),
         winston.format.printf(
-          ({ level, message, timestamp, ms, context, requestId }) => {
+          ({ level, message, timestamp, ms, context, requestId, stack }) => {
             const requestIdStr = requestId ? `[${requestId}]` : '';
-            return `${timestamp} ${level} ${requestIdStr} [${context || 'App'}]: ${message} ${ms}`;
+            let line = `${timestamp} ${level} ${requestIdStr} [${context || 'App'}]: ${message} ${ms}`;
+            if (stack) {
+              line += `\n${stack}`;
+            }
+            return line;
           },
         ),
       ),
