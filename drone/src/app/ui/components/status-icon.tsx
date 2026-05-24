@@ -8,9 +8,9 @@ export default function StatusIcon({ status }: { status?: ProgressStatus }) {
     case ProgressStatus.COMPLETED:
       return <CheckCircleIcon className="h-6 w-6 text-green-500 flex-shrink-0" title="Completed" />;
     case ProgressStatus.IN_PROGRESS:
-      return <PlayCircleIcon className="h-6 w-6 text-blue-500 flex-shrink-0" title="In Progress" />;
+      return <PlayCircleIcon className="h-6 w-6 text-[var(--brand-primary)] flex-shrink-0" title="In Progress" />;
     case ProgressStatus.NOT_STARTED:
     default:
-      return <ClockIcon className="h-6 w-6 text-gray-400 flex-shrink-0" title="Not Started" />;
+      return <ClockIcon className="h-6 w-6 text-[var(--brand-muted)] flex-shrink-0" title="Not Started" />;
   }
 };

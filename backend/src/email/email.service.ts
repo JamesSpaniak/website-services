@@ -6,6 +6,7 @@ import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as sanitizeHtml from 'sanitize-html';
 import { User } from 'src/users/types/user.entity';
 import { ContactDto } from './types/contact.dto';
+import { ConsultationDto } from './types/consultation.dto';
 import { BroadcastDto } from './types/broadcast.dto';
 
 @Injectable()
@@ -20,8 +21,8 @@ export class EmailService {
     private readonly configService: ConfigService,
   ) {
     this.emailEnabled = this.configService.get<string>('EMAIL_ENABLED') !== 'false';
-    this.defaultFrom = this.configService.get<string>('EMAIL_FROM') || 'DroneEdge <donotreply@thedroneedge.com>';
-    this.supportFrom = this.configService.get<string>('SUPPORT_EMAIL_FROM') || 'DroneEdge Support <support@thedroneedge.com>';
+    this.defaultFrom = this.configService.get<string>('EMAIL_FROM') || 'Drone Edge <donotreply@thedroneedge.com>';
+    this.supportFrom = this.configService.get<string>('SUPPORT_EMAIL_FROM') || 'Drone Edge Support <support@thedroneedge.com>';
 
     if (this.emailEnabled) {
       const host = this.configService.get<string>('EMAIL_HOST');
@@ -144,13 +145,68 @@ export class EmailService {
       subject: `You've been invited to join ${orgName}`,
       html: `
         <p>Hello,</p>
-        <p>You've been invited to join <strong>${orgName}</strong> as ${roleLabel} on Drone Training Pro.</p>
+        <p>You've been invited to join <strong>${orgName}</strong> as ${roleLabel} on Drone Edge.</p>
         <p>Click the link below to create your account:</p>
         <p><a href="${signUpLink}">Create Account</a></p>
         <p>This invite link is single-use and will expire in 30 days.</p>
         <p>If you did not expect this invitation, you can safely ignore this email.</p>
       `,
     });
+  }
+
+  async sendConsultationRequest(dto: ConsultationDto): Promise<{ success: boolean; message: string }> {
+    const sanitize = (s: string) => sanitizeHtml(s, { allowedTags: [], allowedAttributes: {} });
+    const name = sanitize(dto.name);
+    const email = sanitize(dto.email);
+    const org = sanitize(dto.organization);
+    const role = sanitize(dto.role);
+    const count = dto.student_count ? sanitize(dto.student_count) : 'Not specified';
+    const time = sanitize(dto.preferred_time);
+    const topics = sanitize(dto.topics);
+
+    const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
+
+    if (this.emailEnabled && this.transporter) {
+      await this.transporter.sendMail({
+        from: this.defaultFrom,
+        to: adminEmail,
+        subject: `Free Consultation Request — ${org} (${role})`,
+        html: `
+          <h2>New Consultation Request</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Organization / School:</strong> ${org}</p>
+          <p><strong>Role:</strong> ${role}</p>
+          <p><strong>Estimated students:</strong> ${count}</p>
+          <p><strong>Preferred time:</strong> ${time}</p>
+          <hr>
+          <p><strong>What they'd like to discuss:</strong></p>
+          <p>${topics.replace(/\n/g, '<br>')}</p>
+        `,
+      });
+
+      await this.transporter.sendMail({
+        from: this.supportFrom,
+        to: email,
+        subject: 'Your Drone Edge consultation request — we\'ll be in touch',
+        html: `
+          <p>Hi ${name},</p>
+          <p>Thanks for reaching out! We've received your consultation request and will contact you within one business day to confirm a time that works for you.</p>
+          <p>Here's a summary of what you submitted:</p>
+          <ul>
+            <li><strong>Organization:</strong> ${org}</li>
+            <li><strong>Role:</strong> ${role}</li>
+            <li><strong>Preferred time:</strong> ${time}</li>
+          </ul>
+          <p>In the meantime, feel free to reply to this email with any questions.</p>
+          <p>— The Drone Edge Team</p>
+        `,
+      });
+    } else {
+      this.logger.warn(`Email disabled; consultation request from ${email} not sent.`);
+    }
+
+    return { success: true, message: 'Your request has been received. We\'ll be in touch within one business day.' };
   }
 
   async sendBroadcastEmail(broadcastDto: BroadcastDto): Promise<{ success: boolean; count: number }> {

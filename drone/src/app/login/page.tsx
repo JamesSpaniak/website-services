@@ -5,6 +5,7 @@ import { useAuth } from '../lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import LoadingComponent from '../ui/components/loading';
+import PageShell from '../ui/components/page-shell';
 
 export default function LoginPage() {
     const { user, isLoading } = useAuth();
@@ -20,5 +21,9 @@ export default function LoginPage() {
         return <LoadingComponent />;
     }
 
-    return <LoginComponent />;
+    return (
+        <PageShell maxWidthClass="max-w-lg">
+            <LoginComponent />
+        </PageShell>
+    );
 }

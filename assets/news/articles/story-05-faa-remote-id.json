@@ -1,0 +1,20 @@
+{
+  "slug": "story-05-faa-remote-id",
+  "title": "FAA Remote ID for Drones: Transparency, Safety, and What Pilots Must Do",
+  "sub_heading": "Digital identification is a building block for busier airspace—and a shift in how accountability works for Part 107 and recreational flights.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "FAA Remote ID",
+    "drone Remote ID rule",
+    "Part 107 Remote ID",
+    "UAS identification",
+    "drone compliance 2024"
+  ],
+  "body_html": "<p><strong>In short:</strong> Remote ID aims to make many drone operations observable to authorities and airspace participants, supporting integration and enforcement. Implementation has been <strong>phased</strong> with paths for built-in vs. add-on modules.</p>\n\n<h2>Key takeaways</h2><ul><li>Think “digital license plate,” not optional sticker.</li><li>Hardware and firmware paths differ by aircraft class.</li><li>Privacy debates persist around who can access ID data and how.</li></ul>\n\n<p><strong>Hook:</strong> Remote ID is less exciting than a new gimbal—but it is what unlocks <strong>scalable BVLOS rules</strong> later.</p>\n\n<h3>Does Remote ID replace Part 107 knowledge?</h3>\n<p>No. It is an additional operational and equipment requirement layered on certificates and airspace rules.</p>\n\n<h2>Mobile readers</h2><p>Use checklists: aircraft model, RID path, firmware version, and where you fly (controlled airspace vs. LAANC). Short paragraphs render well on phones.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>FAA Remote ID</strong>, <strong>drone Remote ID rule</strong>, <strong>Part 107 Remote ID</strong>, <strong>UAS identification</strong>, <strong>drone compliance 2024</strong>.</p>",
+  "marketability_review": "Evergreen high-traffic topic; update annually. Great for SEO landing pages and course upsells.",
+  "readability_review": "Excellent FAQ potential; add schema.org FAQPage if exposed as HTML page.",
+  "considerations": [
+    "Confirm compliance dates from FAA primary sources.",
+    "Link to FAA B4UFLY and RID FAQ."
+  ]
+}

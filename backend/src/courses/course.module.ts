@@ -19,6 +19,6 @@ import { OrganizationModule } from "src/organizations/organization.module";
     ],
     controllers: [CourseController],
     providers: [CourseService, CourseProgressService],
-    exports: [CourseService],
+    exports: [CourseService, CourseProgressService],
   })
   export class CourseModule {}

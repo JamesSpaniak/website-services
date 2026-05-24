@@ -17,10 +17,19 @@ const handler = async (req: NextRequest) => {
   const headers = new Headers(req.headers);
   headers.delete('host');
 
+  let body: string | undefined;
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    body = await req.text();
+    // Ensure backend receives JSON with correct Content-Type when forwarding (CloudFront may strip it)
+    if (body?.trim().startsWith('{') && !headers.has('content-type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+  }
+
   const init: RequestInit = {
     method: req.method,
     headers,
-    body: req.method === 'GET' || req.method === 'HEAD' ? undefined : await req.text(),
+    body,
   };
 
   const response = await fetch(targetUrl, init);

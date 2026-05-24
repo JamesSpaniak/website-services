@@ -1,6 +1,20 @@
-import { ContactPayload, CreateUserDto, UserDto } from "./types/profile";
+import { ContactPayload, ConsultationPayload, CreateUserDto, UserDto } from "./types/profile";
 import { CourseData, UnitData } from "./types/course";
 import { ArticleCreateDto, ArticleFull, ArticleSlim } from "./types/article";
+import {
+    Question,
+    CreateQuestionPayload,
+    UpdateQuestionPayload,
+    BulkImportPayload,
+    BulkImportResult,
+    GenerateExamPayload,
+    GenerateClassExamPayload,
+    ExamWithQuestions,
+    SubmitExamAnswer,
+    ExamAttemptResult,
+    ClassExamSummary,
+    ClassExamResults,
+} from "./types/question";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
 
@@ -32,11 +46,13 @@ const getTokens = () => {
 const setTokens = (access_token: string, refresh_token: string) => {
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('refresh_token', refresh_token);
+    document.cookie = `access_token=${access_token}; path=/; max-age=86400; SameSite=Lax`;
 };
 
 const clearTokens = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    document.cookie = 'access_token=; path=/; max-age=0';
 };
 
 // --- Core API Function ---
@@ -218,8 +234,12 @@ async function updateCourseProgress(courseId: number, status: string): Promise<v
     });
 }
 
+function progressUnitPath(courseId: number, unitId: string) {
+    return `progress/courses/${courseId}/units/${encodeURIComponent(unitId)}`;
+}
+
 async function updateUnitProgress(courseId: number, unitId: string, status: string): Promise<UnitData> {
-    return apiClient(`progress/courses/${courseId}/units/${unitId}`, {
+    return apiClient(progressUnitPath(courseId, unitId), {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
@@ -227,6 +247,13 @@ async function updateUnitProgress(courseId: number, unitId: string, status: stri
 
 async function sendContactMessage(payload: ContactPayload): Promise<{ success: boolean; message: string }> {
     return apiClient('email/contact', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+}
+
+async function sendConsultationRequest(payload: ConsultationPayload): Promise<{ success: boolean; message: string }> {
+    return apiClient('email/consultation', {
         method: 'POST',
         body: JSON.stringify(payload),
     });
@@ -574,6 +601,68 @@ async function logToServer(level: string, message: string, context: object) {
     }
 }
 
+// ── Question Bank (admin) ─────────────────────────────────────────────────────
+
+async function getQuestions(courseId: number, status = 'active'): Promise<Question[]> {
+    return apiClient(`questions?courseId=${courseId}&status=${status}`);
+}
+
+async function createQuestion(dto: CreateQuestionPayload): Promise<Question> {
+    return apiClient('questions', { method: 'POST', body: JSON.stringify(dto) });
+}
+
+async function updateQuestion(id: number, dto: UpdateQuestionPayload): Promise<Question> {
+    return apiClient(`questions/${id}`, { method: 'PUT', body: JSON.stringify(dto) });
+}
+
+async function archiveQuestion(id: number): Promise<void> {
+    return apiClient(`questions/${id}`, { method: 'DELETE' });
+}
+
+async function bulkImportQuestions(dto: BulkImportPayload): Promise<BulkImportResult> {
+    return apiClient('questions/import', { method: 'POST', body: JSON.stringify(dto) });
+}
+
+async function exportQuestions(courseId: number): Promise<Question[]> {
+    return apiClient(`questions/export?courseId=${courseId}`);
+}
+
+// ── Exams (student) ───────────────────────────────────────────────────────────
+
+async function generateExam(dto: GenerateExamPayload): Promise<ExamWithQuestions> {
+    return apiClient('exams/generate', { method: 'POST', body: JSON.stringify(dto) });
+}
+
+async function getExamWithQuestions(examId: number): Promise<ExamWithQuestions> {
+    return apiClient(`exams/${examId}`);
+}
+
+async function submitExamAttempt(examId: number, answers: SubmitExamAnswer[]): Promise<ExamAttemptResult> {
+    return apiClient(`exams/${examId}/submit`, { method: 'POST', body: JSON.stringify({ answers }) });
+}
+
+async function getMyExamAttempt(examId: number): Promise<ExamAttemptResult | null> {
+    try {
+        return await apiClient(`exams/${examId}/attempt`);
+    } catch {
+        return null;
+    }
+}
+
+// ── Class exams (manager) ─────────────────────────────────────────────────────
+
+async function generateClassExam(dto: GenerateClassExamPayload): Promise<{ exam: ExamWithQuestions; class_exam_id: number }> {
+    return apiClient('exams/class', { method: 'POST', body: JSON.stringify(dto) });
+}
+
+async function getOrgClassExams(orgId: number): Promise<ClassExamSummary[]> {
+    return apiClient(`exams/class?orgId=${orgId}`);
+}
+
+async function getClassExamResults(classExamId: number): Promise<ClassExamResults> {
+    return apiClient(`exams/class/${classExamId}/results`);
+}
+
 export {
     getArticleById,
     createUser,
@@ -591,6 +680,7 @@ export {
     logout,
     forgotPassword,
     sendContactMessage,
+    sendConsultationRequest,
     resetPassword,
     verifyEmail,
     purchaseCourse,
@@ -639,4 +729,20 @@ export {
     uploadProfilePicture,
     resetMemberPicture,
     getUnitMedia,
+    // Questions (admin)
+    getQuestions,
+    createQuestion,
+    updateQuestion,
+    archiveQuestion,
+    bulkImportQuestions,
+    exportQuestions,
+    // Exams (student)
+    generateExam,
+    getExamWithQuestions,
+    submitExamAttempt,
+    getMyExamAttempt,
+    // Class exams (manager)
+    generateClassExam,
+    getOrgClassExams,
+    getClassExamResults,
 }

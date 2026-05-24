@@ -1,0 +1,137 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Drone careers beyond the hobby: agriculture, fire, logistics, media, and what's next
+
+────────────────────────────────────────────────────────────
+STATUS
+────────────────────────────────────────────────────────────
+PUBLISH-READY DRAFT — JSON body in assets/news/articles/story-11-drone-careers.json (May 2026). Re-verify salary bands and wire article IDs into Related reading links on CMS import.
+
+────────────────────────────────────────────────────────────
+STORY OPENING (live in JSON)
+────────────────────────────────────────────────────────────
+The glamorous entry point is wedding flyovers—but the hiring surge is in wetlands, warehouses, and wildfire perimeters. Part 107 opens the door; careers are built from sensors, data deliverables, and repeat contracts. Influencers sell simplicity; hiring managers buy repeatable data products and insured operations.
+
+────────────────────────────────────────────────────────────
+JSON ARTICLE STRUCTURE (story-11-drone-careers.json)
+────────────────────────────────────────────────────────────
+1. In short + narrative hook
+2. Key takeaways (5 bullets)
+3. Who hires: employees vs 1099 vs program leads
+4. Agriculture & precision ag + FIGURE ag
+5. Fire, forestry, thermal + FIGURE fire
+6. Delivery & logistics + FIGURE delivery
+7. Infrastructure & energy + FIGURE infrastructure
+8. Creative / RE saturation
+9. Construction, public safety, adjacent paths
+10. Emerging roles 2026–2030
+11. Sector snapshot TABLE (saturation + certs)
+12. Pay bands (verify disclaimer)
+13. FAQ (8 H3 questions)
+14. First 90 days checklist
+15. Related reading → /articles archive
+16. Last updated: May 2026
+17. Topics & related search terms (GEO)
+
+────────────────────────────────────────────────────────────
+IMAGES (published paths — in body + hero)
+────────────────────────────────────────────────────────────
+Hero (article hero_image):
+  https://media.thedroneedge.com/articles/39/2e4a680e-15e5-4d52-8338-f5b11983645e.png
+  Alt: UAS pilot with tablet crop map and drone in field — drone careers beyond hobby
+  Caption: n/a (hero only)
+
+In-article figures (CMS article 39 — media.thedroneedge.com):
+  Ag: https://media.thedroneedge.com/articles/39/d22ba7ed-9878-4afc-b5fe-6dc69d846b86.png
+  Fire: https://media.thedroneedge.com/articles/39/0aa3df9c-f289-45d0-ab00-9ab36c1a42c5.png
+  Delivery: https://media.thedroneedge.com/articles/39/eed2f635-d528-4f41-9721-e22c19c6ae90.png
+  Infra: https://media.thedroneedge.com/articles/39/57494370-f75b-46a1-96ff-92d6c9f7f159.png
+  Local fallbacks: assets/news/images/story-11-*.png
+
+Sources on disk: assets/news/images/ → copy to drone/public/images/articles/
+
+────────────────────────────────────────────────────────────
+SEO / GEO PHRASES (seo_phrases in JSON)
+────────────────────────────────────────────────────────────
+drone pilot jobs, Part 107 careers, agriculture drone jobs, wildfire drone careers,
+drone delivery jobs, thermal imaging drone operator, BVLOS drone salary,
+commercial drone operator salary, UAS program manager jobs, drone inspection careers
+
+────────────────────────────────────────────────────────────
+SECTOR MAP (covered in JSON prose — expand in 11a/11b/11c later)
+────────────────────────────────────────────────────────────
+
+AGRICULTURE & PRECISION AG
+- Roles: crop scouting pilot, agronomist-facing data analyst, spray/dispense (where legal), program manager.
+- Deliverables: NDVI/multispectral, stand counts, irrigation stress, variable-rate support.
+- Path: Part 107 → photogrammetry platforms → seasonal → ag-tech integrator.
+
+FIRE: IMAGING, PREVENTION, SUPPRESSION SUPPORT
+- Prevention vs incident vs R&D; MSO/vendor; NWCG-style quals; thermal + ICS.
+
+DELIVERY & LOGISTICS
+- BVLOS ops, route safety, maintenance, UTM; medical-first routes; link story-06, advance-03.
+
+PHOTOGRAPHY, FILM, REAL ESTATE
+- Saturated entry; pivot to inspection or licensed corporate work.
+
+INFRASTRUCTURE & ENERGY INSPECTION
+- Lines, turbines, solar thermal; LiDAR corridors; higher pay than creative.
+
+CONSTRUCTION & SURVEYING — in JSON adjacent section
+PUBLIC SAFETY & LAW ENFORCEMENT — in JSON adjacent section
+ENVIRONMENTAL, MARITIME (story-08), C-UAS (story-09), TRAINING — named in JSON
+
+EMERGING / 2026–2030
+- BVLOS fleet lead, perception engineer, drone-in-a-box ops, compliance consultant, insurance UAS literacy.
+
+────────────────────────────────────────────────────────────
+RESEARCH QUESTIONS (answered in JSON FAQ / table)
+────────────────────────────────────────────────────────────
+1. Employees vs 1099 vs program managers — § Who hires
+2. Entry vs specialist pay — § Pay bands (verify)
+3. FCC/Blue UAS / fleet compliance — FAQ + Related reading
+4. Part 107 vs thermal/GIS/waivers/NWCG — sector table + fire/ag sections
+5. Saturated vs talent-constrained — sector table
+
+────────────────────────────────────────────────────────────
+MARKET SIGNALS (indicative — verify before grants/ads)
+────────────────────────────────────────────────────────────
+- Entry commercial pilots often cited ~$36k–$65k (regional spread).
+- Specialists / BVLOS leads / inspection: higher bands; confirm per posting.
+- Photography: high supply, price pressure.
+- Ag + inspection + public safety: recurring contracts.
+
+────────────────────────────────────────────────────────────
+TOPIC / GENRE / MOOD
+────────────────────────────────────────────────────────────
+Careers; workforce; Part 107; sector applications; training pathways
+Career guide / industry outlook (annual salary refresh)
+Practical optimism—honest about saturation, excited about niches
+
+────────────────────────────────────────────────────────────
+CROSS-LINKS (prose in JSON → articles archive; add IDs on CMS)
+────────────────────────────────────────────────────────────
+story-02 (fleet compliance), story-05 (Remote ID), story-06 (delivery),
+advance-01 (CV jobs), advance-03 (BVLOS), story-09 (C-UAS), story-08 (maritime)
+story-01 — defense spillover: careful civil framing only
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS (not blocking publish)
+────────────────────────────────────────────────────────────
+- Interview 2–3 employers per sector; dated salary appendix
+- story-11a ag, 11b fire, 11c delivery deep-dives
+- Numeric /articles/{id} links when CMS IDs known
+- Course CTAs: Part 107, advanced ops, GIS module
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Converts news/policy readers into career planners—credible funnel for training if grounded in job boards, not hype.
+
+────────────────────────────────────────────────────────────
+PRODUCTION (images)
+────────────────────────────────────────────────────────────
+Brand footer via scripts/brand_story11_images.py — resvg logos, Chakra Petch + IBM Plex Sans.
+Ag + delivery use 188px footer; hero/fire/infrastructure 148px.

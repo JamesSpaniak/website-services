@@ -8,6 +8,11 @@ output "media_cloudfront_domain" {
   value       = aws_cloudfront_distribution.media_distribution.domain_name
 }
 
+output "frontend_cloudfront_id" {
+  description = "CloudFront distribution ID for the frontend. Use for cache invalidation after deploys."
+  value       = aws_cloudfront_distribution.frontend_distribution.id
+}
+
 output "nameservers" {
   description = "Route53 nameservers for the hosted zone. Set these at your domain registrar."
   value       = aws_route53_zone.main.name_servers

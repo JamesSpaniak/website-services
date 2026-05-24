@@ -1,6 +1,7 @@
 'use client';
 
 import { ContentBlock } from '@/app/lib/types/article';
+import { prepareArticleBodyHtml } from '@/app/lib/article-html';
 import ImageComponent from './image';
 import VideoComponent from './video';
 
@@ -23,8 +24,8 @@ function ContentBlockItem({ block }: { block: ContentBlock }) {
         case 'text':
             return (
                 <div
-                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-600 prose-img:rounded-xl overflow-hidden break-words"
-                    dangerouslySetInnerHTML={{ __html: block.content }}
+                    className="prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)] prose-headings:text-[var(--brand-foreground)] prose-a:text-[var(--brand-primary)] overflow-hidden break-words [&_figure]:my-8 [&_figure]:max-w-full [&_svg]:block [&_svg]:h-auto [&_svg]:max-w-full [&_figcaption]:text-sm [&_figcaption]:text-[var(--brand-muted)]"
+                    dangerouslySetInnerHTML={{ __html: prepareArticleBodyHtml(block.content) }}
                 />
             );
 
@@ -36,10 +37,11 @@ function ContentBlockItem({ block }: { block: ContentBlock }) {
                         alt={block.alt || ''}
                         width={1200}
                         height={675}
-                        className="w-full rounded-xl bg-gray-50 object-cover"
+                        className="w-full object-cover"
+                        style={{ borderRadius: 'var(--radius-md)' }}
                     />
                     {block.caption && (
-                        <figcaption className="mt-2 text-sm text-center text-gray-500">
+                        <figcaption className="mt-2 text-xs text-center text-[var(--brand-muted)] font-mono">
                             {block.caption}
                         </figcaption>
                     )}
@@ -51,7 +53,7 @@ function ContentBlockItem({ block }: { block: ContentBlock }) {
                 <figure>
                     <VideoComponent src={block.content} />
                     {block.caption && (
-                        <figcaption className="mt-2 text-sm text-center text-gray-500">
+                        <figcaption className="mt-2 text-xs text-center text-[var(--brand-muted)] font-mono">
                             {block.caption}
                         </figcaption>
                     )}

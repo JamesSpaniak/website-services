@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { verifyEmail } from '@/app/lib/api-client';
+import PageShell from '@/app/ui/components/page-shell';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -39,22 +40,30 @@ export default function VerifyEmailPage() {
     };
   }, [token]);
 
+  const subtitle =
+    status === 'success'
+      ? 'Your email is verified.'
+      : status === 'error'
+        ? 'Verification could not be completed.'
+        : status === 'loading'
+          ? 'Please wait…'
+          : 'Confirming your email address.';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
-      <div className="max-w-md w-full rounded-lg border border-gray-200 p-6 shadow-sm text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Verify Email</h1>
-        <p className="mt-3 text-gray-600">
-          {status === 'loading' && 'Verifying your email...'}
+    <PageShell title="Verify email" subtitle={subtitle} maxWidthClass="max-w-lg">
+      <div className="p-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg shadow-sm text-center w-full">
+        <p className="text-[var(--brand-muted)]">
+          {status === 'loading' && 'Verifying your email…'}
           {status === 'success' && message}
           {status === 'error' && message}
-          {status === 'idle' && 'Preparing verification...'}
+          {status === 'idle' && 'Preparing verification…'}
         </p>
         <div className="mt-6">
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Go to Login
+          <Link href="/login" className="text-[var(--brand-primary)] hover:underline">
+            Go to login
           </Link>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

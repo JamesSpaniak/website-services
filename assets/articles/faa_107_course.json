@@ -1,0 +1,1419 @@
+{
+    "id": 35,
+    "title": "PART 107 REGULATIONS",
+    "sub_title": "Rules for Civil Small Unmanned Aircraft Systems (sUAS)",
+    "description": "Apply the FAA's Part 107 rules governing commercial sUAS operations, covering pilot roles, operational limitations, airspace requirements, Remote ID compliance, waivers, and regulations for night flight and flight over people and moving objects.",
+    "text_content": "The Part 107 Regulations cover the rules for civil small unmanned aircraft weighing less than 55 pounds. These rules oversee non‑recreational and commercial operations of small unmanned aircraft systems (sUAS) within the National Airspace System (NAS).",
+    "images_url": [
+        "https://media.thedroneedge.com/courses/35/9c2099d5-a2a4-4af6-8d5e-e518ae0502b1.png"
+    ],
+    "price": "0",
+    "has_access": true,
+    "units": [
+        {
+            "id": 1,
+            "title": "PART 107 REGULATIONS",
+            "sub_title": "Rules for Civil Small Unmanned Aircraft Systems (sUAS)",
+            "description": "Apply the FAA's Part 107 rules governing commercial sUAS operations, covering pilot roles, operational limitations, airspace requirements, Remote ID compliance, waivers, and regulations for night flight and flight over people and moving objects.",
+            "text_content": "The Part 107 Regulations cover the rules for civil small unmanned aircraft weighing less than 55 pounds. These rules oversee non‑recreational and commercial operations of small unmanned aircraft systems (sUAS) within the National Airspace System (NAS).",
+            "price": "0",
+            "has_access": true,
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 11,
+                    "title": "Applicability of Part 107",
+                    "text_content": "The FAA published remote pilot certification and operating rules for civil small unmanned aircraft in August 2016. Part 107 applies to any operation that directly or indirectly supports a business, nonprofit, government, or compensated purpose (monetary or non-monetary).\n\nDrone operators no longer need special exemptions or permits from the FAA to fly, only a Remote Pilot certificate. Operators can fly without needing special exemptions, airworthiness requirements, pilot certification provisions, operating limitations, or external payload provisions. Initially, the rule did not permit sUAS operations at night or over people without a waiver.\n\nPart 107 DOES NOT apply to: recreational/model aircraft outside of UAS that occur in accordance with 49 U.S.C. 44809 (Hobby & Recreational use), public aircraft operations, amateur rockets, moored balloons, unmanned free balloons, kites, operations conducted outside the United States, air carrier operations, and operations conducted under Section 333 exemptions.",
+                    "description": "Identify which small unmanned aircraft operations are governed by Part 107 and which operations are explicitly excluded.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 12,
+                    "title": "Roles and Crew Management",
+                    "text_content": "Part 107 specifies requirements for various roles including the Remote Pilot In Command (RPIC), Person Manipulating The Flight Controls, Visual Observer (VO), and others like payload operators.\n\nRemote Pilot In Command (RPIC):\n\nThe RPIC must hold a Remote Pilot Certificate with a sUAS rating (or be under the direct supervision of one). The RPIC has the final authority and ultimate responsibility for the operation and safety of the sUAS and flight. The certificate must be easily accessible when flying. The RPIC must be designated before or during the flight, ensure the sUA will pose no undue hazard if control is lost, and ensure compliance with all applicable regulations.\n\nPreflight duties include conducting preflight checks (aircraft & control system), verifying the aircraft is safe and airworthy, confirming compliance with registration requirements, ensuring Visual Line of Sight (VLOS) rules are met, and briefing/verifying the capability of the crew (VO, control operator). The RPIC has final authority to modify, delay, or cancel a flight and may deviate from rules in a true emergency.\n\nPerson Manipulating The Flight Controls:\n\nThis person is physically operating the drone's controls but may not be the RPIC. If they are not a certified remote pilot, they can operate only if the RPIC is supervising them directly and has the ability to immediately take control (via physical proximity or radio/override system). They must also understand the mission, safety procedures, and emergency actions.\n\nVisual Observer (VO):\n\nThe VO is used to assist in avoiding hazards, obstacles, and maintaining situational awareness and VLOS. They help increase safety by communicating information. They are not required but are recommended based on mission complexity. The VO must keep VLOS of the aircraft unaided (except corrective lenses). They should know the UA's location at all times through VLOS and scan for all potential hazards, including other aircraft.\n\nFlight Crew Management & Communication:\n\nThe RPIC is responsible for task distribution and workload management. Pre-Flight Considerations include assessing weather, airspace, terrain, obstacles, aircraft condition/airworthiness, and crew readiness (mental/physical). Pre-Flight Communications involve a crew briefing covering emergency/contingency procedures and potential hazards. Preflight Familiarization, Inspection, & Actions require reviewing manufacturer instructions and inspecting aircraft components (propellers, battery, control link), and ensuring required documentation is available. Effective communication (two-way radio, cell phone, etc.) is essential. Hands-free communication (earpiece, headset, speaker mode) is recommended if flight controls are being manipulated. If the UA goes out of VLOS for more than 15 seconds, a failsafe return to home must be initiated. Clock coordinates (12:00 straight ahead, 3:00 right, etc.) are universal and should be used to communicate the UA's location.",
+                    "description": "Outline the roles, responsibilities, and communication requirements for RPIC, visual observer, and control operator under Part 107.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 13,
+                    "title": "Operational Rules and Limitations",
+                    "text_content": "This section covers the core rules for operating a sUAS under Part 107, including registration, inspection, reporting, and flight restrictions.",
+                    "description": "Summarize the core operational rules for sUAS flights, including registration, compliance, accident reporting, medical fitness, and general flight limitations.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 131,
+                            "title": "Registration, Inspection, and Falsification",
+                            "description": "Explain requirements for aircraft registration, mandatory compliance inspections, and penalties for falsifying records.",
+                            "text_content": "Aircraft Registration: All non-recreational drones must be registered according to 14CFR Part 47 or Part 48. The registration number must be legibly displayed on the aircraft, and the RPIC must carry proof of registration physically or digitally.\n\nInspection, Testing, and Compliance: Upon request, the RPIC, person controlling, or owner must present their remote pilot certificate with a sUAS rating, photo ID with your birthdate and signature, and any required documents/records/reports to the FAA, NTSB, Federal/State/local law enforcement, or TSA. The RPIC, VO, owner, operator, or person manipulating the controls must allow the FAA to inspect the aircraft and involved personnel, facilities, technical data, and witness any necessary tests to verify Part 107 compliance.\n\nFalsification, Reproduction or Alteration: Providing false information or fraudulently altering or reproducing required records/reports can result in denying, suspending, or revoking a certificate or waiver, or issuing civil penalties (fines).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 132,
+                            "title": "Accident Reporting and Hazardous Operations",
+                            "description": "Summarize rules for mandatory accident reporting, in-flight emergencies, and prohibitions against reckless or hazardous operations.",
+                            "text_content": "Accident Reporting: The RPIC is required to report an accident to the FAA within 10 days if it results in serious injury to any person (or loss of consciousness) or causes damage to property (other than the drone) in excess of $500 to repair or replace (whichever is lower).\n\nIn-Flight Emergency: The RPIC may deviate from any rule of Part 107 to the extent necessary to meet an emergency. Upon request from the administrator, the RPIC who deviates from a rule must send a written report.\n\nHazardous Operations: No person may operate a sUAS in a reckless manner that endangers the life or property of another (e.g., continuing to fly in inclement weather or congested areas). Allowing an object to be dropped from a sUAS in a manner that creates an undue hazard to persons or property is prohibited.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 133,
+                            "title": "Medical Conditions, Alcohol, and Drugs",
+                            "description": "Identify physical and mental fitness requirements for crew members, including prohibitions on operating while impaired by medical conditions, alcohol, or drugs.",
+                            "text_content": "Medical Condition: A medical certificate is not required. However, if you know or have reason to believe your condition would interfere with the safe operation of the sUAS, you must not fly. Examples include: being fatigued, using medication that affects performance or situational awareness (like certain antihistamines and decongestants that may cause drowsiness), being physically (flu/headaches) or mentally ill, loss of hearing or voice that prevents communication, blurred vision preventing 'see and avoid' requirements, or temporary/permanent loss of the ability to control the drone effectively.\n\nAlcohol or Drugs: No person controlling a sUAS or serving as a crew member can: have a medical condition that could risk safety (ex: epilepsy), be under the influence of alcohol, use drugs that affect their capabilities, have consumed alcohol within 8 hours of drinking, or have an alcohol concentration of 0.04 or greater. If requested by law enforcement, an individual must submit to a test to indicate the alcohol concentration in the blood or breath.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 134,
+                            "title": "Operation From Moving Vehicles and Transportation",
+                            "description": "State the rules for operating a sUAS from moving vehicles or platforms and the limitations on transporting property for compensation.",
+                            "text_content": "Operation From a Moving Vehicle: When in a moving vehicle (water or land), no person may operate a UA UNLESS the sUA is flown over a sparsely populated area AND is not transporting another person's property for compensation or hire. You may NOT fly from a moving aircraft.\n\nTransportation of Property: You may transport property under Part 107 if all operations occur within one state and remain fully compliant with all Part 107 requirements within a defined operating area. You may NOT transport property if it occurs within the District of Columbia (DC) and another place in DC, or if it involves crossing state lines or certain territories (e.g., transport between islands in Hawaii if it passes through international airspace).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 135,
+                            "title": "Visual Line of Sight (VLOS) and Multi-Aircraft Rules",
+                            "description": "Define Visual Line of Sight (VLOS) requirements and state the prohibition on controlling more than one unmanned aircraft at a time.",
+                            "text_content": "Visual Line of Sight (VLOS) Aircraft Operation: The RPIC, person manipulating controls, and VO must be able to see the UA throughout the flight unaided (except for corrective lenses). This ensures the pilot knows the UA's location, determines its attitude, altitude, and direction of flight, observes the airspace for other traffic/hazards, and ensures the UA does not endanger life or property. The ability to see the drone unaided (no binoculars) must be exercised by the RPIC/person manipulating controls or a VO. Briefly looking at the controller (to locate the UA if lost for a second or check battery) or if the drone is briefly behind smoke/a chimney is permitted.\n\nOperation of Multiple Small Unmanned Aircraft: A person may not manipulate flight controls or act as a remote pilot in command or visual observer in the operation of more than one unmanned aircraft at the same time.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 136,
+                            "title": "Right-of-Way Rules and Operation Near Aircraft",
+                            "description": "Explain the mandatory see-and-avoid requirement and the prohibition against interfering with manned aircraft operations.",
+                            "text_content": "All sUAS must yield the right of way to all aircraft ('See and Avoid'). The sUAS must give way to the aircraft or vehicle and may not pass over, under, or ahead of it unless well clear. No person may operate a sUA so as to create a collision hazard. To comply, the RPIC must fly the UA so that a manned aircraft pilot never needs to change their flight path to avoid collision. The RPIC must know the location and flight path of their UA at all times and be aware of activity in the vicinity to avoid collision with people, property, or manned aircraft.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 137,
+                            "title": "Autonomous Flight and RPIC Responsibility",
+                            "description": "Define autonomous flight under Part 107 and explain the RPIC's continued responsibility and ability to take control during programmed missions.",
+                            "text_content": "Autonomous flight means the drone can fly parts of its mission using pre-programmed instructions (set route, auto return-home). However, under Part 107, the RPIC is still fully responsible for the flight at all times. When performing autonomous operations, the RPIC must have the ability to direct the sUA to ensure compliance with Part 107. The RPIC must be able to command the aircraft to change route, altitude, or land (either manually or via automation commands). If the control link is lost, the aircraft may continue a programmed mission or return-to-home.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 138,
+                            "title": "Preflight Familiarization and Airspace Operations",
+                            "description": "Outline preflight assessment requirements and restrictions on operating in controlled, prohibited, and restricted airspace.",
+                            "text_content": "Preflight Familiarization, Inspection, and Actions: Prior to flight, the RPIC is responsible for reviewing the operating environment and assessing hazards to persons or property (surface or air). This includes local weather conditions, local airspace and flight restrictions, the location of persons and property on the surface, and other ground hazards. The RPIC must ensure all participating persons are informed about operating conditions, emergency/contingency procedures, roles/responsibilities, and potential hazards. They must ensure control links are working, sufficient power exists, and any attached object is secure and does not adversely affect flight characteristics. Before flight, the RPIC must verify the drone is certified or approved under one of the approved categories (1-4) and ensure necessary documentation (certificate, registration, airworthiness certificate, waiver) is available.\n\nOperation in Certain Airspace: Operations in Class B, C, or D airspace or within the lateral boundaries of the surface area of Class E airspace designated for an airport are prohibited unless prior authorization is obtained. A small drone cannot interfere with manned aircraft traffic patterns or operations at any airport, heliport, or seaplane base (including causing them to alter a flight path or delay takeoff/landing). Operation in prohibited or restricted areas requires authorization from the using or controlling agency. A NOTAM may be issued to establish a Temporary Flight Restriction (TFR), which identifies the affected area and explains the necessary hazard or condition.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 139,
+                            "title": "Operating Limitations",
+                            "description": "State specific performance limitations for sUAS regarding speed, altitude, cloud clearance, and minimum visibility.",
+                            "text_content": "The groundspeed of the sUA may not exceed 87 knots (100 miles per hour). The altitude cannot be higher than 400 feet above ground level (AGL), unless the sUA is flown within a 400-foot radius of a structure, and does not fly higher than 400 feet above the structure's immediate uppermost limit. Minimum flight visibility, as observed from the Control Station, must be no less than 3 statute miles (SM). The minimum distance of the sUA from clouds must be no less than 500 feet below the cloud and 2,000 feet horizontally from the cloud. These restrictions are waivable if safe operation can be demonstrated under a Certificate of Waiver.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 14,
+                    "title": "Waivers",
+                    "text_content": "A waiver is special permission from the FAA that allows you to break certain Part 107 rules if the FAA believes your operation will still be safe. The FAA may issue a Certificate of Waiver (CoW) if you demonstrate that your planned flight can be done safely.\n\nWaiver Application Requirements: A request must contain a complete description of the proposed operation and a safety justification. The safety justification must explain how the operation will be kept safe using equipment, technology, and/or other strategies. The FAA can add additional requirements or limits to ensure safety, and failing to follow every condition makes the operation illegal.\n\nRules That May Be Waived: A Certificate of Waiver may be issued for: operation from a moving vehicle or aircraft (though not for compensation/hire transport of another's property); Visual Observer requirements; Visual line of sight aircraft operation (though not for compensation/hire transport of another's property); daylight operations; anti-collision light required for night/civil twilight operations; operation of multiple small unmanned aircraft systems; yielding the right of way; operation over people; operation in certain airspace; and operating limitations for small unmanned aircraft.\n\nApplication Process: The Part 107 Waiver Application process is now on a new system: https://aviationsafetyportal.faa.gov/ (https://aviationsafetyportal.faa.gov/). Applicants should submit requests at least 60 days prior to the proposed operation date; requests submitted later may not be processed in time and could result in cancellation or denial. Airspace Authorizations (required for flying in controlled airspace) have shorter processing times than airspace waivers. The FAA has a special system for emergencies called the SGI waiver (Special Governmental Interest waiver), designed for public safety, first responders, and critical organizations.\n\nAirspace Authorization: For flying in controlled airspace, Part 107 Remote Pilots must use FAA Drone Zone or a Low Altitude Authorization and Notification Capability (LAANC) provider to obtain authorization. UA operators should not contact Air Traffic Control (ATC) directly by radio or phone.",
+                    "description": "Explain Certificate of Waiver requirements, which Part 107 rules may be waived, and how to obtain controlled-airspace authorization.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 15,
+                    "title": "Remote ID Requirements",
+                    "text_content": "Remote ID, flying over people and moving objects, and flying at night rules were introduced in April 2021 and became mandatory as of September 2023. Remote ID for UA is a digital license plate that broadcasts the drone's identity, location, altitude, and velocity while flying, improving airspace safety and security. All drones require registration, including those less than 0.55 lbs flown for recreation, business, or public safety.\n\nThere are three ways to meet the identification requirements: Standard Remote ID UA, UA with Remote ID Broadcast Module, or operating within an FAA-Recognized Identification Area (FRIA).\n\nStandard Remote ID UA:\n\nA Standard Remote ID drone has built-in FAA Remote ID broadcast capabilities from takeoff to shutdown. The drone's serial number must be an FAA-accepted declaration of compliance and linked to its FAA registration. It must self-test and cannot take off if its remote ID is non-functional, and must land immediately if there is a problem with broadcasting. The equipment must not be modified, blocked, or disabled. It must broadcast continuously over unlicensed Radio Frequency spectrum, designed to maximize the broadcast range. It is limited to VLOS. The broadcast includes: Remote ID Serial Number, Location and Altitude, Velocity, Control Station Location and Elevation, Time Mark, and Emergency Status.\n\nRemote ID Broadcast Module:\n\nA broadcast module is a device that can be added to a drone to retrofit it with Remote ID capabilities. The broadcast module serial number must be included with the UA registration. It must be fully functional from takeoff to shutdown, must self-test, and requires VLOS. The module broadcasts: Drone ID (serial number), Location and Altitude, Velocity, Takeoff location and elevation, and Time mark.\n\nFAA-Recognized Identification Areas (FRIA):\n\nFRIAs are geographic areas where drones can fly without broadcasting Remote ID, provided the drone and pilot are located within the FRIA's boundaries and within VLOS throughout the flight. Only FAA-recognized Community Based Organizations (CBOs) and educational institutions (primary/secondary schools, trade schools, colleges, and universities) can request a FRIA. A FRIA is effective for 48 calendar months, and renewal requests must be submitted at least 120 days prior to expiration.\n\nAlternative Remote Identification:\n\nThe Administrator may authorize operations without remote ID for aeronautical research or to show compliance with regulations. Automatic Dependent Surveillance-Broadcast (ADS-B) Out equipment cannot be used for remote identification compliance. A foreign-registered drone with Remote ID cannot be flown in the U.S. unless a Notice of Identification is submitted to the FAA.",
+                    "description": "Explain the purpose and compliance methods for Remote ID (Standard UA, broadcast module, and FRIA) and required broadcast information.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 16,
+                    "title": "Flying Over People and Moving Objects",
+                    "text_content": "As of April 21, 2021, Part 107 permits operations over people and moving vehicles under certain conditions, eliminating the need for waivers for typical operations.\n\nCompliance Verification (MoC and DoC):\n\nMeans of Compliance (MoC): This is the FAA-approved method a drone manufacturer uses to show their drone meets Remote ID performance and safety requirements (14 CFR Part 89). Requirements relate to exposed rotating parts, impact kinetic energy limit, and safety defects. There are three types: FAA-Provided MoC, FAA-Accepted/FAA-Approved MoC, and Custom MoC.\n\nDeclaration of Compliance (DoC): The submitter must have proof the drone/module meets an FAA-accepted MoC, confirm the aircraft has no safety defects, and have a process to notify the public/FAA about unsafe conditions. The submitter must maintain records directly related to the DoC for two years and allow the FAA to perform inspections/access records.\n\nCategories for Operations Over People:\n\n- Category 1 UA: Weigh 0.55 lbs (250 g) or less, including everything attached at takeoff. Must have no exposed rotating parts that could cut human skin. No DoC or MoC is required.\n- Category 2 UA: Must not cause injury exceeding 11 ft-lb of kinetic energy. Must have no exposed rotating parts that could cut human skin and no safety defects. Must be listed on an FAA-accepted DoC and MoC. Must display labeling for Category 2 eligibility and have manufacturing instructions. The RPIC is responsible for verifying these things.\n- Category 3 UA: Must not cause injury exceeding 25 ft-lb of kinetic energy. Must have no exposed rotating parts that could cut human skin and no safety defects. Requires both MoC and DoC acceptance. Must display labeling for Category 3 eligibility and come with manufacture instructions. The RPIC is responsible for verifying.\n- Category 4 UA: Must have an FAA Airworthiness Certificate under Part 21. Must be operated within its approved Flight Manual operating limitations, which must not prohibit operation over people. Requires maintenance, inspection, and recordkeeping, with labeling as specified in the Type Certificate.\n\nSustained Flight and Crowds:\n\n- Categories 1, 2, or 4: You cannot fly these drones in sustained flight (hovering, circling, or repeatedly flying over) over a crowd (open-air assembly—generally 15–20 people) unless the drone is broadcasting Remote ID (Standard or Broadcast Module).\n- Category 3: CAN'T fly over crowds or open-air assemblies UNLESS two conditions are met: 1) inside a closed/restricted area where everyone is on notice a drone will be overhead; OR 2) you do not maintain sustained flight over anyone unless they are part of the operation. Operation over a person inside a vehicle or under a covered structure that provides protection is acceptable.\n\nOperation Over Moving Vehicles:\n\n- Categories 1, 2, & 3: May operate a sUA over a human being inside a moving vehicle if: 1) the UA remains within/over a closed- or restricted-access site, and all humans inside moving vehicles at that site are notified a sUA may fly over them; AND 2) must not maintain sustained flight over moving vehicles (only passing over briefly/in transit).\n- Category 4: The sUA must meet the Airworthiness Certificate/Flight Manual requirements, and the operating limitations must not prohibit operations over human beings located inside moving vehicles.",
+                    "description": "Differentiate the four drone categories for operations over people, MoC/DoC requirements, and restrictions on sustained flight over crowds or moving vehicles.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 17,
+                    "title": "Flying At Night Under Certain Conditions",
+                    "text_content": "As of April 21, 2021, flying at night without a waiver is allowed if two conditions are met: 1) The RPIC must complete an updated initial knowledge test or online recurrent training; AND 2) The small unmanned aircraft must have lighted anti-collision lighting visible for at least three (3) statute miles that has a flash rate sufficient to avoid a collision. The anti-collision light intensity can be dimmed for safety reasons, but the lights must NOT be turned off under any circumstances.\n\nOperational Requirements and Hazards:\n\nNight operation requires the RPIC to still maintain Visual Line of Sight (VLOS). Additional lighting on the ground may be necessary. Airspace authorization is still required for controlled airspace. All other rules for flying over people still apply. Night flight causes hazards not noticeable during the day, such as difficulty seeing the drone, its orientation, obstacles, wildlife, and other aircraft. Depth perception is also affected.\n\nMitigation Strategies:\n\n- Lighting/Vision Challenges: Avoid looking at bright lights. Use high-intensity, strobe-style anti-collision lights, and choose flight locations away from cluttered lighting. Check and use extra ground lighting, especially near the landing pad. To avoid the night-blind spot, shift your gaze 5–10° off center. Fly closer and lower than daytime operations, and check the area during the day beforehand.\n- VLOS Challenges: Use multiple VOs or VOs trained on night-ops procedures. Keep the drone lit and within VLOS.\n- Depth Perception/Situational Awareness Challenges: Slow down flight speed. Increase standoff distances from objects. Keep the aircraft within a shorter radius.\n- Circadian Rhythm/Battery: Avoid exhaustion. Start with fully warmed batteries, reduce aggressive maneuvers, shorten flight times, and monitor battery performance more frequently due to cold air effects.\n- Loss of Orientation: Use bright position lighting (different colors on different arms). Keep the drone in a predictable flight pattern. Avoid rotating the drone unless necessary. Land immediately if necessary.",
+                    "description": "Identify training and anti-collision lighting requirements for night flight, common hazards, and mitigation strategies for low-light operations.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "Airports, Airspace, and Data Sources",
+            "sub_title": "",
+            "description": "By the end of this unit, you will understand a detailed breakdown of the National Airspace System (NAS), the functions of Air Traffic Control (ATC), essential pilot navigation using Latitude and Longitude, and the four mandatory data sources required for safe drone operations near airports.",
+            "text_content": "Introduction to the System\n- Air Traffic By The Numbers: Adding many small Unmanned Aircraft Systems (sUAS) to the National Airspace System (NAS) is a complex challenge. A managed approach is necessary due to many variables and potential safety concerns, and it is essential to maintain the safety and integrity of U.S. airspace.\n- National Airspace System (NAS): This is a network of airspace, navigation facilities, airports, technology, and regulations that enable safe and efficient air travel in the US.\n    - Components: Airspace Management (organizes airspace: controlled, uncontrolled, & special use), Communication Systems (between pilots and controllers), Navigation & Surveillance (uses radar, GPS, and other systems to track aircraft and provide navigation support), Air Traffic Services (includes flight planning, weather services, and traffic flow management), and Safety & Regulation.\n- Air Traffic Control (ATC): The primary purpose of the ATC is to prevent a collision between aircraft operating in the system and to organize and expedite the flow of traffic.\n    - Services: Provides instructions for flight paths, altitude changes, and landing/takeoff clearances, Separation of Aircraft, Traffic Flow Management, Emergency Assistance, and Coordination Across Sectors.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 21,
+                    "title": "Introduction to Air Traffic and Airspace",
+                    "text_content": "Introduction to Air Traffic and Airspace\n- Air Traffic By The Numbers: Adding many small Unmanned Aircraft Systems (sUAS) to the National Airspace System (NAS) is a complex challenge. A managed approach is needed due to many variables and potential safety concerns, and it is essential to maintain the safety and integrity of U.S. airspace.\n- National Airspace System (NAS): This is a network of airspace, navigation facilities, airports, technology, and regulations that enable safe and efficient air travel in the US.\n    - Components: Airspace Management (organizes airspace: controlled, uncontrolled, & special use), Communication Systems (between pilots and controllers), Navigation & Surveillance (uses radar, GPS, and other systems to track aircraft and provide navigation support), Air Traffic Services (includes flight planning, weather services, and traffic flow management), and Safety & Regulation.\n- Air Traffic Control (ATC): The primary purpose of the ATC is to prevent a collision between aircraft operating in the system and to organize and expedite the flow of traffic.\n    - Services: Provides instructions for flight paths, altitude changes, and landing/takeoff clearances, Separation of Aircraft, Traffic Flow Management, Emergency Assistance, and Coordination Across Sectors.",
+                    "description": "Explain the complexities of integrating sUAS into the NAS, defining the NAS, and detailing the primary purpose and services of Air Traffic Control (ATC).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 22,
+                    "title": "Navigation: Latitude and Longitude",
+                    "text_content": "Key Navigation Principles\n- Reliability: Latitude and longitude is one of the most reliable and commonly used forms of navigation for pilots and other individuals. Any specific point can be determined by the intersection of the two lines (latitude and longitude).\n- Latitude: The equator is an imaginary circle between the poles of the Earth and is the start point for lines running North or South. Circles parallel to the equator run East and West and are called parallels of latitude. Lines of latitude measure degrees North (N) or South (S) of the equator. The continental US is located between 25° and 49° N latitude.\n- Longitude: Meridian lines run from the North Pole to the South Pole and are at right angles to the Equator. The 'Prime Meridian' passes through Greenwich, England, and is used as the zero line. Measurements are made in degrees East (E) and West (W) to 180°. The 48 continental states of the US are between 67° and 125° W longitude.\n- Format: Degrees of latitude and longitude are divided into 60 minutes. Measurements are made in Degrees (°), minutes ('), and seconds (\"). Latitude is listed first, followed by the longitude. North and East is positive; South and West is negative.\n- Conversion: If coordinates are shown as a decimal, conversion is required to use with sectional charts. To convert: use the whole number part as the degrees; multiply decimal parts by 60 to convert them to minutes; multiply decimal parts of the minutes by 60 to convert them to seconds.\n- Example Conversion (JFK): JFK airport coordinates are 40.6399°N, 73.7797°W. This converts to Latitude: 40°38'23\"N and Longitude: 73°46'47\"W.",
+                    "description": "By the end of this lesson on Navigation: Latitude and Longitude, you will explaining the coordinate system that pilots rely on, including the definitions of Latitude and Longitude, the degree format (DMS), and the necessary conversion from decimal coordinates.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 23,
+                    "title": "Four Essential Airport Data Sources",
+                    "text_content": "Required Data Review\nIf planning on flying your drone within 5 miles of an airport, it is important to review the current data for that airport. Data includes information, such as communication frequencies, services available, closed runways, or airport construction.\n\nThe Four sources of information are:\n- Aeronautical Charts\n- Chart Supplement U.S. (formerly Airport/Facility Directory)\n- Notices to Airmen (NOTAMs)\n- Automated Terminal Information Service (ATIS)",
+                    "description": "By the end of this lesson on Four Essential Airport Data Sources, you will overview of the four mandatory data sources remote pilots must consult for flight planning near airports, specifying the requirement to review data within a 5-mile radius.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 231,
+                            "title": "Chart Supplement U.S. (CSU)",
+                            "text_content": "- Comprehensive Info: The Chart Supplement U.S. provides the most comprehensive information on an airport, including airports, heliports, and seaplane bases.\n- Revision Cycle: It is updated in books and digitally and is revised every 56 days.\n- Information Included: Runway info including elevations, CTAF radio frequency, contact information including phone number, and weather sources.\n- Legend: The Chart Supplement U.S. includes a 'Legend Sample' explaining how information may be interpreted.\n- Source URL: www.faa.gov/air_traffic/flight_info/aeronav",
+                            "description": "Describe the content and revision cycle of the Chart Supplement U.S., the most comprehensive source for airport data.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 232,
+                            "title": "Notices to Airmen (NOTAMs)",
+                            "text_content": "- Definition: Time-critical aeronautical information, temporary in nature or not sufficiently known in advance to permit publication in chart supplements or operational publications.\n- Dissemination: Receives immediate dissemination by the NOTAM system. Reviewing NOTAMs could affect your decision to fly; exercise good judgment and common sense.\n- Reasons for NOTAMs: Hazards (air shows, parachute jumps, kite flying, & rocket launches), Flights of important people (presidents or heads of state), Inoperable lights on tall obstructions, Temporary erection of obstacles near airfields, and Flocks of birds through airspace (called BIRDTAM).\n- Sample NOTAM Decoding (JFK Crane Example): The sample NOTAM `!JFK 07/398 JFK OBST CRANE (ASN 2024-AEA-9387-OE) 404002N0734744W (1.8NM NNW JFK) 189FT (171FT AGL) FLAGGED AND LGTD 2507171151-2701151800` includes:\n    - !JFK: John F. Kennedy International Airport (JFK).\n    - 07/398: The 398 NOTAM issued in July.\n    - JFK OBST CRANE: An obstruction (OBST)—a crane near JFK.\n    - (ASN 2024-AEA-9387-OE): Number assigned by the FAA.\n    - 404002N0734744W: Latitude/Longitude of crane (40°40'02\" N 73°47'44\" W).\n    - (1.8NM NNW JFK): Crane is 1.8 NM N/NW of JFK Airport.\n    - 189FT (171FT AGL): 189 feet MSL, 171 feet AGL.\n    - FLAGGED AND LGTD: Crane is flagged and lighted for visibility.\n    - 2507171151-2701151800: Start and end times in UTC.\n- Source URLs: https://notams.aim.faa.gov/, https://tfr.faa.gov/tfr3/?page=list, www.1800wxbrief.com",
+                            "description": "By the end of this lesson on Notices to Airmen (NOTAMs), you will explaining the definition, purpose, and types of time-critical NOTAMs, including a breakdown of how to read and interpret a sample NOTAM.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 233,
+                            "title": "Automated Terminal Information Service (ATIS)",
+                            "text_content": "- Function: ATIS is a looped recording of weather conditions and other information broadcast on a local frequency.\n- Information: Includes weather, runways in use, specific ATC procedures, and any airport construction activity that could affect planning.\n- Updates: Updated hourly but is updated more often if conditions warrant.\n- Procedure: ATIS is given a code (e.g., Alpha, Bravo) and changes with every update. Prior to calling ATC, pilots listen to the broadcast and inform ATC on initial contact that they have the current code (e.g., 'information Bravo'). This allows the tower controller to verify the pilot has current local weather and airport information without having to repeat it. It is good practice to use the ATIS broadcasts at departure and arrival airports.",
+                            "description": "Describe the ATIS broadcast, what information it contains, how frequently it is updated, and the procedure for pilots to use the ATIS code when contacting Air Traffic Control.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 24,
+                    "title": "Aeronautical Charts: Types and Interpretation",
+                    "text_content": "The Pilot's Road Map\n- Purpose: Aeronautical charts are the road map for a pilot. They provide information needed by a remote pilot about the areas where they intend to fly, including the name of the airport, airport class, traffic patterns, radio frequencies, and elevations.\n- Data Source: The FAA is the source for all data and information, including planning charts, Visual Flight Rules (VFR), and Instrument Flight Rules (IFR) charts (training, planning, departures, enroute, approaches, and taxiing charts).\n- Chart Types: The two aeronautical charts used by drone operators are Sectional and Terminal Area Charts.\n- Planning: During your planning process, you must determine if your flight will be near an airport, look at the sectional chart for the airport, and get authorization if required.",
+                    "description": "By the end of this lesson on Aeronautical Charts: Types and Interpretation, you will a guide to the two main types of aeronautical charts and the key data that must be extracted from them for flight planning, including airport symbols, obstacles, and the Maximum Elevation Figure (MEF).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 241,
+                            "title": "Sectional Charts vs. Terminal Area Charts (TACs)",
+                            "text_content": "- Sectional Charts: Covers all of the United States. They are the most common charts used by pilots and are named based on major cities on the chart. The scale is 1:500,000. They are revised semiannually, except for Alaska, which is revised annually. They provide information including airport data, navigational aids, airspace, and topography.\n- Terminal Area Charts (TACs): Cover the busiest airspace, indicated by purple areas on sectional charts, giving a zoomed-in view of an area like a Class B airport at a major city. The scale is 1:250,000, which provides 2x the detail of a sectional chart. TACs are revised semiannually, except for Virgin Islands & Puerto Rico, which are revised annually. TACs don't cover the entire US.",
+                            "description": "By the end of this lesson on Sectional Charts vs. Terminal Area Charts (TACs), you will a comparison of Sectional Charts and Terminal Area Charts, highlighting their different scales, coverage areas, and revision schedules.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 242,
+                            "title": "Interpreting Airport and Airspace Symbols",
+                            "text_content": "- Chart Legend Access: Symbols and terms are found on the VFR Terms and VFR Sectional & TAC tabs in the Airmen Knowledge Testing Supplement, Appendix 1. You have access to this on the test, but you cannot use your own copy; they will give you one.\n- Airport Markings: Blue symbols indicate an airport with a control tower. Magenta symbols indicate an airport with no control tower.\n- Required Airport Data: Every airport has data on the chart, including:\n    - The airport name and location identifier.\n    - The Common Traffic Advisory Frequency (CTAF) or Control Tower (CT) frequency (check for incoming & outgoing traffic).\n    - The Traffic Pattern (Left or Right), which determines where air traffic will be in relation to you.\n    - The Elevation of the runway, used to determine if the risk is acceptable based on your location.\n- VFR Checkpoint: A small flag symbol represents a VFR checkpoint. Expect a higher volume of air traffic in these areas.\n- Other Information: Charts include Airspace Information, Navigational and Procedural Information, Chart Limits, Culture (man-made features like cities, roads, railroads, & towers), Hydrography (Bodies of Water), and Relief (Maximum Elevation Figures, contours).\n- Communication Boxes: Mainly used by aviation pilots but still need to be known for the test.",
+                            "description": "By the end of this lesson on Interpreting Airport and Airspace Symbols, you will guidelines for using the Sectional Chart Legend to identify airport type, necessary frequencies, traffic patterns, and high-traffic Visual Flight Rules (VFR) checkpoints.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 243,
+                            "title": "Obstacles and Maximum Elevation Figure (MEF)",
+                            "text_content": "- Man-Made Obstacles: Sectional charts use symbols like a small triangle or tower icon to represent structures like radio towers or wind turbines.\n    - Grouping: Two or more triangles close together indicate the height listed is the highest in the group.\n    - Lighting: A lightning bolt or star above the symbol indicates lighting for visibility at night.\n    - Height Reporting: Drone operators need to know the highest height in MSL (Mean Sea Level) and AGL (Above Ground Level) if known.\n- Maximum Elevation Figure (MEF): The MEF is the highest elevation (man-made obstacle or terrain) within a quadrant of latitude & longitude, 30' X 30', plus a buffer for safety.\n    - Reporting Format: The MEF is shown in hundreds of feet MSL. It is rounded up to the nearest hundred and omits the last 2 zeros (e.g., '35' means 3,500 feet MSL).\n    - Access: You have access to the MEF information on the test, but you cannot use your own supplement; they will give you one.",
+                            "description": "Explain ow to identify and interpret man-made obstacle symbols, including height reporting (MSL/AGL) and lighting, and defining the Maximum Elevation Figure (MEF).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "title": "Airspace Classifications",
+            "description": "By the end of this lesson on Airspace Classifications, you will a complete breakdown of all Airspace Classifications, including Controlled, Uncontrolled, Special Use, and Other Airspace areas, detailing dimensions, requirements, and charting symbols for remote pilots.",
+            "text_content": "AIRSPACE CLASSIFICATIONS\nControlled airspace is a generic term that covers the different classifications of airspace. It has defined dimensions within which air traffic control (ATC) service is provided. Be sure to note whether MSL or AGL is used when determining altitude: Classes A, B, C, and D use MSL and Class E and G use MSL and AGL. The classification is based on the complexity/concentration of aircraft movements, type of the operations, level of safety required, and national and public interest.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 31,
+                    "title": "Introduction and Airspace Categories",
+                    "description": "By the end of this lesson on Introduction and Airspace Categories, you will overview of the two main categories of airspace (regulatory and nonregulatory) and the factors determining airspace classification.",
+                    "text_content": "INTRO TO AIRSPACE CLASSIFICATIONS & AIRSPACE CATEGORIES\nAirspace is broken into 2 Categories: regulatory and nonregulatory. These categories are further broken down into Controlled, Uncontrolled, Special use, and Other airspace. It is important to understand the various airspace symbols, and the type of airspace you plan on operating in. Note that Class G is depicted even though it is not a controlled airspace – No authorization needed (G means go). Class B and C airspace look like upside down wedding cake.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 32,
+                    "title": "Controlled Airspace Classes (A, B, C, D, E, G)",
+                    "description": "By the end of this lesson on Controlled Airspace Classes (A, B, C, D, E, G), you will a summary of the five main classes (A, B, C, D, E) and Class G, detailing vertical limits, requirements, and charting symbols.",
+                    "text_content": "CONTROLLED AIRSPACE OVERVIEW\nControlled airspace is a generic term that covers the different classifications of airspace. It has defined dimensions within which air traffic control (ATC) service is provided. Airspace of concern to the remote pilot is: Class A – Starts at 18,000 MSL airspace - covers the entire U.S.; Class B – busiest airports; Class C – mid-sized airports; Class D – small city airports; Class E (4 types within) – least busy airports and covers entire U.S. at some level. Be sure to note that Classes A, B, C, and D use MSL, while Class E and G use MSL and AGL. It is helpful to imagine aircraft as it approaches or departs an airport, as larger planes need more area to land, hence the larger Class B and C \"wedding cakes\".",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 321,
+                            "title": "Class A Airspace",
+                            "description": "Describe the vertical limits (18,000' MSL to 60,000' MSL), IFR requirement, coastal water inclusion, and charting of Class A Airspace.",
+                            "text_content": "CLASS A\nClass A is the highest level of airspace. It extends from 18,000 feet mean sea level (MSL) up to and including flight level (FL600) (60,000 Feet). The 60,000' altitude is shortened to 600 (the hundredths place). It includes airspace over water within 12 NM of the coast. All pilots must operate aircraft under instrument flight rules (IFR). Primary users are high-altitude commercial flights and long-haul aircraft. No markings are found on charts because its vertical boundaries are known and not charted.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 322,
+                            "title": "Class B Airspace",
+                            "description": "Define and recognize Class B as the busiest airport airspace, detailing its 'upside-down wedding cake' structure, 10,000 MSL limit, authorization requirements, and charting symbols (solid blue lines, fractional MSL altitudes).",
+                            "text_content": "CLASS B AIRSPACE\nClass B airspace is located around the busiest airports and handles high volumes of commercial and general aviation traffic. It generally extends from the surface to 10,000 feet mean sea level (MSL). It consists of a surface area and two or more layers, resembling an upside-down wedding cake. Remote pilots must receive authorization from ATC before operating in the Class B airspace. Markings are solid blue lines. Layer altitudes are shown in blue and charted in MSL, displayed as a fraction (for example 125/SFC, and 125/30). The bottom number represents the floor and the top number represents the ceiling, both in hundreds of feet (ex: 100/25 = 12,500' MSL ceiling, 2,500' MSL floor). The center layer of Class B airspace that starts at ground level will be noted as SFC in the bottom portion of the fraction. Examples include Atlanta, GA (ATL) (Hartsfield/Jackson) and Baltimore/Washington Intl Thurgood Marshall Airport.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 323,
+                            "title": "Class C Airspace",
+                            "description": "Define and recognize Class C airspace, outlining its 4,000' MSL limit, 5 NM inner and 10 NM outer rings, authorization requirement, and charting symbols (solid magenta lines).",
+                            "text_content": "CLASS C\nClass C airspace is for mid-sized airports, not as busy as Class B, but still important. It normally extends from the surface to 4,000 feet (MSL). It is serviced by radar approach control and has instrument flight rules (IFR) operations. The area is individually tailored and usually consists of an inner surface area with a 5 nautical mile (NM) radius. The outer circle is a 10 NM radius that extends from 1,200' to 4,000' MSL. Authorization is required before operating in Class C airspace. Markings are solid magenta lines. Layer Altitudes are written in magenta. Example: Toledo Express (TOL) has an operational control tower; its Inner Ring is Surface to ceiling of 4,700 feet MSL, and its Outer Ring is Floor: 2,000 feet MSL to ceiling - 4,700 feet MSL. Anchorage, Alaska (PANC) is another example, with an inner core (Surface to 4,100' MSL within 5 NM) and an outer ring (1,400' to 4,100').",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 324,
+                            "title": "Class D Airspace",
+                            "description": "Describe Class D airspace, including its 2,500' AGL limit (relative to airport elevation MSL), single-layer structure, part-time tower reversion to E or G, authorization requirement, and charting symbols (dashed blue lines, ceiling altitude in dashed box).",
+                            "text_content": "CLASS D\nClass D airspace surrounds smaller airports than those found in Class C. It normally extends from the surface to 2,500' above the airport elevation MSL. These airports have an operational control tower. Class D airspace is one layer, individually tailored, and is not always a perfect cylinder. Some will have arrival extensions or departures for Class D or Class E, and some will have a 5 NM radius around the airport. If the control tower is part-time, the airspace reverts to Class E or G airspace. Must receive ATC authorization before operating in Class D airspace. Markings are dashed blue lines. The airspace ceiling is indicated by a number in a dashed box, with its altitude given in hundreds of feet. The fraction format is not used since there is only one layer starting at the surface. Examples: Cincinnati Municipal/Lunken Field Airport (KLUK); an outer ring 30 represents 3,000 MSL, and an area marked (-21) indicates up to but not including 2,100' MSL.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 325,
+                            "title": "Class E and Class G Airspace",
+                            "description": "By the end of this lesson on Class E and Class G Airspace, you will comprehensive details on Class E (definition, limits, AGL/MSL bases, Federal Airways, 4 types/extensions) and Class G (uncontrolled, surface to Class E base, no authorization) airspace.",
+                            "text_content": "CLASS E AND CLASS G AIRSPACE\nClass E airspace is the least busy of the controlled airspace classifications and is the controlled airspace not classified as Class A, B, C, or D airspace. A large amount of the airspace over the US is Class E, providing sufficient airspace for the safe control of aircraft during IFR operations. Class E extends up to, but not including, 18,000' MSL (the lower limit of Class A). All airspace above 60,000' MSL is Class E airspace. In areas where charts do not depict a Class E base, it begins at 14,500' MSL. In most areas, the Class E airspace base is 1,200 ft AGL. In some areas, Class E airspace base is at the surface or 700 feet AGL. Some Class E airspace begins at an MSL altitude instead of an AGL altitude. Federal Airways, shown as blue lines on a sectional chart, are usually found within Class E airspace. Class E airspace acts as a transition zone into other airspaces. The shaded one starting at 700 ft AGL is the most common, shown with a faded magenta line (vignette). Class E Airspace with the floor 1200' or greater above surface that abuts Class G is represented by a blue vignette, where the “faded” side represents the typical floor of 1,200 feet AGL. Class E airspace can change its classification, for instance, from Class D to Class E after a part-time control tower closes.\n\nClass E Extensions/Sub-types (Do not need ATC authorization except for E2):\n\n- Class E2 (Surface Area): Starts at the surface. Typically circular and centered on the airport to contain instrument approach procedures. Prior authorization from Air Traffic Control (ATC) is required. Depicted by dashed magenta lines with no intersecting lines. The FAA uses blue dashed lines for Class E Surface Areas when the airport has approach control services or complex instrument procedures (e.g., Bethel Alaska (PABE), which has no operating control tower).\n- Class E3 (Extension to Class C Surface Area): Extends Class E airspace from the surface to provide IFR approach or departure paths. Has an operating control tower. Depicted by dashed magenta lines extending from Class C. No ATC authorization required in E3 but needed in adjacent C airspace.\n- Class E4 (Extension of a Class D or Class E Surface Area): An extension to another designated surface area, not centered on the airport. Typically to accommodate instrument approach and departure paths. No ATC authorization needed. A dashed magenta line separates the airspace.\n\nCLASS G AIRSPACE\nClass G airspace is uncontrolled airspace. It is anywhere that is not Class A, B, C, D, or E. In the U.S., Class G starts at the surface and goes up to where Class E airspace begins—usually 700 or 1,200 feet AGL. It is not depicted on the sectional chart. No prior authorization is required to fly.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 33,
+                    "title": "Special Use Airspace",
+                    "description": "Describe the six types of special use airspace (Restricted, Prohibited, Warning, MOAs, Alert, and CFAs), the restrictions they impose, and their charting methods.",
+                    "text_content": "SPECIAL USE AIRSPACE\nSpecial use airspace (also referred to as Special Area of Operation (SAO)) is designated for specific activities within a defined area. If not involved in those activities, you may face restrictions when entering this airspace. As part of your planning, you should confirm if you can fly in the area. Multiple types of special use airspace are listed in the legend (Airman Knowledge Testing Supplement). The size, shape, floor, and ceiling of the area will vary. Information regarding the area listed in the legend includes radio frequencies used, active hours, affected altitudes on your sectional chart, and the controlling agency's contact information. Some special use airspace is assigned a letter & number to help identify the airspace on the chart and in the legend (e.g., P-51 refers to Prohibited Area 51).\n\nSpecial Use Airspace types include: Restricted areas, Prohibited areas, Warning areas, Military operation areas (MOAs), Alert areas, and Controlled firing areas (CFAs).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 331,
+                            "title": "Restricted Areas",
+                            "description": "Define and recognize Restricted Areas, flight rules when active/inactive, contained hazards, and charting (hatched blue border with 'R').",
+                            "text_content": "RESTRICTED AREAS\nFlight is possible with restrictions but not when active. Check active hours and affected altitudes on the sectional chart; it lists the controlling agency. These areas can contain hazards, such as artillery firing, aerial gunnery, or guided missiles, and flying in the area without authorization may be extremely hazardous. They are depicted with a hatched blue border and the letter R followed by a number. Ex: R – 4806 W Nellis AFR Range Complex used for Military training and testing.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 332,
+                            "title": "Prohibited Areas",
+                            "description": "Define and recognize Prohibited Areas, their purpose (national security), and charting (P followed by a number).",
+                            "text_content": "PROHIBITED AREAS\nAircraft of any kind is prohibited. These areas are established for national security or other reasons associated with the national welfare. They are indicated on the chart with a “P” followed by a number such as “47” and special marking as shown in the legend. Examples include the DOE nuclear weapons facility in Amarillo, TX, Camp David, and the National Mall in Washington DC.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 333,
+                            "title": "Warning Areas",
+                            "description": "Define and recognize Warning Areas, noting they are similar to Restricted Areas but over open waters (starting 3 NM from coastline), and charting (blue-hatched border with 'W').",
+                            "text_content": "WARNING AREAS\nWarning areas are similar to Restricted Areas but the U.S. does not have sole jurisdiction over airspace over open waters. Legally, they can't stop you from flying into a warning area. They contain activity that may be hazardous to nonparticipating aircraft. They start 3 NM from the U.S. coastline over domestic or international waters. Sectional charts depict warning areas with a blue-hatched border & a “W” followed by a number.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 334,
+                            "title": "Military Operations Areas (MOAs)",
+                            "description": "Define and recognize MOAs for military training separation, rules for IFR traffic, lower altitude limits, and charting (magenta markings like Alert Areas).",
+                            "text_content": "MILITARY OPERATIONS AREAS\nMOAs are established for the purpose of separating military training activities from other aircraft traffic. Check for advisories from the controlling agency. When an MOA is in use, nonparticipating IFR traffic may be cleared through an MOA if IFR separation can be provided. MOAs can have lower altitude limits due to activity. They are depicted with magenta markings like Alert Areas. MOAs are depicted on sectional, VFR terminal area, and en route low altitude charts with a name and are sometimes numbered (e.g., Gamecock 1 in South Carolina used for F-16 training).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 335,
+                            "title": "Alert Areas",
+                            "description": "Define and recognize Alert Areas as high-volume training or unusual aerial activity areas, noting no entry requirements but requiring caution, and charting (magenta markings with 'A').",
+                            "text_content": "ALERT AREAS\nAlert areas are depicted on aeronautical charts with an “A” followed by a number (e.g., A-293). They are depicted with magenta markings like MOA Areas. They may contain a high volume of pilot training or an unusual type of aerial activity. There are no requirements to enter Alert areas but pay attention when flying in alert areas.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 336,
+                            "title": "Controlled Firing Areas (CFAs)",
+                            "description": "Define and recognize CFAs, highlighting the unique requirement for activity suspension when nonparticipating aircraft are detected, and noting that they are not charted.",
+                            "text_content": "CONTROLLED FIRING AREAS (CFA)\nCFAs contain activities that, if not conducted in a controlled environment, could be hazardous to nonparticipating aircraft. The difference between CFAs and other special use airspace is that activities must be suspended when a spotter aircraft, radar, or ground lookout position indicates an aircraft might be approaching the area. CFAs are not listed on aeronautical charts since they do not cause a nonparticipating aircraft to change its flight path.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 34,
+                    "title": "Other Airspace Areas",
+                    "description": "Describe miscellaneous designated airspace areas, including advisories, routes, temporary restrictions, and security zones.",
+                    "text_content": "OTHER AIRSPACE AREAS\nOther Airspace Areas include Local Airport Advisory (LAA), Military Training Route (MTR), Temporary Flight Restriction (TFR), Parachute Jump Aircraft Operations, Published VFR Routes, Terminal Radar Service Area (TRSA), National Security Area (NSA), and Air Defense Identification Zones (ADIZ).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 341,
+                            "title": "Local Airport Advisory (LAA)",
+                            "description": "Define and recognize Local Airport Advisory (LAA) service provided by Flight Service facilities, including communication methods and weather/data sources provided.",
+                            "text_content": "LOCAL AIRPORT ADVISORY\nLAA is an advisory service provided by Flight Service facilities, located on the landing airport. It uses a discrete ground-to-air frequency or the tower frequency when the tower is closed. Services include local airport advisories, automated weather reporting with voice broadcasting, and a continuous Automated Surface Observing System (ASOS)/Automated Weather Observing Station (AWOS) data display, other continuous direct reading instruments, or manual observations available to the specialist.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 342,
+                            "title": "Military Training Routes (MTRs)",
+                            "description": "Describe Military Training Routes (MTRs), including the ability of military aircraft to exceed 250 knots below 10,000 feet, and the numbering conventions for VFR (4-digit, VR) and IFR (3-digit or less, IR) routes.",
+                            "text_content": "MILITARY TRAINING ROUTES\nMTRs are routes that military aircraft fly during training. Military aircraft can exceed 250-knots below 10,000 feet.\n\n- VFR routes (VR): MTRs with no segment above 1500' are identified by four-digit numbers (e.g., VR1007, etc.) and flown under Visual Flight Rules. These are not ATC-controlled.\n- IFR routes (IR): MTRs that include one or more segments above 1500' AGL are identified by three or fewer digit numbers (e.g., IR21, VR207, etc.) and are under ATC control.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 343,
+                            "title": "Temporary Flight Restrictions (TFRs)",
+                            "description": "By the end of this lesson on Temporary Flight Restrictions (TFRs), you will comprehensive details on Temporary Flight Restrictions (TFRs) as a type of NOTAM, including the information they provide, the reasons for their establishment (hazards, special events, protection), and charting status (broken blue line only for national security TFRs).",
+                            "text_content": "Overview: Comprehensive details on Temporary Flight Restrictions (TFRs) as a type of NOTAM, including the information they provide, the reasons for their establishment (hazards, special events, protection), and charting status (broken blue line only for national security TFRs).\n\nTEMPORARY FLIGHT RESTRICTIONS (TFRS)\nA TFR is a type of Notice to Airmen (NOTAM). It includes: Location of the temporary restriction, Time period, Area in statute miles, and altitudes affected, FAA coordination facility and telephone number, and Reason for the restriction. The pilot should check the NOTAMs as part of flight planning.\n\nReasons for a TFR include: Protect persons and property in the air or on the surface from an existing or imminent hazard; Provide a safe environment for the operation of disaster relief aircraft; Prevent an unsafe congestion of aircraft above an incident or event (e.g., Superbowl); Protect declared national disasters for humanitarian reasons in the State of Hawaii; Protect the President, Vice President, or other public figures; Provide a safe environment for space agency operations. It is a pilot's responsibility to be aware of TFRs in their proposed area of flight (one way is to visit the FAA website, www.tfr.faa.gov). Only TFRs relating to National Security are charted, indicated with a broken blue line.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 344,
+                            "title": "Parachute Jump Aircraft Operations",
+                            "description": "Explain where information for Parachute Jump Aircraft Operations is published (Chart Supplement U.S.) and how frequently used sites are charted.",
+                            "text_content": "PARACHUTE JUMP AIRCRAFT OPERATIONS\nOperations are published in the Chart Supplement U.S.. Sites that are used frequently are depicted on sectional charts.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 345,
+                            "title": "Published VFR Routes",
+                            "description": "Define and recognize Published VFR Routes used for navigating complex airspace and where they are found (VFR terminal area planning charts).",
+                            "text_content": "PUBLISHED VFR ROUTES\nThese routes are for transitioning around, under, or through some complex airspace. Terms applied include VFR flyway, VFR corridor, Class B airspace VFR transition route, and terminal area VFR route. They are found on VFR terminal area planning charts.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 346,
+                            "title": "Terminal Radar Service Areas (TRSA)",
+                            "description": "Define and recognize Terminal Radar Service Areas (TRSA) for additional radar services, their purpose (IFR/VFR separation), and charting (solid grey line).",
+                            "text_content": "TERMINAL RADAR SERVICE AREAS TRSA\nTRSAs are areas where participating pilots can receive additional radar services. The purpose of the service is to provide separation between all IFR operations and participating VFR aircraft. They are depicted on sectional charts with a solid grey line.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 347,
+                            "title": "National Security Areas (NSA)",
+                            "description": "Define and recognize National Security Areas (NSAs), noting the voluntary avoidance request, the potential for regulatory flight prohibition (via NOTAM), and their purpose (increased security for ground facilities).",
+                            "text_content": "NATIONAL SECURITY AREAS (NSAS)\nNSAs exist anywhere there is a requirement for increased security and safety of ground facilities. Pilots are requested to voluntarily avoid flying in the area. Flight in NSAs may be temporarily prohibited by regulation under the provisions of 14 CFR part 99. Prohibitions are disseminated via NOTAM.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 348,
+                            "title": "Air Defense Identification Zones (ADIZ)",
+                            "description": "Define and recognize Air Defense Identification Zones (ADIZ) along the country's perimeter, their purpose (identifying unknown aircraft), and charting (magenta line with dots).",
+                            "text_content": "AIR DEFENSE IDENTIFICATION ZONES (ADIZ)\nADIZ surrounds the country's perimeter, protecting the country from unknown aircraft. The government treats unidentified aircraft entering the ADIZ as possible threats, which could lead to possible interception by military aircraft. Sectional charts depict ADIZ boundaries with a magenta line with dots.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "title": "AIRPORT OPERATIONS",
+            "sub_title": "",
+            "description": "By the end of this lesson on AIRPORT OPERATIONS, you will a complete guide to the different categories and types of airports, the rules governing towered and non-towered operations, runway markings, standard traffic patterns for manned aircraft, airport signs, and essential security and wildlife considerations for drone pilots.",
+            "text_content": "Overview: A complete guide to the different categories and types of airports, the rules governing towered and non-towered operations, runway markings, standard traffic patterns for manned aircraft, airport signs, and essential security and wildlife considerations for drone pilots.\n\nIntroduction to Airport Operations\nThis unit covers the essential knowledge required for drone operators regarding airport environments, including classification, runway procedures, traffic flow, and mandatory safety protocols near manned aircraft operations.\n\nDrone operators need approval when operating in controlled airspace. Air Traffic Control (ATC) is responsible for providing safe, orderly and expeditious flow of air traffic at airports where operations and/or volume require it.",
+            "price": "0",
+            "has_access": true,
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 41,
+                    "title": "Airport Classification and Control",
+                    "description": "By the end of this lesson on Airport Classification and Control, you will definitions of the four legal airport categories, two types of operational control (towered/non-towered), and the various airport ownership types.",
+                    "text_content": "Airport Categories and Control Types\nAirport Categories as defined by law:\n- Commercial Service Airports: Publicly owned, with at least 2,500 passenger boardings per year, including international flights stopping for non-traffic purposes (like refueling).\n- Cargo Service Airports: Served by aircraft transporting only cargo greater than 100 million lbs.\n- Reliever Airports: FAA-designated to reduce congestion at commercial service airports.\n- General Aviation Airports: All remaining airports not in the above categories; they constitute the largest group in the U.S. airport system.\n\nTwo types of airports exist based on control: towered and non-towered. Within those there are:\n- Civil Airports: For the general public.\n- Military/Federal Government\n- Private Airports: Not open to the general public.\nFacilities include seaplane bases, heliports, tilt rotor aircraft, and can include an area used or intended for airport facilities.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 42,
+                    "title": "Airport Runways and Orientation",
+                    "description": "By the end of this lesson on Airport Runways and Orientation, you will breakdown of the importance of runway aids, the inherent dangers of takeoff/landing, and the system used for runway orientation and numbering.",
+                    "text_content": "Runway Systems\nIt is essential to know the meanings of the signs, markings, and lights that are used on airports as surface navigational aids. Navigational aids include: the airport diagram or layout, runways in use, and the direction of departing and arriving aircraft.\n\nSafety Critical Phases: The most dangerous part of flying an aircraft is generally considered to be the takeoff and landing phases. Low altitude and speed of the aircraft leave little margin for error. Wind shear, crosswinds, fog, and low visibility are most critical near the ground, as sudden changes in wind can destabilize the aircraft during landing or takeoff.\n\nOrientation: Runways are aligned with the prevailing wind for better lift and control. The runway heading is expressed in magnetic degrees, rounded to the nearest 10° and shortened to two digits. For example, a runway aligned to 273° magnetic is designated Runway 27. Opposite ends of the same runway differ by 180° (e.g., Runway 27 on one end, Runway 9 on the other).\n\nNumbering and Letters: Runway numbers range from 01 to 36, representing compass headings in 10° increments. Parallel runways use letters: L (Left), C (Center), R (Right). Example: Two parallel runways heading 090° would be 09L and 09R.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 421,
+                            "title": "Towered vs. Non-Towered Airport Procedures",
+                            "description": "By the end of this lesson on Towered vs. Non-Towered Airport Procedures, you will rules and communication protocols for operating near towered and non-towered airports, including the use of UNICOM and CTAF.",
+                            "text_content": "Airport Operational Control\n- Towered Airports: A towered airport has an operating control tower.\n- UNICOM: A nongovernment station providing airport information (weather, wind, runway). UNICOM is associated with both towered and non-towered airports.\n\n- Non-Towered Airports: Does not have an operating control tower. Two-way radio is not required but recommended for safety, and pilots must fly with caution. Pilots announce their location and intentions over the Common Traffic Advisory Frequency (CTAF). CTAF is normally UNICOM, but may be MULTICOM, FSS, or a tower frequency—the correct frequency must be checked on the sectional chart.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 422,
+                            "title": "Practical Runway Heading Calculations",
+                            "description": "By the end of this lesson on Practical Runway Heading Calculations, you will examples demonstrating how to determine an aircraft's heading on a downwind leg based on the announced runway number.",
+                            "text_content": "Runway Question Examples\n1. Downwind Heading for Runway 16: If a pilot announces they are left downwind of runway 16, the heading of the aircraft is 340° (160° + 180° = 340°), which is North West.\n\nRule 1 (RWY 18 or less): To find the opposite direction (downwind leg) when the runway is 18 or less, add a zero to the runway number and then add 180. (Ex: RWY 12 = 120 + 180 = 300 degrees).\n\nRule 2 (RWY 18 or greater): To find the opposite direction when the runway is 18 or greater, add a zero to the runway number and subtract 180. (Ex: RWY 24 = 240 - 180 = 60 degrees).\n\n3. Relative Position (Midfield Left Downwind to RWY 13): The aircraft would be West of the runway.\n4. Relative Position (Midfield Left Downwind to RWY 4): The aircraft would be West of the runway.\n5. Relative Position (Short Final of RWY 18): The aircraft is aligned with the runway it is landing on, which is North relative to the airport. (Short final is the last part of the final approach of the runway).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 43,
+                    "title": "Traffic Patterns for Manned Aircraft",
+                    "description": "Describe on the standard traffic pattern, recommended altitudes, and required maneuvers for takeoff, landing, and departing the pattern.",
+                    "text_content": "Standard Traffic Patterns\nAirports use a standard pattern that provides an organized flow for takeoffs and landings. These patterns could change if they have a control tower, unique terrain features, or obstacles. Never assume an aircraft will be following the standard left-hand pattern; there could be a reason for deviation. If in an area with manned aircraft, the best option might be to land until the area is clear.\n\nAltitude and Proximity: Even though propeller aircraft cruise much higher, they descend through lower altitudes near airports. Approach/Departure Paths mean aircraft may be at 500–1,500' AGL several miles from the airport. Common altitudes for propeller aircraft are 600' to 1500' AGL.\n\nPattern Direction: Patterns are normally left unless indicated by ATC. Right patterns are indicated with an (RP) on the chart. Left hand patterns are not labeled on the chart.\n\nSignificant Pattern Items:\n- Enter pattern in level flight, abeam the midpoint of the runway, at pattern altitude.\n- 1,000' AGL is recommended altitude unless otherwise established.\n- Maintain pattern altitude until abeam approach end of the landing runway on the downwind leg.\n- Complete turn to final at least ¼ mile from the runway.\n- After takeoff or go-around, continue straight ahead until beyond the departure end of the runway.\n- If remaining in the traffic pattern, initiate a turn to crosswind leg beyond the departure end of the runway within 300' of pattern altitude.\n- If departing the traffic pattern, continue straight out, or exit with a 45° turn beyond the departure end of the runway, after reaching pattern altitude.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 44,
+                    "title": "Airport Signs and Markings",
+                    "description": "By the end of this lesson on Airport Signs and Markings, you will identification and meaning of mandatory, location, direction, and holding position signs and markings on airport surfaces.",
+                    "text_content": "Airport Surface Signs\nLocation Sign: Black background with yellow letters – indicates taxiway or runway location.\n\nMandatory Instruction Sign: Red sign with white letters – indicates areas where pilots must stop unless cleared by ATC. Found on runways, critical areas, and restricted zones, meaning 'Do not enter'.\n\nDirection and Destination Signs: Yellow backgrounds, black writing, and arrows, used to locate various areas.\n\nILS Critical Area Holding Position: Pilots must hold when the ILS critical area is in use (usually during low visibility).\n\nRunway Holding Position Marking: Consists of two solid lines and two broken lines stretching the width of the taxiway or runway. When approaching from the side with the continuous line, the pilot should not cross the lines without ATC clearance. These markings are located next to the sign on taxiways or runway intersections (e.g., Runway 15 left and runway 33 is right). Aircraft should not proceed beyond this sign until cleared by Air Traffic Control (ATC).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 45,
+                    "title": "Security and Wildlife Hazards",
+                    "description": "By the end of this lesson on Security and Wildlife Hazards, you will regulations concerning access to Security Identification Display Areas (SIDA) and protocols for managing wildlife encounters and hazards.",
+                    "text_content": "Security and Environmental Concerns\nAirport Security (SIDA): If drone operation requires entry onto the airport property, you must determine if that area is a Security Identification Display Area (SIDA). You must have an Airport-Issued Identification badge visible at all times and follow procedures in CFR 49 Part 1542. Movement in these areas is prohibited without a badge being displayed.\n\nWildlife Aircraft Strikes: Wildlife strikes, especially birds, are a major hazard for manned aircraft. Do not increase wildlife hazards near airports or attract wildlife. You are not required to report a collision with wildlife, but you can report to the FAA Wildlife Strike Database. Do not harass wildlife, as it violates FAA and environmental laws. If wildlife is observed near your operation, land immediately.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "title": "WEATHER",
+            "sub_title": "Aviation Weather Sources, Observations (METAR), and Forecasts (TAF)",
+            "description": "By the end of this lesson on WEATHER, you will covers the essential aviation weather services, how to read surface observation reports like METAR, and how to use key forecast products such as TAF, SIGMET, and AIRMET for safe flight planning.",
+            "text_content": "Weather is a critical part of preflight planning, requiring knowledge of specialized aviation weather sources, real-time observation reports, and various forecast products to ensure flight safety and informed decision-making.",
+            "price": "0",
+            "has_access": true,
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 51,
+                    "title": "Aviation Weather Sources Overview",
+                    "text_content": "Weather is an important part of preflight planning. The Weather Services system is a collaborative effort involving the National Weather Service (NWS), Federal Aviation Administration (FAA), Department of Defense (DOD), and other aviation organizations and individuals. Weather can vary greatly depending on location and altitude. Aviation weather reports are available at www.aviationweather.gov (http://www.aviationweather.gov) and 1800wxbrief.com (http://1800wxbrief.com). Weather forecasts are not 100% but are increasingly accurate, using scientific research and computer models to identify patterns, trends, and characteristics of weather systems. This information is used to support informed decision-making for flight planning and safety.",
+                    "description": "By the end of this lesson on Aviation Weather Sources Overview, you will understanding the collaborative system of agencies providing aviation weather data and where to access official reports.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 52,
+                    "title": "Surface Aviation Weather Observations",
+                    "text_content": "Surface Aviation Weather Observations include data from both government-operated and privately contracted facilities, providing real-time, localized weather data collected at ground stations across the US. Automated weather sources like Automated Weather Observing Systems (AWOS) and Automated Surface Observing Systems (ASOS) play major roles in data collection. AWOS is a collection of weather sensors that must meet FAA standards to be able to report weather factors. A Surface Observation Report contains: Type of report (routine or special), Station identifier (airport code or location), Date and time of the observation, Modifier, Wind speed and direction, Visibility (horizontal distance pilots can see), Runway Visual Range (RVR), Weather phenomena, Sky condition, Temperature and dew point, Altimeter reading (atmospheric pressure), and Remarks.",
+                    "description": "Describe on real-time, localized weather data sources, including AWOS and ASOS, and the general content of a surface observation report.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 53,
+                    "title": "Aviation Routine Weather Report (METAR) Decoding",
+                    "text_content": "Aviation Weather Reports provide accurate, current depictions of weather conditions to help pilots make informed decisions. The METAR (Aviation Routine Weather Report) is the standard international format for surface weather observations, typically issued hourly. The SPECI is a special METAR issued between routine reports when significant weather changes occur.",
+                    "description": "By the end of this lesson on Aviation Routine Weather Report (METAR) Decoding, you will a breakdown of the METAR format, covering station identifiers, time conventions, wind reporting, visibility, sky condition, and temperature/altimeter settings.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 531,
+                            "title": "Report Type, Station, Date, and Time",
+                            "text_content": "The report begins with the Type of report: METAR (regular) or SPECI (special report). This is followed by the Station identifier, a 4-letter code to identify airports and other aviation facilities. The Date & time of report is a 6-digit group (date + time) given in Zulu time (UTC), followed by 'Z'. The Modifier, if present, denotes an automated source ('AUTO') or a corrected report ('COR').",
+                            "description": "By the end of this lesson on Report Type, Station, Date, and Time, you will decoding the METAR header, including the report type (METAR/SPECI), station code, time format (Zulu), and modifiers (AUTO/COR).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 532,
+                            "title": "Wind and Visibility",
+                            "text_content": "Wind is reported with direction (first three digits, blowing from in tens of degrees) and speed (last two or three digits) in knots. If the wind direction is variable, 'VRB' is used. Gusts are indicated by 'G' followed by the peak gust (e.g., G26KT). Visibility is reported in statute miles ('SM').",
+                            "description": "By the end of this lesson on Wind and Visibility, you will how wind direction, speed, gusts (G), variable winds (VRB), and visibility (SM) are reported in the METAR.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 533,
+                            "title": "Weather Phenomena and Sky Condition",
+                            "text_content": "Weather is broken down into Qualifiers (intensity: light (-), moderate ( ), heavy (+), and proximity: 'VC' for 5–10 miles from the airport) and Descriptors (describing precipitation or obscurations). Sky condition is reported with amount (in eighths), height (3-digit number in hundreds of feet AGL), and type (e.g., TCU or CB). 'VV' (vertical visibility) is used if clouds cannot be seen due to fog or heavy precipitation.",
+                            "description": "By the end of this lesson on Weather Phenomena and Sky Condition, you will interpreting weather qualifiers (intensity, proximity), descriptors, and sky condition reporting, including cloud height and type.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 534,
+                            "title": "Temperature, Altimeter, and Remarks",
+                            "text_content": "Air Temperature and Dew Point are always given in °C. Temperatures below 0 °C are preceded by 'M' (Minus). The Altimeter setting is inches of mercury ('Hg') in a four-digit group, preceded by 'A'. Remarks start with 'RMK' and include various additional data like pressure information ('PRESRR' or 'PRESFR') and automated station maintenance indicators.",
+                            "description": "By the end of this lesson on Temperature, Altimeter, and Remarks, you will the reporting format for temperature and dew point (°C, 'M' for minus), altimeter setting ('A'), and the content of the 'RMK' (Remarks) section.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 54,
+                    "title": "Aviation Weather Forecast Products",
+                    "text_content": "Forecasts are essential for preflight planning. Pilots should be familiar with the various types of forecast products that provide anticipated weather conditions for specific areas and altitudes.",
+                    "description": "By the end of this lesson on Aviation Weather Forecast Products, you will an introduction to the different types of weather forecasts essential for flight planning, including TAF, SIGMET, and AIRMET.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 541,
+                            "title": "Terminal Aerodrome Forecast (TAF) and Aviation Area Forecast (FA)",
+                            "text_content": "The TAF (Terminal Aerodrome Forecast) is a forecast for a specific airport (usually larger ones), covering expected weather within a 5-mile radius, valid for 24 or 30 hours and updated four times daily (0000Z, 0600Z, 1200Z, and 1800Z). The FA (Aviation Area Forecast) is a broad regional forecast.",
+                            "description": "By the end of this lesson on Terminal Aerodrome Forecast (TAF) and Aviation Area Forecast (FA), you will specifics on the TAF (coverage, duration, update frequency) and the role of the FA (regional scope).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 542,
+                            "title": "SIGMET and Convective SIGMET (WST)",
+                            "text_content": "SIGMET (Significant Meteorological Information) advisories are issued for severe weather hazards (e.g., turbulence, volcanic ash). Convective SIGMETs (WST) are issued specifically for severe thunderstorms producing surface winds greater than 50 knots, hail ¾ inch or larger, or the presence of tornadoes, or heavy precipitation affecting 40% or more of an area at least 3,000 square miles in size. They are relevant to all aircraft for safety and preflight planning.",
+                            "description": "By the end of this lesson on SIGMET and Convective SIGMET (WST), you will the criteria and hazards covered by SIGMETs and the specific conditions that trigger a Convective SIGMET (WST).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 543,
+                            "title": "AIRMET and Winds/Temperatures Aloft (FB)",
+                            "text_content": "AIRMET (Airman’s Meteorological Information) advisories are for less severe weather conditions (e.g., moderate turbulence or icing). The FB (Winds and Temperatures Aloft Forecast) provides wind direction, speed, and temperature at various altitudes, which is crucial for determining flight path efficiency and conditions at altitude.",
+                            "description": "By the end of this lesson on AIRMET and Winds/Temperatures Aloft (FB), you will the difference between AIRMET (moderate conditions) and the use of the FB forecast (wind and temperature at various altitudes).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 55,
+                    "title": "Terminal Aerodrome Forecast (TAF) Decoding",
+                    "text_content": "The TAF provides essential forecast information for specific airports and uses a coded structure that must be carefully decoded to understand the expected weather conditions.",
+                    "description": "By the end of this lesson on Terminal Aerodrome Forecast (TAF) Decoding, you will decoding the structure and content of a TAF report, including the valid period, wind, visibility, and forecast change groups like FM and TEMPO.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 551,
+                            "title": "TAF Header: Type, ID, and Origin Time",
+                            "text_content": "The TAF includes the Type of report (Routine TAF or Amended TAF AMD), the ICAO station identifier (4-digit code, same as a METAR), and the Date and time of origin (6-number code in UTC/Zulu).",
+                            "description": "By the end of this lesson on TAF Header: Type, ID, and Origin Time, you will identifying the routine or amended TAF, the station, and the time the forecast was issued.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 552,
+                            "title": "Valid Period and Core Forecast Elements",
+                            "text_content": "The TAF Valid period dates and times (e.g., 0812/0912) indicate the forecast's duration. This is followed by the core forecast elements: Forecast wind (five-digit group), Forecast visibility (in statute miles, 'P6SM' for greater than six miles), Forecast significant weather, and Forecast sky condition (same format as METAR, but only Cumulonimbus (CB) clouds are forecast in this section).",
+                            "description": "By the end of this lesson on Valid Period and Core Forecast Elements, you will interpreting the start/end dates and times of the forecast and decoding the wind, visibility, weather, and sky condition elements.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 553,
+                            "title": "Forecast Change Groups (FM, TEMPO, PROB)",
+                            "text_content": "The Forecast change group indicates expected significant weather changes. 'FM' (From) is used when a rapid and significant change is expected (usually within an hour). 'TEMPO' (Temporary) is for temporary fluctuations of weather expected to last less than 1 hour. 'PROB30' or 'PROB40' (Probability) is a percentage describing the probability of thunderstorms and precipitation, but this group is not used for the first 6 hours of a 24-hour forecast.",
+                            "description": "By the end of this lesson on Forecast Change Groups (FM, TEMPO, PROB), you will understanding the difference between 'FM' (rapid change), 'TEMPO' (short fluctuation), and 'PROB' (probability of precipitation or thunderstorms).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "title": "WEATHER EFFECTS ON AIRCRAFT PERFORMANCE",
+            "sub_title": "Understanding Weather's Impact on sUAS Operations",
+            "description": "By the end of this lesson on WEATHER EFFECTS ON AIRCRAFT PERFORMANCE, you will an in-depth guide to how atmospheric conditions (air pressure, density, temperature, and humidity) and phenomena (wind, turbulence, clouds, fronts, and thunderstorms) affect small Unmanned Aircraft System (sUAS) performance and pilot decision-making.",
+            "text_content": "Overview: An in-depth guide to how atmospheric conditions (air pressure, density, temperature, and humidity) and phenomena (wind, turbulence, clouds, fronts, and thunderstorms) affect small Unmanned Aircraft System (sUAS) performance and pilot decision-making.\n\nPilots must understand how weather affects drone performance. Every drone has weather limits set by the manufacturer, and exceeding those limits increases the chance of loss of control, crashes, injury, or property damage. Since pilots cannot control the weather, their focus must be on decisions, as weather affects air density, which directly impacts drone performance. Most operations do NOT justify high weather risk, though a higher risk may be justified in emergency situations like searching for a child whose life is in danger.",
+            "price": "0",
+            "has_access": true,
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 61,
+                    "title": "Air Pressure, Density, and Altitude Effects",
+                    "description": "Define and recognize air pressure and air density, explains their relationship with altitude, details standard sea level conditions, and explains the critical concept of density altitude and how it affects sUAS performance.",
+                    "text_content": "Air pressure is the weight of the air above you, caused by gravity pulling air downward. As altitude increases, air pressure decreases, and air density decreases. Standard sea level conditions are 29.92 inHg (inches of Mercury) or 1,013.2 mb (Milibars) at 59° F (15° C). Air density, the amount of air molecules in a given volume of air, affects lift, thrust, and stability. High Air Density (thick air) means better lift and performance, while Low Air Density (thin air) means reduced lift and worse performance. Low air density is caused by high altitude (fewer molecules), high temperature (warm air expands), and high humidity (water vapor is less dense than dry air). Density altitude is pressure altitude corrected for nonstandard temperature and describes how thick or thin the air feels to the aircraft. High density altitude (low air density) leads to poor sUAS performance, resulting in reduced lift, reduced climb rate, reduced propeller efficiency, and shorter battery endurance.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 611,
+                            "title": "Air Pressure and Density Fundamentals",
+                            "description": "Explain air pressure, density, and standard sea level conditions, focusing on the fundamental relationship between altitude, pressure, and density.",
+                            "text_content": "Air pressure is the weight of the air above you, caused by gravity pulling air downward. As altitude increases, air pressure decreases, and air density decreases. Standard sea level conditions are 29.92 inHg (inches of Mercury) or 1,013.2 mb (Milibars) at 59° F (15° C). Air density, the amount of air molecules in a given volume of air, affects lift, thrust, and stability. High Air Density (thick air) means better lift and performance, while Low Air Density (thin air) means reduced lift and worse performance.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 612,
+                            "title": "Density Altitude and Performance",
+                            "description": "Define and recognize density altitude and details how high, hot, and humid conditions decrease air density, leading to reduced sUAS lift, climb rate, and battery endurance.",
+                            "text_content": "Low air density is caused by high altitude (fewer molecules), high temperature (warm air expands), and high humidity (water vapor is less dense than dry air). Density altitude is pressure altitude corrected for nonstandard temperature and describes how thick or thin the air feels to the aircraft. High density altitude (low air density) leads to poor sUAS performance, resulting in reduced lift, reduced climb rate, reduced propeller efficiency, and shorter battery endurance. High, hot, and humid conditions increase density altitude and decrease drone performance.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 62,
+                    "title": "Pressure, Humidity, and Performance",
+                    "description": "Describe the relationship between atmospheric pressure, humidity, and weather patterns, including how these factors directly influence air density and aircraft performance.",
+                    "text_content": "Low Pressure often indicates poor, less predictable weather, as rising air cools and condenses to form clouds and increase the chance of rain. High Pressure leads to stable, clear skies and dry conditions as air descends, warms, and dries. Pressure changes are typically the dominant factor affecting density with altitude. Humidity is the amount of water vapor in the air, and since water vapor (H2O) weighs less than nitrogen and oxygen, the more water in the air, the lighter and less dense the air is. Higher humidity, therefore, results in lower air density, which leads to decreased performance and less lift.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 63,
+                    "title": "Wind, Turbulence, and Severe Wind Hazards",
+                    "description": "By the end of this lesson on Wind, Turbulence, and Severe Wind Hazards, you will covers how obstacles, terrain, and weather systems create wind turbulence, low-level wind shear, and microbursts, and outlines precautions for drone operators.",
+                    "text_content": "Obstacles cause turbulence, the amount of which depends on the size of the obstacle and the wind velocity flowing around it. Turbulence is common around structures, tree lines, mountains, bluffs, and canyons. When flying near mountains, the windward side will help lift the drone, as wind flows smoothly. However, on the leeward side, the air follows the contour of the terrain and is increasingly turbulent, tending to push an aircraft into the side of the mountain. Wind shear is a sudden change in wind speed and/or direction over a short distance and is especially dangerous close to the ground. Microbursts are intense winds in small areas that come down from a thunderstorm and can push drones down very fast.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 631,
+                            "title": "Obstacle and Terrain-Induced Turbulence",
+                            "description": "Explain ow natural and man-made obstacles generate turbulence and provides cautions for flying near mountains and structures.",
+                            "text_content": "Obstacles cause turbulence, the amount of which depends on the size of the obstacle and the wind velocity flowing over or around it. Turbulence is common around structures, tree lines, mountains, bluffs, and canyons. When flying near mountains, the windward side will help lift the drone, as wind flows smoothly. However, on the leeward side, the air follows the contour of the terrain and is increasingly turbulent, tending to push an aircraft into the side of the mountain.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 632,
+                            "title": "Low-Level Wind Shear and Microbursts",
+                            "description": "Define and recognize wind shear, identifies its associated weather systems, and explains the extreme hazard of microbursts.",
+                            "text_content": "Wind shear is a sudden change in wind speed and/or direction over a short distance and is especially dangerous close to the ground. Wind shear is associated with passing frontal systems, thunderstorms, temperature inversions, and strong upper-level winds greater than 25 knots. Microbursts are intense winds that happen in small areas that come down from a thunderstorm and can push drones down very fast.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 64,
+                    "title": "Atmospheric Stability and Temperature Inversions",
+                    "description": "Explain atmospheric stability and its determination by moisture and temperature, the resulting weather, and the characteristics of temperature inversions.",
+                    "text_content": "Convective Currents are caused by uneven heating, making warm air rise (updrafts) and cool air sink (downdrafts), creating bumpy, turbulent flights. Unstable atmosphere promotes vertical air motion, leading to significant turbulence and severe weather. Cool, dry air is very stable, resists vertical movement, and generally leads to clear weather. A temperature inversion exists when the temperature of the air rises with altitude, forming commonly shallow layers of smooth, stable air close to the ground that act as a lid. Surface-based inversions occur on clear, cool nights, while frontal inversions occur when warm air spreads over cooler air, potentially causing unstable air and worsening flight conditions.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 641,
+                            "title": "Atmospheric Stability and Convective Currents",
+                            "description": "Explain ow moisture and temperature determine atmospheric stability and how unstable air leads to vertical motion, turbulence, and cumuliform clouds.",
+                            "text_content": "Convective Currents are caused by uneven heating, making warm air rise (updrafts) and cool air sink (downdrafts), creating bumpy, turbulent flights. Unstable atmosphere (often moist and warm air) promotes vertical air motion, leading to significant turbulence, extensive vertical (cumuliform) clouds, and severe weather. Cool, dry air is very stable, resists vertical movement, and generally leads to clear weather.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 642,
+                            "title": "Temperature Inversions",
+                            "description": "By the end of this lesson on Temperature Inversions, you will describes the phenomenon of a temperature inversion, the 'lid' effect, and the formation of surface-based and frontal inversions.",
+                            "text_content": "A temperature inversion exists when the temperature of the air rises with altitude, forming commonly shallow layers of smooth, stable air close to the ground that act as a lid, trapping weather and pollutants. Surface-based inversions occur on clear, cool nights, while frontal inversions occur when warm air spreads over cooler air, potentially causing unstable air and worsening flight conditions.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 65,
+                    "title": "Dew Point and Structural Icing Hazards",
+                    "description": "Explain relationship between temperature and dew point, which defines relative humidity, and details the conditions necessary for structural icing and its dangerous effect on aircraft performance.",
+                    "text_content": "Dew point is the temperature at which the air can hold no more moisture. When air cools to its dew point, it becomes fully saturated, causing water vapor to condense and form fog, dew, frost, clouds, rain, or snow. Condensed moisture like dew or frost on aircraft surfaces can lower performance and lift by adding weight and interrupting the flow of air over the wings and rotors. Structural icing, which is very dangerous, forms on the aircraft’s wings, body, and propellers. Two conditions are necessary for structural icing: flying through visible water (rain or cloud droplets) AND the temperature at the point where the moisture strikes the aircraft must be 0° C (32° F) or colder.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 651,
+                            "title": "Dew Point and Condensation",
+                            "description": "Define and recognize dew point and explains how condensation and the resulting moisture (dew, frost) can negatively affect sUAS performance.",
+                            "text_content": "Dew point is the temperature at which the air can hold no more moisture. When air cools to its dew point, it becomes fully saturated, causing water vapor to condense and form fog, dew, frost, clouds, rain, or snow. Condensed moisture like dew or frost on aircraft surfaces can lower performance and lift by adding weight and interrupting the flow of air over the wings and rotors.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 652,
+                            "title": "Structural Icing",
+                            "description": "By the end of this lesson on Structural Icing, you will identifies the two mandatory conditions for structural icing to occur on aircraft and the resulting danger to flight safety.",
+                            "text_content": "Structural icing, which is very dangerous, forms on the aircraft’s wings, body, and propellers. Two conditions are necessary for structural icing: flying through visible water (rain or cloud droplets) AND the temperature at the point where the moisture strikes the aircraft must be 0° C (32° F) or colder.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 66,
+                    "title": "Clouds and Thunderstorm Life Cycle",
+                    "description": "By the end of this lesson on Clouds and Thunderstorm Life Cycle, you will describes dangerous cloud types (cumulonimbus, standing lenticular) and the three stages of a thunderstorm (Cumulus, Mature, Dissipating), highlighting the associated hazards.",
+                    "text_content": "Cumuliform clouds are puffy, white clouds with a flat base that can grow large and lead to thunderstorms. Cumulonimbus clouds are one of the most dangerous types to drone operators because rising air currents make them extremely turbulent; a small UA could experience updrafts and downdrafts exceeding 3,000 fpm. Standing lenticular altocumulus clouds are also dangerous, indicating strong turbulence that should be avoided. Thunderstorms go through three stages: Cumulus Stage (strong updraft), Mature Stage (updrafts and downdrafts coexist, most dangerous stage for turbulence), and Dissipating Stage (dominated entirely by diminishing downdrafts).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 661,
+                            "title": "Hazardous Cloud Types",
+                            "description": "By the end of this lesson on Hazardous Cloud Types, you will describes cumuliform, cumulonimbus, and standing lenticular clouds and explains the specific turbulence hazards each poses to sUAS operations.",
+                            "text_content": "Cumuliform clouds are puffy, white clouds with a flat base that can grow large and lead to thunderstorms. Cumulonimbus clouds are one of the most dangerous types to drone operators because rising air currents make them extremely turbulent; a small UA could experience updrafts and downdrafts exceeding 3,000 fpm. Standing lenticular altocumulus clouds are also dangerous, forming on the crests of waves created by barriers like mountains, indicating strong turbulence that should be avoided.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 662,
+                            "title": "Thunderstorm Life Cycle",
+                            "description": "Describe the three stages of a thunderstorm (Cumulus, Mature, Dissipating), emphasizing the most dangerous stage (Mature) and the associated wind and turbulence.",
+                            "text_content": "Thunderstorms go through three stages: Cumulus Stage (strong updraft from surface to cloud top), Mature Stage (precipitation starts, strong updrafts AND downdrafts coexist, most dangerous stage for turbulence, wind shear, and microbursts), and Dissipating Stage (dominated entirely by diminishing downdrafts).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 67,
+                    "title": "Fronts, Mountain Flying, and Operational Minimums",
+                    "description": "Explain characteristics of warm and cold fronts, cautions for mountain flying, and defines aviation terms like ceiling and visibility related to sUAS operational limits.",
+                    "text_content": "A frontal zone or front is the zone between two different air masses where temperature, humidity, and wind can change rapidly. A Warm Front advances slowly, replacing colder air. A Cold Front occurs when cold, dense air replaces warmer air, approaching fast with little warning. When flying over mountainous terrain, gather preflight information on cloud reports, wind direction/speed, and air stability. Ceiling is the lowest layer of clouds reported as being broken or overcast. The sUAS operational minimum distance from clouds is 500 feet below and 2,000 feet horizontally from the cloud. Visibility is the greatest horizontal distance prominent objects can be seen, and the minimum visibility requirement for sUAS operations is 3 statute miles (SM).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 671,
+                            "title": "Atmospheric Fronts",
+                            "description": "By the end of this lesson on Atmospheric Fronts, you will describes the frontal zone and explains the key characteristics and speed of warm fronts and cold fronts.",
+                            "text_content": "A frontal zone or front is the zone between two different air masses where temperature, humidity, and wind can change rapidly. A Warm Front advances and replaces colder air, giving advanced warning and taking days to pass through. A Cold Front occurs when cold, dense air replaces warmer air; it approaches fast with little warning and is indicated by a high dew point and falling barometric pressure.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 672,
+                            "title": "Mountain Flying Cautions",
+                            "description": "By the end of this lesson on Mountain Flying Cautions, you will outlines necessary preflight information and operational cautions when flying over mountainous terrain, including turbulence indicators.",
+                            "text_content": "When planning a flight over mountainous terrain, gather as much preflight information as possible including cloud reports, wind direction/speed, and air stability. Convective clouds on the windward side of mountains mean unstable air and turbulence close to the mountain on either side. Stratified clouds mean stable air.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 673,
+                            "title": "Operational Ceiling and Visibility Minimums",
+                            "description": "Define and recognize ceiling and visibility and states the mandatory minimum distances from clouds and minimum visibility requirements for sUAS operation.",
+                            "text_content": "Ceiling is the lowest layer of clouds reported as being broken (five-eighths to seven-eighths sky coverage) or overcast (entire sky covered). The sUAS operational minimum distance from clouds is 500 feet below and 2,000 feet horizontally from the cloud. Visibility is the greatest horizontal distance prominent objects can be seen, and the minimum visibility requirement for sUAS operations is 3 statute miles (SM).",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "title": "LOADING AND PERFORMANCE",
+            "sub_title": "",
+            "description": "By the end of this unit, you will understand a comprehensive breakdown of the forces acting on an aircraft during flight, critical weight and balance considerations for the Remote Pilot in Command (RPIC), the concept and effects of load factors, and how these factors relate to stalling speed and overall flight safety.",
+            "text_content": "The unit covers the four forces in flight (Lift, Gravity, Thrust, Drag), and how those forces are affected during a turn, resulting in increased load factor. It details the RPIC's pre-flight responsibilities regarding weight and balance, defining components like Center of Gravity (CG) and Center of Pressure (CP) and their relationship. A major focus is on load factors, which are measured in Gs and increase structural stress and stalling speed, especially beyond 45° of bank. Finally, the unit explores the negative impacts of excessive weight on performance and safety considerations, particularly in high-altitude/high-temperature conditions.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 71,
+                    "title": "FORCES IN FLIGHT",
+                    "text_content": "In straight & level flight, four forces always act on an aircraft: Lift, Gravity, Thrust, Drag. These forces affect fixed‑wing aircraft and multirotor differently, but the basic principles are the same for all aircraft.",
+                    "description": "By the end of this lesson on FORCES IN FLIGHT, you will describes the four forces that always act on an aircraft in straight and level flight, noting that the basic principles apply to both fixed-wing aircraft and multirotors.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 72,
+                    "title": "FORCES DURING A TURN",
+                    "description": "Explain ow lift is divided during a turn, the introduction of centrifugal force, and the resulting increase in load factor and stress on the aircraft structure.",
+                    "text_content": "When an aircraft turns, lift is split into two components: a vertical component that opposes gravity & a horizontal component that makes the aircraft turn. During the turn, the aircraft also experiences centrifugal force, pulling it outward from the center of the turn. This force combines with gravity, increasing the load factor & stress on the aircraft. Pilots must understand how these increased forces affect aircraft performance & adjust their control inputs accordingly.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 73,
+                    "title": "WEIGHT & BALANCE CONSIDERATIONS FOR RPIC",
+                    "description": "By the end of this lesson on WEIGHT & BALANCE CONSIDERATIONS FOR RPIC, you will lists the pre-flight responsibilities of the Remote Pilot in Command (RPIC) regarding aircraft weight and balance to ensure flight safety.",
+                    "text_content": "Pre-Flight Responsibilities:\n- Verify aircraft is correctly loaded.\n- Determine weight and balance condition of the aircraft.\n- Follow manufacturer/builder restrictions for weight and balance.\n- Ensure compliance with limits for flight safety.\n- Consider consequences of overweight aircraft in emergencies.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 74,
+                    "title": "LOAD",
+                    "description": "By the end of this lesson on LOAD, you will outlines the essential understanding of load and respecting operating limitations required for Part 107 pilots.",
+                    "text_content": "Overview: Outlines the essential understanding of load and respecting operating limitations required for Part 107 pilots.\n\nDon’t need advanced engineering degrees as part of the Part 107 but, pilots should:\n- Understand forces acting on the aircraft.\n- Know how to use these forces advantageously.\n- Respect operating limitations of the aircraft.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 75,
+                    "title": "MAXIMUM GROSS TAKEOFF WEIGHT",
+                    "description": "By the end of this lesson on MAXIMUM GROSS TAKEOFF WEIGHT, you will discusses the manufacturer-specified maximum takeoff weight and the environmental and operational conditions (including the '3 H' factors) that necessitate a weight reduction.",
+                    "text_content": "Maximum takeoff weight specified by manufacturer but may not guarantee safe takeoff under all conditions.\nConditions requiring weight reduction (3 H):\n- High elevation\n- High temperature\n- High humidity\nOther conditions requiring reduction in weight:\n- Runway/launch area length\n- Surface type and slope\n- Surface wind\n- Obstacles present",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 76,
+                    "title": "WEIGHT CHANGES DURING FLIGHT",
+                    "description": "Explain ow weight changes during flight, including fuel burn in general aviation and changes from expendable items or decreasing battery power in small UAS operations.",
+                    "text_content": "Fuel burn:\n- Aircraft becomes lighter → performance improves.\n- May negatively affect balance.\nSmall UA operations:\n- Weight change from expendable items (e.g., jettisonable load).\n- As battery power goes down the ability to produce lift could decrease.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 77,
+                    "title": "BALANCE AND CENTER OF GRAVITY (CG)",
+                    "description": "By the end of this lesson on BALANCE AND CENTER OF GRAVITY (CG), you will introduces the concept of adverse balance conditions and defines the two key components of balance: Center of Gravity (CG) and Center of Pressure (CP).",
+                    "text_content": "Adverse balance conditions affect flight like excess weight.\nBalance is made up of two key components:\n- Center of Gravity\n- Center of Pressure\nManufacturer sets Center of Gravity (CG) limits.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 78,
+                    "title": "BALANCE AND CENTER OF GRAVITY (CG) - RPIC Management",
+                    "description": "Explain at the Center of Gravity (CG) is dynamic and outlines the RPIC's responsibility to manage CG shifts to ensure it remains within allowable limits, especially when adding payloads.",
+                    "text_content": "CG is not fixed; depends on weight distribution.\nPosition shifts as loads move or are used, ex: luggage, fuel or people.\nRPIC must:\n- Determine CG shift and its effect.\n- Ensure CG remains within allowable limits or relocate or shed weight before flight.\n- If adding additional cameras or sensors – need to check proper loading.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 79,
+                    "title": "GRAVITY",
+                    "description": "Define and recognize gravity and the Center of Gravity (CG), explaining the CG as the focal point of aircraft weight and its role in balancing.",
+                    "text_content": "Gravity - Pulling force that draws bodies toward Earth’s center.\nAircraft weight acts through the Center of Gravity (CG).\nCG - Point where all aircraft weight is focused.\n- If supported at CG → aircraft balances in any attitude.\nCG Location:\n- Determined by aircraft design.\n- Designers account for center of pressure (CP) travel.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 710,
+                    "title": "CG VS. CP RELATIONSHIP - Stability Concept",
+                    "description": "Define and recognize the Center of Pressure (CP) and explains the stability implications, noting that for stability, the CG must be positioned ahead of the CP.",
+                    "text_content": "CP - Center of lift, the opposite of CG.\nThe aerodynamic forces of lift occur at the CP.\nAn aircraft’s weight is concentrated at the CG.\n- CG forward of CP → Nose-down tendency.\n- CP forward of CG → Nose-up tendency.\nDesigners make the rear-most allowable position of the center of gravity (CG) ahead of the center of pressure (CP) for stability.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 711,
+                    "title": "CG VS. CP RELATIONSHIP - Aircraft Type",
+                    "description": "By the end of this lesson on CG VS. CP RELATIONSHIP - Aircraft Type, you will compares the typical locations of the Center of Gravity (CG) and Center of Pressure (CP) on multi-rotor versus fixed-wing aircraft.",
+                    "text_content": "CP and CG on traditionally designed multi-rotors are in the center of the aircraft.\nOn fixed-wing aircraft, the CP it is about 1/3 back from the leading edge of the wing.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 712,
+                    "title": "WEIGHT AND LIFT RELATIONSHIP",
+                    "description": "Explain direct relationship between aircraft weight and lift, defining lift and describing the three equilibrium states (level flight, descent, climb).",
+                    "text_content": "The weight of an aircraft has a direct relationship to the lift generated by its wings or propellers.\nLift:\n- Upward force on wing.\n- Acts perpendicular to relative wind and aircraft’s lateral axis.\nLift vs. Weight:\n- Level flight: Lift = Weight → Equilibrium\n- Lift < Weight → aircraft descends\n- Lift > Weight → aircraft climbs",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 713,
+                    "title": "STABILITY",
+                    "description": "Define and recognize aircraft stability as the design characteristic that allows it to return to equilibrium after a disturbance.",
+                    "text_content": "Stability – The ability of an aircraft to correct for disturbances and return to or maintain its original flight path. Stability is primarily an aircraft design characteristic.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 714,
+                    "title": "STABILITY, MANEUVERABILITY & CONTROLLABILITY",
+                    "description": "By the end of this lesson on STABILITY, MANEUVERABILITY & CONTROLLABILITY, you will differentiates and defines the three flight characteristics: stability, maneuverability, and controllability, listing the factors that influence each.",
+                    "text_content": "Stability – tendency to return to equilibrium.\nManeuverability - Ability to be manipulated easily & handle stress\n- Influenced by: Aircraft weight, inertia, size and location of flight controls, and structural strength.\nControllability:\n- Aircraft’s ability to respond to pilot input.\n- Concerns flight path and attitude.\n- A design characteristic – includes the ability to react to up & downdrafts or horizontal winds.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 715,
+                    "title": "LOAD FACTORS",
+                    "description": "Define and recognize load factors and how they are measured in Gs (gravity units), explaining their trigonometric relationship to lift and weight.",
+                    "text_content": "Measured in Gs (acceleration of gravity):\n- 1 G = force of gravity on a body at rest.\n- Indicates force experienced when accelerated.\nLoad Factor – the maximum load factor (at given bank angle) is a proportion between lift and weight and has a trigonometric relationship.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 716,
+                    "title": "LOAD - Turn Stress",
+                    "description": "Explain at load factor is the stress on the structure created by forces that deflect the aircraft, providing a definition and G-force examples.",
+                    "text_content": "When an aircraft goes into a turn it experiences a load factor determined by its lift required & angle of its turn.\nAny force that deflects an aircraft from a straight path creates stress on its structure.\nLoad Factor = Amount of this force.\nExample:\n- Load factor of 3 → aircraft structure supports 3 times its weight.\n- Expressed as 3 Gs, 4 Gs, etc.\n- You experience more than 1G on your favorite ride.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 717,
+                    "title": "LOAD FACTORS - Pilot Concerns",
+                    "description": "By the end of this lesson on LOAD FACTORS - Pilot Concerns, you will identifies the two critical safety reasons why pilots must be aware of load factors: the potential for structural overload and the increase in stalling speed.",
+                    "text_content": "Two critical reasons for pilots:\n- Dangerous overload can be imposed on aircraft structures.\n- Increased load factor raises stalling speed, making stalls possible even at what one would consider safe speeds.\nAircraft are designed to withstand only a certain amount of overload.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 718,
+                    "title": "LOAD FACTOR IN STEEP TURNS",
+                    "description": "By the end of this lesson on LOAD FACTOR IN STEEP TURNS, you will identifies the two forces — centrifugal force and weight — that contribute to the load factor during a coordinated, constant-altitude steep turn.",
+                    "text_content": "Forces in a coordinated turn at constant altitude, load factor results from:\n- Centrifugal force (outward force during turn)\n- Weight (gravity pulling downward)",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 719,
+                    "title": "RATE OF TURN (ROT) AND AIRSPEED",
+                    "description": "Explain inverse relationship between airspeed and rate of turn (ROT) for a constant bank angle, and that this relationship keeps the load factor constant.",
+                    "text_content": "For a given bank angle:\n- Higher airspeed → slower rate of turn\n- This compensates for added centrifugal force, keeping load factor constant.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 720,
+                    "title": "LOAD FACTOR VS BANK ANGLE - Rapid Increase",
+                    "description": "Describe the non-linear relationship between bank angle and load factor, noting the significant increase beyond 45° and the corresponding increase in required lift and stall speed.",
+                    "text_content": "Load factor increases rapidly beyond a 45°–50° bank, and stall speed increases significantly.\nExamples:\n- 60° bank → 2 Gs\n- 80° bank → 5.76 Gs\nWing must produce lift equal to these load factors to maintain altitude.\nThis chart is in the testing supplement you will have during the test. The wing must produce lift equal to these load factors if altitude is to be maintained.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 721,
+                    "title": "LOAD FACTOR VS BANK ANGLE - Calculation Example",
+                    "description": "By the end of this lesson on LOAD FACTOR VS BANK ANGLE - Calculation Example, you will provides a specific calculation example illustrating the load increase on a 20 lb Unmanned Aircraft (UA) during a 30-degree banked turn.",
+                    "text_content": "Overview: Provides a specific calculation example illustrating the load increase on a 20 lb Unmanned Aircraft (UA) during a 30-degree banked turn.\n\nIf a UA weighs 20 lbs, the approximate weight the UA would be required to support during a 30-degree banked turn while maintaining altitude would be: 20 x 1.154 = 23 lbs.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 722,
+                    "title": "EXTREME BANK ANGLES",
+                    "description": "By the end of this lesson on EXTREME BANK ANGLES, you will discusses the physical limitations of extreme bank angles, noting that a constant-altitude turn is impossible at 90° and that load factors exceed acrobatic limits above 80°.",
+                    "text_content": "Overview: Discusses the physical limitations of extreme bank angles, noting that a constant-altitude turn is impossible at 90° and that load factors exceed acrobatic limits above 80°.\n\nAt 90° bank, constant-altitude turn is not possible.\nAircraft can bank 90° in a slipping turn if not holding altitude.\nAt slightly more than 80°, load factor exceeds 6Gs (limit for acrobatic aircraft).",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 723,
+                    "title": "STALLS AND LOAD FACTOR - Stall Definition",
+                    "description": "Define and recognize a stall, explaining that it can occur at any airspeed when the Angle of Attack (AOA) is too high, leading to airflow separation and lift loss.",
+                    "text_content": "Any aircraft can stall at any airspeed within structural limits.\nOccurs when: Angle of Attack (AOA) becomes too high and the smooth airflow over the wing breaks up and separates.\nResulting in:\n- Abrupt change in flight characteristics\n- Sudden loss of lift → stall",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 724,
+                    "title": "STALLING SPEED & LOAD FACTOR",
+                    "description": "Explain proportional relationship between stalling speed and load factor (proportional to the square root of the load factor) and provides a quantitative example.",
+                    "text_content": "Stalling speed increases with load factor - Proportional to the √ of the load factor.\nEx: An aircraft with a normal unaccelerated stalling speed of 50 knots can be stalled at 100 knots by inducing a load factor of 4Gs.\nLoad factors are measured in Gs (acceleration of gravity) – If a UAV has 4Gs, the total load on a UAVs structure is 4x its actual weight.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 725,
+                    "title": "WEIGHT AND BALANCE - Limits and Consequences",
+                    "description": "By the end of this lesson on WEIGHT AND BALANCE - Limits and Consequences, you will reiterates the critical nature of weight and balance limits and the negative consequences of exceeding maximum weight or allowing the Center of Gravity (CG) to shift out of bounds.",
+                    "text_content": "Weight and balance limits are critical for flight safety.\nExceeding maximum weight can:\n- Compromise structural integrity.\n- Reduce overall aircraft performance.\nCenter of gravity (CG) → outside allowable limits → results in:\n- Control difficulty\n- Possible loss of aircraft stability.\nRPIC responsible for reviewing aircraft weight & balance data, especially for drones with payloads.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 726,
+                    "title": "WEIGHT - Definition",
+                    "description": "Define and recognize weight as a downward force of gravity determined by mass and acceleration, which must be counteracted by lift.",
+                    "text_content": "Weight = force of gravity acting on an object.\nDetermined by:\n- The object’s mass\n- Earth’s gravitational acceleration\nWeight is constantly acting downward and must be counteracted by lift.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 727,
+                    "title": "WEIGHT - Lift Dependence",
+                    "description": "By the end of this lesson on WEIGHT - Lift Dependence, you will lists the four factors that lift depends on: airfoil design, Angle of Attack (AOA), airspeed, and air density, and the consequence of weight exceeding available lift.",
+                    "text_content": "Amount of lift depends on:\n- Airfoil design\n- Angle of attack (AOA)\n- Airspeed\n- Air density\nIf aircraft weight exceeds available lift → flight may be impossible.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 728,
+                    "title": "WEIGHT - Excessive Weight Degradations",
+                    "description": "By the end of this lesson on WEIGHT - Excessive Weight Degradations, you will lists the specific and comprehensive performance degradations caused by operating with excessive weight.",
+                    "text_content": "Excessive weight negatively impacts many aspects of flight including failing to take off.\nKey Performance Degradations:\n- Higher takeoff speed required\n- Longer takeoff distance\n- Reduced rate & angle of climb\n- Lower maximum altitude\n- Shorter flight range\n- Reduced cruising speed\n- Reduced maneuverability\n- Higher stall speed\n- Higher approach & landing speeds\n- Longer landing distance",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 729,
+                    "title": "SAFETY CONSIDERATIONS",
+                    "description": "By the end of this lesson on SAFETY CONSIDERATIONS, you will highlights conditions (high altitude, high density altitude, strong winds, high temperatures) that compound the dangers of overloading, and notes the impact on a pilot's emergency response capability.",
+                    "text_content": "Overloading becomes even more dangerous when combined with:\n- High altitude\n- High density altitude\n- Strong winds\n- High temperatures\nIn emergencies excessive weight can reduce the pilot’s ability to respond effectively.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 730,
+                    "title": "KEY TAKEAWAYS",
+                    "description": "Summarize the essential points regarding load factor, Gs, stall speed, structural stress, and the role of bank angle.",
+                    "text_content": "Load factor = stress on aircraft structure during turn.\nMeasured in Gs (gravity units).\nHigher load factor → higher stall speed and greater structural stress.\nBank angle increases load factor significantly.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 731,
+                    "title": "QUESTIONS AND COMMENTS",
+                    "description": "By the end of this lesson on QUESTIONS AND COMMENTS, you will directs users to post questions or comments.",
+                    "text_content": "Post any questions or comments in the post.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "title": "EMERGENCY PROCEDURES",
+            "sub_title": "",
+            "description": "By the end of this lesson on EMERGENCY PROCEDURES, you will this unit outlines how to prepare for and handle unexpected in-flight emergencies, covering the Remote Pilot in Command's (RPIC) responsibilities for planning, crew briefing, regulatory deviation authority, and required post-emergency documentation.",
+            "text_content": "Overview: This unit outlines how to prepare for and handle unexpected in-flight emergencies, covering the Remote Pilot in Command's (RPIC) responsibilities for planning, crew briefing, regulatory deviation authority, and required post-emergency documentation.\n\nIntroduction to Emergency Procedures\nAn in‑flight emergency is an unexpected event that can create serious risks for an unprepared remote pilot. The RPIC is responsible for safe operation of the Unmanned Aircraft (UA) at all times & should plan for emergencies in the preflight planning process.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 81,
+                    "title": "Potential Hazards and Accident Causes",
+                    "text_content": "Some examples of unexpected events that could cause accidents are:\n- Unexpected Manned Aircraft Entering the Area\n- Propeller or Motor Malfunction\n- Wildlife Interference\n- Battery Depletion Faster Than Expected\n- Unexpected Obstacles",
+                    "description": "By the end of this lesson on Potential Hazards and Accident Causes, you will a list of common in-flight emergencies and unexpected events that the RPIC must plan for.",
+                    "sub_units": [],
+                    "video_url": null,
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 82,
+                    "title": "Preflight Planning, Checklists, and Crew Briefing",
+                    "text_content": "Preparation and Crew Management\n- Checklists: Some manufacturers provide preflight checklists for safe operations. If no manufacturer checklist exists, the remote pilot must create one to ensure safety.\n- Crew Briefing: All crew members must be briefed on operational details and emergency procedures. Having an emergency plan that everyone has been briefed on enables the crew to remain calm, as training will kick in. When additional crew members are used, they must all be briefed before the flight.",
+                    "description": "Explain Requirements for preflight checklists, and the procedure and necessity of briefing all crew members on operational details and emergency plans.",
+                    "sub_units": [],
+                    "video_url": null,
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 83,
+                    "title": "Regulatory Deviation and Documentation",
+                    "text_content": "Overview: Explaining the remote pilot's authority to break Part 107 rules for safety during an emergency and the requirements for post-emergency action and reporting.\n\nAuthority to Deviate\n- Deviation: During an emergency, a remote pilot may deviate from any Part 107 regulation if necessary for safety.\n- Return to Normal: Once the emergency has ended, the remote pilot must return to normal Part 107 operating regulations.\n- Documentation: Document what happened once you return to safety, including videos or pictures.\n- Reporting: When rules are broken for safety, reporting to the FAA is only required when asked.",
+                    "description": "By the end of this lesson on Regulatory Deviation and Documentation, you will explaining the remote pilot's authority to break Part 107 rules for safety during an emergency and the requirements for post-emergency action and reporting.",
+                    "sub_units": [],
+                    "video_url": null,
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 84,
+                    "title": "Example Emergency Scenario",
+                    "text_content": "Example: Manned Aircraft Hazard\n- Scenario: Creating a video at a beach; weather is clear and the area is low-risk. You complete preflight tasks, establish your takeoff/landing zone, and brief your Visual Observer (VO).\n- Hazard Detected (Before Launch): You notice a helicopter flying low where you were planning to fly.\n- Required Action: Since you haven’t launched, keep the UA grounded, maintain visuals of the helicopter, communicate with the crew, reassess the situation after the aircraft passes, update your risk assessment before flying, and launch when completely clear.\n- Action (If Airborne): If you were already airborne, you would make decisions to avoid causing an in‑flight emergency.",
+                    "description": "By the end of this lesson on Example Emergency Scenario, you will a step-by-step procedure for handling a common pre-flight hazard involving manned aircraft.",
+                    "sub_units": [],
+                    "video_url": null,
+                    "status": "NOT_STARTED"
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "title": "AERONAUTICAL DECISION MAKING",
+            "sub_title": "",
+            "description": "By the end of this lesson on AERONAUTICAL DECISION MAKING, you will this unit details Aeronautical Decision Making (ADM), a systematic process for safe flight, covering risk management principles, hazardous attitudes and antidotes, resource management (CRM and SRM), physiological factors affecting pilots, vision scanning techniques, and required sUAS maintenance and inspection procedures.",
+            "text_content": "Overview: This unit details Aeronautical Decision Making (ADM), a systematic process for safe flight, covering risk management principles, hazardous attitudes and antidotes, resource management (CRM and SRM), physiological factors affecting pilots, vision scanning techniques, and required sUAS maintenance and inspection procedures.\n\nOverview of Aeronautical Decision Making (ADM)\\n\\nADM is a systematic process used by pilots to determine the best course of action in response to a specific situation. It helps pilots make consistent, safe, and informed decisions, based on the most current information available, providing feedback to pilots. ADM is essential to safe flight operations because human error is the leading cause of aviation accidents.\\n\\n### Risk Management and Flight Operations\\n\\nRisks are present in everything we do. The goal of Risk Management is to proactively identify safety‑related hazards before they happen and mitigate or remove the risks. Risk Management should be integrated into all phases of flight—before, during, and after. Post-flight, an After Action Review (AAR) should be conducted after each job to discuss successes, failures, and lessons learned for the next time.\\n\\n### Pilot Fitness and Safety Checks\\n\\nPart 107 explicitly prohibits drone operation if the Remote PIC, person controlling the drone, or Visual Observer cannot perform their duties safely. The RPIC must ensure all crewmembers are not impaired during the operation. To mitigate risks related to human factors, pilots use checklists like IMSAFE and PAVE to assess fitness, environmental conditions, and external pressures.\\n\\n### Maintenance and Inspection\\n\\nPart 107 (14 CFR) requires all sUAS operators to ensure their drone is safe for operation. This includes scheduled and unscheduled maintenance, repair, inspection, modification, replacement, and system software upgrades of the sUAS and all of its components, which must be performed according to manufacturer’s instructions.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 91,
+                    "title": "Aeronautical Decision Making (ADM)",
+                    "text_content": "Definition and Importance\\n\\n   ADM is a systematic process used by pilots to determine the best course of action in response to a specific situation.\\n   It helps pilots make consistent, safe, and informed decisions.\\n   Decisions are based on the most current information available to the pilot, providing feedback.\\n   Human error is the leading cause of aviation accidents.\\n*   ADM is essential to safe flight operations.",
+                    "description": "By the end of this lesson on Aeronautical Decision Making (ADM), you will explaining the definition, systematic nature, and critical importance of Aeronautical Decision Making (ADM) in reducing human error in aviation.",
+                    "video_url": null,
+                    "sub_units": [
+                        {
+                            "id": 911,
+                            "title": "Steps to Good Decision Making (Part 1)",
+                            "text_content": "1. Identify personal attitudes hazardous to safe flight\\n   2. Learn behavior modification techniques - Replace hazardous attitudes with safer, more accurate thinking.\\n*   3. Learn how to recognize and deal with stress",
+                            "description": "By the end of this lesson on Steps to Good Decision Making (Part 1), you will the first three steps in the ADM process, focusing on identifying hazardous attitudes and stress management.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 912,
+                            "title": "Steps to Good Decision Making (Part 2)",
+                            "text_content": "4. Develop risk assessment skills - Evaluate hazards with tools like PAVE, CARE, and DECIDE models.\\n   5. Use all resources.\\n*   6. Evaluate the effectiveness of one’s ADM skills - Does outcome support safety and mission goals?",
+                            "description": "By the end of this lesson on Steps to Good Decision Making (Part 2), you will the final three steps in the ADM process, emphasizing risk assessment, resource utilization, and evaluation of ADM effectiveness.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ],
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 92,
+                    "title": "Risk Management",
+                    "description": "By the end of this lesson on Risk Management, you will detailed breakdown of Risk Management, including its goal, the principles guiding risk decisions, and the process of integrating it across all phases of flight, including post-flight review.",
+                    "video_url": null,
+                    "sub_units": [
+                        {
+                            "id": 921,
+                            "title": "Hazards and Risk Assessment",
+                            "text_content": "Hazard: A real or perceived condition, event, or circumstance that a pilot encounters.\\n   When faced with a hazard, the pilot makes an assessment based upon various factors.\\n   Different pilots see hazards differently.\\n   The pilot assigns a value to the potential impact of the hazard.\\n   Throughout the flight, the pilot will make many decisions under hazardous conditions.\\n   The pilot needs to assess the degree of risk and determine the best course of action to mitigate the risk.\\n   Severity Levels (Event Occurrence Likelihood):\\n       Probable - event will occur several times\\n       Occasional - event will probably occur sometime\\n       Remote - event is unlikely to occur, but possible\\n    *   Improbable - event is highly unlikely to occur",
+                            "description": "Define a hazard and risk, detailing the pilot's role in assessing risk severity, and listing the four levels of event occurrence likelihood.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 922,
+                            "title": "Hazardous Attitudes and Antidotes",
+                            "text_content": "Hazardous attitudes can negatively affect pilot judgment, putting everyone at risk, but can be countered by redirecting those attitudes toward safer, more appropriate actions.\\n   Recognition of hazardous thoughts is the first step toward defusing them.\\n   After recognizing it as hazardous, the pilot should label it as hazardous, then state the corresponding antidote.\\n   Pilots should memorize the antidotes for each hazardous attitude for the test.",
+                            "description": "By the end of this lesson on Hazardous Attitudes and Antidotes, you will explaining how to counter hazardous attitudes by recognizing them and applying the corresponding safety antidotes.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 923,
+                            "title": "Mitigating Risks: IMSAFE Checklist",
+                            "text_content": "The IMSAFE checklist ensures everyone on the team is physically and mentally well to minimize the risk of the operation.\\n   If team members are not well, the team, equipment, and general public are put at risk.\\n   There is no test requirement for operators, so self-certification of fitness is required.\\n   Failure to self-assess could result in being tired or having an unclear head, making poor decisions as problems arise.",
+                            "description": "Describe the importance of the IMSAFE checklist for self-certifying the physical and mental fitness of the flight crew.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 924,
+                            "title": "Mitigating Risks: PAVE Checklist",
+                            "text_content": "The PAVE checklist helps pilots reduce risk by spotting hazards and managing risk before the flight.\\n   PAVE organizes hazards into four areas: Pilot, Aircraft, Environment, and External Pressures (Life, work pressures).\\n   The RPIC is responsible for deciding if it is safe to fly, identifying flight risks, and determining if risks can be managed safely and successfully.\\n   If proceeding with the flight, strategies must be developed to mitigate risks (e.g., setting personal minimums for each risk category).\\n*   Maintaining situational awareness helps prevent losing control; risks are dealt with by identifying the hazard, assessing its seriousness, and planning to reduce risk to an acceptable level (e.g., creating a checklist for future jobs).",
+                            "description": "Describe the components of the PAVE checklist and the RPIC's responsibility in using it to identify and mitigate pre-flight hazards.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ],
+                    "text_content": "Principles of Risk Management\\n\\n   Goal: Identify safety‑related hazards before they happen and mitigate or remove the risks.\\n   Foundation of Decisions: Decisions are based on a combination of Direct experience (e.g., seeing a driver get hurt from not wearing a seat belt), Indirect experience (e.g., seeing someone else injured from not wearing a seat belt), and Education and training (RPICs study accidents and lessons learned from others).\\n   Principles:\\n       Accept Unnecessary Risk – Is the outcome worth the risk?\\n       Make Risk Decisions at the Appropriate Level - usually, the RPIC.\\n       Integrate Risk Management Into All Phases of Flight – an ongoing process, not a one‑time step.\\n       Accept Risk When Benefits Outweigh the Costs.\\n   Process: An ongoing cycle where participants constantly reassess risks and evaluate whether their controls are reducing those risks.\\n   Application: Should be used during all aspects of the operation – before, during, and after.\\n   Post-Flight: Conduct an After Action Review (AAR) after each job to discuss what went right and wrong and what can be learned for the next time.",
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 93,
+                    "title": "Crew and Single-Pilot Resource Management",
+                    "description": "By the end of this lesson on Crew and Single-Pilot Resource Management, you will differentiating between Crew Resource Management (CRM) and Single-Pilot Resource Management (SRM) and detailing the resources and skills required for each.",
+                    "video_url": null,
+                    "sub_units": [
+                        {
+                            "id": 931,
+                            "title": "Workload Management",
+                            "text_content": "Definition: Planning team members, resources, and prioritizing tasks to get the important things done without becoming overloaded.\\n   Best Practice: Do not overload team members—they must be able to concentrate on their tasks at hand. Work smarter, not harder.\\n*   Technology: Technology (e.g., radio communications and weather apps) can help team members collect information, improving decision-making and situational awareness.",
+                            "description": "By the end of this lesson on Workload Management, you will outlining the principles of workload management, its purpose in preventing overload, and the role of technology.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 932,
+                            "title": "Effective Team Communication",
+                            "text_content": "Good communication among crew members is essential for a team.\\n   Methods: Use walkie-talkies, phones, or headsets to relay information, manage tasks effectively, and help prevent errors and accidents. Have a backup method of communication just in case.\\n   Knowing the phonetic alphabet helps eliminate communication errors.\\n   RPIC Role: The RPIC determines the communication method as part of preflight planning and communicates if changes are required.\\n   VO Role: The Visual Observer (VO) should communicate with the RPIC any hazards they see in the surrounding area while always maintaining visual contact with the drone.\\n   Ensure all team members are in the loop.",
+                            "description": "By the end of this lesson on Effective Team Communication, you will explaining the necessity of good team communication, common methods, and the specific roles of the RPIC and VO.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 933,
+                            "title": "Situational Awareness",
+                            "text_content": "Definition: Knowing what is happening around you during a flight.\\n   Involves understanding: Pilot, Aircraft, Environment, Operation, and the Overall flight situation.\\n   A pilot must know which factors are important and how they might affect the flight later.\\n   Focus: Do not focus too much on one single thing. Always know where the aircraft is and what is happening around it.\\n*   Threats: Fatigue, stress, and too much work can make it hard to stay aware. These issues can cause a pilot to fixate on one item and ignore everything else.",
+                            "description": "Define situational awareness, listing the factors involved, and identifying common threats that can lead to its loss.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ],
+                    "text_content": "Crew Resource Management (CRM)\\n\\n   Definition: The effective use of all available resources, including Personnel, Equipment, Technical resources, and Information.\\n   Focus: Communication, leadership, decision making, situational awareness, and teamwork.\\n   Benefit: Ensures safe and efficient operations.\\n   Procedure: A formal procedure or Standard Operating Procedure (SOP) helps evaluate and mitigate operational risks associated with drone missions and aids the CRM process.\\n\\n### Single-Pilot Resource Management (SRM)\\n\\n   Definition: Gathering information, understanding it, and making good decisions.\\n   Tasks: Required before and during the flight.\\n   Concepts: Uses many of the CRM concepts.\\n   Goal: Teaches a pilot how to recognize problems, study the situation, and choose the best action.\\n   Requirement: Requires judgment, not just technique - THINK.\\n   Personalized Assessment: Every pilot must look at each situation based on their own experience, skill level, and personal minimums.\\n   Safety: Single pilots need to double-check, as there is no one else to do it.\\n   Decision Basis: A pilot must consider their physical condition and mental readiness before making a decision; the goal is to make the safest and most informed decision for that specific situation.",
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 94,
+                    "title": "Physiology and Vision",
+                    "description": "By the end of this lesson on Physiology and Vision, you will overview of physiological factors, the Part 107 impairment rule, and specific health and environmental conditions pilots must be aware of.",
+                    "video_url": null,
+                    "sub_units": [
+                        {
+                            "id": 941,
+                            "title": "Vision and Scanning Techniques",
+                            "text_content": "Good vision skills make it easier to spot hazards in the sky.\\n   Pilots must learn proper scanning techniques to avoid missing important details.\\n   “See and avoid” relies on knowledge of the limitations of the human eye and the use of proper visual scanning techniques to compensate for these limitations.\\n   To scan effectively:\\n       Look from right to left or left to right.\\n       Begin scanning at the greatest distance an object can be perceived (top) and move inward.\\n       For each stop, scan an area approximately 30° wide.\\n       Stop (2 to 3 seconds) based on the degree of detail required.\\n    *   When moving from one viewing point to the next, overlap the previous field of view by 10°.",
+                            "description": "Describe on the importance of good vision skills, the “see and avoid” principle, and the step-by-step instructions for proper visual scanning techniques.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 942,
+                            "title": "Collision Threat Detection",
+                            "text_content": "Peripheral vision is helpful for noticing items that might be a collision threat.\\n   When a pilot pauses their scan and refocuses their eyes, peripheral vision helps detect movement.\\n   If you lose sight of your UA, make small movements left or right until you can see it again, or use a VO to scan specific sectors or the space.\\n   Movement is almost always the first awareness of a collision threat, and the discovery of a threat triggers your evasive action.\\n*   If another aircraft appears to have no relative motion, it is likely to be on a collision course with you; immediate evasive action should be taken.",
+                            "description": "By the end of this lesson on Collision Threat Detection, you will explaining how peripheral vision aids in collision threat detection and the required evasive action for aircraft on a collision course.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ],
+                    "text_content": "Overview: Overview of physiological factors, the Part 107 impairment rule, and specific health and environmental conditions pilots must be aware of.\n\nPhysiological Factors\\n\\n   Part 107 does NOT allow drone operation if the Remote PIC, person controlling the drone, or Visual Observer cannot perform duties safely.\\n   Drone operators are exposed to additional elements not common in manned aviation.\\n   The RPIC must ensure all crewmembers are not impaired during the operation.\\n   Factors to be aware of include:\\n       Hypoxia - reduced oxygen\\n       Hyperventilation – can cause visual impairment, hot/cold, dizzy or tingling sensations, unconsciousness, and lightheaded\\n       Stress\\n       Fatigue\\n       Dehydration\\n       Heatstroke/Sunburn/Frostbite – dress appropriately, use a tent\\n    *   Effects of alcohol and drugs – Over-the-counter antihistamines and decongestants may cause drowsiness.",
+                    "status": "NOT_STARTED"
+                },
+                {
+                    "id": 95,
+                    "title": "Maintenance and Inspection Procedures",
+                    "description": "By the end of this lesson on Maintenance and Inspection Procedures, you will a comprehensive guide to sUAS maintenance and inspection, detailing Part 107 regulations, the scope of maintenance, the need for a self-developed program (if needed), and the RPIC's ultimate responsibility.",
+                    "video_url": null,
+                    "text_content": "Overview: A comprehensive guide to sUAS maintenance and inspection, detailing Part 107 regulations, the scope of maintenance, the need for a self-developed program (if needed), and the RPIC's ultimate responsibility.\n\nPart 107 Requirements\\n\\n   (14 CFR) Part 107 requires all sUAS operators to make certain their drone is safe for operation.\\n   sUAS maintenance includes scheduled and unscheduled maintenance, repair, inspection, modification, replacement, and system software upgrades of the sUAS and all of its components.\\n   The operator should maintain the sUAS and its components in accordance with manufacturer’s instructions.\\n   The RPIC must verify the sUAS is safe prior to flying, even if someone else did the maintenance.\\n   Operators should complete the repairs based on the manufacture's recommendations.\\n   Some manufacturers require the person completing the repairs to be certified.\\n\\n### Self-Developed Program\\n\\n   Based on FAA guidance in AC 107‑2A, if the manufacturer does not provide a maintenance program, you should create a self-developed program.\\n   The program should cover:\\n       Scheduled inspections\\n       Replacement intervals (propellers, motors, batteries, etc.)\\n       System/firmware updates (drone and its components)\\n       Recordkeeping of all maintenance performed\\n       Cleaning procedures\\n   Maintenance should be done by qualified personnel.\\n   All maintenance should be documented – keep a log.\\n   If other team members complete the UA maintenance, the RPIC is still responsible and should verify it was done correctly before flight.",
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                }
+            ]
+        }
+    ],
+    "status": "NOT_STARTED"
+}

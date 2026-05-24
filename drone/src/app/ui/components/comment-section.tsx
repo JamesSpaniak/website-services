@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/app/lib/auth-context';
@@ -46,8 +47,8 @@ export default function CommentSection({ articleId }: { articleId: number }) {
     const totalCount = countComments(comments);
 
     return (
-        <section className="mt-12 pt-8 border-t border-gray-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">
+        <section className="mt-12 pt-8 border-t border-[var(--surface-border)]">
+            <h3 className="text-lg font-display font-semibold text-[var(--brand-foreground)] mb-6">
                 {totalCount > 0 ? `Comments (${totalCount})` : 'Comments'}
             </h3>
 
@@ -58,30 +59,30 @@ export default function CommentSection({ articleId }: { articleId: number }) {
                         onChange={(e) => setRootBody(e.target.value)}
                         placeholder="Share your thoughts..."
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        className="w-full px-4 py-3 rounded-lg text-sm resize-none bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
                     />
                     <div className="mt-2 flex justify-end">
                         <button
                             onClick={handleRootSubmit}
                             disabled={submitting || !rootBody.trim()}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {submitting ? 'Posting...' : 'Post Comment'}
                         </button>
                     </div>
                 </div>
             ) : (
-                <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
-                    <p className="text-sm text-gray-600">
-                        <Link href="/login" className="text-blue-600 hover:underline font-medium">Sign in</Link> to join the conversation.
+                <div className="mb-8 p-4 bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-lg text-center" style={{ borderRadius: 'var(--radius-md)' }}>
+                    <p className="text-sm text-[var(--brand-muted)]">
+                        <Link href="/login" className="text-[var(--brand-primary)] hover:underline font-medium">Sign in</Link> to join the conversation.
                     </p>
                 </div>
             )}
 
             {loading ? (
-                <p className="text-sm text-gray-500">Loading comments...</p>
+                <p className="text-sm text-[var(--brand-muted)]">Loading comments...</p>
             ) : comments.length === 0 ? (
-                <p className="text-sm text-gray-500">No comments yet. Be the first to share your thoughts!</p>
+                <p className="text-sm text-[var(--brand-muted)]">No comments yet. Be the first to share your thoughts!</p>
             ) : (
                 <div className="space-y-6">
                     {comments.map((c) => (
@@ -187,10 +188,10 @@ function CommentThread({
     };
 
     return (
-        <div className={depth > 0 ? 'ml-6 pl-4 border-l-2 border-gray-100' : ''}>
+        <div className={depth > 0 ? 'ml-6 pl-4 border-l-2 border-[var(--comment-thread-border)]' : ''}>
             <div className="group">
                 <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[var(--comment-avatar-bg)] flex items-center justify-center text-xs font-bold text-[var(--comment-avatar-text)] shrink-0">
                         {comment.author.picture_url ? (
                             <img src={comment.author.picture_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                         ) : (
@@ -199,12 +200,12 @@ function CommentThread({
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-gray-900">{authorName}</span>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-sm font-semibold text-[var(--brand-foreground)]">{authorName}</span>
+                            <span className="text-xs text-[var(--brand-muted)]">
                                 {new Date(comment.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                             </span>
                             {comment.created_at !== comment.updated_at && (
-                                <span className="text-xs text-gray-400">(edited)</span>
+                                <span className="text-xs text-[var(--brand-muted)]">(edited)</span>
                             )}
                         </div>
 
@@ -214,26 +215,26 @@ function CommentThread({
                                     value={editBody}
                                     onChange={(e) => setEditBody(e.target.value)}
                                     rows={2}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    className="w-full px-3 py-2 rounded-lg text-sm resize-none bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
                                 />
                                 <div className="mt-1 flex gap-2">
                                     <button
                                         onClick={handleEdit}
                                         disabled={submitting || !editBody.trim()}
-                                        className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                        className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-md hover:opacity-90 disabled:opacity-50"
                                     >
                                         Save
                                     </button>
                                     <button
                                         onClick={() => { setEditing(false); setEditBody(comment.body); }}
-                                        className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+                                        className="px-3 py-1 text-xs font-medium text-[var(--brand-muted)] bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-md hover:opacity-90"
                                     >
                                         Cancel
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <p className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{comment.body}</p>
+                            <p className="mt-1 text-sm text-[var(--brand-foreground)] whitespace-pre-wrap">{comment.body}</p>
                         )}
 
                         <div className="mt-2 flex items-center gap-4">
@@ -242,8 +243,8 @@ function CommentThread({
                                 disabled={!currentUserId}
                                 className={`flex items-center gap-1 text-xs transition-colors ${
                                     localHasUpvoted
-                                        ? 'text-blue-600 font-semibold'
-                                        : 'text-gray-400 hover:text-blue-500'
+                                        ? 'text-[var(--brand-primary)] font-semibold'
+                                        : 'text-[var(--brand-muted)] hover:text-[var(--brand-primary)]'
                                 } ${!currentUserId ? 'cursor-default' : 'cursor-pointer'}`}
                                 title={currentUserId ? (localHasUpvoted ? 'Remove upvote' : 'Upvote') : 'Sign in to upvote'}
                             >
@@ -256,7 +257,7 @@ function CommentThread({
                             {currentUserId && depth < MAX_REPLY_DEPTH && (
                                 <button
                                     onClick={() => setReplying(!replying)}
-                                    className="text-xs text-gray-400 hover:text-gray-600"
+                                    className="text-xs text-[var(--brand-muted)] hover:text-[var(--brand-foreground)]"
                                 >
                                     Reply
                                 </button>
@@ -264,10 +265,10 @@ function CommentThread({
 
                             {canModify && !editing && (
                                 <>
-                                    <button onClick={() => setEditing(true)} className="text-xs text-gray-400 hover:text-gray-600">
+                                    <button onClick={() => setEditing(true)} className="text-xs text-[var(--brand-muted)] hover:text-[var(--brand-foreground)]">
                                         Edit
                                     </button>
-                                    <button onClick={handleDelete} className="text-xs text-gray-400 hover:text-red-500">
+                                    <button onClick={handleDelete} className="text-xs text-[var(--brand-muted)] hover:text-red-500">
                                         Delete
                                     </button>
                                 </>
@@ -283,20 +284,20 @@ function CommentThread({
                             onChange={(e) => setReplyBody(e.target.value)}
                             placeholder={`Reply to ${authorName}...`}
                             rows={2}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            className="w-full px-3 py-2 rounded-lg text-sm resize-none bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] placeholder:text-[var(--input-placeholder)] focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
                             autoFocus
                         />
                         <div className="mt-1 flex gap-2">
                             <button
                                 onClick={handleReply}
                                 disabled={submitting || !replyBody.trim()}
-                                className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-md hover:opacity-90 disabled:opacity-50"
                             >
                                 {submitting ? 'Posting...' : 'Reply'}
                             </button>
                             <button
                                 onClick={() => { setReplying(false); setReplyBody(''); }}
-                                className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+                                className="px-3 py-1 text-xs font-medium text-[var(--brand-muted)] bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-md hover:opacity-90"
                             >
                                 Cancel
                             </button>

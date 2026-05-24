@@ -14,9 +14,23 @@ export class LoggingController {
   @ApiOperation({ summary: 'Endpoint for frontend to send logs to the backend.', description: 'This is an internal endpoint and not intended for public use.' })
   @Post()
   @HttpCode(204) // No Content
-  logMessage(@Body() log: { level: string; message:string; context?: any }) {
+  logMessage(@Body() log: { level: string; message: string; context?: Record<string, unknown> }) {
     const { level, message, context } = log;
-    const logFunction = this.logger[level] || this.logger.log;
-    logFunction.call(this.logger, message, context);
+    const ctx = context ?? {};
+
+    if (level === 'error') {
+      const stack = typeof ctx.stack === 'string' ? ctx.stack : undefined;
+      const rest = { ...ctx };
+      delete rest.stack;
+      const detail =
+        Object.keys(rest).length > 0 ? `${message} ${JSON.stringify(rest)}` : message;
+      this.logger.error(detail, stack);
+      return;
+    }
+    if (level === 'warn') {
+      this.logger.warn(`${message} ${JSON.stringify(ctx)}`);
+      return;
+    }
+    this.logger.log(`${message} ${JSON.stringify(ctx)}`);
   }
 }

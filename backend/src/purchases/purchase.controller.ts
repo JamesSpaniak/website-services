@@ -16,17 +16,16 @@ export class PurchaseController {
   constructor(private readonly purchasesService: PurchaseService) {}
 
   /**
-   * Grants a user access to a specific course.
-   * In a real application, this would be called after a successful payment transaction.
-   * @param req The Express request object, containing user details from the JWT.
-   * @param purchaseDto DTO containing the courseId to purchase.
-   * @returns The updated user object without the password.
+   * Grants the current user access to a course without going through Stripe.
+   * Admin-only: used for support / manual comping. Normal purchases use create-payment-intent + webhook.
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Purchase a course for the current user' })
-  @ApiResponse({ status: 201, description: 'Course purchased successfully.', type: UserFull })
+  @ApiOperation({ summary: 'Grant the current user a course (Admin only)' })
+  @ApiResponse({ status: 201, description: 'Course granted successfully.', type: UserFull })
   @ApiResponse({ status: 400, description: 'Bad request (e.g., course already owned).' })
+  @ApiResponse({ status: 403, description: 'Forbidden — not an admin.' })
   @Post('course')
   async purchaseCourse(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
     const updatedUser = await this.purchasesService.purchaseCourse(req.user.userId, purchaseDto.courseId);
@@ -63,17 +62,16 @@ export class PurchaseController {
   }
 
   /**
-   * Upgrades a user's role to 'Pro' and sets their membership expiry date.
-   * In a real application, this would be called after a successful subscription payment.
-   * @param req The Express request object, containing user details from the JWT.
-   * @param upgradeDto DTO containing the membership duration (e.g., 'monthly', 'yearly').
-   * @returns The updated user object without the password.
+   * Upgrades the current user to Pro without Stripe (admin comp / testing).
+   * For paid Pro, use Stripe Checkout or Billing + webhooks (not implemented here).
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Upgrade the current user to a Pro membership' })
+  @ApiOperation({ summary: 'Upgrade the current user to Pro (Admin only, no payment)' })
   @ApiResponse({ status: 201, description: 'User upgraded to Pro successfully.', type: UserFull })
   @ApiResponse({ status: 400, description: 'Bad request (e.g., user is already an admin).' })
+  @ApiResponse({ status: 403, description: 'Forbidden — not an admin.' })
   @Post('pro-membership')
   async upgradeToPro(@Request() req, @Body() upgradeDto: UpgradeToProDto) {
     const updatedUser = await this.purchasesService.upgradeToPro(req.user.userId, upgradeDto.duration);

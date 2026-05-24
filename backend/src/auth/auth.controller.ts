@@ -13,6 +13,7 @@ import { LoginCredentialsDto } from './types/login-credentials.dto';
 import { RefreshTokenDto } from './types/refresh-token.dto';
 import { RegisterDto } from './types/register.dto';
 import { VerifyEmailDto } from './types/verify-email.dto';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -21,6 +22,7 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService,
     private organizationService: OrganizationService,
+    private analyticsService: AnalyticsService,
   ) {}
 
   @ApiOperation({ summary: 'Log in a user', description: 'Authenticates a user and returns tokens and user profile.' })
@@ -31,9 +33,11 @@ export class AuthController {
   async login(@Body() loginCredentialsDto: LoginCredentialsDto) {
     const user = await this.authService.validateUser(loginCredentialsDto.username, loginCredentialsDto.password);
     if (!user) {
+      this.analyticsService.recordLoginFailed(loginCredentialsDto.username);
       throw new UnauthorizedException('Invalid credentials');
     }
     const tokens = await this.authService.login(user);
+    this.analyticsService.recordLogin(user.id, user.username);
     const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
     const orgMembership = await this.organizationService.getMyOrganization(user.id);
     if (orgMembership) {
@@ -49,7 +53,9 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Registration successful. Verification email sent.' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
-    return this.authService.registerUser(registerDto);
+    const result = await this.authService.registerUser(registerDto);
+    this.analyticsService.recordRegistration(registerDto.username);
+    return result;
   }
 
   @ApiOperation({ summary: 'Verify email address', description: 'Validates email verification token.' })

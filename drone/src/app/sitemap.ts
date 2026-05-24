@@ -53,6 +53,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.5,
     },
+    {
+      url: `${SITE_URL}/schools`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.75,
+    },
+    {
+      url: `${SITE_URL}/schools/curriculum`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.75,
+    },
+    {
+      url: `${SITE_URL}/schools/funding`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
+    {
+      url: `${SITE_URL}/consultation`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.55,
+    },
+    {
+      url: `${SITE_URL}/legal`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.35,
+    },
+    {
+      url: `${SITE_URL}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.35,
+    },
   ];
 
   const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({

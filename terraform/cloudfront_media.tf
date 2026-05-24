@@ -7,7 +7,7 @@ resource "aws_s3_bucket_cors_configuration" "media" {
 
   cors_rule {
     allowed_headers = ["*"]
-    allowed_methods = ["PUT"]
+    allowed_methods = ["PUT", "POST"]
     allowed_origins = [
       "https://${var.domain_name}",
       "https://${var.frontend_subdomain}.${var.domain_name}",

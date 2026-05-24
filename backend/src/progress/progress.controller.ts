@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProgressService } from './progress.service';
-import { UpdateProgressDto, SubmitExamDto, ProgressStatus, CourseDetails, UnitData, ExamResult } from '../courses/types/course.dto';
+import { UpdateProgressDto, ProgressStatus, CourseDetails, UnitData } from '../courses/types/course.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('User Progress')
@@ -102,24 +102,4 @@ export class ProgressController {
     );
   }
 
-  /**
-   * Submits a user's answers for an exam within a unit.
-   * @param req The Express request object.
-   * @param courseId The ID of the course containing the exam.
-   * @param unitId The ID of the unit containing the exam.
-   * @param submitExamDto DTO containing the user's answers.
-   * @returns The result of the exam, including the score.
-   * @requires Authentication.
-   */
-  @ApiOperation({ summary: 'Submit an exam for a unit' })
-  @ApiResponse({ status: 201, description: 'Exam submitted and graded.', type: ExamResult })
-  @Post('courses/:courseId/units/:unitId/exam/submit')
-  async submitExam(
-    @Request() req,
-    @Param('courseId', ParseIntPipe) courseId: number,
-    @Param('unitId') unitId: string,
-    @Body() submitExamDto: SubmitExamDto,
-  ) {
-    return this.progressService.submitExam(req.user.userId, courseId, unitId, submitExamDto.answers);
-  }
 }

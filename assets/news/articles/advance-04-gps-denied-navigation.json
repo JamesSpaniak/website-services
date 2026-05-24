@@ -1,0 +1,20 @@
+{
+  "slug": "advance-04-gps-denied-navigation",
+  "title": "GPS-Denied Flight: Visual-Inertial Navigation, SLAM, and the Future of Resilient Drones",
+  "sub_heading": "When GNSS fails, autonomy stacks must keep working—here is how industry and defense approach the problem.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "GPS denied navigation drone",
+    "visual inertial odometry UAS",
+    "drone anti-jamming",
+    "alternative PNT drone",
+    "SLAM drone mapping"
+  ],
+  "body_html": "<p><strong>In short:</strong> Jamming and spoofing pushed investment in <strong>VIO/SLAM</strong>, terrain aids, and alternative PNT research. Small drones still face tight SWaP-C limits.</p>\n\n<h2>Key takeaways</h2><ul><li>IMU drift is inevitable; vision constraints differ by terrain and lighting.</li><li>Spoofing detection needs cross-checks, not vibes.</li><li>Operational hacks (tethers, presets) complement—not replace—navigation science.</li></ul>\n\n<p><strong>Hook:</strong> If your GPS icon flickers, your autonomy stack should not panic—your lesson plans should explain <strong>why</strong>.</p>\n\n<h3>Do Part 107 pilots need to understand SLAM?</h3>\n<p>Conceptually helpful for advanced autonomy literacy—not exam-drill material for most beginners.</p>\n\n<h2>Graph (conceptual)</h2><figure style=\"overflow-x:auto;margin:1rem 0\"><svg viewBox=\"0 0 500 160\" xmlns=\"http://www.w3.org/2000/svg\" style=\"width:100%;height:auto\"><rect width=\"500\" height=\"160\" fill=\"#1a1a1a\" rx=\"4\"/><polyline points=\"40,120 120,90 200,100 280,70 360,85 440,60\" fill=\"none\" stroke=\"#8ea66a\" stroke-width=\"2\"/><text x=\"250\" y=\"28\" text-anchor=\"middle\" fill=\"#c9c9c9\" font-size=\"11\" font-family=\"system-ui\">Illustrative: error growth without GNSS (not measured data)</text></svg><figcaption>Not empirical—pedagogical only.</figcaption></figure>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>GPS denied navigation drone</strong>, <strong>visual inertial odometry UAS</strong>, <strong>drone anti-jamming</strong>, <strong>alternative PNT drone</strong>, <strong>SLAM drone mapping</strong>.</p>",
+  "marketability_review": "Niche technical SEO; attracts advanced students and defense-adjacent readers.",
+  "readability_review": "Good for readers who already know Part 107 basics; link prerequisites.",
+  "considerations": [
+    "Avoid implying consumer drones are EW-proof.",
+    "Label illustrative charts clearly."
+  ]
+}

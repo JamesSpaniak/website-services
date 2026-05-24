@@ -1,6 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CourseService } from "./course.service";
-import { CourseDetails, SubmitExamDto, UnitData, UpdateProgressDto } from "./types/course.dto";
+import { CourseDetails, UnitData, UpdateProgressDto } from "./types/course.dto";
 import { Course } from "./types/course.entity";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/users/role.guard";
@@ -11,6 +11,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 import { plainToInstance } from "class-transformer";
 import { OptionalJwtAuthGuard } from "src/auth/optional-jwt-auth.guard";
 import { SignedUrlService } from "src/media/signed-url.service";
+import { migrateCoursePayloadImages } from "./course-payload.util";
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -39,6 +40,7 @@ export class CourseController {
       
       const courseDetailsPromises = courses.map(async (course) => {
         const payload: CourseDetails = JSON.parse(course.payload);
+        migrateCoursePayloadImages(payload);
         payload.units.forEach((unit) => {
             unit.sub_units = [];
             unit.exam = undefined;
@@ -101,6 +103,7 @@ export class CourseController {
     async createCourse(
       @Body() course: CourseDetails
     ): Promise<Course> {
+        migrateCoursePayloadImages(course);
         const courseEntity: Course  = {
             payload: JSON.stringify(course),
             title: course.title,
@@ -143,6 +146,7 @@ export class CourseController {
       @Param('id', ParseIntPipe) id: number,
       @Body() course: CourseDetails
     ): Promise<Course> {
+        migrateCoursePayloadImages(course);
         const updatedCourseData: Course = {
             title: course.title,
             payload: JSON.stringify(course),
@@ -207,6 +211,7 @@ export class CourseController {
       }
 
       const payload: CourseDetails = JSON.parse(course.payload);
+      migrateCoursePayloadImages(payload);
       const unit = this.findUnit(payload.units, unitId);
       if (!unit) {
         throw new NotFoundException(`Unit with ID ${unitId} not found`);
@@ -228,17 +233,4 @@ export class CourseController {
       return null;
     }
 
-    @ApiOperation({ summary: 'Submit answers for a unit exam' })
-    @ApiResponse({ status: 201, description: 'Exam results.' })
-    @Post(':courseId/units/:unitId/exam/submit')
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    async submitExam(
-      @Request() req,
-      @Param('courseId', ParseIntPipe) courseId: number,
-      @Param('unitId') unitId: string,
-      @Body() submitExamDto: SubmitExamDto,
-    ) {
-      return this.courseProgressService.submitExam(req.user.userId, courseId, unitId, submitExamDto.answers);
-    }
 }

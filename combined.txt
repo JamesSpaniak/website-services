@@ -1,0 +1,22 @@
+Adding many sUAS to the NAS is a complex challenge
+Need managed approach -many variables & potential safety concerns
+Essential to maintain the safety and integrity of U.S. airspace.
+
+National Airspace System
+
+Network of airspace, navigation facilities, airports, technology, and regulations that enable safe and efficient air travel in the US.
+Airspace Management - Organizes airspace: controlled, uncontrolled & special use 
+Communication Systems- between pilots and controllers.
+
+Navigation & Surveillance: Uses radar, GPS, and other systems to track aircraft and provide navigation support.
+Air Traffic Services: Includes flight planning, weather services, and traffic flow management.
+Safety & Regulation
+
+Air Traffic Control
+
+Primary purpose of the ATC - to prevent a collision between aircraft operating in the system and to organize and expedite the flow of traffic. 
+Provides instructions for flight paths, altitude changes, and landing/takeoff clearances.
+Separation of Aircraft
+Traffic Flow Management
+Emergency Assistance
+Coordination Across Sectors

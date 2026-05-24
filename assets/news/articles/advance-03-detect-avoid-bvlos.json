@@ -1,0 +1,20 @@
+{
+  "slug": "advance-03-detect-avoid-bvlos",
+  "title": "Detect-and-Avoid and BVLOS: The Sensor Stack Behind Real Drone Logistics",
+  "sub_heading": "Why regulators care about false alarms as much as detection range—and what “airworthy” means for sensors.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "BVLOS drone operations",
+    "detect and avoid UAS",
+    "drone ADS-B",
+    "FAA BVLOS waiver",
+    "UAS airspace integration"
+  ],
+  "body_html": "<p><strong>In short:</strong> BVLOS unlocks economics for inspection and delivery, but requires <strong>evidence-grade</strong> DAA: fusion, track continuity, and acceptable false-alert rates in real weather.</p>\n\n<h2>Key takeaways</h2><ul><li>No single sensor covers all encounter geometries.</li><li>Urban clutter stresses every modality differently.</li><li>Policy timelines often lag hardware capability.</li></ul>\n\n<p><strong>Hook:</strong> BVLOS is less a firmware update and more a <strong>safety case binder</strong> you could drop on a desk—with footnotes.</p>\n\n<h3>Is BVLOS the same as autonomous flight?</h3>\n<p>No. BVLOS is about permission to fly beyond sight; autonomy levels vary.</p>\n\n<figure style=\"margin:1.5rem 0;overflow-x:auto\"><svg viewBox=\"0 0 580 200\" xmlns=\"http://www.w3.org/2000/svg\" style=\"width:100%;height:auto\"><rect width=\"580\" height=\"200\" fill=\"#1a1a1a\" rx=\"4\"/><circle cx=\"120\" cy=\"100\" r=\"40\" fill=\"none\" stroke=\"#8ea66a\" stroke-width=\"2\"/><circle cx=\"290\" cy=\"100\" r=\"40\" fill=\"none\" stroke=\"#737373\" stroke-width=\"2\"/><circle cx=\"460\" cy=\"100\" r=\"40\" fill=\"none\" stroke=\"#8ea66a\" stroke-width=\"2\"/><text x=\"290\" y=\"30\" text-anchor=\"middle\" fill=\"#c9c9c9\" font-size=\"12\" font-family=\"system-ui\">Fusion concept: multiple tracks → single picture</text></svg><figcaption>Illustrative.</figcaption></figure>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>BVLOS drone operations</strong>, <strong>detect and avoid UAS</strong>, <strong>drone ADS-B</strong>, <strong>FAA BVLOS waiver</strong>, <strong>UAS airspace integration</strong>.</p>",
+  "marketability_review": "High B2B value; align CTAs to consultation or advanced pilot programs.",
+  "readability_review": "Diagram supports scanning; consider step list for safety case.",
+  "considerations": [
+    "Cite ASTM/FAA references when going live.",
+    "Update as rulemakings finalize."
+  ]
+}

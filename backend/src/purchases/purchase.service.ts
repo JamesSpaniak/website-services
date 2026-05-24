@@ -79,7 +79,7 @@ export class PurchaseService {
     const paymentIntent = await this.stripe.paymentIntents.create({
         amount: amount,
         currency: 'usd',
-        metadata: { userId, courseId }, // Store your internal IDs for reconciliation
+        metadata: { userId: String(userId), courseId: String(courseId) },
     });
     // TODO save paymentIntent?
 
@@ -101,14 +101,32 @@ export class PurchaseService {
 
     // Handle the event
     switch (event.type) {
-      case 'payment_intent.succeeded':
+      case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const { userId, courseId } = paymentIntent.metadata;
 
+        if (!userId || !courseId) {
+          this.logger.error(
+            `payment_intent.succeeded missing metadata (pi=${paymentIntent.id})`,
+          );
+          break;
+        }
+
         this.logger.log(`PaymentIntent succeeded for userId: ${userId}, courseId: ${courseId}`);
-        // Fulfill the purchase. This is idempotent because purchaseCourse checks for existing ownership.
-        await this.purchaseCourse(parseInt(userId, 10), parseInt(courseId, 10));
+        try {
+          await this.purchaseCourse(parseInt(userId, 10), parseInt(courseId, 10));
+        } catch (e) {
+          // Duplicate webhook delivery: user already owns the course — acknowledge so Stripe stops retrying.
+          if (this.isAlreadyPurchasedBadRequest(e)) {
+            this.logger.log(
+              `Idempotent webhook: user ${userId} already owns course ${courseId}`,
+            );
+            break;
+          }
+          throw e;
+        }
         break;
+      }
       // ... handle other event types
       default:
         this.logger.log(`Unhandled event type ${event.type}`);
@@ -116,5 +134,13 @@ export class PurchaseService {
 
     // Return a 200 response to acknowledge receipt of the event
     return { received: true };
+  }
+
+  private isAlreadyPurchasedBadRequest(e: unknown): boolean {
+    if (!(e instanceof BadRequestException)) return false;
+    const r = e.getResponse();
+    const msg = typeof r === 'string' ? r : (r as { message?: string | string[] }).message;
+    const s = Array.isArray(msg) ? msg.join(' ') : String(msg ?? '');
+    return s.includes('already purchased');
   }
 }

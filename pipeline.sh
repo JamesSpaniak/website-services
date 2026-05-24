@@ -131,13 +131,14 @@ aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AW
 
 build_and_push() {
   local name="$1" ecr_repo="$2" dockerfile="$3" context="$4"
+  local build_args="${5:-}"
   local image_uri="${ECR_URI}/${ecr_repo}:${IMAGE_TAG}"
-  echo "Building ${name} image ${image_uri}"
+  echo "Building ${name} image ${image_uri}" >&2
   ensure_ecr_repo "${ecr_repo}"
   local cache_flag=""
   [[ "${DOCKER_NO_CACHE}" == "true" ]] && cache_flag="--no-cache"
-  docker build --progress "${DOCKER_PROGRESS}" ${cache_flag} -f "${dockerfile}" -t "${image_uri}" "${context}"
-  docker push "${image_uri}"
+  docker build --progress "${DOCKER_PROGRESS}" ${cache_flag} ${build_args} -f "${dockerfile}" -t "${image_uri}" "${context}" >&2
+  docker push "${image_uri}" >&2
   echo "${image_uri}"
 }
 
@@ -158,7 +159,8 @@ else
 fi
 
 if [[ "${BUILD_FRONTEND}" == "true" ]]; then
-  FRONTEND_IMAGE_URI="$(build_and_push "frontend" "${FRONTEND_ECR_REPO}" drone/Dockerfile drone)"
+  FRONTEND_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://thedroneedge.com}"
+  FRONTEND_IMAGE_URI="$(build_and_push "frontend" "${FRONTEND_ECR_REPO}" drone/Dockerfile drone "--build-arg NEXT_PUBLIC_DEBUG_LOGGING=1 --build-arg NEXT_PUBLIC_SITE_URL=${FRONTEND_SITE_URL}")"
 else
   FRONTEND_IMAGE_URI="$(get_current_task_image "${FRONTEND_TASK_FAMILY}" "${FRONTEND_CONTAINER_NAME}")"
 fi
@@ -273,4 +275,13 @@ if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
   [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}"
   [[ "${BUILD_BACKEND}" == "true" ]]  && wait_for_service_stable "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && wait_for_service_stable "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}"
+
+  # Invalidate frontend CloudFront cache after a frontend deploy so clients get fresh HTML/chunks
+  if [[ "${BUILD_FRONTEND}" == "true" ]]; then
+    FRONTEND_CF_ID="$(cd "${TF_DIR}" && terraform output -raw frontend_cloudfront_id 2>/dev/null)" || true
+    if [[ -n "${FRONTEND_CF_ID}" ]]; then
+      echo "Invalidating frontend CloudFront cache (distribution ${FRONTEND_CF_ID})..."
+      aws cloudfront create-invalidation --distribution-id "${FRONTEND_CF_ID}" --paths "/*" >/dev/null || true
+    fi
+  fi
 fi

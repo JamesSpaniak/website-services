@@ -1,0 +1,116 @@
+Event Time,Message,Log group,Log stream
+2026-03-13T01:40:56.882Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 0ms"",
+  ""trace_id"": ""0b3924b49f3288c2fbcba0df0b1b60df"",
+  ""span_id"": ""bca69479e2b00f59"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""319372c7-af49-468d-ab8b-111756cf1edc""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:40:56.889Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 0ms"",
+  ""trace_id"": ""e1e21db060c30db72945b950d120a931"",
+  ""span_id"": ""b3c5f3eee2d6ddce"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""6ed4a2d5-bcf9-4537-b5ee-21b6d5262cd7""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:40:56.881Z,2026-03-13 01:40:56 [32minfo[39m [319372c7-af49-468d-ab8b-111756cf1edc] [HTTP]: GET /health 0ms +30s,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:40:56.889Z,2026-03-13 01:40:56 [32minfo[39m [6ed4a2d5-bcf9-4537-b5ee-21b6d5262cd7] [HTTP]: GET /health 0ms +9ms,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:26.909Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 1ms"",
+  ""trace_id"": ""acabaff2e465c39814b3b8b834029189"",
+  ""span_id"": ""65362ae02aa5a69d"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""911fd290-c70b-4ca7-9f5a-e77fa1d47d69""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:26.920Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 1ms"",
+  ""trace_id"": ""b6189a5c7c202bea92b80ab16622d511"",
+  ""span_id"": ""5ce5d79777e392a9"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""e245ace7-c6c8-4139-a222-e76405dab7ad""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:26.909Z,2026-03-13 01:41:26 [32minfo[39m [911fd290-c70b-4ca7-9f5a-e77fa1d47d69] [HTTP]: GET /health 1ms +30s,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:26.920Z,2026-03-13 01:41:26 [32minfo[39m [e245ace7-c6c8-4139-a222-e76405dab7ad] [HTTP]: GET /health 1ms +11ms,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:41.416Z,"{
+  ""context"": ""ExceptionFilter"",
+  ""level"": ""warn"",
+  ""message"": ""[GET /auth/profile] 401 - \""Unauthorized\"""",
+  ""trace_id"": ""49d908eca17ecb49ad09528bf804d3e8"",
+  ""span_id"": ""6adde6e0b67eacb9"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""72bb6810-7486-415b-9875-cab5bf01f440""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:41.473Z,"{
+  ""context"": ""ExceptionFilter"",
+  ""level"": ""warn"",
+  ""message"": ""[POST /analytics/event] 400 - [\""event must be one of the following values: page_view, article_view, course_view\"",\""path should not be empty\"",\""path must be a string\""]"",
+  ""trace_id"": ""9ba7207c12c122207343cff425826c88"",
+  ""span_id"": ""3d9b8e3443187541"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""ca11442e-7704-4f3e-92be-6f0c250907cf""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:41.497Z,"{
+  ""context"": ""Frontend"",
+  ""stack"": [
+    {
+      ""endpoint"": ""auth/profile"",
+      ""options"": {
+        ""method"": ""GET"",
+        ""headers"": {}
+      },
+      ""requestId"": ""72bb6810-7486-415b-9875-cab5bf01f440"",
+      ""durationMs"": 41,
+      ""stack"": ""Error: Session expired. Please log in again.\n    at u (https://thedroneedge.com/_next/static/chunks/422-b781728c0bc67fb7.js:1:2204)\n    at async https://thedroneedge.com/_next/static/chunks/422-b781728c0bc67fb7.js:1:329"",
+      ""url"": ""https://thedroneedge.com/"",
+      ""userAgent"": ""Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36""
+    }
+  ],
+  ""level"": ""error"",
+  ""message"": ""Session expired. Please log in again."",
+  ""trace_id"": ""8b6df468c29529796e57904f44ba63d0"",
+  ""span_id"": ""146cf03cc2f7e7ec"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""2268c6e8-d620-4c08-b64e-6ea5cfe87fd6""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:41.498Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""POST /logs 1ms"",
+  ""trace_id"": ""8b6df468c29529796e57904f44ba63d0"",
+  ""span_id"": ""2ad4799020971afb"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""2268c6e8-d620-4c08-b64e-6ea5cfe87fd6""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:41.416Z,"2026-03-13 01:41:41 [33mwarn[39m [72bb6810-7486-415b-9875-cab5bf01f440] [ExceptionFilter]: [GET /auth/profile] 401 - ""Unauthorized"" +14s",956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:41.472Z,"2026-03-13 01:41:41 [33mwarn[39m [ca11442e-7704-4f3e-92be-6f0c250907cf] [ExceptionFilter]: [POST /analytics/event] 400 - [""event must be one of the following values: page_view, article_view, course_view"",""path should not be empty"",""path must be a string""] +57ms",956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:41.497Z,2026-03-13 01:41:41 [31merror[39m [2268c6e8-d620-4c08-b64e-6ea5cfe87fd6] [Frontend]: Session expired. Please log in again. +24ms,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:41.497Z,[object Object],956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:41.498Z,2026-03-13 01:41:41 [32minfo[39m [2268c6e8-d620-4c08-b64e-6ea5cfe87fd6] [HTTP]: POST /logs 1ms +1ms,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:56.930Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 0ms"",
+  ""trace_id"": ""b45de18375fb2183340161eb88840b92"",
+  ""span_id"": ""e4afe62efa74e358"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""68af4bfc-0b2f-464d-9678-3b75dd0707b2""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:56.950Z,"{
+  ""context"": ""HTTP"",
+  ""level"": ""info"",
+  ""message"": ""GET /health 0ms"",
+  ""trace_id"": ""86df6eb470c74330cbd0c47bd23da4d2"",
+  ""span_id"": ""3f25169cea66056b"",
+  ""trace_flags"": ""01"",
+  ""requestId"": ""d4cb1184-841a-4e66-af04-7be0bf6ea5ec""
+}",956463123464:/ecs/droneedge-dev/api-server,droneedge-dev-api-stream-1773365816492
+2026-03-13T01:41:56.930Z,2026-03-13 01:41:56 [32minfo[39m [68af4bfc-0b2f-464d-9678-3b75dd0707b2] [HTTP]: GET /health 0ms +15s,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08
+2026-03-13T01:41:56.949Z,2026-03-13 01:41:56 [32minfo[39m [d4cb1184-841a-4e66-af04-7be0bf6ea5ec] [HTTP]: GET /health 0ms +19ms,956463123464:/ecs/droneedge-dev/api-server,api-server/api-server/67c6f79fe99c4cf9a70c75931310cf08

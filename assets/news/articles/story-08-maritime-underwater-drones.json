@@ -1,0 +1,19 @@
+{
+  "slug": "story-08-maritime-underwater-drones",
+  "title": "Maritime and Underwater Drones: USVs, Mine Warfare, and Naval Strategy",
+  "sub_heading": "Uncrewed surface and subsurface systems are no longer niche experiments—here is why coastal and open-ocean risk models changed.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "USV drone",
+    "naval drone technology",
+    "underwater autonomous vehicle",
+    "maritime UAS",
+    "drone boat surveillance"
+  ],
+  "body_html": "<p><strong>In short:</strong> Uncrewed surface vessels and underwater vehicles featured in high-profile incidents and long-term doctrine shifts. <strong>Commercial-derived sensors and datalinks</strong> blur into naval missions.</p>\n\n<h2>Key takeaways</h2><ul><li>Surface drones can threaten high-value ships when targeting chains work.</li><li>Underwater comms and navigation remain hard; autonomy differs by class.</li><li>Environmental and escalation risks appear in public debate.</li></ul>\n\n<p><strong>Hook:</strong> The ocean is the next wide-open GUI for <strong>contested autonomy</strong>—with salt corrosion as an extra boss level.</p>\n\n<h3>Do Part 107 pilots operate USVs?</h3>\n<p>Different regulatory regimes often apply; maritime law and coast guard rules matter—do not assume Part 107 alone.</p>\n\n<figure style=\"margin:1.5rem 0;overflow-x:auto\"><svg viewBox=\"0 0 600 140\" xmlns=\"http://www.w3.org/2000/svg\" style=\"width:100%;height:auto\"><rect width=\"600\" height=\"140\" fill=\"#1a1a1a\" rx=\"4\"/><path d=\"M40 90 Q300 40 560 90\" stroke=\"#8ea66a\" fill=\"none\" stroke-width=\"2\"/><circle cx=\"120\" cy=\"68\" r=\"10\" fill=\"#525252\"/><circle cx=\"300\" cy=\"50\" r=\"10\" fill=\"#8ea66a\"/><circle cx=\"480\" cy=\"68\" r=\"10\" fill=\"#525252\"/><text x=\"300\" y=\"125\" text-anchor=\"middle\" fill=\"#888\" font-size=\"11\" font-family=\"system-ui\">Notional: surface ↔ air ↔ subsurface coordination</text></svg><figcaption>Illustrative diagram.</figcaption></figure>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>USV drone</strong>, <strong>naval drone technology</strong>, <strong>underwater autonomous vehicle</strong>, <strong>maritime UAS</strong>, <strong>drone boat surveillance</strong>.</p>",
+  "marketability_review": "Niche but strategic; pairs well with advanced course modules and policy readers.",
+  "readability_review": "Visual breaks help dense topic; glossary of USV/UUV recommended in sidebar.",
+  "considerations": [
+    "Maritime imagery licensing can be costly—use abstract diagrams or stock."
+  ]
+}

@@ -10,7 +10,7 @@ resource "aws_ecs_cluster" "frontend" {
 
 resource "aws_cloudwatch_log_group" "frontend" {
   name              = "/ecs/${var.project_name}/frontend"
-  retention_in_days = 30
+  retention_in_days = var.cloudwatch_log_retention_days
 }
 
 resource "aws_security_group" "frontend_tasks_sg" {
@@ -25,11 +25,32 @@ resource "aws_security_group" "frontend_tasks_sg" {
     security_groups = [aws_security_group.lb_sg.id]
   }
 
+  # HTTP — internal ALB (backend API proxy)
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  # HTTPS — AWS APIs (via VPC endpoints + NAT)
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # DNS
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-frontend-tasks-sg"
   }
 }
 
@@ -87,8 +108,8 @@ resource "aws_ecs_task_definition" "frontend" {
   family                   = "${var.project_name}-drone-frontend-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "512"  # 0.5 vCPU
+  memory                   = "1024" # 1 GB
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -114,11 +135,16 @@ resource "aws_ecs_task_definition" "frontend" {
       environment = [
         { name = "API_INTERNAL_BASE_URL", value = "http://${aws_lb.backend_internal.dns_name}" },
         { name = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", value = var.stripe_publishable_key },
-        { name = "NEXT_PUBLIC_CLOUDFRONT_DOMAIN", value = "media.thedroneedge.com"  }
+        { name = "NEXT_PUBLIC_CLOUDFRONT_DOMAIN", value = "media.thedroneedge.com" },
+        { name = "NEXT_PUBLIC_DEBUG_LOGGING", value = var.frontend_debug_logging }
       ]
     }
   ])
 
+  # Pipeline updates image via var; we ignore container_definitions changes so Terraform
+  # does not overwrite. To push new env vars (e.g. NEXT_PUBLIC_DEBUG_LOGGING), taint once:
+  #   terraform taint aws_ecs_task_definition.frontend
+  # then apply so the task definition is recreated with the new definition.
   lifecycle {
     ignore_changes = [container_definitions]
   }
@@ -143,4 +169,30 @@ resource "aws_ecs_service" "frontend" {
   }
 
   depends_on = [aws_lb_listener.http, aws_lb_listener.https]
+}
+
+resource "aws_appautoscaling_target" "frontend_ecs_target" {
+  max_capacity       = 3
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.frontend.name}/${aws_ecs_service.frontend.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "frontend_scale_up" {
+  name               = "${var.project_name}-frontend-scale-up"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.frontend_ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.frontend_ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.frontend_ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    target_value       = 75.0
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 60
+  }
 }

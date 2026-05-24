@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getArticleById } from '@/app/lib/api-client';
+import { trackArticleView } from '@/app/lib/analytics';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import { ArticleFull } from '@/app/lib/types/article';
@@ -19,6 +20,7 @@ export default function ArticlePageClient({ articleId }: { articleId: string }) 
         if (isNaN(id)) throw new Error("Invalid article ID.");
         const articleData = await getArticleById(id);
         setArticle(articleData);
+        trackArticleView(articleId, articleData.title);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load article.');
       } finally {

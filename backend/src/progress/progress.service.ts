@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,11 +10,10 @@ import {
   CourseDetails,
   UnitData,
   ProgressStatus,
-  UserAnswer,
-  ExamResult,
 } from '../courses/types/course.dto';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
+import { migrateCoursePayloadImages } from '../courses/course-payload.util';
 
 @Injectable()
 export class ProgressService {
@@ -44,6 +42,7 @@ export class ProgressService {
       }
 
       const coursePayload: CourseDetails = JSON.parse(course.payload);
+      migrateCoursePayloadImages(coursePayload);
       this.initializeProgressPayload(coursePayload);
 
       const { unitsTotal, unitsCompleted, latestExamScore } = this.computeSummary(coursePayload);
@@ -63,9 +62,9 @@ export class ProgressService {
     return progress;
   }
 
-  private findUnit(units: UnitData[], unitId: number): UnitData | null {
+  private findUnit(units: UnitData[], unitId: string): UnitData | null {
     for (const unit of units) {
-      if (parseInt(unit.id) === unitId) {
+      if (String(unit.id) === String(unitId)) {
         return unit;
       }
       if (unit.sub_units?.length) {
@@ -91,6 +90,7 @@ export class ProgressService {
         unit.title = undefined;
         unit.description = undefined;
         unit.video_url = undefined;
+        unit.images_url = undefined;
         unit.image_url = undefined;
         unit.text_content = undefined;
         if (unit.sub_units) {
@@ -104,6 +104,7 @@ export class ProgressService {
     payload.sub_title = undefined;
     payload.description = undefined;
     payload.video_url = undefined;
+    payload.images_url = undefined;
     payload.image_url = undefined;
   }
 
@@ -186,6 +187,7 @@ export class ProgressService {
     }
 
     const coursePayload: CourseDetails = JSON.parse(course.payload);
+    migrateCoursePayloadImages(coursePayload);
     coursePayload.id = courseId;
     this.initializeProgressPayload(coursePayload);
     return coursePayload;
@@ -226,10 +228,21 @@ export class ProgressService {
     unitId: string,
     status: ProgressStatus,
   ): Promise<UnitData> {
-    const progress = await this.getOrCreateProgress(userId, courseId);
-    const progressPayload = progress.payload as CourseDetails;
+    let progress = await this.getOrCreateProgress(userId, courseId);
+    let progressPayload = progress.payload as CourseDetails;
 
-    const unitToUpdate = this.findUnit(progressPayload.units, parseInt(unitId));
+    let unitToUpdate = this.findUnit(progressPayload.units, unitId);
+
+    if (!unitToUpdate) {
+      // Progress blob is stale (course was restructured after progress was created).
+      // Reset the stored progress so getOrCreateProgress rebuilds it from the
+      // current course payload, then retry the lookup.
+      await this.progressRepository.delete({ userId, courseId });
+      progress = await this.getOrCreateProgress(userId, courseId);
+      progressPayload = progress.payload as CourseDetails;
+      unitToUpdate = this.findUnit(progressPayload.units, unitId);
+    }
+
     if (!unitToUpdate) {
       throw new NotFoundException(`Unit with ID ${unitId} not found in course ${courseId}`);
     }
@@ -241,67 +254,6 @@ export class ProgressService {
       this.auditService.log(userId, AuditAction.UNIT_COMPLETED, { courseId, unitId });
     }
     return unitToUpdate;
-  }
-
-  async submitExam(
-    userId: number,
-    courseId: number,
-    unitId: string,
-    userAnswers: UserAnswer[],
-  ): Promise<ExamResult> {
-    const [progress, course] = await Promise.all([
-      this.getOrCreateProgress(userId, courseId),
-      this.courseRepository.findOneBy({ id: courseId }),
-    ]);
-
-    if (!course) throw new NotFoundException(`Course with ID ${courseId} not found`);
-
-    const progressPayload = progress.payload as CourseDetails;
-    const coursePayload: CourseDetails = JSON.parse(course.payload);
-
-    const unitInProgress = this.findUnit(progressPayload.units, parseInt(unitId));
-    const unitInCourse = this.findUnit(coursePayload.units, parseInt(unitId));
-
-    if (!unitInProgress?.exam || !unitInCourse?.exam) {
-      throw new NotFoundException(`Exam for unit ID ${unitId} not found`);
-    }
-
-    const { exam: examInProgress } = unitInProgress;
-    const { exam: examInCourse } = unitInCourse;
-
-    if (examInProgress.retries_taken >= examInCourse.retries_allowed) {
-      throw new BadRequestException('Maximum number of retries exceeded.');
-    }
-
-    let correctCount = 0;
-    for (const userAnswer of userAnswers) {
-      const question = examInCourse.questions.find(q => q.id === userAnswer.questionId);
-      const correctAnswer = question?.answers.find(a => a.correct);
-      if (correctAnswer?.id === userAnswer.selectedAnswerId) {
-        correctCount++;
-      }
-    }
-
-    const score = Math.round((correctCount / examInCourse.questions.length) * 100);
-    const newResult: ExamResult = { score, answers: userAnswers, submittedAt: new Date() };
-
-    examInProgress.retries_taken++;
-    examInProgress.status = ProgressStatus.COMPLETED;
-    if (examInProgress.result) {
-      examInProgress.previous_results = [...(examInProgress.previous_results || []), examInProgress.result];
-    }
-    examInProgress.result = newResult;
-    unitInProgress.status = ProgressStatus.COMPLETED;
-
-    await this.saveWithSummary(progress);
-
-    this.auditService.log(userId, AuditAction.EXAM_SUBMITTED, {
-      courseId,
-      unitId,
-      score,
-      attempt: examInProgress.retries_taken,
-    });
-    return newResult;
   }
 
   async resetAllProgress(userId: number): Promise<void> {

@@ -1,0 +1,20 @@
+{
+  "slug": "advance-01-onboard-ml-computer-vision",
+  "title": "Onboard AI and Computer Vision on Small Drones: From Obstacle Avoidance to Edge Inference",
+  "sub_heading": "Why perception—not just motors—defines the next decade of UAS product roadmaps and FAA safety cases.",
+  "hero_image": "/images/articles/advance-01-hero-cv-targeting.png",
+  "seo_phrases": [
+    "AI drone obstacle avoidance",
+    "edge AI UAS",
+    "computer vision drone",
+    "autonomous drone perception",
+    "neural network embedded drone"
+  ],
+  "body_html": "<p><strong>In short:</strong> Onboard machine learning moved drones from waypoint scripts to <strong>closed-loop perception</strong>: depth, segmentation, tracking, and fusion on embedded GPUs/NPUs—within strict power and thermal budgets.</p>\n\n<h2>Key takeaways</h2><ul><li>Watts matter as much as FLOPs for real missions.</li><li>Synthetic data and sim-to-real pipelines rival architecture tweaks.</li><li>Dual-use: inspection and agriculture vs. contested targeting discussions.</li><li>Better perception unlocks regulator confidence for advanced operations.</li></ul>\n\n<p><strong>Hook:</strong> The prettiest flight path means nothing if the aircraft cannot <strong>see</strong> the wire at the last second.</p>\n\n<h3>Are transformer models running on consumer drones yet?</h3>\n<p>Efficient variants appear in research and premium stacks; mass-market adoption follows cost curves and certification evidence.</p>\n\n<h2>SEO: what people search</h2><p>Queries blend “<strong>AI drone</strong>,” “<strong>obstacle avoidance</strong>,” and “<strong>autonomous flight</strong>.” Use natural language; avoid keyword stuffing.</p>\n\n<figure style=\"margin:1.5rem 0;overflow-x:auto\"><img src=\"https://media.thedroneedge.com/articles/35/b411061e-6210-474f-a1b2-24dba585fd59.png\" alt=\"Perception stack: sensors, fusion, planner, and actuation\" style=\"width:100%;max-width:100%;height:auto;border-radius:4px\" /><figcaption>Conceptual perception stack—not a vendor architecture.</figcaption></figure>\n\n<h2>Next advancement</h2><p>World models and lightweight multimodal reasoning on board, with certifiable behavior under distribution shift—expect incremental releases over several years.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>AI drone obstacle avoidance</strong>, <strong>edge AI UAS</strong>, <strong>computer vision drone</strong>, <strong>autonomous drone perception</strong>, <strong>neural network embedded drone</strong>.</p>",
+  "marketability_review": "Strong evergreen SEO for tech-curious pilots; pairs with advanced modules on automation.",
+  "readability_review": "Diagram breaks up jargon; FAQ hits common ML misconception.",
+  "considerations": [
+    "Update when major vendor ships new on-device stack.",
+    "Clarify no training on export-controlled models."
+  ]
+}

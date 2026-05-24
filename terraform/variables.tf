@@ -47,6 +47,12 @@ variable "stripe_publishable_key" {
   default     = ""
 }
 
+variable "frontend_debug_logging" {
+  description = "Set to 1 to enable NEXT_PUBLIC_DEBUG_LOGGING in the frontend task (visible in AWS console). Actual debug output is enabled at build time via pipeline build-arg; this is for visibility/consistency."
+  type        = string
+  default     = "1"
+}
+
 variable "email_enabled" {
   description = "Enable outbound email sending."
   type        = bool
@@ -87,4 +93,16 @@ variable "cloudfront_signing_public_key_pem" {
   description = "RSA public key PEM for CloudFront signed URLs (course videos)."
   type        = string
   sensitive   = true
+}
+
+variable "cloudwatch_log_retention_days" {
+  description = "Retention for application and VPC flow log groups (lower = lower CloudWatch Logs cost)."
+  type        = number
+  default     = 7
+}
+
+variable "enable_vpc_flow_logs" {
+  description = "VPC Flow Logs to CloudWatch are high-volume. Set false to disable and save cost; re-enable for forensics."
+  type        = bool
+  default     = true
 }

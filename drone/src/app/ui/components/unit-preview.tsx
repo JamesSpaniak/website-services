@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { UnitData, ProgressStatus } from '@/app/lib/types/course';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
-import { ChevronRightIcon, DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
+import { mergeCourseImages } from '@/app/lib/course-images';
 
 interface UnitPreviewProps {
   unit: UnitData;
@@ -15,49 +14,35 @@ interface UnitPreviewProps {
 }
 
 export default function UnitPreviewComponent({ unit, courseId, onStatusUpdate }: UnitPreviewProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const unitHref = `/courses/${courseId}/units/${encodeURIComponent(String(unit.id))}`;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm">
-      <div
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
-      >
-        <div className="flex items-center gap-3">
+    <div className="border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
+      <div className="flex items-stretch justify-between gap-3 p-5">
+        <Link
+          href={unitHref}
+          className="flex flex-1 min-w-0 items-center gap-3 text-left rounded-md outline-none ring-offset-2 ring-offset-[var(--background)] focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] hover:opacity-95"
+        >
           <StatusIcon status={unit.status} />
-          <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold tracking-tight text-gray-900">{unit.title}</h3>
-            {unit.text_content && <DocumentTextIcon className="h-5 w-5 text-gray-400" title="Text Content Available" />}
-            {unit.image_url && <PhotoIcon className="h-5 w-5 text-gray-400" title="Image Available" />}
-            {unit.video_url && <VideoCameraIcon className="h-5 w-5 text-gray-400" title="Video Available" />}
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+              {unit.title}
+            </h3>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[var(--brand-muted)]">
+              {unit.text_content && (
+                <DocumentTextIcon className="h-4 w-4 shrink-0" title="Text" />
+              )}
+              {mergeCourseImages(unit).length > 0 && (
+                <PhotoIcon className="h-4 w-4 shrink-0" title="Images" />
+              )}
+              {unit.video_url && <VideoCameraIcon className="h-4 w-4 shrink-0" title="Video" />}
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div onClick={(e) => e.stopPropagation()}><StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(unit.id, newStatus)} /></div>
-          <ChevronRightIcon className={`h-6 w-6 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+        </Link>
+        <div className="shrink-0 flex items-center self-center">
+          <StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(unit.id, newStatus)} />
         </div>
       </div>
-
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="px-6 pb-6 border-t">
-              <div className="mt-4 prose max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: unit.description?.replace(/\n/g, '<br />') || '' }} />
-              <div className="mt-4 text-right">
-                <Link href={`/courses/${courseId}/units/${unit.id}`} className="text-sm font-semibold text-blue-600 hover:text-blue-500">
-                  Go to Unit →
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

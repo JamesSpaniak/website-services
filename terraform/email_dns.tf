@@ -5,14 +5,17 @@
 # DKIM is managed manually in Route53 console (see bottom of file).
 # =============================================================================
 
-# --- SPF Record ---
+# --- Root TXT Records (SPF + Google Search Console verification) ---
+# Route 53 requires all TXT records for the same name to live in a single
+# aws_route53_record resource. Add new root-domain TXT values to this list.
 resource "aws_route53_record" "spf" {
   zone_id = aws_route53_zone.main.zone_id
   name    = var.domain_name
   type    = "TXT"
   ttl     = 3600
   records = [
-    "v=spf1 include:_spf.google.com ip4:${aws_eip.nat.public_ip} ~all"
+    "v=spf1 include:_spf.google.com ip4:${aws_eip.nat.public_ip} ~all",
+    "google-site-verification=p7lRzk1TR1yHXjCyxMk55BfGmdhKv79nBRNqum0CGQE",
   ]
 }
 

@@ -10,6 +10,7 @@ import { Session } from './types/session.entity';
 import { Repository } from 'typeorm';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
+import { AnalyticsService } from '../analytics/analytics.service';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -24,6 +25,7 @@ export class AuthService {
     private emailService: EmailService,
     private organizationService: OrganizationService,
     private auditService: AuditService,
+    private analyticsService: AnalyticsService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -215,6 +217,7 @@ export class AuthService {
     };
 
     this.logger.debug(`Token refreshed for user="${user.username}" (id=${user.id})`);
+    this.analyticsService.recordTokenRefresh(user.id);
 
     const new_refresh_token = `${selector}:${new_verifier}`;
 

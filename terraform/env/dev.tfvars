@@ -9,3 +9,4 @@ email_host = "smtp-relay.gmail.com"
 email_port = 587
 email_from = "DroneEdge <donotreply@thedroneedge.com>"
 admin_email = "james@thedroneedge.com"
+frontend_debug_logging = "1"

@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Courses',
   description: 'Professional drone certification courses including FAA Part 107 exam prep, flight training, and advanced drone operations.',
   openGraph: {
-    title: 'Courses — Drone Training Pro',
+    title: 'Courses — Drone Edge',
     description: 'Professional drone certification courses including FAA Part 107 exam prep, flight training, and advanced drone operations.',
   },
   other: {

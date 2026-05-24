@@ -1,0 +1,57 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Detect-and-avoid (DAA) sensors and beyond-visual-line-of-sight (BVLOS) integration (2010s–present)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Scaling commercial operations required aircraft to “see” cooperative and non-cooperative traffic: ADS-B In, airborne radar, EO/IR gimbals, acoustic cues, and fusion algorithms. Standards bodies and regulators (FAA, EASA, ASTM-style performance metrics) progressed from waivers toward repeatable BVLOS rules in selected corridors. The problem is as much **system safety evidence** and **false-alarm rates** as raw sensor range.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- No single sensor solves all encounter geometries; fusion and track continuity dominate.
+- Urban canyons and small UAS signatures stress radar and optical solutions differently.
+- Spectrum and equipage assumptions (who broadcasts what) vary globally.
+- Human oversight requirements may shrink only when DAA + comms reliability meets quantitative safety targets.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Airspace integration; sensors; aviation safety; UTM / U-space interfaces
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Technical capability survey
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Methodical; occasionally frustrated by policy lag vs. hardware capability
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Pilots and airports prioritize near-zero midair risk; drone operators want predictable rules; public worries about noise and surveillance often overshadow DAA discussions unless an incident occurs.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+UTM services linking intent, constraint sets, and contingency maneuvers; wake of Remote ID and transponder-like behaviors; integration with crewed traffic in mixed corridors.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Long R&D thread from ~2010s; accelerated standards work ~2018–2026 with jurisdiction-specific rollouts and pilot programs.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+BVLOS is the economic unlock for inspection, logistics, and mapping at scale—without it, drones remain a line-of-sight tool.
+
+────────────────────────────────────────────────────────────
+NEXT ADVANCEMENT (HOW CLOSE?)
+────────────────────────────────────────────────────────────
+**Close in pockets, far globally.** The “next advancement” is less a brand-new sensor and more **certified, repeatable BVLOS in complex airspace** with **quantified encounter risk**—moving from exemptions to **normalized operations**. Expect **5–15 years** of uneven geographic progress tied to regulation, not sensor physics alone.

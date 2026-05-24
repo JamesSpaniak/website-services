@@ -1371,6 +1371,720 @@
             "version": "13.0.0-22262684784"
           }
         }
+      },
+      "panel-page-views-rate": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(increase(page_view_total{service_name=\"droneedge\"}[1h]))",
+                        "instant": true,
+                        "legendFormat": "views/hr",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Total page views per hour",
+          "id": 60,
+          "links": [],
+          "title": "Page Views / hr",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [{ "color": "blue", "value": 0 }]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "background_solid",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-logins-rate": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(increase(auth_login_total{service_name=\"droneedge\"}[1h]))",
+                        "instant": true,
+                        "legendFormat": "logins/hr",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Successful logins in the last hour",
+          "id": 61,
+          "links": [],
+          "title": "Logins / hr",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [{ "color": "green", "value": 0 }]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "background_solid",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-registrations-total": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(increase(auth_registration_total{service_name=\"droneedge\"}[24h]))",
+                        "instant": true,
+                        "legendFormat": "registrations",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "New user registrations in the last 24 hours",
+          "id": 62,
+          "links": [],
+          "title": "Registrations (24h)",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [{ "color": "purple", "value": 0 }]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "background_solid",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-failed-logins": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(increase(auth_login_failed_total{service_name=\"droneedge\"}[1h]))",
+                        "instant": true,
+                        "legendFormat": "failed/hr",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Failed login attempts in the last hour",
+          "id": 63,
+          "links": [],
+          "title": "Failed Logins / hr",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      { "color": "green", "value": 0 },
+                      { "color": "orange", "value": 5 },
+                      { "color": "red", "value": 20 }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "background_solid",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-page-views-over-time": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(page_view_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "All pages",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(article_view_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Articles",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(course_view_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Courses",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Page views per minute: all pages, articles, and courses",
+          "id": 64,
+          "links": [],
+          "title": "Page Views Over Time",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "palette-classic" },
+                  "custom": {
+                    "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                    "axisLabel": "views/min", "axisPlacement": "auto", "barAlignment": 0,
+                    "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 20,
+                    "gradientMode": "scheme",
+                    "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                    "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2,
+                    "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                    "showPoints": "never", "showValues": false, "spanNulls": false,
+                    "stacking": { "group": "A", "mode": "none" },
+                    "thresholdsStyle": { "mode": "off" }
+                  },
+                  "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }] }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": { "calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+                "tooltip": { "hideZeros": true, "mode": "multi", "sort": "desc" }
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-auth-activity": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(auth_login_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Logins",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(auth_login_failed_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Failed logins",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(auth_token_refresh_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Token refreshes",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(auth_registration_total{service_name=\"droneedge\"}[5m])) * 60",
+                        "instant": false,
+                        "legendFormat": "Registrations",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "D"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Authentication events per minute: logins, failed logins, token refreshes, registrations",
+          "id": 65,
+          "links": [],
+          "title": "Auth Activity Over Time",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "palette-classic" },
+                  "custom": {
+                    "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                    "axisLabel": "events/min", "axisPlacement": "auto", "barAlignment": 0,
+                    "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                    "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2,
+                    "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                    "showPoints": "never", "showValues": false, "spanNulls": false,
+                    "stacking": { "group": "A", "mode": "none" },
+                    "thresholdsStyle": { "mode": "off" }
+                  },
+                  "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }] }
+                },
+                "overrides": [
+                  {
+                    "matcher": { "id": "byName", "options": "Failed logins" },
+                    "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+                  }
+                ]
+              },
+              "options": {
+                "legend": { "calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+                "tooltip": { "hideZeros": true, "mode": "multi", "sort": "desc" }
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-top-articles": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "topk(10, sum by (article_id, title) (increase(article_view_total{service_name=\"droneedge\"}[$__range])))",
+                        "format": "table",
+                        "instant": true,
+                        "legendFormat": "",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Top 10 most viewed articles in the selected time range",
+          "id": 66,
+          "links": [],
+          "title": "Top Articles by Views",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": { "type": "auto" },
+                    "filterable": true,
+                    "footer": { "reducers": [] },
+                    "inspect": false
+                  },
+                  "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }] }
+                },
+                "overrides": [
+                  {
+                    "matcher": { "id": "byName", "options": "Value" },
+                    "properties": [
+                      { "id": "displayName", "value": "Views" },
+                      { "id": "decimals", "value": 0 }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [{ "desc": true, "displayName": "Views" }]
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-top-courses": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "topk(10, sum by (course_id, title) (increase(course_view_total{service_name=\"droneedge\"}[$__range])))",
+                        "format": "table",
+                        "instant": true,
+                        "legendFormat": "",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Top 10 most viewed courses in the selected time range",
+          "id": 67,
+          "links": [],
+          "title": "Top Courses by Views",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": { "type": "auto" },
+                    "filterable": true,
+                    "footer": { "reducers": [] },
+                    "inspect": false
+                  },
+                  "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }] }
+                },
+                "overrides": [
+                  {
+                    "matcher": { "id": "byName", "options": "Value" },
+                    "properties": [
+                      { "id": "displayName", "value": "Views" },
+                      { "id": "decimals", "value": 0 }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [{ "desc": true, "displayName": "Views" }]
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
+      },
+      "panel-views-by-page": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "topk(15, sum by (path) (increase(page_view_total{service_name=\"droneedge\"}[$__range])))",
+                        "format": "table",
+                        "instant": true,
+                        "legendFormat": "",
+                        "range": false
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Top 15 most visited pages by total views in the selected time range",
+          "id": 68,
+          "links": [],
+          "title": "Top Pages by Views",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": { "mode": "thresholds" },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": { "type": "auto" },
+                    "filterable": true,
+                    "footer": { "reducers": [] },
+                    "inspect": false
+                  },
+                  "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }] }
+                },
+                "overrides": [
+                  {
+                    "matcher": { "id": "byName", "options": "Value" },
+                    "properties": [
+                      { "id": "displayName", "value": "Views" },
+                      { "id": "decimals", "value": 0 }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [{ "desc": true, "displayName": "Views" }]
+              }
+            },
+            "version": "13.0.0-22262684784"
+          }
+        }
       }
     },
     "layout": {
@@ -1532,6 +2246,123 @@
               "x": 12,
               "y": 28
             }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-page-views-rate"
+              },
+              "height": 4,
+              "width": 6,
+              "x": 0,
+              "y": 36
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-logins-rate"
+              },
+              "height": 4,
+              "width": 6,
+              "x": 6,
+              "y": 36
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-registrations-total"
+              },
+              "height": 4,
+              "width": 6,
+              "x": 12,
+              "y": 36
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-failed-logins"
+              },
+              "height": 4,
+              "width": 6,
+              "x": 18,
+              "y": 36
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-page-views-over-time"
+              },
+              "height": 8,
+              "width": 12,
+              "x": 0,
+              "y": 40
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-auth-activity"
+              },
+              "height": 8,
+              "width": 12,
+              "x": 12,
+              "y": 40
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-top-articles"
+              },
+              "height": 8,
+              "width": 8,
+              "x": 0,
+              "y": 48
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-top-courses"
+              },
+              "height": 8,
+              "width": 8,
+              "x": 8,
+              "y": 48
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-views-by-page"
+              },
+              "height": 8,
+              "width": 8,
+              "x": 16,
+              "y": 48
+            }
           }
         ]
       }
@@ -1542,7 +2373,8 @@
     "tags": [
       "droneedge",
       "otel",
-      "backend"
+      "backend",
+      "analytics"
     ],
     "timeSettings": {
       "autoRefresh": "30s",

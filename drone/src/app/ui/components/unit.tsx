@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UnitData, ProgressStatus } from '@/app/lib/types/course';
 import { updateUnitProgress } from '@/app/lib/api-client';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
-import ExamComponent from './exam';
 import SectionComponent from './section';
+import ExamPlayer from './exam-player';
 
 interface UnitComponentProps {
     unitData: UnitData;
@@ -15,52 +15,90 @@ interface UnitComponentProps {
 
 export default function UnitComponent({ unitData, courseId }: UnitComponentProps) {
     const [unit, setUnit] = useState<UnitData>(unitData);
-    const { id, title, sub_units, description, text_content, status, exam } = unit;
+    const { id, title, sub_units, description, text_content, status } = unit;
+
+    useEffect(() => {
+        let cancelled = false;
+        const s = unitData.status;
+        if (s != null && s !== ProgressStatus.NOT_STARTED) return;
+        (async () => {
+            try {
+                const updated = await updateUnitProgress(
+                    courseId,
+                    String(unitData.id),
+                    ProgressStatus.IN_PROGRESS,
+                );
+                if (!cancelled) {
+                    setUnit((prev) => ({ ...prev, status: updated.status }));
+                }
+            } catch {
+                /* guest or offline */
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [courseId, unitData.id, unitData.status]);
 
     const handleStatusUpdate = async (newStatus: ProgressStatus) => {
         const updatedUnitFromApi = await updateUnitProgress(courseId, id, newStatus);
-        setUnit(prevUnit => ({ ...prevUnit, status: updatedUnitFromApi.status }));
+        setUnit((prevUnit) => ({ ...prevUnit, status: updatedUnitFromApi.status }));
     };
 
     const handleSubUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
         const updatedSubUnit = await updateUnitProgress(courseId, unitId, newStatus);
-        setUnit(prevUnit => updateUnitInState(prevUnit, updatedSubUnit));
+        setUnit((prevUnit) => updateUnitInState(prevUnit, updatedSubUnit));
     };
 
+    const unitScopeId = typeof id === 'string' ? parseInt(id, 10) : id;
+
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="p-8 bg-white rounded-2xl shadow-sm">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="p-8 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
                 <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{title}</h1>
+                    <h1 className="text-2xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] sm:text-3xl">{title}</h1>
                     <StatusIcon status={status} />
                     <StatusUpdater onStatusSelect={handleStatusUpdate} />
                 </div>
+
                 
-                <div className="mt-8 prose lg:prose-lg max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: description?.replace(/\n/g, '<br />') || ''}} />
-                {text_content && <div className="mt-4 prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
+                    <div className="mt-8 prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)] prose-headings:text-[var(--brand-foreground)] prose-a:text-[var(--brand-primary)]" dangerouslySetInnerHTML={{ __html: description?.replace(/\n/g, '<br />') || ''}} />
+                
+                {text_content && <div className="mt-4 prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)]" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
 
                 {sub_units && sub_units.length > 0 && (
                     <div className="mt-12">
-                        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Sections</h2>
+                        <h2 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">Sections</h2>
                         {sub_units?.map((sub_unit) => (
-                            <SectionComponent key={sub_unit.id} section={sub_unit} courseId={courseId} onStatusUpdate={handleSubUnitStatusUpdate} />
+                            <SectionComponent
+                                key={sub_unit.id}
+                                section={sub_unit}
+                                courseId={courseId}
+                                onStatusUpdate={handleSubUnitStatusUpdate}
+                            />
                         ))}
                     </div>
                 )}
 
-                {/* Main Unit Exam */}
-                <UnitExamSection exam={exam} />
+                {!Number.isNaN(unitScopeId) && (
+                    <ExamPlayer
+                        courseId={courseId}
+                        scope="unit"
+                        scopeId={unitScopeId}
+                        label={`Unit: ${title}`}
+                        questionCount={25}
+                    />
+                )}
             </div>
         </div>
     );
 }
 
-// Helper function to recursively update a sub-unit in the state
 function updateUnitInState(unit: UnitData, updatedSubUnit: UnitData): UnitData {
     const update = (units: UnitData[]): UnitData[] => {
-        return units.map(u => {
-            if (u.id === updatedSubUnit.id) {
-                return { ...u, status: updatedSubUnit.status };
+        return units.map((u) => {
+            if (String(u.id) === String(updatedSubUnit.id)) {
+                return { ...u, ...updatedSubUnit };
             }
             if (u.sub_units) {
                 return { ...u, sub_units: update(u.sub_units) };
@@ -69,27 +107,4 @@ function updateUnitInState(unit: UnitData, updatedSubUnit: UnitData): UnitData {
         });
     };
     return { ...unit, sub_units: update(unit.sub_units || []) };
-}
-
-function UnitExamSection({ exam }: { exam?: UnitData['exam'] }) {
-    const [showExam, setShowExam] = useState(false);
-
-    if (!exam || !exam.questions) return null;
-
-    return (
-        <div className="mt-12 pt-8 border-t">
-            {!showExam ? (
-                <div className="text-center">
-                    <button 
-                        onClick={() => setShowExam(true)}
-                        className="px-6 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                    >
-                        Take Unit Exam
-                    </button>
-                </div>
-            ) : (
-                <ExamComponent {...exam} />
-            )}
-        </div>
-    );
 }

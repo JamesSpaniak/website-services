@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig = {
+    compiler: {
+      removeConsole: false,
+    },
+    trailingSlash: false,
     images: {
       remotePatterns: [
         {

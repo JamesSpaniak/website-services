@@ -25,7 +25,7 @@ describe('API (e2e)', () => {
     sub_title: 'Basics',
     description: 'Course description',
     text_content: 'Full course text',
-    image_url: 'https://example.com/image.png',
+    images_url: ['https://example.com/image.png'],
     video_url: 'https://example.com/video.mp4',
     units: [
       {
@@ -34,7 +34,7 @@ describe('API (e2e)', () => {
         description: 'Unit description',
         text_content: 'Unit content',
         video_url: 'https://example.com/unit.mp4',
-        image_url: 'https://example.com/unit.png',
+        images_url: ['https://example.com/unit.png'],
         sub_units: [],
         exam: {
           retries_allowed: 1,
@@ -238,6 +238,36 @@ describe('API (e2e)', () => {
       await request(app.getHttpServer()).post('/purchases/course').expect(401);
       await request(app.getHttpServer()).post('/purchases/create-payment-intent').expect(401);
       await request(app.getHttpServer()).post('/purchases/pro-membership').expect(401);
+    });
+
+    it('rejects non-admin for direct course grant and pro upgrade', async () => {
+      const course = await createCourse('Direct Grant Course');
+      await createUser(Role.User, 'nogrant', 'nogrant@example.com');
+      const token = await loginAndGetToken('nogrant');
+
+      await request(app.getHttpServer())
+        .post('/purchases/course')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ courseId: course.id })
+        .expect(403);
+
+      await request(app.getHttpServer())
+        .post('/purchases/pro-membership')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ duration: 'monthly' })
+        .expect(403);
+    });
+
+    it('allows admin to grant themselves a course via direct grant', async () => {
+      const course = await createCourse('Admin Self Grant');
+      await createUser(Role.Admin, 'admingrant3', 'admingrant3@example.com');
+      const adminToken = await loginAndGetToken('admingrant3');
+
+      await request(app.getHttpServer())
+        .post('/purchases/course')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ courseId: course.id })
+        .expect(201);
     });
   });
 });

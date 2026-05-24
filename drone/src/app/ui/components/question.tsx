@@ -24,23 +24,27 @@ export default function QuestionComponent({id, question, answers, onAnswerSelect
     }
 
     return (
-        <div key={id} className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0">
-            <h4 className="text-md font-semibold text-gray-800">{question}</h4>
+        <div key={id} className="border-t border-[var(--surface-border)] pt-4 first:border-t-0 first:pt-0">
+            <h4 className="text-md font-semibold text-[var(--brand-foreground)]">{question}</h4>
             <div className="mt-3 space-y-2">
                 {answers.map((option: AnswerData) => {
                     const isSelected = selectedAnswerId === option.id;
                     const isCorrect = option.correct;
 
-                    let buttonStyles = 'bg-white text-gray-700 border-gray-300'; // Default
+                    let buttonStyles =
+                        'bg-[var(--surface)] text-[var(--brand-foreground)] border-[var(--input-border)]';
                     if (!isSubmitted) {
-                        buttonStyles = isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
+                        buttonStyles = isSelected
+                            ? 'bg-[var(--brand-primary)] text-[var(--background)] border-[var(--brand-primary)]'
+                            : 'bg-[var(--surface)] text-[var(--brand-foreground)] border-[var(--input-border)] hover:bg-[var(--comment-secondary-bg)]';
                     } else {
                         if (isCorrect) {
                             buttonStyles = 'bg-green-100 text-green-800 border-green-300';
                         } else if (isSelected && !isCorrect) {
                             buttonStyles = 'bg-red-100 text-red-800 border-red-300';
                         } else {
-                            buttonStyles = 'bg-gray-100 text-gray-500 border-gray-200';
+                            buttonStyles =
+                                'bg-[var(--comment-secondary-bg)] text-[var(--brand-muted)] border-[var(--surface-border)]';
                         }
                     }
 

@@ -1,55 +1,117 @@
 import { Metadata } from 'next';
 import ImageComponent from '../ui/components/image';
 import SocialMediaLinks from '../ui/components/socials';
+import PageShell from '../ui/components/page-shell';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'Empowering professionals through accessible, high-quality technical education in drone technology and certification.',
+  description:
+    'Drone Edge is built by people from the drone community—serious Part 107 preparation, practical lessons, and a mission to grow safe, skilled operators.',
   openGraph: {
-    title: 'About — Drone Training Pro',
-    description: 'Empowering professionals through accessible, high-quality technical education in drone technology and certification.',
+    title: 'About — Drone Edge',
+    description:
+      'Built by people from the drone community. Practical certification prep and ongoing learning for pilots, schools, and career switchers.',
   },
 };
 
 export default function AboutPage() {
-    return (
-        <div className="bg-white py-12 sm:py-16">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto max-w-2xl lg:mx-0">
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">About Us</h2>
-                    <p className="mt-2 text-lg leading-8 text-gray-600">
-                        Empowering professionals through accessible, high-quality technical education.
-                    </p>
-                </div>
-                <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                    <div className="flex flex-col lg:col-span-2">
-                        <h3 className="text-2xl font-bold tracking-tight text-gray-900">Our Mission</h3>
-                        <p className="mt-4 text-base text-gray-600">
-                            At Drone Training Pro, we believe that mastering technology grants individuals greater control and freedom in their personal and professional lives. Our mission is to provide clear, concise, and practical learning paths in complex technical fields.
-                        </p>
-                        <p className="mt-4 text-base text-gray-600">
-                            Whether you&apos;re studying for a certification, seeking to understand industry regulations, or enhancing your skills for a project, our courses and articles are designed to support your growth. We break down intricate topics into manageable components, ensuring you gain the knowledge and confidence to succeed.
-                        </p>
-                    </div>
-                    <div className="relative h-64 sm:h-80 w-full lg:h-full">
-                        <ImageComponent
-                            className="rounded-2xl bg-gray-50 object-cover"
-                            src="/about-placeholder.svg"
-                            alt="A drone flying over a modern city skyline"
-                            fill
-                        />
-                    </div>
-                </div>
-                <div className="mx-auto mt-16 max-w-2xl border-t border-gray-200 pt-10 sm:pt-16">
-                    <h3 className="text-2xl font-bold tracking-tight text-center text-gray-900">Connect With Us</h3>
-                    <p className="mt-4 text-center text-gray-600">
-                        Have questions or want to learn more? <a href="/contact" className="font-semibold text-blue-600 hover:text-blue-500">Send us a message</a> or find us on social media.
-                    </p>
-                    <div className="mt-8">
-                        <SocialMediaLinks />
-                    </div>
-                </div>
-            </div>
+  return (
+    <PageShell
+      title="About"
+      subtitle="From the community. For everyone who flies—or teaches—the work."
+      maxWidthClass="max-w-3xl"
+    >
+      <div className="mt-10 space-y-10 text-sm text-[var(--brand-muted)] leading-relaxed">
+
+        {/* ── Audience cards ──────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="border border-[var(--surface-border)] bg-[var(--surface)] p-6 space-y-3" style={{ borderRadius: 'var(--radius-md)' }}>
+            <h3 className="text-base font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+              For individuals
+            </h3>
+            <p>
+              Career changers, hobbyists going commercial, and anyone curious about unmanned aviation.
+              Self-paced courses you can fit around a real schedule — no classroom required.
+            </p>
+            <Link href="/courses" className="inline-block text-[var(--brand-primary)] font-medium hover:opacity-90">
+              Browse courses →
+            </Link>
+          </div>
+
+          <div className="border border-[var(--surface-border)] bg-[var(--surface)] p-6 space-y-3" style={{ borderRadius: 'var(--radius-md)' }}>
+            <h3 className="text-base font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+              For schools &amp; programs
+            </h3>
+            <p>
+              CTE pathways, STEM electives, and career academies. Organization accounts, manager
+              dashboards, and structured pacing built for how classrooms actually run.
+            </p>
+            <Link href="/schools" className="inline-block text-[var(--brand-primary)] font-medium hover:opacity-90">
+              See Schools &amp; Educators →
+            </Link>
+          </div>
         </div>
-    )
+
+        {/* ── Mission sections ────────────────────────────────────────── */}
+        <section>
+          <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+            Who we are
+          </h3>
+          <p className="mt-4">
+            Drone Edge comes out of the{' '}
+            <strong className="font-medium text-[var(--brand-foreground)]">drone community</strong>—pilots,
+            instructors, and builders who care how this industry matures. We support its{' '}
+            <strong className="font-medium text-[var(--brand-foreground)]">mission</strong>: safe
+            operations, credible certification, and room for people from every background to learn well.
+            We understand the <strong className="font-medium text-[var(--brand-foreground)]">culture</strong>—the
+            mix of regulation, field craft, and curiosity that makes unmanned aviation different from a generic
+            online class.
+          </p>
+        </section>
+
+        <section>
+          <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+            What we&apos;re building
+          </h3>
+          <p className="mt-4">
+            We build <strong className="font-medium text-[var(--brand-foreground)]">clear learning paths</strong>—structured
+            courses with units and sections, rich media, progress you can see, and assessments where the curriculum
+            calls for them. We complement that with <strong className="font-medium text-[var(--brand-foreground)]">articles</strong> and
+            updates so learning doesn&apos;t stop at the last quiz. Our focus is{' '}
+            <strong className="font-medium text-[var(--brand-foreground)]">honest preparation</strong>: we are
+            continuously growing our question bank and tightening instructional quality so that what we publish
+            matches the seriousness of the FAA Remote Pilot standard.
+          </p>
+        </section>
+
+        <div className="relative h-48 sm:h-72 w-full overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
+          <ImageComponent
+            className="object-cover object-center"
+            src="/get_the_edge.png"
+            alt="Get the edge — community-driven drone training"
+            fill
+            sizes="(max-width: 768px) 100vw, 42rem"
+            priority
+          />
+        </div>
+
+        <section className="pt-6 border-t border-[var(--surface-border)] text-center">
+          <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+            Connect
+          </h3>
+          <p className="mt-4">
+            Questions about courses, partnerships, or content—start on our{' '}
+            <Link href="/contact" className="text-[var(--brand-primary)] hover:opacity-90">
+              contact page
+            </Link>
+            . For updates and community, find us on social.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <SocialMediaLinks />
+          </div>
+        </section>
+      </div>
+    </PageShell>
+  );
 }

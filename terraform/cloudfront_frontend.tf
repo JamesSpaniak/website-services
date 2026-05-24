@@ -106,15 +106,86 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
+  enabled         = true
+  is_ipv6_enabled = true
+  # Do NOT set default_root_object for Next.js on ALB — it would map / → /index.html at the origin and return 404.
+  # (S3 static sites use index.html; App Router serves /.)
 
+  # Include www — Route53 points www → this distribution; omitting www here causes
+  # CloudFront to return 403 for Host: www..., which blocks Google indexing.
   aliases = [
     var.domain_name,
+    "www.${var.domain_name}",
     "${var.frontend_subdomain}.${var.domain_name}",
     "${var.frontend_subdomain}.${var.dev_subdomain}.${var.domain_name}"
   ]
+
+  # ── Static JS/CSS chunks — long-lived, no auth needed ─────────────────────
+  ordered_cache_behavior {
+    path_pattern           = "/_next/static/*"
+    target_origin_id       = "ALB-${var.project_name}-frontend"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+
+    forwarded_values {
+      query_string = false
+      headers      = []
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 86400    # 1 day
+    max_ttl     = 31536000 # 1 year (Next.js hashes chunk filenames)
+  }
+
+  # ── Next.js image optimisation — cache by URL+query, strip cookies ─────────
+  ordered_cache_behavior {
+    path_pattern           = "/_next/image*"
+    target_origin_id       = "ALB-${var.project_name}-frontend"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+
+    forwarded_values {
+      # query_string carries the src URL, width, and quality — must be forwarded
+      query_string = true
+      headers      = []
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 86400    # 1 day
+    max_ttl     = 2592000  # 30 days
+  }
+
+  # ── Public-folder static files (favicon, OG images, etc.) ─────────────────
+  ordered_cache_behavior {
+    path_pattern           = "/images/*"
+    target_origin_id       = "ALB-${var.project_name}-frontend"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+
+    forwarded_values {
+      query_string = false
+      headers      = []
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 3600    # 1 hour
+    max_ttl     = 86400   # 1 day
+  }
 
   default_cache_behavior {
     target_origin_id       = "ALB-${var.project_name}-frontend"
@@ -124,7 +195,8 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Authorization", "Origin", "Referer"]
+      # Content-Type required so POST body (e.g. /api/analytics/event) is parsed as JSON at origin/backend
+      headers      = ["Authorization", "Content-Type", "Origin", "Referer"]
 
       cookies {
         forward = "all"

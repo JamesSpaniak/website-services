@@ -36,7 +36,7 @@ resource "aws_s3_bucket_policy" "logs" {
 
 resource "aws_cloudwatch_log_group" "api_server" {
   name              = "/ecs/${var.project_name}/api-server"
-  retention_in_days = 30 # Keep logs in CloudWatch for 30 days before they are archived to S3
+  retention_in_days = var.cloudwatch_log_retention_days
 }
 
 /*

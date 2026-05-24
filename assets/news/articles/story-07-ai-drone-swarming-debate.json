@@ -1,0 +1,20 @@
+{
+  "slug": "story-07-ai-drone-swarming-debate",
+  "title": "AI, Drone Swarms, and Autonomy: Separating Headlines from Hardware Reality",
+  "sub_heading": "Coordinated multi-UAS concepts push ethics and doctrine—here is a sober technical framing for instructors and students.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "AI drone swarm",
+    "autonomous weapons drones",
+    "multi-UAV coordination",
+    "military AI ethics",
+    "UAS autonomy"
+  ],
+  "body_html": "<p><strong>In short:</strong> “Swarm” and “AI drone” are overloaded terms. Real systems blend <strong>communications constraints</strong>, human oversight rules, and planning algorithms—often far from cinematic autonomy.</p>\n\n<h2>Key takeaways</h2><ul><li>Scale breaks naive coordination algorithms at low bandwidth.</li><li>EW makes links intermittent—designs must degrade gracefully.</li><li>Civil society pushes for clearer international norms; progress is uneven.</li></ul>\n\n<p><strong>Hook:</strong> Your students will ask about swarms—give them a framework: <strong>sensing, comms, autonomy level, and accountability.</strong></p>\n\n<h3>Are consumer drone light shows “swarms”?</h3>\n<p>They are coordinated choreography—different reliability and safety case than contested military operations.</p>\n\n<h2>Teaching responsibly</h2><p>Pair ethics discussion with FAA rules and professional codes. Highlight verification gaps in viral clips.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>AI drone swarm</strong>, <strong>autonomous weapons drones</strong>, <strong>multi-UAV coordination</strong>, <strong>military AI ethics</strong>, <strong>UAS autonomy</strong>.</p>",
+  "marketability_review": "High shareability; balance with sober disclaimers to protect brand trust for an education site.",
+  "readability_review": "FAQ addresses misconceptions—good for snippet SEO and classroom use.",
+  "considerations": [
+    "Avoid sensational thumbnails.",
+    "Link to ICRC or academic primers for ethics depth."
+  ]
+}

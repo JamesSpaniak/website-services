@@ -1,7 +1,6 @@
 import {
     Injectable,
     NotFoundException,
-    BadRequestException,
   } from '@nestjs/common';
   import { InjectRepository } from '@nestjs/typeorm';
   import { Repository } from 'typeorm';
@@ -10,13 +9,14 @@ import {
   import {
     CourseDetails,
     ProgressStatus,
-    UserAnswer,
-    ExamResult,
     UnitData,
   } from '../courses/types/course.dto';
 import { CourseService } from './course.service';
 import { Role } from 'src/users/types/role.enum';
 import { Trace } from 'src/common/tracing.decorator';
+import { migrateCoursePayloadImages } from './course-payload.util';
+import { ExamScoreSnapshot } from '../questions/types/question.dto';
+import type { ExamPool } from '../questions/types/exam.entity';
   
   @Injectable()
   export class CourseProgressService {
@@ -48,8 +48,9 @@ import { Trace } from 'src/common/tracing.decorator';
         }
   
         const coursePayload: CourseDetails = JSON.parse(course.payload);
+        migrateCoursePayloadImages(coursePayload);
         this.initializeProgressPayload(coursePayload);
-  
+
         progress = this.progressRepository.create({
           userId,
           courseId,
@@ -59,13 +60,18 @@ import { Trace } from 'src/common/tracing.decorator';
       }
       return progress;
     }
+
+    /** Ensures a progress row exists before exam generate/submit (public for exam API). */
+    async ensureProgress(userId: number, courseId: number): Promise<Progress> {
+      return this.getOrCreateProgress(userId, courseId);
+    }
   
     /**
      * Recursively finds a unit or sub-unit by its ID within a list of units.
      */
     private findUnit(units: UnitData[], unitId: string): UnitData | null {
       for (const unit of units) {
-        if (unit.id === unitId) {
+        if (String(unit.id) === String(unitId)) {
           return unit;
         }
         if (unit.sub_units?.length) {
@@ -112,6 +118,7 @@ import { Trace } from 'src/common/tracing.decorator';
 
       const hasAccess = await this.courseService.hasAccess(courseId, userFromJwt);
       const coursePayload: CourseDetails = JSON.parse(course.payload);
+      migrateCoursePayloadImages(coursePayload);
       coursePayload.id = course.id;
       // Assuming price is stored in the payload JSON. If it's a column on Course, use course.price
       coursePayload.price = course.price || 49.95; // Fallback price
@@ -121,6 +128,7 @@ import { Trace } from 'src/common/tracing.decorator';
         // If user has access, get or create their progress and merge it.
         const progress = await this.getOrCreateProgress(userFromJwt.userId, courseId);
         this.mergeProgressAndCourse(progress.payload as CourseDetails, coursePayload);
+        coursePayload.exam_summary = this.buildExamSummary(progress.exam_scores);
       } else {
         // If no access, initialize a clean payload but redact sensitive content.
         // This ensures the frontend can show course info without giving away the content.
@@ -142,28 +150,58 @@ import { Trace } from 'src/common/tracing.decorator';
       return coursePayload;
     }
 
+    private buildExamSummary(
+      examScores: ExamScoreSnapshot[] | null | undefined,
+    ): CourseDetails['exam_summary'] {
+      const scores = examScores ?? [];
+      const latestForPool = (pool: ExamPool) => {
+        const matching = scores.filter(
+          (s) => s.scope === 'full_course' && s.exam_pool === pool,
+        );
+        if (matching.length === 0) return null;
+        const best = matching.reduce((a, b) =>
+          new Date(a.taken_at) > new Date(b.taken_at) ? a : b,
+        );
+        return { score: best.score, taken_at: best.taken_at };
+      };
+      return {
+        practice: latestForPool('scoped'),
+        final: latestForPool('final_only'),
+      };
+    }
+
     mergeProgressAndCourse(progress: CourseDetails, course: CourseDetails): void {
         course.status = progress.status;
-        const merge = (progressUnits: UnitData[], courseUnits: UnitData[]) => {
-            if (!progressUnits || !courseUnits) return;
-            for(let i: number = 0; i<courseUnits.length; i++) {
-                courseUnits[i].status = i>=progressUnits.length
-                    ? ProgressStatus.NOT_STARTED : progressUnits[i].status;
-                if(courseUnits[i].exam) {
-                    if(i>=progressUnits.length) {
-                        courseUnits[i].exam.status = ProgressStatus.NOT_STARTED;
+
+        // Build a flat map of unitId → progress unit for O(1) lookup by ID.
+        const progressMap = new Map<string, UnitData>();
+        const indexUnits = (units: UnitData[]) => {
+            if (!units?.length) return;
+            for (const u of units) {
+                progressMap.set(String(u.id), u);
+                if (u.sub_units?.length) indexUnits(u.sub_units);
+            }
+        };
+        indexUnits(progress.units ?? []);
+
+        const merge = (courseUnits: UnitData[]) => {
+            if (!courseUnits?.length) return;
+            for (const cu of courseUnits) {
+                const pu = progressMap.get(String(cu.id));
+                cu.status = pu?.status ?? ProgressStatus.NOT_STARTED;
+                if (cu.exam) {
+                    if (!pu?.exam) {
+                        cu.exam.status = ProgressStatus.NOT_STARTED;
                     } else {
-                        courseUnits[i].exam.status = progressUnits[i].exam?.status;
-                        courseUnits[i].exam.result = progressUnits[i].exam?.result;
-                        courseUnits[i].exam.previous_results = progressUnits[i].exam?.previous_results;
+                        cu.exam.status = pu.exam.status;
+                        cu.exam.result = pu.exam.result;
+                        cu.exam.previous_results = pu.exam.previous_results;
                     }
                 }
-                if(courseUnits[i].sub_units) {
-                    merge(progressUnits[i].sub_units ? progressUnits[i].sub_units : [], courseUnits[i].sub_units)
-                }
+                if (cu.sub_units?.length) merge(cu.sub_units);
             }
-          };
-        merge(progress.units, course.units);
+        };
+        merge(course.units ?? []);
     }
   
     async updateUnitProgress(
@@ -172,10 +210,21 @@ import { Trace } from 'src/common/tracing.decorator';
       unitId: string,
       status: ProgressStatus,
     ): Promise<UnitData> {
-      const progress = await this.getOrCreateProgress(userId, courseId);
-      const progressPayload = progress.payload as CourseDetails;
-  
-      const unitToUpdate = this.findUnit(progressPayload.units, unitId);
+      let progress = await this.getOrCreateProgress(userId, courseId);
+      let progressPayload = progress.payload as CourseDetails;
+
+      let unitToUpdate = this.findUnit(progressPayload.units, unitId);
+
+      if (!unitToUpdate) {
+        // Progress blob is stale (course was restructured after progress was created).
+        // Reset stored progress so getOrCreateProgress rebuilds it from the
+        // current course payload, then retry the lookup.
+        await this.progressRepository.delete({ userId, courseId });
+        progress = await this.getOrCreateProgress(userId, courseId);
+        progressPayload = progress.payload as CourseDetails;
+        unitToUpdate = this.findUnit(progressPayload.units, unitId);
+      }
+
       if (!unitToUpdate) {
         throw new NotFoundException(`Unit with ID ${unitId} not found in course ${courseId}`);
       }
@@ -185,59 +234,6 @@ import { Trace } from 'src/common/tracing.decorator';
       return unitToUpdate;
     }
   
-    async submitExam(
-      userId: number,
-      courseId: number,
-      unitId: string,
-      userAnswers: UserAnswer[],
-    ): Promise<ExamResult> {
-      const [progress, course] = await Promise.all([
-        this.getOrCreateProgress(userId, courseId),
-        this.courseRepository.findOneBy({ id: courseId }),
-      ]);
-  
-      if (!course) throw new NotFoundException(`Course with ID ${courseId} not found`);
-  
-      const progressPayload = progress.payload as CourseDetails;
-      const coursePayload: CourseDetails = JSON.parse(course.payload);
-  
-      const unitInProgress = this.findUnit(progressPayload.units, unitId);
-      const unitInCourse = this.findUnit(coursePayload.units, unitId);
-  
-      if (!unitInProgress?.exam || !unitInCourse?.exam) {
-        throw new NotFoundException(`Exam for unit ID ${unitId} not found`);
-      }
-  
-      const { exam: examInProgress } = unitInProgress;
-      const { exam: examInCourse } = unitInCourse;
-  
-      if (examInProgress.retries_taken >= examInCourse.retries_allowed) {
-        throw new BadRequestException('Maximum number of retries exceeded.');
-      }
-  
-      let correctCount = 0;
-      for (const userAnswer of userAnswers) {
-        const question = examInCourse.questions.find(q => q.id === userAnswer.questionId);
-        const correctAnswer = question?.answers.find(a => a.correct);
-        if (correctAnswer?.id === userAnswer.selectedAnswerId) {
-          correctCount++;
-        }
-      }
-  
-      const score = Math.round((correctCount / examInCourse.questions.length) * 100);
-      const newResult: ExamResult = { score, answers: userAnswers, submittedAt: new Date() };
-  
-      examInProgress.retries_taken++;
-      examInProgress.status = ProgressStatus.COMPLETED;
-      if (examInProgress.result) {
-        examInProgress.previous_results = [...(examInProgress.previous_results || []), examInProgress.result];
-      }
-      examInProgress.result = newResult;
-      unitInProgress.status = ProgressStatus.COMPLETED;
-  
-      await this.progressRepository.save(progress);
-      return newResult;
-    }
   }
   
   

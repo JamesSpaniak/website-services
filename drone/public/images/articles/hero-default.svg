@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Article hero placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#262626"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <g fill="none" stroke="#8ea66a" stroke-width="2" opacity="0.9">
+    <path d="M120 420 L600 200 L1080 420" stroke-linecap="round"/>
+    <circle cx="600" cy="260" r="48"/>
+    <path d="M552 320 L648 320 M600 272 L600 368"/>
+  </g>
+  <text x="600" y="560" text-anchor="middle" fill="#c9c9c9" font-family="system-ui,sans-serif" font-size="22">Replace with topic-specific photography or illustration</text>
+</svg>

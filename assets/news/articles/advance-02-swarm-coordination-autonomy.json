@@ -1,0 +1,20 @@
+{
+  "slug": "advance-02-swarm-coordination-autonomy",
+  "title": "Swarms and Multi-UAV Autonomy: Algorithms Meet Radio Reality",
+  "sub_heading": "Why “flock intelligence” is as much about links, jamming, and test harnesses as about clever math.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "drone swarm technology",
+    "multi-UAV autonomous systems",
+    "distributed drone control",
+    "UAS mesh network",
+    "AI swarm drones"
+  ],
+  "body_html": "<p><strong>In short:</strong> Multi-agent coordination research collided with <strong>bandwidth limits</strong> and EW. Useful swarms degrade gracefully when links drop—Hollywood rarely does.</p>\n\n<h2>Key takeaways</h2><ul><li>Scaling coordination is harder than demoing ten aircraft in a field.</li><li>Human-machine teaming interfaces matter for accountability.</li><li>Civilian light shows are not military-grade reliability.</li></ul>\n\n<p><strong>Hook:</strong> The hardest part of a swarm is not the swarm—it is the <strong>spectrum map</strong> around it.</p>\n\n<h3>Is this the same as AI drone swarms in movies?</h3>\n<p>No. Operational systems emphasize constraints, fallbacks, and rules of engagement—when those exist.</p>\n\n<h2>Marketability note</h2><p>Headlines oversell; your article wins by being <strong>technically grounded</strong> and classroom-ready.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>drone swarm technology</strong>, <strong>multi-UAV autonomous systems</strong>, <strong>distributed drone control</strong>, <strong>UAS mesh network</strong>, <strong>AI swarm drones</strong>.</p>",
+  "marketability_review": "Moderate search volume; strong for differentiation as serious education brand.",
+  "readability_review": "Short sections; add glossary for EW acronyms.",
+  "considerations": [
+    "Avoid classified-sounding claims.",
+    "Neutral on specific militaries."
+  ]
+}

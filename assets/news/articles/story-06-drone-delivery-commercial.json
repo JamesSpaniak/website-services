@@ -1,0 +1,20 @@
+{
+  "slug": "story-06-drone-delivery-commercial",
+  "title": "Drone Delivery Beyond Demos: Logistics, BVLOS, and Neighborhood Acceptance",
+  "sub_heading": "Retail and medical routes prove feasibility in pockets—scaling still hinges on regulation, weather, and local politics.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "drone delivery",
+    "BVLOS drone logistics",
+    "autonomous delivery UAS",
+    "last mile drone",
+    "AI routing drones"
+  ],
+  "body_html": "<p><strong>In short:</strong> Drone delivery matured from marketing stunts to <strong>limited operational routes</strong> where regulators, insurers, and communities align. AI helps routing and contingency planning—not magic autonomy in all conditions.</p>\n\n<h2>Key takeaways</h2><ul><li>Economics love route density; sparse suburbs are harder.</li><li>Noise and privacy drive hyper-local acceptance.</li><li>Medical payloads often get better public support than gadgets.</li></ul>\n\n<p><strong>Hook:</strong> The hardest part is not lifting a box—it is <strong>earning the right to fly over strangers’ yards every day.</strong></p>\n\n<h3>Is AI drone delivery fully autonomous?</h3>\n<p>Usually partial: supervised autonomy with human oversight, geofencing, and contingency rules—terms vary by operator.</p>\n\n<h2>SEO angle</h2><p>Cluster content: “<strong>drone delivery</strong>,” “<strong>autonomous UAS logistics</strong>,” and “<strong>FAA BVLOS waiver</strong>” capture different intents—cross-link them.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>drone delivery</strong>, <strong>BVLOS drone logistics</strong>, <strong>autonomous delivery UAS</strong>, <strong>last mile drone</strong>, <strong>AI routing drones</strong>.</p>",
+  "marketability_review": "Consumer curiosity + B2B logistics interest; video snippets help. Avoid overpromising timelines.",
+  "readability_review": "Strong narrative arc; add subheads every ~200 words for mobile skimming.",
+  "considerations": [
+    "Use operator-specific examples only with permission.",
+    "Noise studies add credibility."
+  ]
+}

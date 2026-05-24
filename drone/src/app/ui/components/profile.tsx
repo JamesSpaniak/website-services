@@ -102,8 +102,7 @@ export default function ProfileComponent() {
     const displayName = (first_name && last_name) ? `${first_name} ${last_name}` : username;
 
     return (
-        <div className="p-4 md:p-8 bg-white rounded-lg shadow-md">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">User Profile</h1>
+        <div className="p-4 md:p-8 rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] shadow-md">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
                 <div className="flex-shrink-0 relative group">
                     <input
@@ -117,7 +116,7 @@ export default function ProfileComponent() {
                         type="button"
                         onClick={handleAvatarClick}
                         disabled={uploading}
-                        className="relative rounded-full overflow-hidden border-4 border-gray-200 hover:border-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+                        className="relative rounded-full overflow-hidden border-4 border-[var(--surface-border)] hover:border-[var(--brand-primary)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:ring-offset-2 focus:ring-offset-[var(--background)] cursor-pointer"
                     >
                         {picture_url ? (
                             <Image
@@ -128,8 +127,8 @@ export default function ProfileComponent() {
                                 className="rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-[150px] h-[150px] bg-gray-200 rounded-full flex items-center justify-center">
-                                <span className="text-gray-500 text-lg">No Image</span>
+                            <div className="w-[150px] h-[150px] bg-[var(--comment-avatar-bg)] rounded-full flex items-center justify-center">
+                                <span className="text-[var(--comment-avatar-text)] text-lg">No Image</span>
                             </div>
                         )}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors rounded-full flex items-center justify-center">
@@ -140,17 +139,17 @@ export default function ProfileComponent() {
                     </button>
                 </div>
                 <div className="flex flex-col pt-4 text-center md:text-left">
-                    <h2 className="text-4xl font-bold text-gray-900">{displayName}</h2>
-                    {email && <p className="text-gray-600 mt-2 text-lg">{email}</p>}
-                    <p className="text-gray-500 mt-1 text-md">@{username}</p>
+                    <h2 className="text-4xl font-bold text-[var(--brand-foreground)]">{displayName}</h2>
+                    {email && <p className="text-[var(--brand-muted)] mt-2 text-lg">{email}</p>}
+                    <p className="text-[var(--brand-muted)] mt-1 text-md opacity-90">@{username}</p>
                 </div>
             </div>
             
             <div className="mt-10">
-                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">My Courses</h3>
+                <h3 className="text-2xl font-semibold border-b border-[var(--surface-border)] pb-2 mb-4 text-[var(--brand-foreground)]">My Courses</h3>
                 {coursesLoading ? (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                        <p className="text-gray-600">Loading courses...</p>
+                    <div className="p-4 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
+                        <p className="text-[var(--brand-muted)]">Loading courses...</p>
                     </div>
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -159,29 +158,29 @@ export default function ProfileComponent() {
                         ))}
                     </div>
                 ) : (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                        <p className="text-gray-600">
+                    <div className="p-4 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
+                        <p className="text-[var(--brand-muted)]">
                             You have not started any courses yet.{' '}
-                            <Link href="/courses" className="text-blue-600 hover:underline">Browse courses</Link> to get started.
+                            <Link href="/courses" className="text-[var(--brand-primary)] hover:underline">Browse courses</Link> to get started.
                         </p>
                     </div>
                 )}
             </div>
 
             <div className="mt-10">
-                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">Recent Activity</h3>
+                <h3 className="text-2xl font-semibold border-b border-[var(--surface-border)] pb-2 mb-4 text-[var(--brand-foreground)]">Recent Activity</h3>
                 {activityLoading ? (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                        <p className="text-gray-600">Loading activity...</p>
+                    <div className="p-4 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
+                        <p className="text-[var(--brand-muted)]">Loading activity...</p>
                     </div>
                 ) : (
                     <div>
                         {loginStreak >= 2 && (
-                            <div className="mb-4 flex items-center gap-3 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl px-5 py-4">
+                            <div className="mb-4 flex items-center gap-3 bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-xl px-5 py-4">
                                 <span className="text-3xl">&#128293;</span>
                                 <div>
-                                    <p className="text-lg font-bold text-orange-700">{loginStreak}-day streak!</p>
-                                    <p className="text-sm text-orange-600">
+                                    <p className="text-lg font-bold text-[var(--brand-primary)]">{loginStreak}-day streak!</p>
+                                    <p className="text-sm text-[var(--brand-muted)]">
                                         You&apos;ve logged in {loginStreak} days in a row. Keep it up!
                                     </p>
                                 </div>
@@ -189,22 +188,22 @@ export default function ProfileComponent() {
                         )}
 
                         {activity.length === 0 ? (
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <p className="text-gray-600">No recent activity.</p>
+                            <div className="p-4 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
+                                <p className="text-[var(--brand-muted)]">No recent activity.</p>
                             </div>
                         ) : (
                             <div className="space-y-2">
                                 {activity.map((entry) => {
-                                    const cfg = PROFILE_ACTION_LABELS[entry.action] || { label: entry.action, icon: '&#9679;', color: 'text-gray-500' };
+                                    const cfg = PROFILE_ACTION_LABELS[entry.action] || { label: entry.action, icon: '&#9679;', color: 'text-[var(--brand-muted)]' };
                                     const meta = formatProfileMeta(entry.metadata);
                                     return (
-                                        <div key={entry.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                        <div key={entry.id} className="flex items-center gap-3 p-3 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
                                             <span className="text-lg" dangerouslySetInnerHTML={{ __html: cfg.icon }} />
                                             <div className="flex-1 min-w-0">
                                                 <p className={`text-sm font-medium ${cfg.color}`}>{cfg.label}</p>
-                                                {meta && <p className="text-xs text-gray-500 truncate">{meta}</p>}
+                                                {meta && <p className="text-xs text-[var(--brand-muted)] truncate">{meta}</p>}
                                             </div>
-                                            <span className="text-xs text-gray-400 shrink-0">
+                                            <span className="text-xs text-[var(--brand-muted)] shrink-0 opacity-80">
                                                 {new Date(entry.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                             </span>
                                         </div>
@@ -217,7 +216,7 @@ export default function ProfileComponent() {
             </div>
 
             <div className="mt-10">
-                <h3 className="text-2xl font-semibold border-b pb-2 mb-4 text-gray-800">Settings</h3>
+                <h3 className="text-2xl font-semibold border-b border-[var(--surface-border)] pb-2 mb-4 text-[var(--brand-foreground)]">Settings</h3>
                 
                 {message && (
                     <div className={`p-3 mb-4 rounded-md text-white ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
@@ -225,17 +224,17 @@ export default function ProfileComponent() {
                     </div>
                 )}
 
-                <div className="p-4 bg-gray-50 rounded-lg space-y-6">
+                <div className="p-4 bg-[var(--comment-secondary-bg)] rounded-lg space-y-6 border border-[var(--surface-border)]">
                     {/* Update Email */}
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Update Email</label>
+                        <label htmlFor="email" className="block text-sm font-medium text-[var(--brand-foreground)]">Update Email</label>
                         <div className="mt-1 flex rounded-md shadow-sm">
                             <input
                                 type="email"
                                 id="email"
                                 value={newEmail}
                                 onChange={(e) => setNewEmail(e.target.value)}
-                                className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
+                                className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md sm:text-sm border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] ring-focus focus:ring-2 focus:ring-[var(--brand-primary)]"
                             />
                             <button
                                 onClick={async () => {
@@ -255,7 +254,7 @@ export default function ProfileComponent() {
                                         setMessage({ text: e instanceof Error ? e.message : 'Failed to update email.', type: 'error' });
                                     }
                                 }}
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700"
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-[var(--background)] bg-[var(--brand-primary)] hover:opacity-90"
                             >
                                 Save
                             </button>
@@ -265,11 +264,11 @@ export default function ProfileComponent() {
 
                     {/* Membership Type */}
                     <div>
-                        <h4 className="text-sm font-medium text-gray-700">Membership</h4>
-                        <div className="mt-2 space-x-4">
-                            <button className="px-4 py-2 border rounded-md bg-gray-200 text-gray-600 cursor-not-allowed">Basic (Current)</button>
-                            <button className="px-4 py-2 border rounded-md text-gray-700 bg-yellow-100 hover:bg-yellow-200">Upgrade to Pro</button>
-                            <button className="px-4 py-2 border rounded-md text-gray-700 bg-purple-100 hover:bg-purple-200">Upgrade to Enterprise</button>
+                        <h4 className="text-sm font-medium text-[var(--brand-foreground)]">Membership</h4>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md bg-[var(--surface)] text-[var(--brand-muted)] cursor-not-allowed">Basic (Current)</button>
+                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90">Upgrade to Pro</button>
+                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90">Upgrade to Enterprise</button>
                         </div>
                     </div>
                 </div>
@@ -279,16 +278,16 @@ export default function ProfileComponent() {
 }
 
 const PROFILE_ACTION_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-    LOGIN: { label: 'Logged in', icon: '&#128275;', color: 'text-gray-700' },
-    REGISTER: { label: 'Joined the platform', icon: '&#127881;', color: 'text-green-700' },
-    VERIFY_EMAIL: { label: 'Verified email', icon: '&#9989;', color: 'text-green-700' },
-    COURSE_STARTED: { label: 'Started a new course', icon: '&#128218;', color: 'text-blue-700' },
-    UNIT_COMPLETED: { label: 'Completed a unit', icon: '&#127942;', color: 'text-indigo-700' },
-    EXAM_SUBMITTED: { label: 'Took an exam', icon: '&#128221;', color: 'text-purple-700' },
-    COURSE_COMPLETED: { label: 'Completed a course', icon: '&#127941;', color: 'text-emerald-700' },
-    PROGRESS_RESET: { label: 'Reset course progress', icon: '&#128260;', color: 'text-red-600' },
-    COURSE_PURCHASED: { label: 'Purchased a course', icon: '&#128176;', color: 'text-yellow-700' },
-    PRO_UPGRADE: { label: 'Upgraded to Pro', icon: '&#11088;', color: 'text-amber-700' },
+    LOGIN: { label: 'Logged in', icon: '&#128275;', color: 'text-[var(--brand-foreground)]' },
+    REGISTER: { label: 'Joined the platform', icon: '&#127881;', color: 'text-[var(--brand-primary)]' },
+    VERIFY_EMAIL: { label: 'Verified email', icon: '&#9989;', color: 'text-[var(--brand-primary)]' },
+    COURSE_STARTED: { label: 'Started a new course', icon: '&#128218;', color: 'text-[var(--brand-primary)]' },
+    UNIT_COMPLETED: { label: 'Completed a unit', icon: '&#127942;', color: 'text-[var(--brand-foreground)]' },
+    EXAM_SUBMITTED: { label: 'Took an exam', icon: '&#128221;', color: 'text-[var(--brand-muted)]' },
+    COURSE_COMPLETED: { label: 'Completed a course', icon: '&#127941;', color: 'text-[var(--brand-primary)]' },
+    PROGRESS_RESET: { label: 'Reset course progress', icon: '&#128260;', color: 'text-red-500' },
+    COURSE_PURCHASED: { label: 'Purchased a course', icon: '&#128176;', color: 'text-[var(--brand-muted)]' },
+    PRO_UPGRADE: { label: 'Upgraded to Pro', icon: '&#11088;', color: 'text-[var(--brand-primary)]' },
 };
 
 function formatProfileMeta(metadata: Record<string, unknown> | null): string {

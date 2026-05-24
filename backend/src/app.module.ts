@@ -16,11 +16,14 @@ import { LoggingModule } from './logging/logging.module';
 import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { OrganizationModule } from './organizations/organization.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuditModule } from './audit/audit.module';
 import { CommentModule } from './comments/comment.module';
+import { QuestionModule } from './questions/question.module';
 
 @Module({
   imports: [
+    AnalyticsModule,
     ArticleModule,
     AuditModule,
     AuthModule,
@@ -36,6 +39,7 @@ import { CommentModule } from './comments/comment.module';
     }),
     CourseModule,
     EmailModule,
+    QuestionModule,
     TypeOrmModule.forRoot({
         ...defaultConnection,
         migrationsRun: true,

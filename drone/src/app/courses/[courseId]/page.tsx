@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getCourseById } from '@/app/lib/api-client';
+import { trackCourseView } from '@/app/lib/analytics';
 import CourseComponent from '@/app/ui/components/course';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
@@ -32,7 +33,9 @@ function SingleCoursePage() {
             try {
                 const courseData = await getCourseById(parseInt(courseId as string));
                 setCourse(courseData);
+                trackCourseView(courseId as string, courseData.title);
             } catch (e) {
+                console.error("console.logger", e);
                 if (e instanceof Error) {
                     setError(e);
                 } else {

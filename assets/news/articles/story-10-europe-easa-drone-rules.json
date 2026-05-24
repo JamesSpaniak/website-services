@@ -1,0 +1,20 @@
+{
+  "slug": "story-10-europe-easa-drone-rules",
+  "title": "European Drone Rules and EASA Frameworks: Classes, Risk, and Market Access",
+  "sub_heading": "Harmonized UAS rules changed how manufacturers label aircraft and how pilots qualify—useful contrast for U.S. training audiences.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "EASA drone regulations",
+    "EU drone class mark",
+    "UAS Open category Europe",
+    "drone CE marking",
+    "cross border drone operations"
+  ],
+  "body_html": "<p><strong>In short:</strong> The EU’s risk-based categories (Open, Specific, Certified) tie operations to aircraft capabilities and pilot competency. <strong>Class marks</strong> influenced global SKUs.</p>\n\n<h2>Key takeaways</h2><ul><li>Harmonization helps manufacturers; pilots still face national nuances.</li><li>Training pathways differ from FAA Part 107—compare carefully in courses.</li><li>UK regimes diverged post-Brexit—verify current text.</li></ul>\n\n<p><strong>Hook:</strong> If you sell training online, your international students live under <strong>different default assumptions</strong>—make comparisons explicit.</p>\n\n<h3>Is Part 107 valid in the EU?</h3>\n<p>Not automatically; operations follow local rules—treat as separate certification question.</p>\n\n<h2>Structure for readability</h2><p>Use comparison tables sparingly; on mobile, stacked definition lists beat wide tables. If you must use tables, wrap in a scroll container in your layout component.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>EASA drone regulations</strong>, <strong>EU drone class mark</strong>, <strong>UAS Open category Europe</strong>, <strong>drone CE marking</strong>, <strong>cross border drone operations</strong>.</p>",
+  "marketability_review": "Strong for international SEO and B2B training exports; pair with localization notes.",
+  "readability_review": "Clear contrast narrative; add comparison table as downloadable PDF for desktop users.",
+  "considerations": [
+    "EASA updates—date the article.",
+    "Verify UK CAA separately."
+  ]
+}
