@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Matches, Min, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum MediaFolder {
     ARTICLES = 'articles',
@@ -62,4 +63,48 @@ export class DeleteMediaDto {
     @IsString()
     @IsNotEmpty()
     key: string;
+}
+
+// ── Multipart upload DTOs ──────────────────────────────────────────
+
+export class InitiateMultipartDto {
+    @ApiProperty() @IsString() @IsNotEmpty() filename: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^(image\/(jpeg|png|gif|webp|svg\+xml)|video\/(mp4|webm|quicktime))$/, {
+        message: 'contentType must be a supported image or video MIME type',
+    })
+    contentType: string;
+
+    @ApiProperty({ enum: MediaFolder }) @IsEnum(MediaFolder) folder: MediaFolder;
+    @ApiPropertyOptional() @IsOptional() @IsString() subfolder?: string;
+}
+
+export class MultipartPartUrlDto {
+    @ApiProperty() @IsString() @IsNotEmpty() key: string;
+    @ApiProperty() @IsString() @IsNotEmpty() uploadId: string;
+    @ApiProperty() @IsInt() @Min(1) partNumber: number;
+}
+
+export class CompletedPartDto {
+    @ApiProperty() @IsString() @IsNotEmpty() ETag: string;
+    @ApiProperty() @IsInt() @Min(1) PartNumber: number;
+}
+
+export class CompleteMultipartDto {
+    @ApiProperty() @IsString() @IsNotEmpty() key: string;
+    @ApiProperty() @IsString() @IsNotEmpty() uploadId: string;
+
+    @ApiProperty({ type: [CompletedPartDto] })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CompletedPartDto)
+    parts: CompletedPartDto[];
+}
+
+export class AbortMultipartDto {
+    @ApiProperty() @IsString() @IsNotEmpty() key: string;
+    @ApiProperty() @IsString() @IsNotEmpty() uploadId: string;
 }

@@ -1,19 +1,20 @@
-'use client';
-
 import Link from 'next/link';
+import PageShell from '@/app/ui/components/page-shell';
 
 export default function ResetPasswordErrorPage() {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen -mt-32">
-            <div className="p-8 bg-white rounded-lg shadow-xl w-full max-w-md text-center">
-                <h2 className="text-2xl font-bold text-red-600 mb-4">Link Expired or Invalid</h2>
-                <p className="text-gray-600 mb-6">
-                    The password reset link you used is either invalid or has expired. Please request a new one.
-                </p>
-                <Link href="/forgot-password" className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:shadow-outline">
-                    Request a New Link
-                </Link>
-            </div>
-        </div>
-    );
+  return (
+    <PageShell title="Link expired" subtitle="Password reset links are single-use and time-limited." maxWidthClass="max-w-lg">
+      <div className="p-8 bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg shadow-xl w-full text-center">
+        <p className="text-[var(--brand-muted)] mb-6">
+          The password reset link you used is either invalid or has expired. Please request a new one.
+        </p>
+        <Link
+          href="/forgot-password"
+          className="inline-block w-full px-4 py-2 font-bold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 focus:outline-none focus:shadow-outline"
+        >
+          Request a new link
+        </Link>
+      </div>
+    </PageShell>
+  );
 }

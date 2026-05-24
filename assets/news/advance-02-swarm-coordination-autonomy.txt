@@ -1,0 +1,57 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Multi-UAV coordination, swarming logic, and distributed autonomy (2010s-present)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Research and defense programs advanced algorithms for formation control, task allocation, and resilient mesh communication among many small aircraft. Ideas from robotics (consensus, potential fields, market-based assignment) met radio constraints, packet loss, and jamming. Demonstrations ranged from indoor labs to outdoor hundreds-of-nodes marketing tests; contested environments exposed the difference between choreographed demos and operationally robust swarms.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Scale changes the problem: pairwise coordination does not survive large fleet sizes at low bandwidth.
+- Electromagnetic contestability pushes toward intermittent links, leader-follower fallbacks, or preplanned autonomy envelopes.
+- Civilian swarm light (light shows, agriculture) is not the same reliability class as military swarming under fire.
+- AI enters as online replanning and target prioritization, not magic group consciousness.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Multi-agent systems; communications; mission autonomy; military robotics
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Technical capability survey
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Spectacular demos; sobering integration reality
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Headlines often imply unstoppable drone hordes; specialists emphasize EW fragility and logistics. Ethical debate focuses on delegated targeting and accountability when many agents share a mission.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Heterogeneous teams (air plus ground plus sea); human-machine teaming interfaces; standards for safe civilian swarm operations; regulatory barriers to dense autonomous flocks in cities.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+DARPA-style demos and academic papers from ~2010 onward; Ukraine-era urgency accelerated funding and rhetoric from ~2022 onward; industrial adoption outside defense remains niche.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Swarming is the force-multiplier path when single platforms are too expensive or too easy to jam.
+
+────────────────────────────────────────────────────────────
+NEXT ADVANCEMENT (HOW CLOSE?)
+────────────────────────────────────────────────────────────
+Moderately close but uneven. The next jump is robust operation under intermittent comms and adaptive adversaries, combining learning-based policies with verifiable safety constraints (partly algorithms, partly test-and-certification). For defense, expect incremental fielded improvements; for civilian megacity swarms, not close without airspace governance and DAA infrastructure.

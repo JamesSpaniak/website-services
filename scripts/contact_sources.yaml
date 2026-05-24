@@ -1,0 +1,42 @@
+sources:
+  - name: PDE contact page
+    url: https://www.pa.gov/agencies/education/contact-us
+    organization: Pennsylvania Department of Education
+    organization_type: state_agency
+    state: PA
+    extractor: hub_page
+
+  - name: PDE OESE contact list
+    url: https://www.pa.gov/agencies/education/programs-and-services/instruction/elementary-and-secondary-education/oese-contact-list
+    organization: Pennsylvania Department of Education
+    organization_type: state_agency
+    state: PA
+    extractor: pde_oese_tables
+
+  - name: Philadelphia district contact hub
+    url: https://www.philasd.org/contactus/
+    organization: School District of Philadelphia
+    organization_type: district
+    state: PA
+    extractor: philly_contact_hub
+
+  - name: West Chester school board
+    url: https://www.wcasd.net/school-board
+    organization: West Chester Area School District
+    organization_type: district
+    state: PA
+    extractor: finalsite_page
+
+  - name: Avon Grove directory
+    url: https://www.avongrove.org/directory
+    organization: Avon Grove School District
+    organization_type: district
+    state: PA
+    extractor: finalsite_directory
+
+  - name: Downingtown teaching and learning staff
+    url: https://www.dasd.org/departments/teaching-and-learning/staff
+    organization: Downingtown Area School District
+    organization_type: district
+    state: PA
+    extractor: finalsite_staff_page

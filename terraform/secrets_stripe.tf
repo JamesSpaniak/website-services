@@ -2,6 +2,10 @@ resource "aws_secretsmanager_secret" "stripe_secret_key" {
   name = "${var.project_name}-stripe-secret-key"
 }
 
+resource "aws_secretsmanager_secret" "stripe_webhook_secret" {
+  name = "${var.project_name}-stripe-webhook-secret"
+}
+
 resource "aws_secretsmanager_secret" "jwt_secret" {
   name = "${var.project_name}-jwt-secret"
 }

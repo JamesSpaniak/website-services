@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import PageShell from '../ui/components/page-shell';
+import ThemePreferenceSettings from './theme-preference';
 
 export const metadata: Metadata = {
   title: 'Settings',
@@ -6,10 +8,18 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsPage() {
-    return (
-        <div>
-            <h1>Settings</h1>
-            <p>Will have settings here in future to manage things about the account.</p>
-        </div>
-    )
+  return (
+    <PageShell
+      title="Settings"
+      subtitle="Account preferences and appearance."
+      maxWidthClass="max-w-3xl"
+    >
+      <div className="space-y-10">
+        <ThemePreferenceSettings />
+        <p className="text-sm text-[var(--brand-muted)] leading-relaxed">
+          Additional account options will appear here over time.
+        </p>
+      </div>
+    </PageShell>
+  );
 }

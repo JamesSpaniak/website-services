@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
 import { createPaymentIntent, getCourseById } from '@/app/lib/api-client';
 import ImageComponent from './image';
+import { mergeCourseImages } from '@/app/lib/course-images';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -89,10 +90,10 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
     if (!user) {
         return (
             <div className="text-center p-8 max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-8">
-                    <h2 className="text-2xl font-bold">Please Log In</h2>
-                    <p className="mt-2 text-gray-600">You need to be logged in to purchase this course.</p>
-                    <Link href="/login" className="mt-4 inline-block px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8">
+                    <h2 className="text-2xl font-bold text-[var(--brand-foreground)]">Please Log In</h2>
+                    <p className="mt-2 text-[var(--brand-muted)]">You need to be logged in to purchase this course.</p>
+                    <Link href="/login" className="mt-4 inline-block px-6 py-2 text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
                         Login or Sign Up
                     </Link>
                 </div>
@@ -102,30 +103,30 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h1 className="text-3xl font-bold text-gray-900">Purchase Course</h1>
-                <p className="text-lg text-gray-600 mt-2">You&apos;re about to unlock full access to:</p>
+            <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8">
+                <h1 className="text-3xl font-bold text-[var(--brand-foreground)]">Purchase Course</h1>
+                <p className="text-lg text-[var(--brand-muted)] mt-2">You&apos;re about to unlock full access to:</p>
                 
-                <div className="mt-6 flex flex-col md:flex-row gap-8 items-center bg-gray-50 p-6 rounded-lg">
+                <div className="mt-6 flex flex-col md:flex-row gap-8 items-center bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] p-6 rounded-lg">
                     <ImageComponent 
-                        src={course.image_url} 
+                        src={mergeCourseImages(course)[0] || '/globe.svg'} 
                         alt={course.title} 
                         width={200} 
                         height={112} 
                         className="rounded-lg object-cover aspect-video"
                     />
                     <div className="flex-grow">
-                        <h2 className="text-2xl font-semibold">{course.title}</h2>
-                        <p className="text-gray-500 mt-1">{course.sub_title}</p>
+                        <h2 className="text-2xl font-semibold text-[var(--brand-foreground)]">{course.title}</h2>
+                        <p className="text-[var(--brand-muted)] mt-1">{course.sub_title}</p>
                     </div>
-                    <div className="text-3xl font-bold text-gray-800">
+                    <div className="text-3xl font-bold text-[var(--brand-foreground)]">
                         ${course.price}
                     </div>
                 </div>
 
                 <div className="mt-8">
-                    <h2 className="text-xl font-semibold text-gray-800">Payment Information</h2>
-                    <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                    <h2 className="text-xl font-semibold text-[var(--brand-foreground)]">Payment Information</h2>
+                    <div className="mt-4 p-4 border border-[var(--surface-border)] rounded-lg bg-[var(--comment-secondary-bg)]">
                         {/* This is the Stripe Card Element for securely collecting card details */}
                         <CardElement options={{
                             style: {
@@ -137,9 +138,9 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
                 </div>
 
                 <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-500">This is a one-time payment for lifetime access.</p>
+                    <p className="text-sm text-[var(--brand-muted)]">This is a one-time payment for lifetime access.</p>
                     <div className="mt-4 flex justify-center gap-4">
-                        <button onClick={handlePurchase} disabled={isLoading || !stripe} className="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400">
+                        <button onClick={handlePurchase} disabled={isLoading || !stripe} className="px-8 py-3 font-semibold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--background)] focus:ring-[var(--brand-primary)] transition-colors disabled:opacity-40">
                             {isLoading ? 'Processing...' : 'Purchase with Stripe'}
                         </button>
                     </div>

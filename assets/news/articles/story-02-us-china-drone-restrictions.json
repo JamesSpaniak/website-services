@@ -1,0 +1,22 @@
+{
+  "slug": "story-02-us-china-drone-restrictions",
+  "title": "U.S. Policy, Chinese Drones, and the FCC Covered List: What Operators Should Know",
+  "sub_heading": "National-security-driven market rules are reshaping who can sell radios in the U.S.—and what fleet owners should plan for next.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "DJI drone ban",
+    "FCC covered list drone",
+    "commercial drone regulations",
+    "UAS national security",
+    "Autel drone",
+    "drone import restrictions"
+  ],
+  "body_html": "<p><strong>In short:</strong> U.S. policy now couples drone buying with <strong>telecom authorization</strong> and national-security lists—not only FAA flight rules. Late 2025–early 2026 FCC actions broadly restricted new approvals for many foreign-produced UAS, then carved narrow exemptions for some <strong>Blue UAS</strong> and domestic-end-product paths—while DJI remained a focal restriction for new authorizations. <em>Verify FCC orders before enterprise decisions.</em></p>\n\n<h2>Key takeaways</h2><ul><li>Debate centers on firmware, telemetry, cloud sync, and update channels—not only country of assembly.</li><li>“Banned” often means <strong>no new FCC authorization/import path</strong>, not necessarily grounding every aircraft already owned.</li><li>Plan fleet refresh, spares, and contract compliance as a multi-year capital problem.</li><li>Blue UAS and allied alternatives matter for agencies; civil users face cost/capability tradeoffs.</li></ul>\n\n<p><strong>Story hook:</strong> Your program used to start with a Part 107 study guide. Now it also starts with a compliance spreadsheet: Who made the radio? Will this SKU still be importable next year?</p>\n\n<h3>What changed in late 2025 and early 2026?</h3>\n<p>Reporting describes a Dec 2025 Covered List expansion for foreign-produced UAS under NDAA national-security determinations, then Jan 2026 exclusions through early 2027 for certain Blue UAS Cleared List and domestic-end-product categories—check the FCC’s current Covered List FAQs and orders.</p>\n\n<h3>Does this brick drones already purchased?</h3>\n<p>Implementation targets <strong>new market access</strong> (authorization, import, sale of non-exempt models). Existing authorized aircraft may continue operating under separate FAA rules—confirm your model and date.</p>\n\n<h3>What is Blue UAS and why should I care?</h3>\n<p>A defense-cleared list used in federal procurement; Jan 2026 FCC exclusions referenced it for some foreign-produced systems. Public-safety and enterprise RFPs increasingly mirror these trust assumptions.</p>\n\n<h2>Operational planning for ag, film, and small business</h2><p>Document fleet models and firmware policies; budget refresh cycles; evaluate alternatives where insurers or municipalities require trusted vendors. Photography is not the only sector affected—<strong>farms and survey firms</strong> feel spare-part and upgrade risk acutely.</p>\n\n<h3>How does this connect to Ukraine supply-chain stories?</h3>\n<p>The same global component chains feed civil and military small UAS. Import rules (this story) and export controls (China’s rules) squeeze ESCs, radios, and cameras—not only finished drones.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>DJI drone ban</strong>, <strong>FCC covered list drone</strong>, <strong>commercial drone regulations</strong>, <strong>UAS national security</strong>, <strong>Autel drone</strong>, <strong>drone import restrictions</strong>.</p>",
+  "marketability_review": "High-intent commercial searches; pair with buyer’s guides and compliance checklists. Avoid fear-mongering—build trust with sourced timelines.",
+  "readability_review": "Short sections; FAQ addresses the #1 user fear. Add internal links to Remote ID and training content.",
+  "considerations": [
+    "Legal landscape changes—date-stamp the article.",
+    "Coordinate with counsel for enterprise statements.",
+    "Swap hero for neutral product/compliance imagery."
+  ]
+}

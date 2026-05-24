@@ -5,6 +5,7 @@ import LoadingComponent from "@/app/ui/components/loading";
 import ErrorComponent from '@/app/ui/components/error';
 import { useAuth } from '@/app/lib/auth-context';
 import CoursePreviewComponent from '@/app/ui/components/course-preview';
+import PageShell from '@/app/ui/components/page-shell';
 import { CourseData } from '@/app/lib/types/course';
 
 export default function CoursePage() {
@@ -48,21 +49,20 @@ export default function CoursePage() {
     }
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-6">Available Courses</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <PageShell title="Courses" subtitle="Available courses and learning paths." maxWidthClass="max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {courses.length > 0 ? (
                     courses.map((course) => (
                         <CoursePreviewComponent
                             key={`crs-${course.id} `}
-                            {...course} 
+                            {...course}
                             unitCount={course.units?.length || 0} />
                     ))
                 ) : (
-                    <p>No courses found.</p>
+                    <p className="text-[var(--brand-muted)] font-mono text-sm col-span-full">No courses found.</p>
                 )}
             </div>
-        </div>
+        </PageShell>
     )
 }
 

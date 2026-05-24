@@ -151,4 +151,8 @@ vite.config.ts.timestamp-*
 *.tfstate.*
 terraform.tfstate.d/
 crash.log
-.terraform.lock.hcl**/.terraform/
+.terraform.lock.hcl
+
+# Brand deck — too large for GitHub (>100MB); keep locally or in cloud storage
+assets/Presentation/VisualIdentityDroneEdge.pdf
+assets/Presentation/*.pdf

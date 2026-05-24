@@ -1,0 +1,71 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Onboard machine learning and computer vision for small UAS (2015-present)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Consumer and industrial drones moved from scripted waypoint flight to real-time perception: depth estimation, semantic segmentation, object tracking, and obstacle avoidance using CNNs and later efficient architectures (MobileNet-class, transformers at the edge) running on embedded GPUs, NPUs, and DSPs. Vendors productized vision-based follow-me, precision landing on patterned pads, and omnidirectional sensing. Research and defense pushed target detection, mapping, and onboard sensor fusion at higher frame rates and lower watt budgets.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Power and thermal limits (not only FLOPs) govern what AI on the drone can do in sustained flight.
+- Sim-to-real and synthetic data pipelines became as important as model architecture for robustness.
+- Dual-use tension: the same stacks support agriculture, inspection, and weaponized targeting pipelines.
+- Redundancy (vision + IMU + baro) improved safety cases for regulators inching toward automation.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Edge AI; computer vision; embedded systems; perception for UAS
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Technical capability survey
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Optimistic engineering progress with recurring anxiety about misuse
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+General audiences associate AI drones with sci-fi or military clips; commercial users care about reliability in wind and low light. Privacy advocates worry about persistent aerial cameras plus analytics. Industry markets safer autonomous flight as a net good for operators.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Foundation models distilled for edge; neuromorphic and event-camera experiments; open-weight vs export-controlled software; tighter coupling between vision and mission planners for true autonomy layers above hover-and-avoid.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Rough arc: early deep-learning demos (~2014-2016) to mass-market obstacle sensing and tracking (~2017-2020) to efficient on-drone inference and multi-sensor fusion mainstream (~2020-2026).
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Perception is the bottleneck for moving from remote-piloted gadgets to scalable, certifiable autonomy in cluttered airspace and complex missions.
+
+────────────────────────────────────────────────────────────
+NEXT ADVANCEMENT (HOW CLOSE?)
+────────────────────────────────────────────────────────────
+Yes: this line of work is near the next step. Generalizable world models and lightweight multimodal reasoning (vision plus language or mission graphs) on board, plus better calibration under distribution shift. The gap is less a slightly better detector and more closed-loop planning under uncertainty with certifiable behavior. Expect incremental releases over roughly 3-7 years rather than a single breakthrough moment.
+
+────────────────────────────────────────────────────────────
+HEADER IMAGES (Social theme — assets/Assets/Social)
+────────────────────────────────────────────────────────────
+Primary hero (targeting / detection HUD):
+  /images/articles/advance-01-hero-cv-targeting.png
+  Source: assets/news/images/advance-01-hero-cv-targeting.png
+
+Alternate hero (flight + controller HUD):
+  /images/articles/advance-01-hero-cv-flight.png
+
+In-article diagram (sensor stack):
+  https://media.thedroneedge.com/articles/35/b411061e-6210-474f-a1b2-24dba585fd59.png
+  (embedded in article JSON body figure; article id 35 on CMS)

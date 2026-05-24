@@ -1,8 +1,8 @@
 export default function LoadingComponent() {
     return (
-        <div className="flex justify-center items-center p-8">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
-            <p className="ml-4 text-xl font-semibold">Loading...</p>
+        <div className="relative z-10 flex justify-center items-center min-h-[40vh]">
+            <div className="animate-spin h-8 w-8 border-2 border-[var(--brand-primary)] border-t-transparent" style={{ borderRadius: '50%' }} />
+            <span className="sr-only">Loading...</span>
         </div>
     );
 }

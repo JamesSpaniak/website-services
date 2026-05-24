@@ -1,7 +1,9 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DataSource } from 'typeorm';
 import * as cookieParser from 'cookie-parser';
+import * as bodyParser from 'body-parser';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { LoggingInterceptor } from './common/logging.interceptor';
 import { WinstonModule } from 'nest-winston';
@@ -87,7 +89,13 @@ async function bootstrap() {
       ),
       transports,
     }),
+    bodyParser: false, // disable built-in so we can set a custom limit below
   });
+
+  // The default Express body-parser limit is 100 kb, which is too small for
+  // large course payloads. Set to 10 mb; adjust if payloads grow further.
+  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
   // This logger instance will now use Winston under the hood
   const logger = new Logger('Bootstrap');
@@ -115,6 +123,16 @@ async function bootstrap() {
       persistAuthorization: true, // Remembers the JWT token in the UI
     },
   });
+
+  const dataSource = app.get(DataSource);
+  const pending = await dataSource.showMigrations();
+  if (pending) {
+    logger.log('Running pending database migrations...');
+    await dataSource.runMigrations();
+    logger.log('Migrations complete.');
+  } else {
+    logger.log('Database schema is up to date.');
+  }
 
   await app.listen(3000, '0.0.0.0');
   logger.log(`Application is running on: ${await app.getUrl()}`);

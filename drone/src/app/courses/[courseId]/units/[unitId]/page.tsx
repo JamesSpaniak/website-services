@@ -9,6 +9,17 @@ import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import { CourseData, UnitData } from '@/app/lib/types/course';
 
+function findUnitDeep(units: UnitData[] | undefined, id: string): UnitData | undefined {
+    if (!units?.length) return undefined;
+    const want = String(id);
+    for (const u of units) {
+        if (String(u.id) === want) return u;
+        const nested = findUnitDeep(u.sub_units, id);
+        if (nested) return nested;
+    }
+    return undefined;
+}
+
 export default function SingleUnitPage() {
     const { courseId, unitId } = useParams();
     const { isLoading: isAuthLoading } = useAuth();
@@ -24,17 +35,14 @@ export default function SingleUnitPage() {
 
         const fetchUnit = async () => {
             setLoading(true);
+            setError(null);
             try {
                 const courseData: CourseData = await getCourseById(parseInt(courseId as string));
-                let foundUnit: UnitData | undefined = undefined;
-                if(courseData.units!=undefined) {
-                    for(let i=0; i<courseData?.units.length; i++) {
-                        const unit: UnitData = courseData.units[i];
-                        if (parseInt(unitId as string) === parseInt(unit.id)) {
-                            foundUnit = unit;
-                            setUnit(foundUnit);
-                        }
-                    }
+                const rawId = Array.isArray(unitId) ? unitId[0] : unitId;
+                const decodedId = rawId != null ? decodeURIComponent(String(rawId)) : '';
+                const foundUnit = findUnitDeep(courseData.units, decodedId);
+                if (foundUnit) {
+                    setUnit(foundUnit);
                 }
 
                 if (!foundUnit) {

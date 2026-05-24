@@ -10,6 +10,10 @@ import { InviteCode } from '../organizations/types/invite-code.entity';
 import { AuditLog } from '../audit/types/audit-log.entity';
 import { Comment } from '../comments/types/comment.entity';
 import { CommentVote } from '../comments/types/comment-vote.entity';
+import { Question } from '../questions/types/question.entity';
+import { Exam } from '../questions/types/exam.entity';
+import { ExamAttempt } from '../questions/types/exam-attempt.entity';
+import { ClassExam } from '../questions/types/class-exam.entity';
 
 
 const useSsl = process.env.DB_SSL === 'true' || process.env.DB_SSL === '1';
@@ -35,6 +39,10 @@ const defaultConnection: DataSourceOptions = {
         AuditLog,
         Comment,
         CommentVote,
+        Question,
+        Exam,
+        ExamAttempt,
+        ClassExam,
     ],
     migrations: [
         'dist/**/migrations/**'

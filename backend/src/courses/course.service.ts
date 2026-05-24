@@ -7,6 +7,7 @@ import { Role } from 'src/users/types/role.enum';
 import { MediaService } from 'src/media/media.service';
 import { OrganizationService } from 'src/organizations/organization.service';
 import { CourseDetails, UnitData } from './types/course.dto';
+import { migrateCoursePayloadImages } from './course-payload.util';
 
 @Injectable()
 export class CourseService {
@@ -69,10 +70,11 @@ export class CourseService {
 
   async deleteCourse(id: number): Promise<void> {
     const course = await this.courseRepository.findOne({ where: { id } });
-    if (course) {
-      await this.deleteCourseMedia(course);
-    }
+    if (!course) return;
     await this.courseRepository.delete(id);
+    void this.deleteCourseMedia(course).catch((err) =>
+      this.logger.error(`Post-delete media cleanup failed for course ${id}: ${(err as Error).message}`),
+    );
   }
 
   async updateCourse(id: number, course: Course): Promise<Course> {
@@ -93,12 +95,8 @@ export class CourseService {
     const keys = this.mediaService.extractKeysFromUrls(urls);
     if (keys.length === 0) return;
 
-    try {
-      await this.mediaService.deleteMultipleMedia(keys);
-      this.logger.log(`Deleted ${keys.length} media files for course ${course.id}`);
-    } catch (err) {
-      this.logger.error(`Failed to delete media for course ${course.id}: ${(err as Error).message}`);
-    }
+    await this.mediaService.deleteMultipleMedia(keys);
+    this.logger.log(`Deleted ${keys.length} media files for course ${course.id}`);
   }
 
   private collectCourseMediaUrls(course: Course): string[] {
@@ -110,7 +108,9 @@ export class CourseService {
       return urls;
     }
 
-    if (payload.image_url) urls.push(payload.image_url);
+    migrateCoursePayloadImages(payload);
+
+    if (payload.images_url?.length) urls.push(...payload.images_url);
     if (payload.video_url) urls.push(payload.video_url);
 
     if (payload.units) {
@@ -122,7 +122,7 @@ export class CourseService {
 
   private collectUnitMediaUrls(units: UnitData[], urls: string[]): void {
     for (const unit of units) {
-      if (unit.image_url) urls.push(unit.image_url);
+      if (unit.images_url?.length) urls.push(...unit.images_url);
       if (unit.video_url) urls.push(unit.video_url);
       if (unit.sub_units) {
         this.collectUnitMediaUrls(unit.sub_units, urls);

@@ -67,8 +67,10 @@ export class ArticleService {
 
   async deleteArticle(id: string) {
     const article = await this.getArticle(id);
-    await this.deleteArticleMedia(article);
     await this.articleRepository.delete(+id);
+    void this.deleteArticleMedia(article).catch((err) =>
+      this.logger.error(`Post-delete media cleanup failed for article ${id}: ${(err as Error).message}`),
+    );
   }
 
   private async deleteArticleMedia(article: Article): Promise<void> {
@@ -78,12 +80,8 @@ export class ArticleService {
     const keys = this.mediaService.extractKeysFromUrls(urls);
     if (keys.length === 0) return;
 
-    try {
-      await this.mediaService.deleteMultipleMedia(keys);
-      this.logger.log(`Deleted ${keys.length} media files for article ${article.id}`);
-    } catch (err) {
-      this.logger.error(`Failed to delete media for article ${article.id}: ${(err as Error).message}`);
-    }
+    await this.mediaService.deleteMultipleMedia(keys);
+    this.logger.log(`Deleted ${keys.length} media files for article ${article.id}`);
   }
 
   private collectArticleMediaUrls(article: Article): string[] {

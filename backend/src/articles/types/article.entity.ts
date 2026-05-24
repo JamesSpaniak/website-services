@@ -15,7 +15,7 @@ export class Article {
     @Column({ type: 'varchar', nullable: true })
     image_url?: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'text' })
     body: string;
 
     @Column({ type: 'jsonb', nullable: true })

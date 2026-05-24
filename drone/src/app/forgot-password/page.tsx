@@ -1,12 +1,14 @@
-'use client';
-
-import ForgotPasswordComponent from "../ui/components/forgot-password";
-
+import PageShell from '../ui/components/page-shell';
+import ForgotPasswordComponent from '../ui/components/forgot-password';
 
 export default function ForgotPasswordPage() {
-    return (
-        <div>
-            <ForgotPasswordComponent />
-        </div>
-    );
+  return (
+    <PageShell
+      title="Forgot password"
+      subtitle="Enter your email and we will send a reset link if an account exists."
+      maxWidthClass="max-w-lg"
+    >
+      <ForgotPasswordComponent />
+    </PageShell>
+  );
 }

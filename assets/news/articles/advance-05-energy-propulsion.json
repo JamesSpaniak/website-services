@@ -1,0 +1,20 @@
+{
+  "slug": "advance-05-energy-propulsion",
+  "title": "Batteries, Motors, and Endurance: The Physics Ceiling on Electric Drones",
+  "sub_heading": "AI cannot cheat thermodynamics—why energy storage still gates mission profiles for multicopters and eVTOL adjacent designs.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "drone battery technology",
+    "UAS endurance",
+    "electric drone propulsion",
+    "Li-ion drone flight time",
+    "eVTOL battery energy density"
+  ],
+  "body_html": "<p><strong>In short:</strong> Chemistry advances moved slower than Moore’s law. Mission planners optimize paths; hardware teams fight for <strong>grams</strong> and cooling.</p>\n\n<h2>Key takeaways</h2><ul><li>Specific energy dominates headlines; pack engineering dominates reality.</li><li>Hybrid and tethering fill niches, not universals.</li><li>Thermal limits affect fast charging on hot ramps.</li></ul>\n\n<p><strong>Hook:</strong> Every sensor gram steals flight time—your <strong>integration discipline</strong> is as important as your battery brand.</p>\n\n<h3>Will solid-state batteries double drone flight time overnight?</h3>\n<p>Unlikely uniformly—manufacturing yield, safety testing, and aviation certification set the pace.</p>\n\n<figure style=\"margin:1.5rem 0;overflow-x:auto\"><svg viewBox=\"0 0 520 180\" xmlns=\"http://www.w3.org/2000/svg\" style=\"width:100%;height:auto\"><rect width=\"520\" height=\"180\" fill=\"#1a1a1a\" rx=\"4\"/><rect x=\"60\" y=\"60\" width=\"80\" height=\"90\" fill=\"#404040\"/><rect x=\"160\" y=\"45\" width=\"80\" height=\"105\" fill=\"#8ea66a\"/><rect x=\"260\" y=\"55\" width=\"80\" height=\"95\" fill=\"#525252\"/><rect x=\"360\" y=\"50\" width=\"80\" height=\"100\" fill=\"#404040\"/><text x=\"260\" y=\"32\" text-anchor=\"middle\" fill=\"#c9c9c9\" font-size=\"12\" font-family=\"system-ui\">Illustrative: mission energy budget categories</text></svg><figcaption>Conceptual bars—not measurements.</figcaption></figure>\n\n<h2>AI connection</h2><p>Power-aware planning and contingency routing are active research areas—<strong>software squeezes waste</strong> when cells cannot squeeze more joules yet.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>drone battery technology</strong>, <strong>UAS endurance</strong>, <strong>electric drone propulsion</strong>, <strong>Li-ion drone flight time</strong>, <strong>eVTOL battery energy density</strong>.</p>",
+  "marketability_review": "Cross-audience: hobbyists want flight time; engineers want charts—serve both with layers (summary + deep link).",
+  "readability_review": "Clear physics framing; chart aids shareability on social.",
+  "considerations": [
+    "Update when major cell chemistry shifts ship at scale.",
+    "Avoid naming unverifiable energy densities."
+  ]
+}

@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Drone delivery scales from demos to limited commercial routes (Amazon, Walmart partners, Zipline, Wing)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Major retailers and logistics firms moved drone delivery from stunt videos to constrained real operations in select U.S. and international locales—often under tight FAA waivers/partnerships or country-specific frameworks. Medical deliveries in Africa and Asia remained an early success story alongside suburban retail experiments.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Economics hinge on route density, weather, noise politics, and crash risk tolerance.
+- Regulatory BVLOS progress remains the bottleneck in many jurisdictions.
+- Public acceptance is hyper-local: one town’s approval isn’t another’s.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Logistics; retail; healthcare supply chain; urban air mobility (lower altitude)
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Business / technology
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Cautiously optimistic; occasionally skeptical
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Excitement about convenience and speed competes with noise complaints and privacy fears (cameras, flight paths). Medical drone stories generally drew warmer coverage than retail buzz over suburban rooftops.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+BVLOS rulemakings; operator consolidation; incidents driving local moratoria; integration with weather modeling and detect-and-avoid research.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Steady 2021–2026 progression with uneven geography—some markets leap ahead, others stall.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Demonstrates that the hardest part of drone delivery is societal and regulatory, not just engineering.

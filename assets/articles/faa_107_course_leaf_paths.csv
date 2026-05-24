@@ -1,0 +1,123 @@
+unit_id,sub_unit_id,course_path
+1,11,PART 107 REGULATIONS > Applicability of Part 107
+1,17,PART 107 REGULATIONS > Flying At Night Under Certain Conditions
+1,16,PART 107 REGULATIONS > Flying Over People and Moving Objects
+1,132,PART 107 REGULATIONS > Operational Rules and Limitations > Accident Reporting and Hazardous Operations
+1,137,PART 107 REGULATIONS > Operational Rules and Limitations > Autonomous Flight and RPIC Responsibility
+1,133,"PART 107 REGULATIONS > Operational Rules and Limitations > Medical Conditions, Alcohol, and Drugs"
+1,139,PART 107 REGULATIONS > Operational Rules and Limitations > Operating Limitations
+1,134,PART 107 REGULATIONS > Operational Rules and Limitations > Operation From Moving Vehicles and Transportation
+1,138,PART 107 REGULATIONS > Operational Rules and Limitations > Preflight Familiarization and Airspace Operations
+1,131,"PART 107 REGULATIONS > Operational Rules and Limitations > Registration, Inspection, and Falsification"
+1,136,PART 107 REGULATIONS > Operational Rules and Limitations > Right-of-Way Rules and Operation Near Aircraft
+1,135,PART 107 REGULATIONS > Operational Rules and Limitations > Visual Line of Sight (VLOS) and Multi-Aircraft Rules
+1,15,PART 107 REGULATIONS > Remote ID Requirements
+1,12,PART 107 REGULATIONS > Roles and Crew Management
+1,14,PART 107 REGULATIONS > Waivers
+2,242,"Airports, Airspace, and Data Sources > Aeronautical Charts: Types and Interpretation > Interpreting Airport and Airspace Symbols"
+2,243,"Airports, Airspace, and Data Sources > Aeronautical Charts: Types and Interpretation > Obstacles and Maximum Elevation Figure (MEF)"
+2,241,"Airports, Airspace, and Data Sources > Aeronautical Charts: Types and Interpretation > Sectional Charts vs. Terminal Area Charts (TACs)"
+2,233,"Airports, Airspace, and Data Sources > Four Essential Airport Data Sources > Automated Terminal Information Service (ATIS)"
+2,231,"Airports, Airspace, and Data Sources > Four Essential Airport Data Sources > Chart Supplement U.S. (CSU)"
+2,232,"Airports, Airspace, and Data Sources > Four Essential Airport Data Sources > Notices to Airmen (NOTAMs)"
+2,21,"Airports, Airspace, and Data Sources > Introduction to Air Traffic and Airspace"
+2,22,"Airports, Airspace, and Data Sources > Navigation: Latitude and Longitude"
+3,321,"Airspace Classifications > Controlled Airspace Classes (A, B, C, D, E, G) > Class A Airspace"
+3,322,"Airspace Classifications > Controlled Airspace Classes (A, B, C, D, E, G) > Class B Airspace"
+3,323,"Airspace Classifications > Controlled Airspace Classes (A, B, C, D, E, G) > Class C Airspace"
+3,324,"Airspace Classifications > Controlled Airspace Classes (A, B, C, D, E, G) > Class D Airspace"
+3,325,"Airspace Classifications > Controlled Airspace Classes (A, B, C, D, E, G) > Class E and Class G Airspace"
+3,31,Airspace Classifications > Introduction and Airspace Categories
+3,348,Airspace Classifications > Other Airspace Areas > Air Defense Identification Zones (ADIZ)
+3,341,Airspace Classifications > Other Airspace Areas > Local Airport Advisory (LAA)
+3,342,Airspace Classifications > Other Airspace Areas > Military Training Routes (MTRs)
+3,347,Airspace Classifications > Other Airspace Areas > National Security Areas (NSA)
+3,344,Airspace Classifications > Other Airspace Areas > Parachute Jump Aircraft Operations
+3,345,Airspace Classifications > Other Airspace Areas > Published VFR Routes
+3,343,Airspace Classifications > Other Airspace Areas > Temporary Flight Restrictions (TFRs)
+3,346,Airspace Classifications > Other Airspace Areas > Terminal Radar Service Areas (TRSA)
+3,335,Airspace Classifications > Special Use Airspace > Alert Areas
+3,336,Airspace Classifications > Special Use Airspace > Controlled Firing Areas (CFAs)
+3,334,Airspace Classifications > Special Use Airspace > Military Operations Areas (MOAs)
+3,332,Airspace Classifications > Special Use Airspace > Prohibited Areas
+3,331,Airspace Classifications > Special Use Airspace > Restricted Areas
+3,333,Airspace Classifications > Special Use Airspace > Warning Areas
+4,41,AIRPORT OPERATIONS > Airport Classification and Control
+4,422,AIRPORT OPERATIONS > Airport Runways and Orientation > Practical Runway Heading Calculations
+4,421,AIRPORT OPERATIONS > Airport Runways and Orientation > Towered vs. Non-Towered Airport Procedures
+4,44,AIRPORT OPERATIONS > Airport Signs and Markings
+4,45,AIRPORT OPERATIONS > Security and Wildlife Hazards
+4,43,AIRPORT OPERATIONS > Traffic Patterns for Manned Aircraft
+5,531,"WEATHER > Aviation Routine Weather Report (METAR) Decoding > Report Type, Station, Date, and Time"
+5,534,"WEATHER > Aviation Routine Weather Report (METAR) Decoding > Temperature, Altimeter, and Remarks"
+5,533,WEATHER > Aviation Routine Weather Report (METAR) Decoding > Weather Phenomena and Sky Condition
+5,532,WEATHER > Aviation Routine Weather Report (METAR) Decoding > Wind and Visibility
+5,543,WEATHER > Aviation Weather Forecast Products > AIRMET and Winds/Temperatures Aloft (FB)
+5,542,WEATHER > Aviation Weather Forecast Products > SIGMET and Convective SIGMET (WST)
+5,541,WEATHER > Aviation Weather Forecast Products > Terminal Aerodrome Forecast (TAF) and Aviation Area Forecast (FA)
+5,51,WEATHER > Aviation Weather Sources Overview
+5,52,WEATHER > Surface Aviation Weather Observations
+5,553,"WEATHER > Terminal Aerodrome Forecast (TAF) Decoding > Forecast Change Groups (FM, TEMPO, PROB)"
+5,551,"WEATHER > Terminal Aerodrome Forecast (TAF) Decoding > TAF Header: Type, ID, and Origin Time"
+5,552,WEATHER > Terminal Aerodrome Forecast (TAF) Decoding > Valid Period and Core Forecast Elements
+6,611,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Air Pressure, Density, and Altitude Effects > Air Pressure and Density Fundamentals"
+6,612,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Air Pressure, Density, and Altitude Effects > Density Altitude and Performance"
+6,641,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Atmospheric Stability and Temperature Inversions > Atmospheric Stability and Convective Currents
+6,642,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Atmospheric Stability and Temperature Inversions > Temperature Inversions
+6,661,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Clouds and Thunderstorm Life Cycle > Hazardous Cloud Types
+6,662,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Clouds and Thunderstorm Life Cycle > Thunderstorm Life Cycle
+6,651,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Dew Point and Structural Icing Hazards > Dew Point and Condensation
+6,652,WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Dew Point and Structural Icing Hazards > Structural Icing
+6,671,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Fronts, Mountain Flying, and Operational Minimums > Atmospheric Fronts"
+6,672,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Fronts, Mountain Flying, and Operational Minimums > Mountain Flying Cautions"
+6,673,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Fronts, Mountain Flying, and Operational Minimums > Operational Ceiling and Visibility Minimums"
+6,62,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Pressure, Humidity, and Performance"
+6,632,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Wind, Turbulence, and Severe Wind Hazards > Low-Level Wind Shear and Microbursts"
+6,631,"WEATHER EFFECTS ON AIRCRAFT PERFORMANCE > Wind, Turbulence, and Severe Wind Hazards > Obstacle and Terrain-Induced Turbulence"
+7,77,LOADING AND PERFORMANCE > BALANCE AND CENTER OF GRAVITY (CG)
+7,78,LOADING AND PERFORMANCE > BALANCE AND CENTER OF GRAVITY (CG) - RPIC Management
+7,711,LOADING AND PERFORMANCE > CG VS. CP RELATIONSHIP - Aircraft Type
+7,710,LOADING AND PERFORMANCE > CG VS. CP RELATIONSHIP - Stability Concept
+7,722,LOADING AND PERFORMANCE > EXTREME BANK ANGLES
+7,72,LOADING AND PERFORMANCE > FORCES DURING A TURN
+7,71,LOADING AND PERFORMANCE > FORCES IN FLIGHT
+7,79,LOADING AND PERFORMANCE > GRAVITY
+7,730,LOADING AND PERFORMANCE > KEY TAKEAWAYS
+7,74,LOADING AND PERFORMANCE > LOAD
+7,716,LOADING AND PERFORMANCE > LOAD - Turn Stress
+7,718,LOADING AND PERFORMANCE > LOAD FACTOR IN STEEP TURNS
+7,721,LOADING AND PERFORMANCE > LOAD FACTOR VS BANK ANGLE - Calculation Example
+7,720,LOADING AND PERFORMANCE > LOAD FACTOR VS BANK ANGLE - Rapid Increase
+7,715,LOADING AND PERFORMANCE > LOAD FACTORS
+7,717,LOADING AND PERFORMANCE > LOAD FACTORS - Pilot Concerns
+7,75,LOADING AND PERFORMANCE > MAXIMUM GROSS TAKEOFF WEIGHT
+7,731,LOADING AND PERFORMANCE > QUESTIONS AND COMMENTS
+7,719,LOADING AND PERFORMANCE > RATE OF TURN (ROT) AND AIRSPEED
+7,729,LOADING AND PERFORMANCE > SAFETY CONSIDERATIONS
+7,713,LOADING AND PERFORMANCE > STABILITY
+7,714,"LOADING AND PERFORMANCE > STABILITY, MANEUVERABILITY & CONTROLLABILITY"
+7,724,LOADING AND PERFORMANCE > STALLING SPEED & LOAD FACTOR
+7,723,LOADING AND PERFORMANCE > STALLS AND LOAD FACTOR - Stall Definition
+7,73,LOADING AND PERFORMANCE > WEIGHT & BALANCE CONSIDERATIONS FOR RPIC
+7,726,LOADING AND PERFORMANCE > WEIGHT - Definition
+7,728,LOADING AND PERFORMANCE > WEIGHT - Excessive Weight Degradations
+7,727,LOADING AND PERFORMANCE > WEIGHT - Lift Dependence
+7,725,LOADING AND PERFORMANCE > WEIGHT AND BALANCE - Limits and Consequences
+7,712,LOADING AND PERFORMANCE > WEIGHT AND LIFT RELATIONSHIP
+7,76,LOADING AND PERFORMANCE > WEIGHT CHANGES DURING FLIGHT
+8,84,EMERGENCY PROCEDURES > Example Emergency Scenario
+8,81,EMERGENCY PROCEDURES > Potential Hazards and Accident Causes
+8,82,"EMERGENCY PROCEDURES > Preflight Planning, Checklists, and Crew Briefing"
+8,83,EMERGENCY PROCEDURES > Regulatory Deviation and Documentation
+9,911,AERONAUTICAL DECISION MAKING > Aeronautical Decision Making (ADM) > Steps to Good Decision Making (Part 1)
+9,912,AERONAUTICAL DECISION MAKING > Aeronautical Decision Making (ADM) > Steps to Good Decision Making (Part 2)
+9,932,AERONAUTICAL DECISION MAKING > Crew and Single-Pilot Resource Management > Effective Team Communication
+9,933,AERONAUTICAL DECISION MAKING > Crew and Single-Pilot Resource Management > Situational Awareness
+9,931,AERONAUTICAL DECISION MAKING > Crew and Single-Pilot Resource Management > Workload Management
+9,95,AERONAUTICAL DECISION MAKING > Maintenance and Inspection Procedures
+9,942,AERONAUTICAL DECISION MAKING > Physiology and Vision > Collision Threat Detection
+9,941,AERONAUTICAL DECISION MAKING > Physiology and Vision > Vision and Scanning Techniques
+9,922,AERONAUTICAL DECISION MAKING > Risk Management > Hazardous Attitudes and Antidotes
+9,921,AERONAUTICAL DECISION MAKING > Risk Management > Hazards and Risk Assessment
+9,923,AERONAUTICAL DECISION MAKING > Risk Management > Mitigating Risks: IMSAFE Checklist
+9,924,AERONAUTICAL DECISION MAKING > Risk Management > Mitigating Risks: PAVE Checklist

@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Maritime and underwater drone systems move to center stage (Black Sea, Pacific, mine warfare)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Uncrewed surface vessels (USVs) and underwater vehicles featured prominently in naval strategy reporting—mine detection, harbor surveillance, and long-range strikes using maritime drones. The Black Sea conflict provided high-profile examples of USV attacks and evolving counter-tactics.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Surface drones can punch above their weight against ships if ISR and targeting chains work.
+- Underwater autonomy remains hard: navigation, communication, endurance.
+- Civilian tech (starlink-like links, commercial cameras) again blurred into naval warfare.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Naval warfare; mine countermeasures; ISR; autonomous vessels
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Defense / maritime security
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Strategic awe; escalation anxiety
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+General audiences discovered USVs through viral attack videos; expert commentary emphasized escalation risks in chokepoints. Environmental groups raised questions about fuel spills and debris from maritime drone engagements.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Naval doctrine updates; harbor defenses; electronic attack against drone boat datalinks; allied exercises integrating USVs.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Notable public episodes across 2022–2026 with accelerating procurement interest worldwide.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Shows drones are not only an air-land story—sea domains are being remapped by uncrewed systems.

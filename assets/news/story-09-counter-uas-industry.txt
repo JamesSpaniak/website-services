@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+Counter-UAS (C-UAS) becomes a major industry: airports, stadiums, and battlefields (2021–2026)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+As drone threats diversified (reckless hobbyists, criminal smuggling, and state-sponsored systems), demand grew for detection (radar, RF, EO/IR) and defeat (jamming, spoofing, nets, directed energy). Airports and large events expanded mitigation programs; militaries layered C-UAS into layered air defense.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Legal constraints on jamming remain thorny in civilian airspace (collateral communications impacts).
+- False positives and operator training are operational pain points.
+- C-UAS procurement often lags fast-evolving drone threats.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Airport security; spectrum policy; defense procurement; public safety
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Industrial / homeland security
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Security-forward; occasionally skeptical of vendor hype
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Air travelers generally supported protections after high-profile near-miss reporting. Civil liberties groups cautioned about surveillance creep from wide-area drone monitoring. Military audiences focused on cost-exchange against cheap drones.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Integration with ATC systems; standards for airport C-UAS; battlefield C-UAS paired with EW; insurance and liability frameworks.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Steady buildout across the 2020s with recurring incident-driven funding spikes.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Created a whole parallel market: stopping drones as big a business as flying them.

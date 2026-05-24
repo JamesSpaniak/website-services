@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+AI-enabled swarming and autonomous targeting debates intensify (2022–2026)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Defense research and battlefield anecdotes pushed public discourse on autonomous weapons: coordinated drone swarms, target recognition pipelines, and human-in-the-loop versus human-on-the-loop doctrines. Ukraine-related footage and marketing from defense startups amplified attention even where claims outpaced verified autonomy levels.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- “Autonomy” ranges from waypoint navigation to contested lethal decision-making—terms get blurred in headlines.
+- EW vulnerability can push militaries toward more local autonomy—raising ethical dilemmas.
+- Civil society groups intensified campaigns for new international limits; progress remains fragmented.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Military AI; arms control ethics; autonomy; EW
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Ethics / defense technology
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Alarmed; morally charged; techno-determinist at times
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Strong concern in Western publics about “killer robots,” often without nuance about existing human-supervised systems. Defense analysts emphasized command-and-control realities and legal reviews. Social media amplified dramatic clips, sometimes mislabeled as fully autonomous.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+UN CCW discussions; national AI strategies referencing autonomy; corporate policies on computer-vision for weapons; continued operational learning from contested airspace.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Persistent 2020s arc with spikes tied to major conflicts and high-profile demos.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Drones became the iconic hardware for a broader AI governance fight.

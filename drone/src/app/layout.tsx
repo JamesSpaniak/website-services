@@ -1,22 +1,17 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import "./font-imports.css";
 import "./globals.css";
 import HeaderComponent from "./ui/components/header";
+import FooterComponent from "./ui/components/footer";
+import PageAnalytics from "./ui/components/page-analytics";
 import { AuthProvider } from "./lib/auth-context";
+import { ThemeProvider } from "./lib/theme-context";
+import { SITE_ASSETS, THEME_COLOR } from "./lib/site-assets";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+/** Canonical site origin (apex). www redirects here via middleware. */
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedroneedge.com';
-const SITE_NAME = 'Drone Training Pro';
+const SITE_NAME = 'Drone Edge';
 const DEFAULT_DESCRIPTION = 'Master drone regulations, earn your FAA Part 107 certification, and stay current with the latest in drone technology through expert-led courses and articles.';
 
 export const metadata: Metadata = {
@@ -37,20 +32,25 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — FAA Certification & Drone Education`,
     description: DEFAULT_DESCRIPTION,
-    images: [
-      {
-        url: '/og-default.png',
-        width: 1200,
-        height: 630,
-        alt: SITE_NAME,
-      },
-    ],
+    /* og:image / twitter:image: `app/opengraph-image.tsx` + `app/twitter-image.tsx` */
   },
   twitter: {
     card: 'summary_large_image',
     title: `${SITE_NAME} — FAA Certification & Drone Education`,
     description: DEFAULT_DESCRIPTION,
-    images: ['/og-default.png'],
+  },
+  icons: {
+    icon: [
+      { url: SITE_ASSETS.iconPng, type: 'image/png', sizes: 'any' },
+      { url: SITE_ASSETS.favicon, type: 'image/svg+xml' },
+      { url: SITE_ASSETS.brandMark, type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: [{ url: SITE_ASSETS.iconPng, sizes: '180x180', type: 'image/png' }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: 'default',
   },
   robots: {
     index: true,
@@ -72,14 +72,25 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: THEME_COLOR.light },
+    { media: '(prefers-color-scheme: dark)', color: THEME_COLOR.dark },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <body className="antialiased">
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
             async
@@ -88,12 +99,25 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         )}
-        <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-                <HeaderComponent />
-                <main className="flex-grow">{children}</main>
+        <ThemeProvider>
+          <AuthProvider>
+            <PageAnalytics />
+            <a href="#main-content" className="skip-link">
+              Skip to main content
+            </a>
+            <div className="relative z-10 flex min-h-screen flex-col">
+              <HeaderComponent />
+              <main
+                id="main-content"
+                tabIndex={-1}
+                className="flex-grow outline-none"
+              >
+                {children}
+              </main>
+              <FooterComponent />
             </div>
-        </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

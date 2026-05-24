@@ -1,26 +1,192 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
+/* Font faces: `font-imports.css` (@fontsource, bundled — no Google Fonts at build or runtime). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-display: "Chakra Petch", system-ui, sans-serif;
 }
 
-/*@theme inline {
+/* ── Educator / Schools theme scope — light palette on any wrapped element ── */
+[data-edu-theme] {
+  --background: #fafafa;
+  --foreground: #0d0d0d;
+  --brand-primary: #4a6b2f;
+  --brand-foreground: #171717;
+  --brand-muted: #525252;
+  --brand-subtle: #404040;
+  --surface: #ffffff;
+  --surface-border: #e5e5e5;
+  --input-bg: #ffffff;
+  --input-border: #d4d4d4;
+  --input-text: #171717;
+  --input-placeholder: #737373;
+  background: #fafafa;
+  color: #171717;
+}
+
+/* ── Night (default) — no JS / SSR ───────────────────────────────────────── */
+:root,
+html[data-theme="dark"] {
+  --brand-black: #0d0d0d;
+  --brand-gray-400: #737373;
+  --brand-gray-500: #404040;
+  --brand-gray-800: #262626;
+  --brand-gray-200: #d9d9d9;
+  --brand-white: #ffffff;
+  --brand-green-accent: #8ea66a;
+  --brand-gradient: linear-gradient(180deg, #262626 0%, #0d0d0d 100%);
+
+  --background: var(--brand-black);
+  --foreground: var(--brand-white);
+  --brand-primary: var(--brand-green-accent);
+  --brand-foreground: var(--brand-white);
+  --brand-muted: #c9c9c9;
+  --brand-subtle: rgba(255, 255, 255, 0.88);
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 0px;
+
+  --surface: var(--brand-gray-800);
+  --surface-border: var(--brand-gray-500);
+
+  /* Comments / form controls on dark */
+  --input-bg: #1a1a1a;
+  --input-border: #525252;
+  --input-text: var(--brand-foreground);
+  --input-placeholder: #888888;
+  --comment-thread-border: #333333;
+  --comment-avatar-bg: #404040;
+  --comment-avatar-text: #c9c9c9;
+  --comment-secondary-bg: #1f1f1f;
+}
+
+/* ── Day (light) ──────────────────────────────────────────────────────────── */
+html[data-theme="light"] {
+  --background: #fafafa;
+  --foreground: #0d0d0d;
+  --brand-primary: #4a6b2f;
+  --brand-foreground: #171717;
+  --brand-muted: #525252;
+  --brand-subtle: #404040;
+
+  --surface: #ffffff;
+  --surface-border: #e5e5e5;
+
+  --input-bg: #ffffff;
+  --input-border: #d4d4d4;
+  --input-text: #171717;
+  --input-placeholder: #737373;
+  --comment-thread-border: #e5e5e5;
+  --comment-avatar-bg: #e5e5e5;
+  --comment-avatar-text: #525252;
+  --comment-secondary-bg: #f5f5f5;
+}
+
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}*/
-
 body {
-  /*background: var(--background);
-  color: var(--foreground);*/
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color: var(--brand-foreground);
+  background: var(--background);
+  letter-spacing: 0.01em;
+}
+
+/* Grid only on dark theme — subtle on light */
+html[data-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--surface-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--surface-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+html[data-theme="light"] body::before {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+.font-mono,
+code,
+pre,
+kbd {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.ring-focus {
+  outline: none;
+}
+.ring-focus:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile / touch: faster taps, no double-tap zoom on controls */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  a[href] {
+    touch-action: manipulation;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Skip link: visually hidden until keyboard focus */
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link:focus {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--brand-primary);
+  color: var(--brand-black);
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: 2px solid var(--brand-foreground);
+  outline-offset: 2px;
 }

@@ -1,0 +1,352 @@
+[{
+  "id": 6,
+  "title": "WEATHER EFFECTS ON AIRCRAFT PERFORMANCE",
+  "sub_title": "Understanding Weather's Impact on sUAS Operations",
+  "description": "An in-depth guide to how atmospheric conditions (air pressure, density, temperature, and humidity) and phenomena (wind, turbulence, clouds, fronts, and thunderstorms) affect small Unmanned Aircraft System (sUAS) performance and pilot decision-making.",
+  "text": "Pilots must understand how weather affects drone performance. Every drone has weather limits set by the manufacturer, and exceeding those limits increases the chance of loss of control, crashes, injury, or property damage. Since pilots cannot control the weather, their focus must be on decisions, as weather affects air density, which directly impacts drone performance. Most operations do NOT justify high weather risk, though a higher risk may be justified in emergency situations like searching for a child whose life is in danger.",
+  "price": "0",
+  "has_access": true,
+  "video_url": null,
+  "status": "NOT_STARTED",
+  "sub_units": [
+    {
+      "id": 61,
+      "title": "Air Pressure, Density, and Altitude Effects",
+      "description": "Defines air pressure and air density, explains their relationship with altitude, details standard sea level conditions, and explains the critical concept of density altitude and how it affects sUAS performance.",
+      "text": "Air pressure is the weight of the air above you, caused by gravity pulling air downward. As altitude increases, air pressure decreases, and air density decreases. Standard sea level conditions are 29.92 inHg (inches of Mercury) or 1,013.2 mb (Milibars) at 59° F (15° C). Air density, the amount of air molecules in a given volume of air, affects lift, thrust, and stability. High Air Density (thick air) means better lift and performance, while Low Air Density (thin air) means reduced lift and worse performance. Low air density is caused by high altitude (fewer molecules), high temperature (warm air expands), and high humidity (water vapor is less dense than dry air). Density altitude is pressure altitude corrected for nonstandard temperature and describes how thick or thin the air feels to the aircraft. High density altitude (low air density) leads to poor sUAS performance, resulting in reduced lift, reduced climb rate, reduced propeller efficiency, and shorter battery endurance.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 611,
+          "title": "Air Pressure and Density Fundamentals",
+          "description": "Explains air pressure, density, and standard sea level conditions, focusing on the fundamental relationship between altitude, pressure, and density.",
+          "text": "Air pressure is the weight of the air above you, caused by gravity pulling air downward. As altitude increases, air pressure decreases, and air density decreases. Standard sea level conditions are 29.92 inHg (inches of Mercury) or 1,013.2 mb (Milibars) at 59° F (15° C). Air density, the amount of air molecules in a given volume of air, affects lift, thrust, and stability. High Air Density (thick air) means better lift and performance, while Low Air Density (thin air) means reduced lift and worse performance.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 612,
+          "title": "Density Altitude and Performance",
+          "description": "Defines density altitude and details how high, hot, and humid conditions decrease air density, leading to reduced sUAS lift, climb rate, and battery endurance.",
+          "text": "Low air density is caused by high altitude (fewer molecules), high temperature (warm air expands), and high humidity (water vapor is less dense than dry air). Density altitude is pressure altitude corrected for nonstandard temperature and describes how thick or thin the air feels to the aircraft. High density altitude (low air density) leads to poor sUAS performance, resulting in reduced lift, reduced climb rate, reduced propeller efficiency, and shorter battery endurance. High, hot, and humid conditions increase density altitude and decrease drone performance.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "title": "Pressure, Humidity, and Performance",
+      "description": "Details the relationship between atmospheric pressure, humidity, and weather patterns, including how these factors directly influence air density and aircraft performance.",
+      "text": "Low Pressure often indicates poor, less predictable weather, as rising air cools and condenses to form clouds and increase the chance of rain. High Pressure leads to stable, clear skies and dry conditions as air descends, warms, and dries. Pressure changes are typically the dominant factor affecting density with altitude. Humidity is the amount of water vapor in the air, and since water vapor (H2O) weighs less than nitrogen and oxygen, the more water in the air, the lighter and less dense the air is. Higher humidity, therefore, results in lower air density, which leads to decreased performance and less lift.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": []
+    },
+    {
+      "id": 63,
+      "title": "Wind, Turbulence, and Severe Wind Hazards",
+      "description": "Covers how obstacles, terrain, and weather systems create wind turbulence, low-level wind shear, and microbursts, and outlines precautions for drone operators.",
+      "text": "Obstacles cause turbulence, the amount of which depends on the size of the obstacle and the wind velocity flowing around it. Turbulence is common around structures, tree lines, mountains, bluffs, and canyons. When flying near mountains, the windward side will help lift the drone, as wind flows smoothly. However, on the leeward side, the air follows the contour of the terrain and is increasingly turbulent, tending to push an aircraft into the side of the mountain. Wind shear is a sudden change in wind speed and/or direction over a short distance and is especially dangerous close to the ground. Microbursts are intense winds in small areas that come down from a thunderstorm and can push drones down very fast.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 631,
+          "title": "Obstacle and Terrain-Induced Turbulence",
+          "description": "Explains how natural and man-made obstacles generate turbulence and provides cautions for flying near mountains and structures.",
+          "text": "Obstacles cause turbulence, the amount of which depends on the size of the obstacle and the wind velocity flowing over or around it. Turbulence is common around structures, tree lines, mountains, bluffs, and canyons. When flying near mountains, the windward side will help lift the drone, as wind flows smoothly. However, on the leeward side, the air follows the contour of the terrain and is increasingly turbulent, tending to push an aircraft into the side of the mountain.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 632,
+          "title": "Low-Level Wind Shear and Microbursts",
+          "description": "Defines wind shear, identifies its associated weather systems, and explains the extreme hazard of microbursts.",
+          "text": "Wind shear is a sudden change in wind speed and/or direction over a short distance and is especially dangerous close to the ground. Wind shear is associated with passing frontal systems, thunderstorms, temperature inversions, and strong upper-level winds greater than 25 knots. Microbursts are intense winds that happen in small areas that come down from a thunderstorm and can push drones down very fast.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "title": "Atmospheric Stability and Temperature Inversions",
+      "description": "Explains atmospheric stability and its determination by moisture and temperature, the resulting weather, and the characteristics of temperature inversions.",
+      "text": "Convective Currents are caused by uneven heating, making warm air rise (updrafts) and cool air sink (downdrafts), creating bumpy, turbulent flights. Unstable atmosphere promotes vertical air motion, leading to significant turbulence and severe weather. Cool, dry air is very stable, resists vertical movement, and generally leads to clear weather. A temperature inversion exists when the temperature of the air rises with altitude, forming commonly shallow layers of smooth, stable air close to the ground that act as a lid. Surface-based inversions occur on clear, cool nights, while frontal inversions occur when warm air spreads over cooler air, potentially causing unstable air and worsening flight conditions.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 641,
+          "title": "Atmospheric Stability and Convective Currents",
+          "description": "Explains how moisture and temperature determine atmospheric stability and how unstable air leads to vertical motion, turbulence, and cumuliform clouds.",
+          "text": "Convective Currents are caused by uneven heating, making warm air rise (updrafts) and cool air sink (downdrafts), creating bumpy, turbulent flights. Unstable atmosphere (often moist and warm air) promotes vertical air motion, leading to significant turbulence, extensive vertical (cumuliform) clouds, and severe weather. Cool, dry air is very stable, resists vertical movement, and generally leads to clear weather.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 642,
+          "title": "Temperature Inversions",
+          "description": "Describes the phenomenon of a temperature inversion, the 'lid' effect, and the formation of surface-based and frontal inversions.",
+          "text": "A temperature inversion exists when the temperature of the air rises with altitude, forming commonly shallow layers of smooth, stable air close to the ground that act as a lid, trapping weather and pollutants. Surface-based inversions occur on clear, cool nights, while frontal inversions occur when warm air spreads over cooler air, potentially causing unstable air and worsening flight conditions.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "title": "Dew Point and Structural Icing Hazards",
+      "description": "Explains the relationship between temperature and dew point, which defines relative humidity, and details the conditions necessary for structural icing and its dangerous effect on aircraft performance.",
+      "text": "Dew point is the temperature at which the air can hold no more moisture. When air cools to its dew point, it becomes fully saturated, causing water vapor to condense and form fog, dew, frost, clouds, rain, or snow. Condensed moisture like dew or frost on aircraft surfaces can lower performance and lift by adding weight and interrupting the flow of air over the wings and rotors. Structural icing, which is very dangerous, forms on the aircraft’s wings, body, and propellers. Two conditions are necessary for structural icing: flying through visible water (rain or cloud droplets) AND the temperature at the point where the moisture strikes the aircraft must be 0° C (32° F) or colder.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 651,
+          "title": "Dew Point and Condensation",
+          "description": "Defines dew point and explains how condensation and the resulting moisture (dew, frost) can negatively affect sUAS performance.",
+          "text": "Dew point is the temperature at which the air can hold no more moisture. When air cools to its dew point, it becomes fully saturated, causing water vapor to condense and form fog, dew, frost, clouds, rain, or snow. Condensed moisture like dew or frost on aircraft surfaces can lower performance and lift by adding weight and interrupting the flow of air over the wings and rotors.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 652,
+          "title": "Structural Icing",
+          "description": "Identifies the two mandatory conditions for structural icing to occur on aircraft and the resulting danger to flight safety.",
+          "text": "Structural icing, which is very dangerous, forms on the aircraft’s wings, body, and propellers. Two conditions are necessary for structural icing: flying through visible water (rain or cloud droplets) AND the temperature at the point where the moisture strikes the aircraft must be 0° C (32° F) or colder.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "title": "Clouds and Thunderstorm Life Cycle",
+      "description": "Describes dangerous cloud types (cumulonimbus, standing lenticular) and the three stages of a thunderstorm (Cumulus, Mature, Dissipating), highlighting the associated hazards.",
+      "text": "Cumuliform clouds are puffy, white clouds with a flat base that can grow large and lead to thunderstorms. Cumulonimbus clouds are one of the most dangerous types to drone operators because rising air currents make them extremely turbulent; a small UA could experience updrafts and downdrafts exceeding 3,000 fpm. Standing lenticular altocumulus clouds are also dangerous, indicating strong turbulence that should be avoided. Thunderstorms go through three stages: Cumulus Stage (strong updraft), Mature Stage (updrafts and downdrafts coexist, most dangerous stage for turbulence), and Dissipating Stage (dominated entirely by diminishing downdrafts).",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 661,
+          "title": "Hazardous Cloud Types",
+          "description": "Describes cumuliform, cumulonimbus, and standing lenticular clouds and explains the specific turbulence hazards each poses to sUAS operations.",
+          "text": "Cumuliform clouds are puffy, white clouds with a flat base that can grow large and lead to thunderstorms. Cumulonimbus clouds are one of the most dangerous types to drone operators because rising air currents make them extremely turbulent; a small UA could experience updrafts and downdrafts exceeding 3,000 fpm. Standing lenticular altocumulus clouds are also dangerous, forming on the crests of waves created by barriers like mountains, indicating strong turbulence that should be avoided.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 662,
+          "title": "Thunderstorm Life Cycle",
+          "description": "Details the three stages of a thunderstorm (Cumulus, Mature, Dissipating), emphasizing the most dangerous stage (Mature) and the associated wind and turbulence.",
+          "text": "Thunderstorms go through three stages: Cumulus Stage (strong updraft from surface to cloud top), Mature Stage (precipitation starts, strong updrafts AND downdrafts coexist, most dangerous stage for turbulence, wind shear, and microbursts), and Dissipating Stage (dominated entirely by diminishing downdrafts).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "title": "Fronts, Mountain Flying, and Operational Minimums",
+      "description": "Explains the characteristics of warm and cold fronts, cautions for mountain flying, and defines aviation terms like ceiling and visibility related to sUAS operational limits.",
+      "text": "A frontal zone or front is the zone between two different air masses where temperature, humidity, and wind can change rapidly. A Warm Front advances slowly, replacing colder air. A Cold Front occurs when cold, dense air replaces warmer air, approaching fast with little warning. When flying over mountainous terrain, gather preflight information on cloud reports, wind direction/speed, and air stability. Ceiling is the lowest layer of clouds reported as being broken or overcast. The sUAS operational minimum distance from clouds is 500 feet below and 2,000 feet horizontally from the cloud. Visibility is the greatest horizontal distance prominent objects can be seen, and the minimum visibility requirement for sUAS operations is 3 statute miles (SM).",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 671,
+          "title": "Atmospheric Fronts",
+          "description": "Describes the frontal zone and explains the key characteristics and speed of warm fronts and cold fronts.",
+          "text": "A frontal zone or front is the zone between two different air masses where temperature, humidity, and wind can change rapidly. A Warm Front advances and replaces colder air, giving advanced warning and taking days to pass through. A Cold Front occurs when cold, dense air replaces warmer air; it approaches fast with little warning and is indicated by a high dew point and falling barometric pressure.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 672,
+          "title": "Mountain Flying Cautions",
+          "description": "Outlines necessary preflight information and operational cautions when flying over mountainous terrain, including turbulence indicators.",
+          "text": "When planning a flight over mountainous terrain, gather as much preflight information as possible including cloud reports, wind direction/speed, and air stability. Convective clouds on the windward side of mountains mean unstable air and turbulence close to the mountain on either side. Stratified clouds mean stable air.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 673,
+          "title": "Operational Ceiling and Visibility Minimums",
+          "description": "Defines ceiling and visibility and states the mandatory minimum distances from clouds and minimum visibility requirements for sUAS operation.",
+          "text": "Ceiling is the lowest layer of clouds reported as being broken (five-eighths to seven-eighths sky coverage) or overcast (entire sky covered). The sUAS operational minimum distance from clouds is 500 feet below and 2,000 feet horizontally from the cloud. Visibility is the greatest horizontal distance prominent objects can be seen, and the minimum visibility requirement for sUAS operations is 3 statute miles (SM).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    }
+  ]
+},
+
+
+{
+  "id": 5,
+  "title": "WEATHER",
+  "sub_title": "Aviation Weather Sources, Observations (METAR), and Forecasts (TAF)",
+  "description": "Covers the essential aviation weather services, how to read surface observation reports like METAR, and how to use key forecast products such as TAF, SIGMET, and AIRMET for safe flight planning.",
+  "text_content": "Weather is a critical part of preflight planning, requiring knowledge of specialized aviation weather sources, real-time observation reports, and various forecast products to ensure flight safety and informed decision-making.",
+  "price": "0",
+  "has_access": true,
+  "video_url": null,
+  "status": "NOT_STARTED",
+  "sub_units": [
+    {
+      "id": 51,
+      "title": "Aviation Weather Sources Overview",
+      "text_content": "Weather is an important part of preflight planning. The Weather Services system is a collaborative effort involving the National Weather Service (NWS), Federal Aviation Administration (FAA), Department of Defense (DOD), and other aviation organizations and individuals. Weather can vary greatly depending on location and altitude. Aviation weather reports are available at [www.aviationweather.gov](http://www.aviationweather.gov) and [1800wxbrief.com](http://1800wxbrief.com). Weather forecasts are not 100% but are increasingly accurate, using scientific research and computer models to identify patterns, trends, and characteristics of weather systems. This information is used to support informed decision-making for flight planning and safety.",
+      "description": "Understanding the collaborative system of agencies providing aviation weather data and where to access official reports.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": []
+    },
+    {
+      "id": 52,
+      "title": "Surface Aviation Weather Observations",
+      "text_content": "Surface Aviation Weather Observations include data from both government-operated and privately contracted facilities, providing real-time, localized weather data collected at ground stations across the US. Automated weather sources like Automated Weather Observing Systems (AWOS) and Automated Surface Observing Systems (ASOS) play major roles in data collection. AWOS is a collection of weather sensors that must meet FAA standards to be able to report weather factors. A Surface Observation Report contains: Type of report (routine or special), Station identifier (airport code or location), Date and time of the observation, Modifier, Wind speed and direction, Visibility (horizontal distance pilots can see), Runway Visual Range (RVR), Weather phenomena, Sky condition, Temperature and dew point, Altimeter reading (atmospheric pressure), and Remarks.",
+      "description": "Details on real-time, localized weather data sources, including AWOS and ASOS, and the general content of a surface observation report.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": []
+    },
+    {
+      "id": 53,
+      "title": "Aviation Routine Weather Report (METAR) Decoding",
+      "text_content": "Aviation Weather Reports provide accurate, current depictions of weather conditions to help pilots make informed decisions. The METAR (Aviation Routine Weather Report) is the standard international format for surface weather observations, typically issued hourly. The SPECI is a special METAR issued between routine reports when significant weather changes occur.",
+      "description": "A breakdown of the METAR format, covering station identifiers, time conventions, wind reporting, visibility, sky condition, and temperature/altimeter settings.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 531,
+          "title": "Report Type, Station, Date, and Time",
+          "text_content": "The report begins with the Type of report: METAR (regular) or SPECI (special report). This is followed by the Station identifier, a 4-letter code to identify airports and other aviation facilities. The Date & time of report is a 6-digit group (date + time) given in Zulu time (UTC), followed by 'Z'. The Modifier, if present, denotes an automated source ('AUTO') or a corrected report ('COR').",
+          "description": "Decoding the METAR header, including the report type (METAR/SPECI), station code, time format (Zulu), and modifiers (AUTO/COR).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 532,
+          "title": "Wind and Visibility",
+          "text_content": "Wind is reported with direction (first three digits, blowing from in tens of degrees) and speed (last two or three digits) in knots. If the wind direction is variable, 'VRB' is used. Gusts are indicated by 'G' followed by the peak gust (e.g., G26KT). Visibility is reported in statute miles ('SM').",
+          "description": "How wind direction, speed, gusts (G), variable winds (VRB), and visibility (SM) are reported in the METAR.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 533,
+          "title": "Weather Phenomena and Sky Condition",
+          "text_content": "Weather is broken down into Qualifiers (intensity: light (-), moderate ( ), heavy (+), and proximity: 'VC' for 5–10 miles from the airport) and Descriptors (describing precipitation or obscurations). Sky condition is reported with amount (in eighths), height (3-digit number in hundreds of feet AGL), and type (e.g., TCU or CB). 'VV' (vertical visibility) is used if clouds cannot be seen due to fog or heavy precipitation.",
+          "description": "Interpreting weather qualifiers (intensity, proximity), descriptors, and sky condition reporting, including cloud height and type.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 534,
+          "title": "Temperature, Altimeter, and Remarks",
+          "text_content": "Air Temperature and Dew Point are always given in °C. Temperatures below 0 °C are preceded by 'M' (Minus). The Altimeter setting is inches of mercury ('Hg') in a four-digit group, preceded by 'A'. Remarks start with 'RMK' and include various additional data like pressure information ('PRESRR' or 'PRESFR') and automated station maintenance indicators.",
+          "description": "The reporting format for temperature and dew point (°C, 'M' for minus), altimeter setting ('A'), and the content of the 'RMK' (Remarks) section.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "title": "Aviation Weather Forecast Products",
+      "text_content": "Forecasts are essential for preflight planning. Pilots should be familiar with the various types of forecast products that provide anticipated weather conditions for specific areas and altitudes.",
+      "description": "An introduction to the different types of weather forecasts essential for flight planning, including TAF, SIGMET, and AIRMET.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 541,
+          "title": "Terminal Aerodrome Forecast (TAF) and Aviation Area Forecast (FA)",
+          "text_content": "The TAF (Terminal Aerodrome Forecast) is a forecast for a specific airport (usually larger ones), covering expected weather within a 5-mile radius, valid for 24 or 30 hours and updated four times daily (0000Z, 0600Z, 1200Z, and 1800Z). The FA (Aviation Area Forecast) is a broad regional forecast.",
+          "description": "Specifics on the TAF (coverage, duration, update frequency) and the role of the FA (regional scope).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 542,
+          "title": "SIGMET and Convective SIGMET (WST)",
+          "text_content": "SIGMET (Significant Meteorological Information) advisories are issued for severe weather hazards (e.g., turbulence, volcanic ash). Convective SIGMETs (WST) are issued specifically for severe thunderstorms producing surface winds greater than 50 knots, hail ¾ inch or larger, or the presence of tornadoes, or heavy precipitation affecting 40% or more of an area at least 3,000 square miles in size. They are relevant to all aircraft for safety and preflight planning.",
+          "description": "The criteria and hazards covered by SIGMETs and the specific conditions that trigger a Convective SIGMET (WST).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 543,
+          "title": "AIRMET and Winds/Temperatures Aloft (FB)",
+          "text_content": "AIRMET (Airman’s Meteorological Information) advisories are for less severe weather conditions (e.g., moderate turbulence or icing). The FB (Winds and Temperatures Aloft Forecast) provides wind direction, speed, and temperature at various altitudes, which is crucial for determining flight path efficiency and conditions at altitude.",
+          "description": "The difference between AIRMET (moderate conditions) and the use of the FB forecast (wind and temperature at various altitudes).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "title": "Terminal Aerodrome Forecast (TAF) Decoding",
+      "text_content": "The TAF provides essential forecast information for specific airports and uses a coded structure that must be carefully decoded to understand the expected weather conditions.",
+      "description": "Decoding the structure and content of a TAF report, including the valid period, wind, visibility, and forecast change groups like FM and TEMPO.",
+      "video_url": null,
+      "status": "NOT_STARTED",
+      "sub_units": [
+        {
+          "id": 551,
+          "title": "TAF Header: Type, ID, and Origin Time",
+          "text_content": "The TAF includes the Type of report (Routine TAF or Amended TAF AMD), the ICAO station identifier (4-digit code, same as a METAR), and the Date and time of origin (6-number code in UTC/Zulu).",
+          "description": "Identifying the routine or amended TAF, the station, and the time the forecast was issued.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 552,
+          "title": "Valid Period and Core Forecast Elements",
+          "text_content": "The TAF Valid period dates and times (e.g., 0812/0912) indicate the forecast's duration. This is followed by the core forecast elements: Forecast wind (five-digit group), Forecast visibility (in statute miles, 'P6SM' for greater than six miles), Forecast significant weather, and Forecast sky condition (same format as METAR, but only Cumulonimbus (CB) clouds are forecast in this section).",
+          "description": "Interpreting the start/end dates and times of the forecast and decoding the wind, visibility, weather, and sky condition elements.",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        },
+        {
+          "id": 553,
+          "title": "Forecast Change Groups (FM, TEMPO, PROB)",
+          "text_content": "The Forecast change group indicates expected significant weather changes. 'FM' (From) is used when a rapid and significant change is expected (usually within an hour). 'TEMPO' (Temporary) is for temporary fluctuations of weather expected to last less than 1 hour. 'PROB30' or 'PROB40' (Probability) is a percentage describing the probability of thunderstorms and precipitation, but this group is not used for the first 6 hours of a 24-hour forecast.",
+          "description": "Understanding the difference between 'FM' (rapid change), 'TEMPO' (short fluctuation), and 'PROB' (probability of precipitation or thunderstorms).",
+          "video_url": null,
+          "status": "NOT_STARTED",
+          "sub_units": []
+        }
+      ]
+    }
+  ]
+}]

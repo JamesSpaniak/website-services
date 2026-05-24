@@ -14,17 +14,46 @@ resource "aws_security_group" "ecs_tasks_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
     security_groups = [aws_security_group.internal_lb_sg.id]
   }
 
+  # HTTPS — AWS APIs (via VPC endpoints + NAT), Grafana OTEL, Stripe
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # PostgreSQL — Aurora in private subnets
+  egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.20.0/24", "10.0.21.0/24"]
+  }
+
+  # SMTP — Gmail relay (port 587 STARTTLS)
+  egress {
+    from_port   = 587
+    to_port     = 587
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # DNS
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-ecs-tasks-sg"
   }
 }
 
@@ -66,6 +95,7 @@ resource "aws_iam_policy" "secrets_manager_policy" {
         Resource = [
           aws_secretsmanager_secret.db_credentials.arn,
           aws_secretsmanager_secret.stripe_secret_key.arn,
+          aws_secretsmanager_secret.stripe_webhook_secret.arn,
           aws_secretsmanager_secret.jwt_secret.arn,
           aws_secretsmanager_secret.admin_seed_password.arn,
           aws_secretsmanager_secret.grafana_otel_headers.arn,
@@ -125,7 +155,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_cloudwatch_attachment" 
 
 resource "aws_iam_policy" "s3_media_policy" {
   name        = "${var.project_name}-s3-media-policy"
-  description = "Allow ECS backend tasks to manage objects in the media S3 bucket"
+  description = "Allow ECS backend tasks to manage objects in the media S3 bucket and invalidate CloudFront"
 
   policy = jsonencode({
     Version   = "2012-10-17"
@@ -142,6 +172,11 @@ resource "aws_iam_policy" "s3_media_policy" {
           "${aws_s3_bucket.media.arn}/*",
         ]
       },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudfront:CreateInvalidation"]
+        Resource = [aws_cloudfront_distribution.media_distribution.arn]
+      },
     ]
   })
 }
@@ -155,8 +190,8 @@ resource "aws_ecs_task_definition" "api_server" {
   family                   = "${var.project_name}-api-server-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"  # 0.25 vCPU
-  memory                   = "512"  # 512 MB
+  cpu                      = "512"  # 0.5 vCPU
+  memory                   = "1024" # 1 GB
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -188,6 +223,10 @@ resource "aws_ecs_task_definition" "api_server" {
         {
           name      = "STRIPE_SECRET_KEY"
           valueFrom = aws_secretsmanager_secret.stripe_secret_key.arn
+        },
+        {
+          name      = "STRIPE_WEBHOOK_SECRET"
+          valueFrom = aws_secretsmanager_secret.stripe_webhook_secret.arn
         },
         {
           name      = "JWT_SECRET"
@@ -228,7 +267,8 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "OTEL_SERVICE_NAME", value = "droneedge" },
         { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "https://otlp-gateway-prod-us-east-2.grafana.net/otlp" },
         { name = "OTEL_EXPORTER_OTLP_PROTOCOL", value = "http/protobuf" },
-        { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id }
+        { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id },
+        { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id }
       ]
     }
   ])
@@ -260,7 +300,7 @@ resource "aws_ecs_service" "api_server" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  max_capacity       = 3 # The maximum number of tasks to run
+  max_capacity       = 5 # The maximum number of tasks to run
   min_capacity       = 1 # The minimum number of tasks to run
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.api_server.name}"
   scalable_dimension = "ecs:service:DesiredCount"

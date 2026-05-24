@@ -143,7 +143,15 @@ export class UnitData {
     @IsString()
     video_url?: string;
 
-    @ApiPropertyOptional()
+    @ApiPropertyOptional({ type: [String], description: 'Gallery images for this unit (horizontal scroll in the app).' })
+    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    images_url?: string[];
+
+    /** @deprecated Merged into `images_url` on read/write. */
+    @ApiPropertyOptional({ deprecated: true })
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
     @IsOptional()
     @IsString()
@@ -181,6 +189,9 @@ export class CourseDetails {
 
     text_content?: string;
 
+    images_url?: string[];
+
+    /** @deprecated Merged into `images_url` on read/write. */
     image_url?: string;
 
     video_url?: string;
@@ -192,6 +203,12 @@ export class CourseDetails {
     price: number;
 
     has_access: boolean;
+
+    /** Latest full-course practice / final scores from progress (when user has access). */
+    exam_summary?: {
+        practice?: { score: number; taken_at: string } | null;
+        final?: { score: number; taken_at: string } | null;
+    };
 }
 
 // --- DTOs for specific endpoint actions ---

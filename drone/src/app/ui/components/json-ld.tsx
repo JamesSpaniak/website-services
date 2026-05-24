@@ -1,3 +1,5 @@
+import { SITE_ASSETS } from '@/app/lib/site-assets';
+
 interface JsonLdProps {
   data: Record<string, unknown>;
 }
@@ -12,7 +14,10 @@ export default function JsonLd({ data }: JsonLdProps) {
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedroneedge.com';
-const SITE_NAME = 'Drone Training Pro';
+const SITE_NAME = 'Drone Edge';
+
+/** Square brand mark for Organization / publisher logos (Google-friendly minimum size when rendered from SVG). */
+const ORG_LOGO_URL = `${SITE_URL}${SITE_ASSETS.brandMark}`;
 
 export function organizationJsonLd() {
   return {
@@ -20,7 +25,7 @@ export function organizationJsonLd() {
     '@type': 'Organization',
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/og-default.png`,
+    logo: ORG_LOGO_URL,
     sameAs: [],
   };
 }
@@ -66,7 +71,7 @@ export function articleJsonLd(article: {
       url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_URL}/og-default.png`,
+        url: ORG_LOGO_URL,
       },
     },
     mainEntityOfPage: {
@@ -81,9 +86,13 @@ export function courseJsonLd(course: {
   sub_title?: string;
   description?: string;
   price?: number;
+  images_url?: string[];
   image_url?: string;
+  video_url?: string;
   id: number;
 }) {
+  const primaryImage =
+    course.images_url?.find(Boolean) || course.image_url;
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
@@ -94,7 +103,13 @@ export function courseJsonLd(course: {
       name: SITE_NAME,
       url: SITE_URL,
     },
-    ...(course.image_url && { image: course.image_url }),
+    ...(primaryImage && { image: primaryImage }),
+    ...(course.video_url && {
+      video: {
+        '@type': 'VideoObject',
+        contentUrl: course.video_url,
+      },
+    }),
     ...(course.price !== undefined && {
       offers: {
         '@type': 'Offer',

@@ -1,0 +1,57 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+GPS-denied navigation: visual-inertial odometry, SLAM, and alternative PNT (2010s–present)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Military and commercial drones faced jamming and spoofing long before Ukraine made it headline news. The technical response combined tighter inertial integration, monocular/stereo visual-inertial odometry (VIO), SLAM for mapping, terrain-relative navigation, celestial aiding in some classes, and emerging **alternative positioning, navigation, and timing (A-PNT)** concepts. Civilian systems improved return-to-home robustness; defense pushed missions where GNSS cannot be trusted for long.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Drift is the enemy: IMUs alone diverge quickly; vision limits accumulate differently.
+- Lighting, texture-poor terrain, and altitude change VIO behavior sharply.
+- Spoofing can be harder than jamming to detect without cryptographic or cross-check layers.
+- Fiber-optic links and preplanned autonomy are operational hacks, not substitutes for navigation science.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Navigation; sensor fusion; electronic warfare resilience; robotics state estimation
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Technical capability survey
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Cat-and-mouse; urgency in contested theaters
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Most consumers only notice “GPS issues” as flyaways or RTH quirks; EW-aware narratives grew after 2022. Policymakers discuss GNSS backup for critical infrastructure beyond drones.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+LEO-PNT and hybrid commercial signals; better spoofing detection; learning-enhanced mapping with safety bounds; tighter coupling between navigation stacks and mission autonomy under comms loss.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Academic VIO/SLAM maturation ~2010–2018; broad product-grade VIO ~2016+; renewed urgency and classified advances ~2020s conflicts.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+If positioning is untrustworthy, autonomy and long-range logistics collapse—navigation resilience is foundational.
+
+────────────────────────────────────────────────────────────
+NEXT ADVANCEMENT (HOW CLOSE?)
+────────────────────────────────────────────────────────────
+**Close for incremental gains, medium for step-change.** Next milestones are **long-horizon drift reduction without GNSS**, **spoof-resistant fusion** at SWaP-C suitable for small UAS, and **certifiable** behavior under sensor degradation. A true “GPS-free everywhere” small drone remains **hard**; expect **steady** progress over ~5–10 years with occasional leaps from new signals-of-opportunity and better maps.

@@ -25,8 +25,19 @@ interface ContactPayload {
     message: string;
 }
 
+interface ConsultationPayload {
+    name: string;
+    email: string;
+    organization: string;
+    role: string;
+    student_count?: string;
+    preferred_time: string;
+    topics: string;
+}
+
 export type {
     CreateUserDto,
     ContactPayload,
+    ConsultationPayload,
     UserDto
 }
