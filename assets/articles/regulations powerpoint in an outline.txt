@@ -1,0 +1,592 @@
+﻿PART 107 REGULATIONS
+SECTION TOPICS
+* Applicability
+* Roles
+* Operational Rules
+* Waivers
+* Remote ID
+* Flying Over People And Moving Objects
+* Flying At Night
+APPLICABILITY
+* In August 2016, the FAA published remote pilot certification and operating rules for civil small unmanned aircraft weighing less than 55 pounds. 
+* Purpose of Part 107 oversees non-recreational / commercial operations of small unmanned aircraft systems (sUAS) in the National Airspace System (NAS).
+APPLICABILITY
+* Includes any operation that directly or indirectly supports a business, nonprofit, government, or compensated purpose (monetary or non-monetary)
+* Did not permit small unmanned aircraft operations at night or over people without a waiver
+APPLICABILITY
+* Drone operators no longer needed special exemptions or permits from the FAA to fly.
+* Drone operators can fly drones without needing:
+   * Special exemptions 
+   * Airworthiness requirements 
+   * Pilot certification provisions 
+   * Operating limitations 
+   * External payload provisions  
+* Just need your Remote Pilot certificate.
+APPLICABILITY
+14 CFR Part 107 DOES NOT apply to:
+   * Recreational/model aircraft  outside of UAS that occur in accordance with 49 U.S.C. 44809 (Hobby & Recreational use)
+   * Public aircraft operations
+   * Amateur rockets, moored balloons, unmanned free balloons, kites
+   * Operations conducted outside the United States
+   * Air carrier operations
+   * Operations conducted under Section 333 exemptions
+QUESTIONS AND COMMENTS
+Leave any questions or comments in the chat
+ROLES
+ROLES
+* Part 107 has specific requirements for the various roles related to flying sUAS:
+   * Remote Pilot In Command (RPIC) 
+   * Person Manipulating The Flight Controls 
+   * Visual Observer (VO)
+   * And others such as payload operators
+REMOTE PILOT IN COMMAND (RPIC)
+* The person flying the drone must have passed the Part 107 exam & hold a Remote Pilot Certificate with a sUAS rating or be under direct supervision of a person who holds a Remote Pilot Certificate
+* The RPIC:
+   * Has the final authority and ultimate responsibility for the operation and safety of the sUAS & flight
+   * The certificate must be easily accessible when flying
+REMOTE PILOT IN COMMAND (RPIC)
+* The RPIC:
+   * Must be designated before or during the flight of the sUA 
+   * Must ensure that the sUA will pose no undue hazard to other people, aircraft, or property in the event of a loss of control of the sUAS
+   * Must ensure operation complies with all applicable regulations
+REMOTE PILOT IN COMMAND
+* The RPIC:
+   * Must conduct preflight checks including the aircraft & control system
+   * Verify aircraft is safe and airworthy
+   * Confirm the sUAS complies with registration requirements 
+   * Has final authority to modify, delay, or cancel a flight
+REMOTE PILOT IN COMMAND
+* The RPIC:
+   * Ensures Visual Line of Sight (VLOS) rules are met
+   * Ensures crew (VO, control operator) are briefed and capable
+   * May deviate from rules in case of true emergency
+PERSON MANIPULATING THE FLIGHT CONTROLS
+* Under 14 CFR Part 107 the person manipulating the flight controls is physically operating the drone’s controls but not necessarily the Remote Pilot in Command (RPIC).
+PERSON MANIPULATING THE FLIGHT CONTROLS
+* If person manipulating the flight controls is NOT a certified remote pilot, they can operate the controls only if: 
+   * The EPIC is supervising them directly
+   * The RPIC has the ability to immediately take control (either physically standing next to or via radio/override system.
+   * They understand the mission, safety procedures and emergency actions.
+VISUAL OBSERVER
+(VO)
+VISUAL OBSERVER (VO)
+ADDITIONAL ROLES
+* Depending on the complexity of the operation there maybe need for additional crew
+* Along with the RPIC, VO and Person manipulating the controls you may need additional members payload and camera operators, group crew members ect.
+FLIGHT CREW MANAGEMENT
+* RPIC responsible for task distribution and workload management
+* Pre-Flight Considerations:
+   * Assessing weather, airspace, terrain, and obstacles
+   * Aircraft condition and airworthiness
+   * Crew readiness (mental, physical)
+FLIGHT CREW MANAGEMENT
+* Pre-Flight Communications
+   * Crew briefing
+   * Emergency procedures & potential hazards
+   * Contingency plans
+* Preflight Familiarization, Inspection, & Actions
+   * Reviewing manufacturer instructions
+   * Inspecting aircraft components (propellers, battery, control link)
+   * Required documentation
+COMMUNICATION
+* Effective communication between crew can be a two-way radio or a cell phone or other tech.
+* If using the sUAS flight controls may be unable to manipulate the controls of a communication device
+   * Use options such as hands-free communication, earpiece, a headset, or the “speaker” mode on a cell phone
+   *  The RPIC can pick any method of communication as long as it is safe 
+   * If UA goes out of VLOS for more than 15 seconds initiate a failsafe return to home
+COMMUNICATION
+* When flying an UA it is important for everyone to have situational awareness
+* Communicating the UA’s location is helpful
+* Clock coordinates are universal and should be used:
+   * 12:00 is straight in front of the RPIC
+   * 3:00 is 90 degrees to the RPIC right
+   * 6:00 is directly behind the RPIC
+   * 9:00 is 90 degrees to the RPIC left
+QUESTIONS AND COMMENTS
+Leave any questions or comments in the chat
+OPERATING RULES
+AIRCRAFT REGISTRATION
+* All non-recreational drones must be registered according to 14CFR Part 47 or Part 48
+* Registration number must be legibly displayed on the aircraft
+* RPIC must carry proof of registration physically or digitally
+* OPERATING RULES 
+
+INSPECTION, TESTING, AND DEMONSTRATION OF COMPLIANCE
+INSPECTION, TESTING, AND DEMONSTRATION OF COMPLIANCE
+Upon request the RPIC, person controlling the aircraft, or the owner must do the following:
+   * Present to the FAA,  National Transportation Safety Board (NTSB), Federal, State, or local law enforcement officer or the Transportation Security Administration (TSA) 
+   * His or her remote pilot certificate with a sUAS rating 
+   * Photo ID with signature and date of birth
+   * Any documents, records, or reports you are required to keep under Part 107
+INSPECTION, TESTING, AND DEMONSTRATION OF COMPLIANCE
+   * Upon request, the RPIC, visual observer, owner, operator, or person manipulating the controls must allow the FAA to inspect the aircraft and any involved personnel to verify compliance with Part 107
+   * Includes facilities, technical data, and any manufactured small UAS and witness any tests necessary
+   * OPERATING RULES 
+
+FALSIFICATION, REPRODUCTION OR ALTERATION
+FALSIFICATION, REPRODUCTION OR ALTERATION
+      * Providing false information or fraudulently altering or reproducing, including omissions of any required records or reports can result in:
+      * Denying your certificate or waive
+      * Suspending your certificate or waiver
+      * Revoking it completely 
+      * Issuing civil penalties (fines)
+      * OPERATING RULES 
+
+ACCIDENT REPORTING, IN-FLIGHT EMERGENCY & HAZARDOUS OPERATIONS
+ACCIDENT REPORTING
+         * The remote pilot in command of the sUAS is required to report an accident to the FAA within 10 days if it results in:
+         * Serious injury to any person or any loss of consciousness
+         * If it causes damage to any property (other than the UAS or drone) in excess of $500 to repair or replace the property (whichever is lower).
+IN FLIGHT EMERGENCY
+         * In an in-flight emergency requiring immediate action, the remote pilot in command may deviate from any rule of this part to the extent necessary to meet that emergency.
+         * Upon request from the administrator the remote pilot in command who deviates from a rule must send a written report to the Administrator.
+HAZARDOUS OPERATIONS
+No person may:
+         * Operate a sUAS in a reckless manner that would endanger the life or property of another
+         * This could include continuing to fly in inclement weather, or in an area with many buildings, trees or other structures
+         * Allow an object to be dropped from a sUAS in a manner that creates an undue hazard to persons or property.
+QUESTIONS
+Put any questions in the comments
+         * OPERATING RULES 
+
+MEDICAL CONDITIONS
+MEDICAL CONDITION
+A medical certificate is not required to fly a sUAS or to be part of the operation but…
+            * If you know or have reason to believe your condition would interfere with the safe operation of the sUAS you must not fly. 
+            * Examples include when:
+            * Fatigued
+            * Using medication that would affect your performance or situational awareness
+MEDICAL CONDITION
+Additional Examples of Medical Conditions:
+            * Physically (flu/headaches) or mentally ill
+            * Loss of hearing or voice so that you can’t communicate
+            * Blurred vision due to infection or missing glasses – see and avoid requirement can’t be satisfied
+            * Temporary or permanent loss of the ability to control your drone effectively 
+            * OPERATING RULES 
+
+OPERATION FROM A MOVING VEHICLE
+OPERATION FROM A MOVING VEHICLE
+               * When in a moving vehicle (water or land vehicle) no person may operate a UA:
+               * UNLESS the sUA is flown over a sparsely populated area 
+               * Is not transporting another person's property for compensation or hire.
+               * You may NOT fly from a moving aircraft
+               * OPERATING RULES 
+
+ALCOHOL OR DRUGS
+ALCOHOL OR DRUGS
+                  * No person controlling a sUAS or as a member of the team can:
+                  * Have a medical condition that could risk safety of the operation
+                  * Ex: epilepsy
+                  * Be under the influence of alcohol;
+                  * Use drugs which affects their capabilities (including OTC meds);
+                  * Antihistamines and decongestants may cause drowsiness
+                  * Has had alcohol within 8 hours of drinking; and/or
+                  * Have an alcohol concentration of 0.04 or greater; 
+ALCOHOL OR DRUGS
+                  * If requested by law enforcement an individual must submit to a test to indicate the alcohol concentration in the blood or breath
+                  * The RPIC is responsible for the safety of the crew but in an emergency, they can deviate from the rules
+                  * OPERATING RULES 
+
+NIGHT OPERATIONS
+NIGHT OPERATIONS
+                     * The RPIC must have completed an initial knowledge test, or recurrent training must have been completed on or after April 6, 2021
+                     * Free online course on the www.faasafety.gov 
+NIGHT OPERATIONS
+New rules after April 21, 2021, made night operations now possible if certain requirements are met
+You may NOT fly a UA during civil twilight unless:
+                     * The drone has anti-collision lights that are turned on and are visible for at least 3 SM
+                     * Have a flash rate sufficient to avoid a collision & the lights must remain on throughout 
+NIGHT OPERATIONS
+                     * The RPIC may dim the lights if brightness would reduce safety
+                     * The lights may NOT be turned off under any circumstances.
+NIGHT OPERATIONS
+Civil Twilight 
+                     * Night - the time period between the end of evening civil twilight & the beginning of morning civil twilight.
+                     * Morning civil twilight - Begins 30 minutes before official sunrise, ends at official sunrise
+                     * Evening civil twilight - Begins at official sunset & ends 30 minutes after official sunset
+                     * In Alaska civil twilight is determined by the Air Almanac.
+NIGHT OPERATIONS
+                     * Understanding how your vision works in low light helps in safely operating drones at night.
+                     * Pilots use lights on airplanes to indicate direction and position. 
+                     * Lights: Red on the left wing,  green on the right,  white at the tail 
+                     * Recognizing these lights can help you understand the direction an aircraft is moving & increase your situational awareness when flying near airports or manned aircraft.
+                     * OPERATING RULES 
+
+VISUAL LINE OF SIGHT (VLOS)
+VISUAL LINE OF SIGHT (VLOS) AIRCRAFT OPERATION
+                        * The RPIC, person manipulating the flight controls and VO must be able to see the UA throughout the flight unaided, except for corrective lenses  in order to:
+                        * Know the unmanned aircraft's location;
+                        * Determine the UA’s attitude, altitude, and direction of flight;
+                        * Observe the airspace for other air traffic or hazards;
+                        * Determine that the UA does not endanger the life or property of another.
+VISUAL LINE OF SIGHT AIRCRAFT OPERATION
+                        * Throughout the entire flight of the sUA, the ability to see the drone unaided (glasses or contact lens only – no binoculars) must be exercised by either:
+                        * The remote pilot in command and the person manipulating the flight controls; or
+                        * A visual observer
+VISUAL OBSERVER (VO)
+                        * The RPIC, the person manipulating the flight controls of the sUAS, and the VO if used, must:
+                        * Maintain effective communication with each other at all times
+                        * Scan the airspace for any potential collision hazard; and
+                        * Maintain awareness of the position of the sUA through direct visual observation
+                        * Looking at controller briefly to locate UA if lost for a second or to check battery life, behind smoke or behind a chimney is ok.
+                        * OPERATING RULES 
+
+MULTIPLE SMALL UNMANNED AIRCRAFT AND RIGHT-OF-WAY RULES
+OPERATION OF MULTIPLE SMALL UNMANNED AIRCRAFT
+                           * A person may not manipulate flight controls or act as a remote pilot in command or visual observer in the operation of more than one unmanned aircraft at the same time.
+OPERATION NEAR AIRCRAFT
+RIGHT-OF-WAY RULES
+                           * All sUAS must yield the right of way to all aircraft
+                           * “See and Avoid”
+                           * The sUAS must give way to the aircraft or vehicle and may not pass over, under, or ahead of it unless well clear
+                           * No person may operate a sUA so to create a collision hazard
+OPERATION NEAR AIRCRAFT
+RIGHT-OF-WAY RULES
+                           * To comply with “ See & Avoid” requirements the RPIC must:
+                           * Fly the UA so that a manned aircraft pilot never needs to change their flight path to avoid collision
+                           * To avoid collision of people, property or manned aircraft the RPIC know their location and be aware of activity in the vicinity
+                           * Know the location and flight path or their UA at all times
+                           * OPERATING RULES 
+
+OPERATION OVER PEOPLE AND TRANSPORTATION OF PROPERTY
+OPERATION OVER PEOPLE
+                              * No person except in certain situations may operate a sUA over a person unless the person is:
+                              * Directly participating in the operation of the sUA;
+                              * Under a covered structure or inside a stationary vehicle that can provide reasonable protection from a falling sUA; 
+TRANSPORTATION OF PROPERTY
+                              * You may transport property under Part 107 if certain conditions are met:  
+                              * All operations of transportation of property are within one state
+                              * Operations must occur within a defined operating area and remain fully compliant with all Part 107 requirements.
+TRANSPORTATION OF PROPERTY
+                              * You may NOT transport property under Part 107 if in:  
+                              * The District of Columbia (DC) and another place in DC
+                              * It involves crossing state lines or certain territories (e.g., transport between islands in Hawaii if it passes through international airspace).
+                              * OPERATING RULES
+AUTONOMOUS FLIGHT
+AUTONOMOUS FLIGHT
+                                 * Autonomous flight means the drone can fly parts of its mission on its own using pre-programmed instructions such as flying a set route or automatically returning home if it loses signal.
+                                 * BUT under Part 107, autonomous does NOT mean the drone is on its own.
+                                 * The RPIC is still fully responsible for the flight at all times.
+AUTONOMOUS FLIGHT
+                                 * When performing an autonomous operation, the RPIC must have the ability to direct the sUA to ensure compliance with Part 107
+                                 * If the control link is lost, the aircraft may continue a programmed mission or return-to-home
+                                 * During autonomous flight, the RPIC must be able to command the aircraft to change route, altitude, or command it to land
+                                 * Control may be manual or via automation commands, as long as the RPIC can direct the aircraft.
+QUESTIONS AND COMMENTS
+Leave any questions or comments in the chat
+                                 * OPERATIONAL RULES 
+
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION 
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION
+                                    * Prior to flight, the RPIC is responsible for reviewing the operating environment & assessing any hazards that could affect persons or property on the surface or in the air
+                                    * Including:
+                                    * Local weather conditions;
+                                    * Local airspace and flight restrictions;
+                                    * The location of persons and property on the surface; and
+                                    * Other ground hazards
+OPERATION IN CERTAIN AIRSPACE
+                                    * Operations in Class B, Class C, or Class D airspace or within the lateral boundaries of the surface area of Class E airspace designated for an airport  are prohibited unless that person has prior authorization.
+                                    * A small drone cannot interfere with manned aircraft traffic patterns or operations at any airport, heliport, or seaplane base.
+                                    * Includes anything that causes manned aircraft to alter its flight path, delay taking off, delay landing, ect.
+OPERATION IN CERTAIN AIRSPACE
+                                    * No person may operate a sUA in prohibited or restricted areas unless that person has authorization from the using or controlling agency
+                                    * A NOTAM may be issued to establish a temporary flight restriction (TFR). 
+                                    * Notice identifies the affected area & explains the specific hazard or condition that makes the restriction necessary
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION
+                                    * RPIC should complete a preflight familiarization, inspection, and actions for aircraft operation
+                                    * Ensuring that all persons directly participating in the sUA operation are informed about:
+                                    * Weather, airspace restrictions, people/structures/landscape obstacles, ect.
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION
+                                    * Ensure that all persons directly participating in the sUA operation are informed about
+                                    * Operating conditions 
+                                    * Emergency procedures
+                                    * Contingency procedures 
+                                    * Roles and responsibilities 
+                                    * Potential hazards
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION
+                                    * Ensure that all control links between the control station and the sUA are working
+                                    * Ensure there is sufficient power for the sUA to operate for the intended time
+PREFLIGHT FAMILIARIZATION, INSPECTION, AND ACTIONS FOR AIRCRAFT OPERATION
+                                    * Ensure that any object attached or carried by the sUA is secure & does not adversely affect the flight characteristics or controllability
+                                    * Before flight, the RPIC must verify that the drone is certified or approved under the one of the approved categories (1-4)
+                                    * Ensure the necessary documentation is available if requested including RPIC’s certificate, registration, airworthiness certificate and Certificate of Waiver (if needed)
+OPERATING LIMITATIONS FOR SMALL UNMANNED AIRCRAFT
+                                    * Operating limitations when operating a sUAS:
+                                    * The groundspeed of the sUA may not exceed 87 knots (100 miles per hour).
+                                    * The altitude of the sUA cannot be higher than 400 feet above ground level (AGL), unless the sUA:
+                                    * Is flown within a 400-foot radius of a structure; and
+                                    * Does not fly higher than 400 feet above the structure's immediate uppermost limit
+OPERATING LIMITATIONS FOR SMALL UNMANNED AIRCRAFT
+                                    * Minimum flight visibility, as observed from the Control Station must be no less than 3 SM. 
+                                    * Defined as the average distance at which major unlit objects can be seen by day and major lighted objects can be seen by night.
+                                    * The minimum distance of the sUA from clouds must be no less than:
+                                    * 500 feet below the cloud; and
+                                    * 2,000 feet horizontally from the cloud
+                                    * Restrictions are waivable if you can explain how the operation can safely be piloted under the terms of a certificate of waiver
+QUESTIONS AND COMMENTS 
+WAIVERS
+WAIVERS
+                                    * A waiver is special permission from the FAA that allows you to break certain Part 107 rules but only if the FAA believes your operation will still be safe.
+                                    * The FAA may issue a Certificate of Waiver (COW) that lets you deviate from specific rules, but only if you show that your planned flight can be done safely.
+WAIVERS
+                                    * A request for a Certificate of Waiver (CoW) must contain a complete description of the proposed operation and justification that establishes that the operation can safely be conducted under the terms the waiver.
+WAIVERS
+Your waiver application must include:
+                                    * A complete description of what you want to do
+                                    * A safety justification explaining how you will keep the operation safe through equipment, technology and/or other strategies
+                                    * Even if your waiver is approved, the FAA can add additional requirements or limits to ensure safety
+                                    * You must follow every condition & limitation written in the waiver
+                                    * Failing to follow these conditions makes the operation illegal
+WAIVERS
+                                    * A certificate of waiver issued for the following:
+                                    * Operation from a moving vehicle or aircraft 
+                                    * No waiver of this provision will be issued to allow the carriage of property of another by aircraft for compensation or hire
+                                    * Visual Observer
+                                    * Visual line of sight aircraft operation
+                                    * No waiver of this provision will be issued to allow the carriage of property of another by aircraft for compensation or hire
+WAIVERS
+A certificate of waiver issued may be issued for the following:
+                                    * Daylight operations 
+                                    * Anti-collision light required for operations at night and during periods of civil twilight
+                                    * Operation of multiple small unmanned aircraft systems
+                                    * Yielding the right of way
+                                    * Operation over people
+                                    * Operation in certain airspace
+                                    * Operating limitations for small unmanned aircraft. 
+WAIVERS
+                                    * The Part 107 Waiver Application process has transitioned to a new system. 
+                                    * To access the new system and begin a waiver application go to https://aviationsafetyportal.faa.gov/
+                                    * Applicants, should submit requests at least 60 days prior to the proposed operation date.
+WAIVERS
+                                    * Requests submitted less than 60 days prior may not get processed in time to meet your proposed dates.
+                                    * Could result in a cancellation or a denial of the request. 
+                                    * Actual time to process can vary depending on complexity and completeness/accuracy of the application 
+                                    * Complete the application as soon as you know your date
+                                    * Airspace Authorizations are processed on a first come, first served basis.
+                                    * Processing times are shorter than airspace waivers
+WAIVERS
+                                    * Your lateness may result in the inability to conduct proposed operations.
+                                    * The FAA has a special system for emergencies - SGI waiver (Special Governmental Interest waiver) 
+                                    * Designed for public safety, first responders, & critical organizations
+WAIVERS
+                                    * If your operation requires you to fly in controlled airspace you must apply for airspace authorization
+                                    * Part 107 Remote Pilots must use FAA Drone Zone or a  Low Altitude Authorization and Notification Capability (LAANC) provider to obtain airspace authorization
+                                    * UA operators should not contact ATC directly by radio or phone
+                                    *  The main job of ATC is to keep aircraft safe. 
+                                    * Also helps make sure traffic moves safely and smoothly, and it supports national security and defense when needed
+QUESTIONS AND COMMENTS
+Put any questions or comments in the chat
+REMOTE ID, FLYING OVER PEOPLE AND MOVING OBJECTS, FLYING AT NIGHT
+REMOTE ID
+INTRODUCTION
+                                    * In April 2021 new rules related to Remote ID, flying over people and moving objects, and flying at night under certain conditions were introduced and as September 2023 they are mandatory except as stated in Part 89 in Title 14 of the Code of Federal Regulations.
+REMOTE ID
+                                    * No person may operate an UA in the US unless the operation meets the requirements 
+                                    * Remote ID for UA is like a digital license plate that broadcasts the drone's identity, location, altitude, and velocity while it's flying.
+                                    *  This allows authorities and the public to see who's flying, where they are, and if they're flying safely or in restricted areas, improving airspace safety and security. 
+REMOTE ID
+                                    * Mandatory as of September 16, 2023
+                                    * All drones require registration, including those flown for recreation, business, or public safety.
+                                    * Includes those that are less than 0.55 lbs
+REMOTE ID
+                                    * There are three ways drone pilots can meet the identification requirements of the Remote ID rule:
+                                    * Standard Remote ID UA
+                                    * UA with Remote ID Broadcast Module
+                                    * FAA-Recognized Identification Areas (FRIA)
+QUESTIONS
+Put any questions in the comments
+STANDARD REMOTE ID
+STANDARD REMOTE ID
+                                    * A Standard Remote ID drone is produced with built-in FAA Remote ID broadcast capabilities from takeoff to shutdown.
+                                    * New UA products with Standard Remote ID must meet all requirements.
+STANDARD REMOTE ID REQUIREMENTS PERFORMANCE REQUIREMENTS
+                                    *  The drone’s serial number must be FAA-accepted declaration of compliance
+                                    * The drone’s serial number must be linked to its FAA registration prior to operation
+                                    * Must self-test and not be able to takeoff if its remote ID is not functional.
+                                    * Must be fully functional for the entire flight - from takeoff to shutdown
+                                    * Land immediately if there is a problem with broadcasting
+STANDARD REMOTE ID PERFORMANCE
+REQUIREMENTS
+                                    * Its remote ID equipment and functionality have not been modified, blocked, or disabled; 
+                                    * It must broadcast the required information continuously over unlicensed Radio Frequency spectrum 
+                                    * Be designed to maximize the broadcast range
+                                    * Limited to VLOS
+STANDARD REMOTE ID 
+                                    * Standard Remote ID drones only need to broadcast the Remote ID signal directly from the aircraft.
+                                    * Remote ID will be available to personal wireless devices if in range by broadcasting its ID locally using Bluetooth Wi-Fi-type signals 
+                                    * UA should be designed to maximize the range of broadcast
+                                    * The FAA and law enforcement can request access to the information when needed
+STANDARD REMOTE ID
+                                    * Remote ID drone is produced with built-in FAA Remote ID broadcast capabilities from takeoff to shutdown.
+                                    * The Standard Remote ID drone broadcasts its:
+                                    * Remote ID Serial Number
+                                    * Location and Altitude
+                                    * Velocity
+                                    * Control Station Location and Elevation  
+                                    * Time Mark
+                                    * Emergency Status
+QUESTIONS
+Put any questions in the comments
+REMOTE ID BROADCAST MODULE
+REMOTE ID BROADCAST MODULE
+                                    * A broadcast module is a device that broadcasts identification and location information of the drone and take-off location
+                                    * Must be produced to meet the requirements before they can be used
+                                    * The broadcast module can be added to a drone to retrofit it with Remote ID capabilities. 
+                                    * If using a drone with a Remote ID broadcast module you must be able to see their drone at all times during flight VLOS.
+REMOTE ID BROADCAST MODULE
+                                    * The UA or the broadcast module must be fully functional for the entire flight - from takeoff to shutdown
+                                    * Must self-test and not be able to takeoff if its remote ID is not functional.
+                                    * Land immediately if there is a problem with broadcasting
+REMOTE ID BROADCAST MODULE
+                                    * The broadcast module serial number must be included with the registration of the UA
+                                    * From takeoff to shutdown the Remote ID module will broadcast: 
+                                    * Drone ID - serial number
+                                    * Location and Altitude
+                                    * Velocity
+                                    * Takeoff location and elevation
+                                    * Time mark
+REMOTE ID BROADCAST MODULE
+                                    * Drone broadcasts remote ID information via radio frequency (Wi-Fi & Bluetooth)
+                                    * The broadcast range is comparable to that of a Standard Remote ID UA
+QUESTIONS
+Put any questions in the comments
+FAA-RECOGNIZED IDENTIFICATION AREAS (FRIA)
+FAA-RECOGNIZED IDENTIFICATION AREAS - FRIA
+                                    * Geographic area where drones can fly if they don’t have Remote ID
+                                    * Drone & the pilot must be located within the FRIA's boundaries; and
+                                    * Be within VLOS throughout the flight
+                                    * FRIAs - only locations where drones may operate without broadcasting Remote ID.
+                                    * Only FAA-recognized Community Based Organizations (CBOs) and educational institutions are eligible to request a FRIA
+                                    * Primary & secondary schools, trade schools, colleges, and universities.
+FAA-RECOGNIZED IDENTIFICATION AREAS - FRIA
+                                    * FRIA will be in effect for 48 calendar months after the approval date from the FAA
+                                    * To  renew - must submit a request no later than 120 days prior to the expiration date. 
+                                    * The FAA may terminate a FRIA if the application had false information or if the area poses a risk to aviation or public safety, homeland or national security
+                                    * ALTERNATIVE REMOTE IDENTIFICATION
+ALTERNATIVE REMOTE IDENTIFICATION
+                                    * The Administrator may authorize operations without remote ID if for of aeronautical research or to show compliance with regulations.
+                                    * Automatic Dependent Surveillance-Broadcast (ADS-B) Out equipment cannot be used to comply with the remote identification requirements of this part
+                                    * Cannot fly a foreign-registered drone with Remote ID in U.S.  unless you submit a Notice of Identification to the FAA.
+QUESTIONS AND COMMENTS
+Put any questions or comments in the chat
+FLYING OVER PEOPLE AND MOVING OBJECTS
+FLYING OVER PEOPLE & MOVING OBJECTS
+                                    * On April 21, 2021 Part 107 was amended permitting operations of sUA over people, moving vehicles, and at night under certain conditions
+                                    * The rule eliminated the need for typical operations to receive certificate of waivers from the FAA.
+MEANS OF COMPLIANCE (MOC)
+                                    * A Means of Compliance (MoC) is the FAA-approved method a drone manufacturer uses to show their drone meets the Remote ID performance requirements  14 CFR Part 89 (Remote ID)
+                                    * Safety requirements related to exposed rotating parts, impact kinetic energy limit and any safety defects
+MEANS OF COMPLIANCE (MOC)
+                                    * There are 3 types of MoC 
+                                    * FAA-Provided MoC 
+                                    * FAA-Accepted / FAA-Approved MoC - submitted to the FAA, and accepted if they meet the performance requirements.
+                                    * Custom MoC - developed by applicants & approved if they demonstrate compliance 
+DECLARATION OF COMPLIANCE (DOC)
+Submitter must:
+                                    * Have proof that the drone or broadcast module meets an FAA-accepted Means of Compliance (MoC)
+                                    * Have a process to notify the public and the FAA about unsafe conditions that make the aircraft non-compliant.
+                                    * Allow FAA to perform inspections, facility access, & access to records
+DECLARATION OF COMPLIANCE (DOC)
+Submitter must:
+                                    * Confirmation that the aircraft has no safety defects
+                                    * Main records directly relate to the aircraft’s Declaration of Compliance DoC for 2 years to show continued compliance.
+                                    * Maintain data for custom MoC as long as MoC is accepted
+QUESTIONS
+Put any questions in the comments
+FLYING OVER PEOPLE AND MOVING OBJECTS - CATAGORIES
+FLYING OVER PEOPLE & MOVING OBJECTS
+There are 4 categories related to eligibility
+Category 1 UA
+                                    * Weigh 0.55 lbs (250 g) or less, including everything attached at takeoff
+                                    * Have no exposed rotating parts that could cut human skin
+                                    * No Declaration of Compliance (DoC) or Means of Compliance (MoC) is required
+FLYING OVER PEOPLE & MOVING OBJECTS
+Category 2 UA
+                                    * Must not cause injury exceeding 11 ft-lb of kinetic energy
+                                    * Must have no exposed rotating parts that could cut human skin
+                                    * Must have no safety defects
+                                    * Must be listed on an FAA-accepted DoC & MoC
+                                    * Must display labeling for Category 2 eligibility & have manufacturing instructions
+FLYING OVER PEOPLE & MOVING OBJECTS
+                                    * Category 3 UA
+                                    * Must not cause injury exceeding 25 ft-lb of kinetic energy
+                                    * Must have no exposed rotating parts that could cut human skin
+                                    * Must have no safety defects
+                                    * Must display labeling for Category 3 eligibility and come with manufacture instructions
+                                    * Requires both MoC and DoC acceptance.
+FLYING OVER PEOPLE & MOVING OBJECTS
+Category 4 UA
+                                    * Have an FAA Airworthiness Certificate under Part 21
+                                    * Be operated within its Flight Manual operating limitations
+                                    * The Flight Manual (or FAA-specified limitations) must not prohibit operation over people.
+                                    * Undergo required maintenance, inspection, and recordkeeping
+FLYING OVER PEOPLE & MOVING OBJECTS
+                                    * You cannot fly a Category 1, 2, or 4 drone in sustained flight over a crowd unless the drone is broadcasting Remote ID (either built-in Standard Remote ID or a Remote ID Broadcast Module).
+                                    * Sustained flight - means hovering, circling, or repeatedly flying over the same group of people.
+                                    * An open-air assembly - a big crowd of people gathered closely together. – generally 15–20 people.
+FLYING OVER PEOPLE & MOVING OBJECTS
+Category 3 UA
+                                    * CAN’T fly a Category 3 drone over crowds or open-air assemblies UNLESS two conditions are met:
+                                    * You are inside a closed/restricted area, and everyone inside knows a drone will be overhead; or
+                                    * You do not hover, circle, or stay above anyone (no sustained flight) unless they are part of the operation 
+                                    * Inside a vehicle or under a covered structure that will provide protection is ok
+FLYING OVER PEOPLE & MOVING OBJECTS
+Category 1, 2, & 3
+May operate a sUA over a human being located inside a moving vehicle if  the following conditions are met:
+                                    * The UA must remain within or over a closed- or restricted-access site, and all human beings located inside a moving vehicle at that site must be on notice that a sUA may fly over them; 
+                                    * Must not maintain sustained flight over moving vehicles (hovering, circling, flying back and forth) 
+                                    * Passing over briefly/ in transit only
+FLYING OVER PEOPLE & MOVING OBJECTS
+                                    * Category 4: The sUA must: 
+                                    * Have an airworthiness certificate issued under part 21
+                                    * Be operated in accordance with the operating limitations specified in the approved Flight Manual 
+                                    * The operating limitations must not prohibit operations over human beings located inside moving vehicles.
+QUESTIONS
+Put any questions in the comments
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * As of April 21, 2021, flying at night without a waiver is allowed under two conditions:
+                                    * The remote pilot in command must complete an updated initial knowledge test or online recurrent training, and
+                                    * The small unmanned aircraft must have lighted anti-collision lighting visible for at least three (3) statute miles that has a flash rate sufficient to avoid a collision
+                                    * Anti-collision light intensity can be dimmed for safety reasons
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * You must still maintain Visual Line of Sight (VLOS)
+                                    * May need additional lighting on the ground
+                                    * If flying at night in controlled airspace, you still need airspace authorization
+                                    * No waiver required unless you cannot meet the rule
+                                    * All other rules for flying over people still apply when flying at night
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * Flying at night can cause hazards that are not present or as noticeable during the day.
+                                    * May struggle to see the drone, its orientation, obstacles, wildlife, and other aircraft
+                                    * Affects depth perception
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+Lighting Difficulty Challenges:
+                                    * Avoid looking at bright lights
+                                    * Use required anti-collision lights
+                                    * Choose flight locations away from cluttered lighting, use high-intensity, strobe-style anti-collision lights
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+Lighting Difficulty Challenges:
+                                    * Check ground lighting & use extra especially near landing pad
+                                    * Shift your gaze 5–10° off center to avoid the night-blind spot
+                                    * Fly closer & lower than daytime operations
+                                    * Check out the area during the day before the night operation
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * Harder to Maintain Visual Line of Sight (VLOS) Challenge
+                                    * Use multiple VOs or a VO trained on night-ops procedures, keep the drone lit and within VLOS
+                                    * Depth Perception & Situational Awareness Decrease
+                                    * Slow down your flight speed.
+                                    * Increase standoff distances from objects.
+                                    * Keep the aircraft within a shorter radius.
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * Circadian Rhythm Effects Challenge
+                                    * Avoid hypoglycemia, exhaustion, ect.
+                                    * Battery Performance Can Be Affected by Cold Night Air
+                                    * Start with fully warmed batteries, reduce aggressive maneuvers, shorten flight times and monitor battery more frequently
+FLYING AT NIGHT UNDER CERTAIN CONDITIONS
+                                    * Loss of Orientation of the Drone
+                                    * Use bright position lighting (different colors on different arms)
+                                    * Keep the drone in a predictable flight pattern
+                                    * Avoid rotating the drone unless necessary
+                                    * Use common sense – land immediately
+QUESTIONS
+Put any questions in the comments

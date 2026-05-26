@@ -2,6 +2,7 @@
 
 import { ContentBlock } from '@/app/lib/types/article';
 import { prepareArticleBodyHtml } from '@/app/lib/article-html';
+import { ARTICLE_PROSE_BODY_CLASS } from '@/app/lib/article-prose';
 import ImageComponent from './image';
 import VideoComponent from './video';
 
@@ -24,22 +25,27 @@ function ContentBlockItem({ block }: { block: ContentBlock }) {
         case 'text':
             return (
                 <div
-                    className="prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)] prose-headings:text-[var(--brand-foreground)] prose-a:text-[var(--brand-primary)] overflow-hidden break-words [&_figure]:my-8 [&_figure]:max-w-full [&_svg]:block [&_svg]:h-auto [&_svg]:max-w-full [&_figcaption]:text-sm [&_figcaption]:text-[var(--brand-muted)]"
+                    className={ARTICLE_PROSE_BODY_CLASS}
                     dangerouslySetInnerHTML={{ __html: prepareArticleBodyHtml(block.content) }}
                 />
             );
 
         case 'image':
             return (
-                <figure>
-                    <ImageComponent
-                        src={block.content}
-                        alt={block.alt || ''}
-                        width={1200}
-                        height={675}
-                        className="w-full object-cover"
+                <figure className="my-0">
+                    <div
+                        className="flex justify-center max-h-[70vh] overflow-hidden bg-[var(--background)]"
                         style={{ borderRadius: 'var(--radius-md)' }}
-                    />
+                    >
+                        <ImageComponent
+                            src={block.content}
+                            alt={block.alt || ''}
+                            width={1200}
+                            height={675}
+                            className="w-full h-auto max-h-[70vh] object-contain"
+                            style={{ borderRadius: 'var(--radius-md)' }}
+                        />
+                    </div>
                     {block.caption && (
                         <figcaption className="mt-2 text-xs text-center text-[var(--brand-muted)] font-mono">
                             {block.caption}
