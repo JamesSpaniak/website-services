@@ -34,9 +34,9 @@ export default function ArticlesPage() {
     <PageShell
       title="Articles"
       subtitle="Drone technology, regulations, and practice."
-      maxWidthClass="max-w-4xl"
+      maxWidthClass="max-w-6xl"
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
           <ArticlePreviewComponent key={article.id} article={article} />
         ))}

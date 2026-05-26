@@ -2,6 +2,8 @@
 
 import { ArticleFull } from '@/app/lib/types/article';
 import { prepareArticleBodyHtml } from '@/app/lib/article-html';
+import { articleHeroSrc } from '@/app/lib/article-images';
+import { ARTICLE_PROSE_BODY_CLASS } from '@/app/lib/article-prose';
 import ImageComponent from './image';
 import ContentBlockRenderer from './content-block-renderer';
 import JsonLd, { articleJsonLd } from './json-ld';
@@ -29,24 +31,26 @@ export default function ArticleComponent({ article }: ArticleProps) {
           {article.sub_heading && <p className="mt-4 text-[var(--brand-muted)] leading-relaxed">{article.sub_heading}</p>}
         </header>
         <div className="mt-10">
-          {article.image_url && (
-            <div className="my-8">
-              <ImageComponent
-                src={article.image_url}
-                alt={article.title}
-                width={1200}
-                height={675}
-                className="w-full aspect-video object-cover"
-                style={{ borderRadius: 'var(--radius-md)' }}
-              />
-            </div>
-          )}
+          <div
+            className="my-8 flex justify-center max-h-[70vh] overflow-hidden bg-[var(--background)]"
+            style={{ borderRadius: 'var(--radius-md)' }}
+          >
+            <ImageComponent
+              src={articleHeroSrc(article.image_url)}
+              alt={article.title}
+              width={1200}
+              height={675}
+              className="w-full h-auto max-h-[70vh] object-contain"
+              style={{ borderRadius: 'var(--radius-md)' }}
+              fallbackSrc={articleHeroSrc(null)}
+            />
+          </div>
 
           {hasContentBlocks ? (
             <ContentBlockRenderer blocks={article.content_blocks!} />
           ) : (
             <div
-              className="prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)] prose-headings:text-[var(--brand-foreground)] prose-a:text-[var(--brand-primary)] prose-img:rounded overflow-hidden break-words [&_figure]:my-8 [&_figure]:max-w-full [&_svg]:block [&_svg]:h-auto [&_svg]:max-w-full [&_figcaption]:text-sm [&_figcaption]:text-[var(--brand-muted)]"
+              className={ARTICLE_PROSE_BODY_CLASS}
               style={{ ['--tw-prose-links' as string]: 'var(--brand-primary)' }}
               dangerouslySetInnerHTML={{ __html: bodyHtml }}
             />

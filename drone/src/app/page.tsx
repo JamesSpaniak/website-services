@@ -6,6 +6,7 @@ import ImageComponent from './ui/components/image';
 import HeroScrollNext from './ui/components/hero-scroll-next';
 import { ArrowRightIcon, AcademicCapIcon, FilmIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 import { ArticleSlim } from './lib/types/article';
+import ArticlePreviewComponent from './ui/components/article-preview';
 
 // ── Server-side data ──────────────────────────────────────────────────────────
 
@@ -236,41 +237,18 @@ export default async function Home() {
           </div>
 
           {recentArticles.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {recentArticles.map((article) => (
-                <Link
+                <ArticlePreviewComponent
                   key={article.id}
-                  href={`/articles/${article.id}`}
-                  className="group flex flex-col gap-3 border border-[var(--surface-border)] bg-[var(--background)] p-5 hover:border-[var(--brand-primary)]/50 transition-colors ring-focus touch-manipulation"
-                  style={{ borderRadius: 'var(--radius-md)' }}
-                >
-                  <p className="font-mono text-xs tracking-wide text-[var(--brand-muted)]">
-                    <time dateTime={new Date(article.submitted_at).toISOString()}>
-                      {new Date(article.submitted_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  </p>
-                  <h3 className="text-base font-display font-semibold tracking-tight text-[var(--brand-foreground)] group-hover:text-[var(--brand-primary)] transition-colors leading-snug">
-                    {article.title}
-                  </h3>
-                  {article.sub_heading && (
-                    <p className="text-sm text-[var(--brand-muted)] leading-relaxed line-clamp-2">
-                      {article.sub_heading}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-1 text-xs font-medium text-[var(--brand-primary)] mt-auto pt-1">
-                    Read article
-                    <ArrowRightIcon className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
+                  article={article}
+                  cardTone="background"
+                />
               ))}
             </div>
           ) : (
             /* Fallback when API is unreachable — static teaser cards */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
                 {
                   title: 'Understanding FAA Airspace Classifications',

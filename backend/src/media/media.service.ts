@@ -12,7 +12,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { MediaFolder } from './types/media.dto';
 
 const MAX_BYTES: Record<MediaFolder, number> = {
@@ -56,7 +56,7 @@ export class MediaService {
         maxBytes?: number,
     ): Promise<{ uploadUrl: string; publicUrl: string; key: string }> {
         const ext = filename.substring(filename.lastIndexOf('.'));
-        const uniqueName = `${uuidv4()}${ext}`;
+        const uniqueName = `${randomUUID()}${ext}`;
         const keyParts = [folder, subfolder, uniqueName].filter(Boolean);
         const key = keyParts.join('/');
 
@@ -91,7 +91,7 @@ export class MediaService {
         subfolder?: string,
     ): Promise<{ uploadId: string; key: string; publicUrl: string }> {
         const ext = filename.substring(filename.lastIndexOf('.'));
-        const uniqueName = `${uuidv4()}${ext}`;
+        const uniqueName = `${randomUUID()}${ext}`;
         const key = [folder, subfolder, uniqueName].filter(Boolean).join('/');
 
         const { UploadId } = await this.s3Client.send(
@@ -205,7 +205,7 @@ export class MediaService {
                 new CreateInvalidationCommand({
                     DistributionId: this.cloudfrontDistributionId,
                     InvalidationBatch: {
-                        CallerReference: `${Date.now()}-${uuidv4().slice(0, 8)}`,
+                        CallerReference: `${Date.now()}-${randomUUID().slice(0, 8)}`,
                         Paths: { Quantity: paths.length, Items: paths },
                     },
                 }),
