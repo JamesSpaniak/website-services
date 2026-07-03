@@ -1284,7 +1284,7 @@
                     "id": 78,
                     "title": "BALANCE AND CENTER OF GRAVITY (CG) - RPIC Management",
                     "description": "Explain at the Center of Gravity (CG) is dynamic and outlines the RPIC's responsibility to manage CG shifts to ensure it remains within allowable limits, especially when adding payloads.",
-                    "text_content": "CG is not fixed; depends on weight distribution.\nPosition shifts as loads move or are used, ex: luggage, fuel or people.\nRPIC must:\n- Determine CG shift and its effect.\n- Ensure CG remains within allowable limits or relocate or shed weight before flight.\n- If adding additional cameras or sensors – need to check proper loading.",
+                    "text_content": "CG is not fixed; depends on weight distribution.\nPosition shifts as loads move or are used, ex: fuel.\nRPIC must:\n- Determine CG shift and its effect.\n- Ensure CG remains within allowable limits or relocate or shed weight before flight.\n- If adding additional cameras or sensors – need to check proper loading.",
                     "video_url": null,
                     "status": "NOT_STARTED",
                     "sub_units": []
@@ -1392,7 +1392,7 @@
                     "id": 720,
                     "title": "LOAD FACTOR VS BANK ANGLE - Rapid Increase",
                     "description": "Describe the non-linear relationship between bank angle and load factor, noting the significant increase beyond 45° and the corresponding increase in required lift and stall speed.",
-                    "text_content": "Load factor increases rapidly beyond a 45°–50° bank, and stall speed increases significantly.\nExamples:\n- 60° bank → 2 Gs\n- 80° bank → 5.76 Gs\nWing must produce lift equal to these load factors to maintain altitude.\nThis chart is in the testing supplement you will have during the test. The wing must produce lift equal to these load factors if altitude is to be maintained.",
+                    "text_content": "Load factor increases rapidly beyond a 45°–50° bank, and stall speed increases significantly.\nExamples:\n- 60° bank → 2 Gs\n- 80° bank → 5.76 Gs\nWing must produce lift equal to these load factors to maintain altitude.\nThis chart is in the testing supplement you will have during the test. Explain how the load factor increases at a significant rate after a bank has reached 45° or 50°. The wing must produce lift equal to these load factors if altitude is to be maintained. Show example with a paper airplane or your drone.",
                     "video_url": null,
                     "status": "NOT_STARTED",
                     "sub_units": []
@@ -1701,6 +1701,136 @@
                     "text_content": "Overview: A comprehensive guide to sUAS maintenance and inspection, detailing Part 107 regulations, the scope of maintenance, the need for a self-developed program (if needed), and the RPIC's ultimate responsibility.\n\nPart 107 Requirements\\n\\n   (14 CFR) Part 107 requires all sUAS operators to make certain their drone is safe for operation.\\n   sUAS maintenance includes scheduled and unscheduled maintenance, repair, inspection, modification, replacement, and system software upgrades of the sUAS and all of its components.\\n   The operator should maintain the sUAS and its components in accordance with manufacturer’s instructions.\\n   The RPIC must verify the sUAS is safe prior to flying, even if someone else did the maintenance.\\n   Operators should complete the repairs based on the manufacture's recommendations.\\n   Some manufacturers require the person completing the repairs to be certified.\\n\\n### Self-Developed Program\\n\\n   Based on FAA guidance in AC 107‑2A, if the manufacturer does not provide a maintenance program, you should create a self-developed program.\\n   The program should cover:\\n       Scheduled inspections\\n       Replacement intervals (propellers, motors, batteries, etc.)\\n       System/firmware updates (drone and its components)\\n       Recordkeeping of all maintenance performed\\n       Cleaning procedures\\n   Maintenance should be done by qualified personnel.\\n   All maintenance should be documented – keep a log.\\n   If other team members complete the UA maintenance, the RPIC is still responsible and should verify it was done correctly before flight.",
                     "status": "NOT_STARTED",
                     "sub_units": []
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "title": "RADIO COMMUNICATION PROCEDURES",
+            "sub_title": "",
+            "description": "Understand radio communication in the National Airspace System, standard phraseology and the phonetic alphabet, CTAF and advisory frequencies, and recommended practices for remote pilots operating near airports — without transmitting unless it is an emergency.",
+            "text_content": "Radio communication is critical for safe aircraft operations in the National Airspace System (NAS). Although remote pilots are not required to communicate on aviation frequencies, they should understand traffic patterns, radio behavior of manned aircraft, and standard phraseology. Do NOT transmit on aviation frequencies unless it is an emergency.",
+            "video_url": null,
+            "status": "NOT_STARTED",
+            "sub_units": [
+                {
+                    "id": 101,
+                    "title": "Radio Communication in the NAS",
+                    "description": "Explain why radio communication matters in the NAS and how pilots use radios before, during, and after flight.",
+                    "text_content": "Radio communication is critical for safe aircraft operations in the National Airspace System (NAS).\n\nPilots use radios to:\n- Give and receive information before, during, and after flight\n- Communicate safety issues such as unexpected weather or inflight emergencies",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 102,
+                    "title": "Understanding Proper Radio Procedures",
+                    "description": "Apply AIM phraseology standards and the phonetic alphabet to interpret manned-aircraft communications near your operation.",
+                    "text_content": "Proper radio phraseology improves safety and efficiency.\n\nThe AIM Pilot/Controller Glossary provides standard terminology and examples of proper radio transmissions.\n\nThe phonetic alphabet is used for aircraft identification (e.g., \"Alpha, Bravo, Charlie\"). Do not make up your own words to denote the letters.\n\nKnowing this helps remote pilots understand manned-aircraft communications around them.\n\nMonitoring radio frequencies of local tower may be a requirement of airspace authorization.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 103,
+                    "title": "Phonetic Alphabet",
+                    "description": "Recall the ICAO phonetic alphabet used for aircraft identification and radio communications.",
+                    "text_content": "Phonetic alphabet letters used in radio communications:\n\nAlpha, Bravo, Charlie, Delta, Echo, Foxtrot, Golf, Hotel, India, Juliet, Kilo, Lima, Mike, November, Oscar, Papa, Quebec, Romeo, Sierra, Tango, Uniform, Victor, Whiskey, X-ray, Yankee, Zulu",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 104,
+                    "title": "Common Traffic Advisory Frequency (CTAF)",
+                    "description": "Define CTAF, identify what services may provide it, and explain when remote pilots should monitor it.",
+                    "text_content": "CTAF — Common Traffic Advisory Frequency.\n\nUsed to conduct airport advisory practices at non-towered airports. Monitor if working near a non-towered airport.\n\nCTAF may be:\n- UNICOM\n- MULTICOM\n- FSS\n- Tower frequency (when Tower is closed)",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 105,
+                    "title": "Communication Frequencies and Chart Supplements",
+                    "description": "Use Chart Supplement U.S. and sectional charts to find communication frequencies and understand remote pilot monitoring responsibilities.",
+                    "text_content": "Example communication frequency information appears in Chart Supplements U.S.\n\nAlthough remote pilots are not required to communicate, they should understand:\n- Traffic patterns\n- Radio behavior of manned aircraft\n- Standard phraseology\n\nDo NOT transmit on aviation frequencies unless it is an emergency.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 106,
+                    "title": "Recommended Traffic Advisory Practices for Remote Pilots",
+                    "description": "Navigate advisory frequency types and recommended self-announce practices when operating near non-towered airports.",
+                    "text_content": "This section covers recommended communications practices near non-towered airports, including UNICOM, MULTICOM, and Flight Service Station (FSS) advisory services.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 1061,
+                            "title": "Recommended Communications Practices",
+                            "description": "Apply recommended frequency checks and traffic awareness when operating near non-towered airports.",
+                            "text_content": "When flying within 5 miles of a non-towered airport, check appropriate frequencies on the Chart Supplement and sectional charts for the area.\n\nPilots must be alert and look for other traffic when operating near an airport without an operating control tower.\n\nCTAF is a radio frequency used for making airport advisory communications.\n\nIt may be provided by UNICOM, MULTICOM, a Flight Service Station (FSS), or a control tower frequency.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 1062,
+                            "title": "UNICOM",
+                            "description": "Describe UNICOM services, the standard frequency, and how UNICOM advisories differ from ATC instructions.",
+                            "text_content": "UNICOM is a non-government radio station used at airports without a control tower or FSS, or at a full-time or part-time UNICOM station.\n\n122.8 is the frequency.\n\nGives airport advisory information when pilots request it, including:\n- Runway in use\n- Local weather observations\n- Airport conditions\n\nUNICOM advisories are not ATC instructions — pilots still self-announce and maintain traffic awareness.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 1063,
+                            "title": "MULTICOM",
+                            "description": "Explain when and how pilots use the MULTICOM frequency for self-announce at non-towered airports.",
+                            "text_content": "At non-towered airports without a UNICOM, or any other listed frequency, pilots should use the MULTICOM frequency of 122.9 to self-announce.\n\nAt airports lacking air traffic control, pilots use the MULTICOM frequency as a CTAF to self-announce their intentions.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        },
+                        {
+                            "id": 1064,
+                            "title": "Flight Service Station (FSS)",
+                            "description": "Distinguish FSS preflight and in-flight services from ATC clearances.",
+                            "text_content": "Flight Service Station (FSS) is an air traffic facility providing pilots with preflight and in-flight services, such as:\n- Weather briefings\n- Flight plan processing\n- Search and rescue initiation\n- NOTAM updates\n\nUnlike Air Traffic Control (ATC), FSS does not issue clearances.",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
+                },
+                {
+                    "id": 107,
+                    "title": "Aircraft Call Signs and Identification",
+                    "description": "Interpret U.S. aircraft registration call signs and naming conventions for light GA, turboprop/jet, and airline operations.",
+                    "text_content": "U.S. aircraft have unique \"N\" registration numbers (e.g., N123AB).\n\nPronounced using the phonetic alphabet (e.g., November One-Two-Three-Alpha-Bravo).\n\nLight GA aircraft: use manufacturer name.\nExample: Cessna 172 → \"Cessna One-Two-Three-Alpha-Bravo\"\n\nLarger aircraft (turbo-prop/jet): use model name.\nExample: Citation → \"Citation One-Two-Three-Alpha-Bravo\"\n\nAirliners: use company name + flight number.\nExample: Southwest 711 → \"Southwest Seven-One-One\"\n\nSome airlines use special call signs.\nExample: British Airways → \"Speedbird\"",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": []
+                },
+                {
+                    "id": 108,
+                    "title": "Standard Radio Calls for Incoming Aircraft",
+                    "description": "Recognize standard self-announce radio calls used by manned aircraft at non-towered airports.",
+                    "text_content": "Standard radio calls help pilots at non-towered airports coordinate traffic. The initial 10-mile call is a common inbound announcement format.",
+                    "video_url": null,
+                    "status": "NOT_STARTED",
+                    "sub_units": [
+                        {
+                            "id": 1081,
+                            "title": "Initial 10-Mile Call",
+                            "description": "Recognize the standard format for an initial 10-mile inbound call at a non-towered airport.",
+                            "text_content": "Example:\n\"Town and Country traffic, Cessna 123 Bravo Foxtrot is 10 miles south inbound for landing, Town and Country traffic.\"",
+                            "video_url": null,
+                            "status": "NOT_STARTED",
+                            "sub_units": []
+                        }
+                    ]
                 }
             ]
         }

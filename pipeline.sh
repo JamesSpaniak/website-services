@@ -233,10 +233,48 @@ fi
 # ─── ECS deploy + wait ──────────────────────────────────────────────────────────
 
 ecs_force_deploy() {
-  local cluster="$1" service="$2" image="$3"
+  local cluster="$1" service="$2" image="$3" container_name="$4"
+  local current_td_arn td_json register_input new_td_arn
+
+  current_td_arn="$(aws ecs describe-services --cluster "${cluster}" --services "${service}" \
+    --region "${AWS_REGION}" --query 'services[0].taskDefinition' --output text)"
+
+  td_json="$(aws ecs describe-task-definition --task-definition "${current_td_arn}" \
+    --region "${AWS_REGION}" --query 'taskDefinition' --output json)"
+
+  register_input="$(mktemp)"
+
+  CONTAINER_NAME="${container_name}" IMAGE_URI="${image}" python3 -c '
+import json, os, sys
+td = json.load(sys.stdin)
+container_name = os.environ["CONTAINER_NAME"]
+image_uri = os.environ["IMAGE_URI"]
+updated = False
+for container in td["containerDefinitions"]:
+    if container["name"] == container_name:
+        container["image"] = image_uri
+        updated = True
+        break
+if not updated:
+    sys.exit(f"container {container_name!r} not found in task definition")
+for key in (
+    "taskDefinitionArn", "revision", "status", "requiresAttributes",
+    "compatibilities", "registeredAt", "registeredBy",
+):
+    td.pop(key, None)
+with open(sys.argv[1], "w", encoding="utf-8") as fh:
+    json.dump(td, fh)
+' "${register_input}" <<<"${td_json}"
+
+  new_td_arn="$(aws ecs register-task-definition --cli-input-json "file://${register_input}" \
+    --region "${AWS_REGION}" --query 'taskDefinition.taskDefinitionArn' --output text)"
+  rm -f "${register_input}"
+
   aws ecs update-service --cluster "${cluster}" --service "${service}" \
-    --force-new-deployment --region "${AWS_REGION}" >/dev/null
-  echo "Deploy triggered: ${service} with ${image}"
+    --task-definition "${new_td_arn}" --force-new-deployment \
+    --region "${AWS_REGION}" >/dev/null
+
+  echo "Deploy triggered: ${service} with ${image} (${new_td_arn})"
 }
 
 wait_for_service_stable() {
@@ -271,8 +309,8 @@ wait_for_service_stable() {
 }
 
 if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
-  [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"
-  [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}"
+  [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"  "${BACKEND_CONTAINER_NAME}"
+  [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}"
   [[ "${BUILD_BACKEND}" == "true" ]]  && wait_for_service_stable "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && wait_for_service_stable "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}"
 
