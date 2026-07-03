@@ -106,10 +106,12 @@ export interface SectionBreakdown {
   failed_standards: string[];
 }
 
+/**
+ * The API never returns the answer key (correct_choice_id / explanation) —
+ * retries are unlimited, so students only learn which answers were wrong.
+ */
 export interface ScoredAnswer extends SubmitExamAnswer {
   is_correct: boolean;
-  correct_choice_id?: number;
-  explanation?: string | null;
 }
 
 export interface ExamAttemptResult {

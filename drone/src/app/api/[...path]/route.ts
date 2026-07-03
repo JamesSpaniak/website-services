@@ -36,6 +36,17 @@ const handler = async (req: NextRequest) => {
   const responseHeaders = new Headers(response.headers);
   responseHeaders.delete('content-encoding');
 
+  // new Headers() folds multiple Set-Cookie headers into one comma-joined
+  // value, which browsers can't parse. Re-append each cookie individually so
+  // the backend's HttpOnly auth cookies survive the proxy hop.
+  const setCookies = response.headers.getSetCookie();
+  if (setCookies.length > 0) {
+    responseHeaders.delete('set-cookie');
+    for (const cookie of setCookies) {
+      responseHeaders.append('set-cookie', cookie);
+    }
+  }
+
   return new NextResponse(response.body, {
     status: response.status,
     headers: responseHeaders,

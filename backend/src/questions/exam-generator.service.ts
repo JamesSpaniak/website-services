@@ -35,6 +35,9 @@ export class ExamGeneratorService {
     // Reuse the most recent unattempted exam for this user+scope+pool
     // to avoid creating orphan rows when the student spams "Start"
     if (dto.is_randomized !== false) {
+      // Set equality (mutual containment) so a pending exam for one unit is
+      // never returned for a request that covers different units.
+      const scopeIds = (dto.scope_ids ?? []).slice().sort((a, b) => a - b);
       const recent = await this.examRepository
         .createQueryBuilder('e')
         .leftJoin('exam_attempts', 'ea', 'ea.exam_id = e.id AND ea.user_id = :uid', { uid: userId })
@@ -43,6 +46,7 @@ export class ExamGeneratorService {
         .andWhere('e.scope = :scope', { scope: dto.scope })
         .andWhere('e.exam_pool = :pool', { pool: this.resolveExamPool(dto) })
         .andWhere('e.generated_by = :gb', { gb: 'student' })
+        .andWhere('e.scope_ids <@ :ids::int[] AND e.scope_ids @> :ids::int[]', { ids: scopeIds })
         .andWhere('ea.id IS NULL')
         .orderBy('e.created_at', 'DESC')
         .getOne();

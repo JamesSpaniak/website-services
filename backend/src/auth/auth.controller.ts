@@ -1,4 +1,5 @@
-import { Controller, Post, UseGuards, Request, Get, Body, UseInterceptors, ClassSerializerInterceptor, NotFoundException, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Res, Get, Body, UseInterceptors, ClassSerializerInterceptor, NotFoundException, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/user.service';
 import { OrganizationService } from '../organizations/organization.service';
@@ -15,6 +16,22 @@ import { RegisterDto } from './types/register.dto';
 import { VerifyEmailDto } from './types/verify-email.dto';
 import { AnalyticsService } from '../analytics/analytics.service';
 
+/** Auth cookies are HttpOnly so tokens are unreachable from page JavaScript (XSS). */
+export const ACCESS_TOKEN_COOKIE = 'access_token';
+export const REFRESH_TOKEN_COOKIE = 'refresh_token';
+
+const ACCESS_TOKEN_MAX_AGE_MS = 60 * 60 * 1000; // 1h — matches JWT_EXPIRES_IN
+const REFRESH_TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30d
+
+// Path is '/' (not '/auth') because the browser reaches the API through the
+// Next proxy under /api/*, so a backend-relative path would never match.
+const baseCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+});
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -25,24 +42,46 @@ export class AuthController {
     private analyticsService: AnalyticsService,
   ) {}
 
+  private setAuthCookies(res: Response, tokens: { access_token: string; refresh_token: string }) {
+    res.cookie(ACCESS_TOKEN_COOKIE, tokens.access_token, {
+      ...baseCookieOptions(),
+      maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+    });
+    res.cookie(REFRESH_TOKEN_COOKIE, tokens.refresh_token, {
+      ...baseCookieOptions(),
+      maxAge: REFRESH_TOKEN_MAX_AGE_MS,
+    });
+  }
+
+  private clearAuthCookies(res: Response) {
+    res.clearCookie(ACCESS_TOKEN_COOKIE, baseCookieOptions());
+    res.clearCookie(REFRESH_TOKEN_COOKIE, baseCookieOptions());
+  }
+
   @ApiOperation({ summary: 'Log in a user', description: 'Authenticates a user and returns tokens and user profile.' })
   @ApiResponse({ status: 200, description: 'Login successful.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginCredentialsDto: LoginCredentialsDto) {
+  async login(
+    @Body() loginCredentialsDto: LoginCredentialsDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user = await this.authService.validateUser(loginCredentialsDto.username, loginCredentialsDto.password);
     if (!user) {
       this.analyticsService.recordLoginFailed(loginCredentialsDto.username);
       throw new UnauthorizedException('Invalid credentials');
     }
     const tokens = await this.authService.login(user);
+    this.setAuthCookies(res, tokens);
     this.analyticsService.recordLogin(user.id, user.username);
     const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
     const orgMembership = await this.organizationService.getMyOrganization(user.id);
     if (orgMembership) {
       userFull.organization = orgMembership;
     }
+    // Tokens remain in the body for one release for older clients (mobile,
+    // Swagger); the web frontend relies solely on the cookies.
     return {
       ...tokens,
       user: userFull,
@@ -71,8 +110,19 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token.' })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshAccessToken(refreshTokenDto.refresh_token);
+  async refresh(
+    @Request() req,
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token: string | undefined =
+      req.cookies?.[REFRESH_TOKEN_COOKIE] || refreshTokenDto.refresh_token;
+    if (!token) {
+      throw new UnauthorizedException('No refresh token provided.');
+    }
+    const tokens = await this.authService.refreshAccessToken(token);
+    this.setAuthCookies(res, tokens);
+    return tokens;
   }
 
   @ApiOperation({ summary: 'Get current user profile' })
@@ -99,8 +149,17 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logout successful.' })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Body() refreshTokenDto: RefreshTokenDto) {
-    await this.authService.logout(refreshTokenDto.refresh_token);
+  async logout(
+    @Request() req,
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token: string | undefined =
+      req.cookies?.[REFRESH_TOKEN_COOKIE] || refreshTokenDto.refresh_token;
+    if (token) {
+      await this.authService.logout(token);
+    }
+    this.clearAuthCookies(res);
     return { message: 'Logged out successfully' };
   }
 

@@ -108,7 +108,18 @@ async function bootstrap() {
     origin: process.env.FRONTEND_URL || 'http://localhost:8080',
     credentials: true,
   });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // Strip any body properties not declared on the DTO. Without this,
+      // unknown keys flow through to services (mass-assignment risk).
+      whitelist: true,
+      // Instantiate DTO classes so nested @ValidateNested rules actually run.
+      transform: true,
+      // Course DTOs use @Expose({groups}) for response serialization; without a
+      // matching group the input transform would silently drop those fields.
+      transformOptions: { groups: ['COURSE_DETAILS'] },
+    }),
+  );
   
   // --- Swagger (OpenAPI) Setup ---
   const config = new DocumentBuilder()

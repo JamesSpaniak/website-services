@@ -126,7 +126,7 @@ export class ExamAttemptService {
       score,
       total_questions: questions.length,
       correct_count: correctCount,
-      answers: scoredAnswers,
+      answers: ExamAttemptService.sanitizeAnswers(scoredAnswers),
       section_breakdown: breakdown,
       completed_at: saved.completed_at,
     };
@@ -135,17 +135,37 @@ export class ExamAttemptService {
   // ── Retrieval ──────────────────────────────────────────────────────────────
 
   async getLatestAttempt(userId: number, examId: number): Promise<ExamAttempt | null> {
-    return this.attemptRepository.findOne({
+    const attempt = await this.attemptRepository.findOne({
       where: { user_id: userId, exam_id: examId },
     });
+    if (!attempt) return null;
+    return {
+      ...attempt,
+      answers: ExamAttemptService.sanitizeAnswers(attempt.answers),
+    };
+  }
+
+  /**
+   * Removes the answer key from attempt answers before they leave the API.
+   * Retries are unlimited, so students must never see correct_choice_id or
+   * explanation text — only which of their answers were right or wrong.
+   * The full annotated answers remain stored on the exam_attempts row.
+   */
+  private static sanitizeAnswers(answers: AttemptAnswer[]): AttemptAnswer[] {
+    return (answers ?? []).map((a) => ({
+      question_id: a.question_id,
+      selected_choice_id: a.selected_choice_id,
+      is_correct: a.is_correct,
+    }));
   }
 
   /**
    * Returns all student attempts for a class exam.
    * Includes students who have NOT yet taken the exam (score = null).
    * This requires the organization members list from the User table.
+   * Org-level authorization is enforced by the controller before calling.
    */
-  async getClassResults(classExamId: number, requestingUserId: number): Promise<ClassExamResultsDto> {
+  async getClassResults(classExamId: number): Promise<ClassExamResultsDto> {
     const classExam = await this.classExamRepository.findOne({
       where: { id: classExamId },
     });

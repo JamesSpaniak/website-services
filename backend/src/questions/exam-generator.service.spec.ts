@@ -32,6 +32,19 @@ describe('ExamGeneratorService', () => {
     create: jest.fn((data) => ({ id: 1, ...data })),
     save: jest.fn(async (data) => data),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(),
+  };
+
+  const makeReuseQb = (result: unknown = null) => {
+    const qb = {
+      leftJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getOne: jest.fn(async () => result),
+    };
+    examRepo.createQueryBuilder.mockReturnValue(qb);
+    return qb;
   };
 
   const classExamRepo = {
@@ -107,6 +120,41 @@ describe('ExamGeneratorService', () => {
       'q.standard = :finalStandard',
       { finalStandard: FINAL_EXAM_STANDARD },
     );
+  });
+
+  it('constrains randomized exam reuse to identical scope_ids (H3)', async () => {
+    const qb = makeReuseQb(null);
+
+    const dto: GenerateExamDto = {
+      course_id: 35,
+      scope: 'unit',
+      scope_ids: [6, 5],
+      // is_randomized omitted → defaults to true, reuse path active
+    };
+
+    await service.generate(dto, 99);
+
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'e.scope_ids <@ :ids::int[] AND e.scope_ids @> :ids::int[]',
+      { ids: [5, 6] },
+    );
+    // No reusable exam → a fresh one is created
+    expect(examRepo.save).toHaveBeenCalled();
+  });
+
+  it('reuses an unattempted exam when scope matches', async () => {
+    const existing = { id: 42, question_ids: [1, 2] };
+    makeReuseQb(existing);
+
+    const dto: GenerateExamDto = {
+      course_id: 35,
+      scope: 'unit',
+      scope_ids: [5],
+    };
+
+    const exam = await service.generate(dto, 99);
+    expect(exam).toBe(existing);
+    expect(examRepo.save).not.toHaveBeenCalled();
   });
 
   it('defaults to scoped pool excluding FINAL_EXAM', async () => {
