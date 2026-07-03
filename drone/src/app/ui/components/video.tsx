@@ -7,6 +7,8 @@ import { debugLog } from '@/app/lib/logger';
 interface VideoComponentProps {
   src: string | undefined | null;
   className?: string;
+  title?: string;
+  captionsSrc?: string;
 }
 
 function getEmbedUrl(url: string): string | null {
@@ -38,7 +40,17 @@ function isSelfHostedVideo(url: string): boolean {
     url.includes('media.');
 }
 
-function HlsPlayer({ src, className = '' }: { src: string; className?: string }) {
+function HlsPlayer({
+  src,
+  className = '',
+  title,
+  captionsSrc,
+}: {
+  src: string;
+  className?: string;
+  title?: string;
+  captionsSrc?: string;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -73,13 +85,16 @@ function HlsPlayer({ src, className = '' }: { src: string; className?: string })
         preload="metadata"
         className="w-full h-full rounded-xl bg-black"
       >
+        {captionsSrc && (
+          <track kind="captions" src={captionsSrc} srcLang="en" label="English" default />
+        )}
         Your browser does not support the video tag.
       </video>
     </div>
   );
 }
 
-export default function VideoComponent({ src, className = '' }: VideoComponentProps) {
+export default function VideoComponent({ src, className = '', title, captionsSrc }: VideoComponentProps) {
   const url = typeof src === 'string' ? src.trim() : '';
   debugLog('VideoComponent', {
     src: src ?? null,
@@ -100,7 +115,7 @@ export default function VideoComponent({ src, className = '' }: VideoComponentPr
 
   if (isHlsStream(url)) {
     debugLog('VideoComponent', 'using HlsPlayer', url);
-    return <HlsPlayer src={url} className={className} />;
+    return <HlsPlayer src={url} className={className} title={title} captionsSrc={captionsSrc} />;
   }
 
   if (isSelfHostedVideo(url)) {
@@ -112,7 +127,11 @@ export default function VideoComponent({ src, className = '' }: VideoComponentPr
           controls
           preload="metadata"
           className="w-full h-full rounded-xl bg-black"
+          title={title}
         >
+          {captionsSrc && (
+            <track kind="captions" src={captionsSrc} srcLang="en" label="English" default />
+          )}
           Your browser does not support the video tag.
         </video>
       </div>
@@ -127,15 +146,17 @@ export default function VideoComponent({ src, className = '' }: VideoComponentPr
   }
 
   debugLog('VideoComponent', 'using embed', embedUrl);
+  const embedTitle = title?.trim() || 'Embedded course video';
   return (
     <div className={`aspect-video w-full ${className}`}>
       <iframe
         src={embedUrl}
+        title={embedTitle}
         className="w-full h-full rounded-xl"
         frameBorder="0"
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
-      ></iframe>
+      />
     </div>
   );
 }

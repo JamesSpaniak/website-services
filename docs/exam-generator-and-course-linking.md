@@ -59,20 +59,24 @@ flowchart TB
 
 Course outline lives in **`courses.payload`** (`CourseDetails` JSON), e.g. `assets/articles/faa_107_course.json` for Part 107 (course id **35**).
 
-| Level | ID pattern | Example |
-| --- | --- | --- |
-| Unit | `1`–`9` | Unit 5 = Weather, Unit 6 = Weather effects |
-| Sub-unit | `unit * 10 + n` | `51`–`55` under Unit 5 |
-| Sub-sub-unit | `unit * 100 + …` | `531`–`534` under METAR decoding |
+Unit ids are **stable string refs** (`course_units.ref`). Legacy numeric ids
+(`1`–`9`, `51`–`55`, `531`…) are normalized to `u{n}` on save (`101 → u101`);
+new units authored in the editor get UUID refs. The tree is indexed in the
+normalized **`course_units`** table (rebuilt on every course save), which is
+also the validation source for question/exam refs. See
+[`unit-refs-migration.md`](./unit-refs-migration.md).
 
-Questions in the bank link via **`course_id`**, **`unit_id`**, **`sub_unit_id`** (nullable). There is **no foreign key** to the JSON payload—IDs must match by convention.
+Questions in the bank link via **`course_id`**, **`unit_ref`**, **`sub_unit_ref`**
+(nullable). Refs are validated against `course_units` on create/update/import
+(no DB foreign key).
 
 ### 1.2 Question bank (assessment linker)
 
 | Field | Purpose |
 | --- | --- |
 | `course_id` | Required; all questions for a course |
-| `unit_id` / `sub_unit_id` | Scopes questions to unit/sub-unit quizzes; `null` = course-wide only |
+| `unit_ref` / `sub_unit_ref` | Scopes questions to unit/sub-unit quizzes (string refs, e.g. `"u5"` / `"u531"`); `null` = course-wide only. Legacy numeric `unit_id`/`sub_unit_id` still accepted on import and mapped to refs |
+| `figure_ref` | FAA-CT-8080-2H figure number for chart questions (player links the PDF) |
 | `choices` | JSONB `[{id, text, is_correct}]` — exactly one correct |
 | `priority` | `1` core, `2` standard, `3` supplemental (selection order) |
 | `difficulty` | `easy` \| `medium` \| `hard` |
@@ -85,11 +89,13 @@ Questions in the bank link via **`course_id`**, **`unit_id`**, **`sub_unit_id`**
 
 ### 1.3 Exam scopes
 
-| `scope` | `scope_ids` | Pool query (today) |
+| `scope` | `scope_refs` | Pool query (today) |
 | --- | --- | --- |
-| `sub_unit` | e.g. `[531]` | `sub_unit_id = ANY(scope_ids)`, `status = active` |
-| `unit` | e.g. `[5]` | `unit_id = ANY(scope_ids)`, `status = active` |
+| `sub_unit` | e.g. `["u531"]` | `sub_unit_ref = ANY(scope_refs)`, `status = active` |
+| `unit` | e.g. `["u5"]` | `unit_ref = ANY(scope_refs)`, `status = active` |
 | `full_course` | `[]` | All active questions for `course_id` (no unit filter) |
+
+Legacy `scope_ids` (numbers) are still accepted on `POST /exams/generate` and mapped to `u{n}` refs.
 
 **Selection:** Core (`priority=1`) always included first, then standard, then supplemental until `question_count` is met—or entire pool if `question_count` omitted.
 
@@ -144,9 +150,9 @@ Gaps are ordered by impact on shipping a credible Part 107 practice + final exam
 | # | Gap | Detail |
 | --- | --- | --- |
 | G5 | ~~Dual exam systems~~ | **Resolved (Bundle B).** Legacy `ExamComponent` and unit exam submit removed. |
-| G6 | **No course-ID validation on import** | `unit_id` / `sub_unit_id` not verified against `courses.payload`. Typos silently create empty scoped exams. |
+| G6 | ~~No course-ID validation on import~~ | **Resolved (PR 3).** Refs are validated against `course_units` on create/update/import. |
 | G7 | **Many sub-units have zero questions** | See `faa_107_questions_gaps.md`. Sub-unit scoped quizzes can return empty pools. |
-| G8 | **Section breakdown uses numeric IDs** | Results show “Unit 5 · Section 531”, not titles from course JSON. |
+| G8 | ~~Section breakdown uses numeric IDs~~ | **Resolved (PR 3).** Breakdown returns refs + titles resolved from `course_units`. |
 | G9 | **No explanations after submit** | `explanation` on questions is not returned in attempt results; review mode is weaker than it could be. |
 
 ### 3.3 Medium — figure / chart questions
@@ -656,7 +662,7 @@ exam_summary?: {
 | Task | Addresses | Status | Notes |
 | --- | --- | --- | --- |
 | Return `explanation` + `correct_choice_id` in attempt result | G9 | **Done (R6)** | `ExamAttemptResultDto` includes both; player shows green highlight + explanation card |
-| Resolve unit/sub-unit titles in breakdown from course payload | G8 | Deferred | Pass course outline to player or enrich breakdown server-side |
+| Resolve unit/sub-unit titles in breakdown from course payload | G8 | **Done (PR 3)** | Enriched server-side from `course_units` (`unit_title` / `sub_unit_title`) |
 | Label `FINAL_EXAM` breakdown as "Cross-section / Final" instead of Unit 0 | G14 | **Done** | Already implemented in current player |
 | Optional: show `difficulty` / `standard` in manager reports | G12 | Deferred | |
 
@@ -685,7 +691,7 @@ POST /exams/generate
 {
   "course_id": 35,
   "scope": "full_course",
-  "scope_ids": [],
+  "scope_refs": [],
   "exam_pool": "final_only",
   "question_count": 60,
   "is_randomized": true,
@@ -698,7 +704,7 @@ POST /exams/generate
 {
   "course_id": 35,
   "scope": "sub_unit",
-  "scope_ids": [531],
+  "scope_refs": ["u531"],
   "exam_pool": "scoped",
   "question_count": 15,
   "is_randomized": true
@@ -709,7 +715,7 @@ POST /exams/generate
 
 | Value | Behavior |
 | --- | --- |
-| `scoped` | Default for unit/sub_unit; respect scope_ids; exclude `FINAL_EXAM` |
+| `scoped` | Default for unit/sub_unit; respect scope_refs; exclude `FINAL_EXAM` |
 | `final_only` | Only `standard = 'FINAL_EXAM'` (typically `full_course`) |
 | `all` | All active questions (current `full_course` behavior) |
 

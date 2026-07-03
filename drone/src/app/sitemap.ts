@@ -9,6 +9,20 @@ interface ArticleSlim {
   updated_at?: string;
 }
 
+interface CourseSlim {
+  id: number;
+}
+
+async function getPublishedCourses(): Promise<CourseSlim[]> {
+  try {
+    const res = await fetch(`${API_BASE}/courses`, { next: { revalidate: 3600 } });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
 async function getPublishedArticles(): Promise<ArticleSlim[]> {
   try {
     const res = await fetch(`${API_BASE}/articles`, { next: { revalidate: 3600 } });
@@ -20,7 +34,10 @@ async function getPublishedArticles(): Promise<ArticleSlim[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const articles = await getPublishedArticles();
+  const [articles, courses] = await Promise.all([
+    getPublishedArticles(),
+    getPublishedCourses(),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -84,10 +101,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.35,
     },
     {
-      url: `${SITE_URL}/privacy`,
+      url: `${SITE_URL}/courses/tracks/video`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.35,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${SITE_URL}/courses/tracks/ai`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
   ];
 
@@ -98,5 +121,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...articlePages];
+  const coursePages: MetadataRoute.Sitemap = courses.map((course) => ({
+    url: `${SITE_URL}/courses/${course.id}/preview`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }));
+
+  return [...staticPages, ...articlePages, ...coursePages];
 }

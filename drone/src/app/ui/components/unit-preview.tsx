@@ -7,13 +7,16 @@ import StatusUpdater from './status-updater';
 import { DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
 import { mergeCourseImages } from '@/app/lib/course-images';
 
+import { LockClosedIcon } from '@heroicons/react/24/outline';
+
 interface UnitPreviewProps {
   unit: UnitData;
   courseId: number;
+  locked?: boolean;
   onStatusUpdate: (unitId: string, newStatus: ProgressStatus) => Promise<void>;
 }
 
-export default function UnitPreviewComponent({ unit, courseId, onStatusUpdate }: UnitPreviewProps) {
+export default function UnitPreviewComponent({ unit, courseId, locked, onStatusUpdate }: UnitPreviewProps) {
   const unitHref = `/courses/${courseId}/units/${encodeURIComponent(String(unit.id))}`;
 
   return (
@@ -29,6 +32,12 @@ export default function UnitPreviewComponent({ unit, courseId, onStatusUpdate }:
               {unit.title}
             </h3>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-[var(--brand-muted)]">
+              {locked && (
+                <span className="inline-flex items-center gap-1 text-xs text-[var(--brand-muted)]">
+                  <LockClosedIcon className="h-3.5 w-3.5" aria-hidden />
+                  Locked
+                </span>
+              )}
               {unit.text_content && (
                 <DocumentTextIcon className="h-4 w-4 shrink-0" title="Text" />
               )}

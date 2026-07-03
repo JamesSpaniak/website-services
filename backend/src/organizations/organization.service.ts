@@ -499,8 +499,22 @@ export class OrganizationService {
             let mergedPayload: CourseDetails | null = null;
 
             if (progress) {
-                mergedPayload = progress.payload as CourseDetails;
+                // Overlay the member's unit_statuses map onto a fresh copy of
+                // the course tree (content stripped — this is a progress view).
+                mergedPayload = JSON.parse(JSON.stringify(coursePayload)) as CourseDetails;
                 mergedPayload.id = courseId;
+                mergedPayload.status = (progress.status as ProgressStatus) ?? ProgressStatus.NOT_STARTED;
+                const statuses = progress.unit_statuses ?? {};
+                const overlay = (units?: CourseDetails['units']): void => {
+                    if (!units?.length) return;
+                    for (const unit of units) {
+                        unit.status = (statuses[String(unit.id)] as ProgressStatus) ?? ProgressStatus.NOT_STARTED;
+                        unit.text_content = undefined;
+                        unit.video_url = undefined;
+                        overlay(unit.sub_units);
+                    }
+                };
+                overlay(mergedPayload.units);
             }
 
             return {

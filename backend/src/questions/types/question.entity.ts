@@ -23,8 +23,8 @@ export type QuestionStatus = 'active' | 'draft' | 'archived';
  * so they can be managed, versioned, and queried without parsing course blobs.
  */
 @Entity('questions')
-@Index(['course_id', 'unit_id'])
-@Index(['course_id', 'sub_unit_id'])
+@Index(['course_id', 'unit_ref'])
+@Index(['course_id', 'sub_unit_ref'])
 export class Question {
   @PrimaryGeneratedColumn()
   id: number;
@@ -35,15 +35,30 @@ export class Question {
   course_id: number;
 
   /**
-   * The numeric unit ID from the course payload (e.g. 1, 2, 3 …).
-   * Null means the question applies to the full course.
+   * Ref of the top-level unit this question belongs to (course_units.ref,
+   * e.g. "u10"). Null means the question applies to the full course only
+   * (e.g. FINAL_EXAM-tagged chart questions).
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  unit_ref: string | null;
+
+  /**
+   * Ref of the specific lesson/sub-unit (course_units.ref, e.g. "u101").
+   * Null means the question is scoped only to the parent unit.
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  sub_unit_ref: string | null;
+
+  /**
+   * @deprecated Legacy numeric payload id, kept one release for rollback.
+   * Application code reads/writes unit_ref instead.
    */
   @Column({ type: 'int', nullable: true })
   unit_id: number | null;
 
   /**
-   * The numeric sub-unit ID from the course payload (e.g. 11, 12, 21 …).
-   * Null means the question is scoped only to the parent unit.
+   * @deprecated Legacy numeric payload id, kept one release for rollback.
+   * Application code reads/writes sub_unit_ref instead.
    */
   @Column({ type: 'int', nullable: true })
   sub_unit_id: number | null;

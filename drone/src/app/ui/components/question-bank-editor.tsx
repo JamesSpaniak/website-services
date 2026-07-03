@@ -24,8 +24,8 @@ const STATUS_LABELS = { active: 'Active', draft: 'Draft', archived: 'Archived' }
 function blankForm(courseId: number): CreateQuestionPayload {
     return {
         course_id: courseId,
-        unit_id: null,
-        sub_unit_id: null,
+        unit_ref: null,
+        sub_unit_ref: null,
         question_text: '',
         choices: EMPTY_CHOICES.map((c) => ({ ...c })),
         explanation: '',
@@ -90,8 +90,8 @@ export default function QuestionBankEditor({ courses }: Props) {
         setEditingId(q.id);
         setForm({
             course_id: q.course_id,
-            unit_id: q.unit_id,
-            sub_unit_id: q.sub_unit_id,
+            unit_ref: q.unit_ref,
+            sub_unit_ref: q.sub_unit_ref,
             question_text: q.question_text,
             choices: q.choices.map((c) => ({ ...c })),
             explanation: q.explanation ?? '',
@@ -289,7 +289,7 @@ export default function QuestionBankEditor({ courses }: Props) {
                         rows={10}
                         value={importJson}
                         onChange={(e) => setImportJson(e.target.value)}
-                        placeholder={'[\n  {\n    "question_text": "What is...",\n    "choices": [\n      {"id": 1, "text": "Answer A", "is_correct": true},\n      {"id": 2, "text": "Answer B", "is_correct": false}\n    ],\n    "unit_id": 1,\n    "priority": 1\n  }\n]'}
+                        placeholder={'[\n  {\n    "question_text": "What is...",\n    "choices": [\n      {"id": 1, "text": "Answer A", "is_correct": true},\n      {"id": 2, "text": "Answer B", "is_correct": false}\n    ],\n    "unit_ref": "u1",\n    "priority": 1\n  }\n]'}
                         className="w-full px-3 py-2 font-mono text-xs bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg resize-y focus:ring-2 focus:ring-[var(--brand-primary)]"
                     />
                     <div className="flex gap-2 mt-3">
@@ -394,23 +394,23 @@ export default function QuestionBankEditor({ courses }: Props) {
                         {/* Metadata row */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div>
-                                <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">Unit ID</label>
+                                <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">Unit ref</label>
                                 <input
-                                    type="number"
-                                    value={form.unit_id ?? ''}
-                                    onChange={(e) => setForm((f) => ({ ...f, unit_id: e.target.value ? Number(e.target.value) : null }))}
+                                    type="text"
+                                    value={form.unit_ref ?? ''}
+                                    onChange={(e) => setForm((f) => ({ ...f, unit_ref: e.target.value.trim() || null }))}
                                     className="w-full px-3 py-1.5 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg"
-                                    placeholder="e.g. 1"
+                                    placeholder="e.g. u1"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">Sub-unit ID</label>
+                                <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">Sub-unit ref</label>
                                 <input
-                                    type="number"
-                                    value={form.sub_unit_id ?? ''}
-                                    onChange={(e) => setForm((f) => ({ ...f, sub_unit_id: e.target.value ? Number(e.target.value) : null }))}
+                                    type="text"
+                                    value={form.sub_unit_ref ?? ''}
+                                    onChange={(e) => setForm((f) => ({ ...f, sub_unit_ref: e.target.value.trim() || null }))}
                                     className="w-full px-3 py-1.5 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg"
-                                    placeholder="e.g. 11"
+                                    placeholder="e.g. u11"
                                 />
                             </div>
                             <div>
@@ -504,8 +504,8 @@ export default function QuestionBankEditor({ courses }: Props) {
                                         <p className="text-xs text-[var(--brand-muted)] mt-0.5">{q.choices.length} choices</p>
                                     </td>
                                     <td className="hidden sm:table-cell px-4 py-3 text-xs text-[var(--brand-muted)] whitespace-nowrap">
-                                        {q.unit_id != null ? `Unit ${q.unit_id}` : '—'}
-                                        {q.sub_unit_id != null ? ` / ${q.sub_unit_id}` : ''}
+                                        {q.unit_ref != null ? q.unit_ref : '—'}
+                                        {q.sub_unit_ref != null ? ` / ${q.sub_unit_ref}` : ''}
                                     </td>
                                     <td className="hidden md:table-cell px-4 py-3 text-xs text-[var(--brand-muted)]">
                                         {PRIORITY_LABELS[q.priority as 1|2|3] ?? q.priority}

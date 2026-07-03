@@ -19,10 +19,13 @@ export interface AttemptAnswer {
 }
 
 export interface SectionBreakdown {
-  /** unit_id from the course payload */
-  unit_id: number;
-  /** sub_unit_id from the course payload — null if scoped only to a unit */
-  sub_unit_id: number | null;
+  /** Top-level unit ref (course_units.ref) — null for cross-section / final questions */
+  unit_ref: string | null;
+  /** Lesson/sub-unit ref — null if scoped only to a unit */
+  sub_unit_ref: string | null;
+  /** Display titles resolved from course_units at scoring time */
+  unit_title?: string | null;
+  sub_unit_title?: string | null;
   correct: number;
   total: number;
   score_percent: number;

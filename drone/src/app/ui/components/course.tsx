@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CourseData, ProgressStatus, UnitData } from "@/app/lib/types/course";
 import { updateCourseProgress, updateUnitProgress } from '@/app/lib/api-client';
 import PurchaseFlow from './purchase-flow';
+import CoursePurchaseBanner from './course-purchase-banner';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import UnitPreviewComponent from './unit-preview';
@@ -14,29 +15,39 @@ import { debugLog } from '@/app/lib/logger';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import CourseImageStrip from './course-image-strip';
 import CourseExamsSection from './course-exams-section';
+import CourseOutlineSidebar from './course-outline-sidebar';
+import { isUnitPreviewAccessible } from '@/app/lib/course-tree';
 
 export default function CourseComponent(props: CourseData) {
     const [course, setCourse] = useState<CourseData>(props);
+    const [showPurchase, setShowPurchase] = useState(false);
     const { id, title, sub_title, video_url, units, status, price, has_access, image_focal_point } = course;
     const courseId = id;
     const heroImages = mergeCourseImages(course);
+    const paidCourse = Number(price) > 0;
+    const fullAccess = has_access !== false;
 
     debugLog('CourseComponent', {
         courseId,
         title,
         heroImagesCount: heroImages.length,
         video_url: video_url ?? null,
-        video_url_type: typeof video_url,
-        video_url_truthy: !!video_url,
         will_render_video: !!video_url,
-        course_keys: course ? Object.keys(course) : [],
     });
+
     const handlePurchaseSuccess = () => {
-        setCourse(prevCourse => ({ ...prevCourse, has_access: true }));
+        setCourse((prev) => ({ ...prev, has_access: true }));
+        setShowPurchase(false);
     };
 
-    if (has_access === false && price && price > 0) {
-        return <PurchaseFlow course={course} onPurchaseSuccess={handlePurchaseSuccess} />;
+    if (showPurchase && paidCourse && !fullAccess) {
+        return (
+            <PurchaseFlow
+                course={course}
+                onPurchaseSuccess={handlePurchaseSuccess}
+                redirectPath={`/courses/${courseId}`}
+            />
+        );
     }
 
     const handleCourseStatusUpdate = async (newStatus: ProgressStatus) => {
@@ -52,29 +63,38 @@ export default function CourseComponent(props: CourseData) {
     return (
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <JsonLd data={courseJsonLd(course)} />
+            {!fullAccess && paidCourse && (
+                <CoursePurchaseBanner course={course} onPurchaseClick={() => setShowPurchase(true)} />
+            )}
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
                 <div className="lg:col-span-2">
                     <div className="mb-8 space-y-4 overflow-hidden">
                         {heroImages.length > 0 && (
                             <CourseImageStrip images={heroImages} alt={title} objectPosition={image_focal_point} />
                         )}
-                        {video_url && (
+                        {video_url && fullAccess && (
                             <div className="overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
-                                <VideoComponent src={video_url} className="w-full" />
+                                <VideoComponent src={video_url} className="w-full" title={title} />
                             </div>
                         )}
                     </div>
                     <div className="space-y-4">
                         {units?.map((unit) => (
-                            <UnitPreviewComponent key={unit.id} unit={unit} courseId={courseId} onStatusUpdate={handleUnitStatusUpdate} />
+                            <UnitPreviewComponent
+                                key={unit.id}
+                                unit={unit}
+                                courseId={courseId}
+                                locked={!fullAccess && !isUnitPreviewAccessible(units, String(unit.id))}
+                                onStatusUpdate={handleUnitStatusUpdate}
+                            />
                         ))}
                     </div>
-                    {has_access !== false && (
+                    {fullAccess && (
                         <CourseExamsSection courseId={courseId} examSummary={course.exam_summary} />
                     )}
                 </div>
 
-                <div className="mt-8 lg:mt-0">
+                <div className="mt-8 lg:mt-0 space-y-6">
                     <div className="p-6 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
                         <h1 className="text-xl font-display font-semibold tracking-tight text-[var(--brand-foreground)]">{title}</h1>
                         {sub_title && <p className="mt-2 text-sm text-[var(--brand-muted)]">{sub_title}</p>}
@@ -92,19 +112,26 @@ export default function CourseComponent(props: CourseData) {
                                 <span className="text-sm text-[var(--brand-muted)]">Units</span>
                                 <span className="font-mono text-xs text-[var(--brand-foreground)]">{units?.length || 0}</span>
                             </div>
+                            {paidCourse && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-[var(--brand-muted)]">Price</span>
+                                    <span className="font-mono text-xs text-[var(--brand-foreground)]">${Number(price)}</span>
+                                </div>
+                            )}
                         </div>
 
-                        <h3 className="mt-6 pt-6 border-t border-[var(--surface-border)] text-sm font-display font-semibold text-[var(--brand-foreground)]">Units</h3>
-                        <div className="mt-4 space-y-2">
-                            {units?.map((unit) => (
-                                <Link key={unit.id} href={`/courses/${courseId}/units/${encodeURIComponent(String(unit.id))}`} className="flex items-center justify-between p-3 border border-transparent hover:border-[var(--surface-border)] hover:bg-[var(--background)] transition-colors" style={{ borderRadius: 'var(--radius-sm)' }}>
-                                    <span className="text-sm text-[var(--brand-foreground)]">{unit.title}</span>
-                                    <StatusIcon status={unit.status} />
-                                </Link>
-                            ))}
-                        </div>
+                        {!fullAccess && paidCourse && (
+                            <button
+                                type="button"
+                                onClick={() => setShowPurchase(true)}
+                                className="mt-6 w-full py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+                                style={{ borderRadius: 'var(--radius-sm)' }}
+                            >
+                                Unlock for ${Number(price)}
+                            </button>
+                        )}
 
-                        {has_access !== false && (
+                        {fullAccess && (
                             <Link
                                 href={`/courses/${courseId}/exams`}
                                 className="mt-6 flex items-center justify-between p-3 border border-transparent hover:border-[var(--surface-border)] hover:bg-[var(--background)] transition-colors border-t border-[var(--surface-border)] pt-6"
@@ -115,13 +142,18 @@ export default function CourseComponent(props: CourseData) {
                             </Link>
                         )}
                     </div>
+
+                    <CourseOutlineSidebar
+                        courseId={courseId}
+                        units={units}
+                        hasAccess={fullAccess}
+                    />
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-// Helper function to recursively update a unit in the state without re-fetching
 function updateUnitInState(course: CourseData, updatedUnit: UnitData): CourseData {
     const update = (units: UnitData[]): UnitData[] => {
         return units.map(unit => {

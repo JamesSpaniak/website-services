@@ -7,6 +7,7 @@ import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import SectionComponent from './section';
 import ExamPlayer from './exam-player';
+import { PROSE_BODY } from '@/app/lib/prose-classes';
 
 interface UnitComponentProps {
     unitData: UnitData;
@@ -50,7 +51,7 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
         setUnit((prevUnit) => updateUnitInState(prevUnit, updatedSubUnit));
     };
 
-    const unitScopeId = typeof id === 'string' ? parseInt(id, 10) : id;
+    const unitScopeRef = String(id);
 
     return (
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -62,9 +63,9 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
                 </div>
 
                 
-                    <div className="mt-8 prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)] prose-headings:text-[var(--brand-foreground)] prose-a:text-[var(--brand-primary)]" dangerouslySetInnerHTML={{ __html: description?.replace(/\n/g, '<br />') || ''}} />
+                    <div className={`mt-8 ${PROSE_BODY}`} dangerouslySetInnerHTML={{ __html: description?.replace(/\n/g, '<br />') || ''}} />
                 
-                {text_content && <div className="mt-4 prose prose-invert prose-sm sm:prose-base max-w-none text-[var(--brand-muted)]" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
+                {text_content && <div className={`mt-4 ${PROSE_BODY}`} dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
 
                 {sub_units && sub_units.length > 0 && (
                     <div className="mt-12">
@@ -80,15 +81,13 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
                     </div>
                 )}
 
-                {!Number.isNaN(unitScopeId) && (
-                    <ExamPlayer
-                        courseId={courseId}
-                        scope="unit"
-                        scopeId={unitScopeId}
-                        label={`Unit: ${title}`}
-                        questionCount={25}
-                    />
-                )}
+                <ExamPlayer
+                    courseId={courseId}
+                    scope="unit"
+                    scopeRef={unitScopeRef}
+                    label={`Unit: ${title}`}
+                    questionCount={25}
+                />
             </div>
         </div>
     );

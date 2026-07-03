@@ -1,13 +1,18 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './types/course.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from 'src/users/types/user.entity';
 import { Role } from 'src/users/types/role.enum';
 import { MediaService } from 'src/media/media.service';
 import { OrganizationService } from 'src/organizations/organization.service';
 import { CourseDetails, UnitData } from './types/course.dto';
-import { migrateCoursePayloadImages } from './course-payload.util';
+import { CourseUnitService } from './course-unit.service';
+import { normalizeAndFlattenUnits } from './course-unit.util';
+import {
+  assertCourseExists,
+  stripCourseForPublic,
+} from './course-access.util';
 
 @Injectable()
 export class CourseService {
@@ -20,6 +25,8 @@ export class CourseService {
         private userRepository: Repository<User>,
         private readonly mediaService: MediaService,
         private readonly organizationService: OrganizationService,
+        private readonly courseUnitService: CourseUnitService,
+        private readonly dataSource: DataSource,
   ) {}
 
   async getCourseByTitle(title: string): Promise<Course | undefined> {
@@ -64,8 +71,65 @@ export class CourseService {
     return (await this.courseRepository.find()).filter(course => !course.hidden)
   }
 
-  async saveCourse(course: Course): Promise<Course> {
-    return this.courseRepository.save(course);
+  /** Unauthenticated marketing payload — outline and hero media only. */
+  async getPublicCourseById(id: number): Promise<CourseDetails> {
+    const course = await this.getCourseById(id);
+    assertCourseExists(course, id);
+    if (course.hidden) {
+      throw new NotFoundException(`Course with ID ${id} not found`);
+    }
+    const payload: CourseDetails = JSON.parse(course.payload);
+    payload.id = course.id;
+    payload.price = Number(course.price);
+    return stripCourseForPublic(payload);
+  }
+
+  /**
+   * Creates a course from an authored payload. Unit ids are normalized to
+   * canonical string refs and the course_units index is built in the same
+   * transaction so refs are queryable the moment the course exists.
+   */
+  async createCourseFromPayload(details: CourseDetails): Promise<Course> {
+    const flat = normalizeAndFlattenUnits(details);
+    return this.dataSource.transaction(async (manager) => {
+      const course = await manager.getRepository(Course).save({
+        payload: JSON.stringify(details),
+        title: details.title,
+        hidden: false,
+        purchased_by_users: [],
+        price: details.price,
+      });
+      await this.courseUnitService.rebuild(course.id, flat, manager);
+      return course;
+    });
+  }
+
+  /**
+   * Overwrites a course from an authored payload (admin JSON upload / editor
+   * save). Normalizes unit ids and rebuilds course_units transactionally —
+   * legacy numeric ids map deterministically to the same refs on every
+   * upload, so existing question/exam links survive re-uploads.
+   */
+  async updateCourseFromPayload(
+    id: number,
+    details: CourseDetails,
+  ): Promise<Course> {
+    const existing = await this.courseRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Course with ID ${id} not found`);
+    }
+
+    const flat = normalizeAndFlattenUnits(details);
+    return this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(Course).update(id, {
+        title: details.title,
+        payload: JSON.stringify(details),
+        price: details.price,
+        updated_at: new Date(),
+      });
+      await this.courseUnitService.rebuild(id, flat, manager);
+      return manager.getRepository(Course).findOne({ where: { id } });
+    });
   }
 
   async deleteCourse(id: number): Promise<void> {
@@ -75,22 +139,6 @@ export class CourseService {
     void this.deleteCourseMedia(course).catch((err) =>
       this.logger.error(`Post-delete media cleanup failed for course ${id}: ${(err as Error).message}`),
     );
-  }
-
-  async updateCourse(id: number, course: Course): Promise<Course> {
-    const existing = await this.courseRepository.findOne({ where: { id: id } });
-    if (!existing) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
-    }
-    course.submitted_at = existing.submitted_at;
-    course.hidden = existing.hidden;
-    // Note: purchased_by_users is a relation and cannot be persisted through
-    // repository.update() — it must never be assigned here.
-    delete course.purchased_by_users;
-    course.updated_at = new Date();
-
-    await this.courseRepository.update(id, course);
-    return course;
   }
 
   private async deleteCourseMedia(course: Course): Promise<void> {
@@ -112,8 +160,6 @@ export class CourseService {
     } catch {
       return urls;
     }
-
-    migrateCoursePayloadImages(payload);
 
     if (payload.images_url?.length) urls.push(...payload.images_url);
     if (payload.video_url) urls.push(payload.video_url);

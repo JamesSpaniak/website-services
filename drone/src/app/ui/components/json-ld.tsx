@@ -87,12 +87,10 @@ export function courseJsonLd(course: {
   description?: string;
   price?: number;
   images_url?: string[];
-  image_url?: string;
   video_url?: string;
   id: number;
 }) {
-  const primaryImage =
-    course.images_url?.find(Boolean) || course.image_url;
+  const primaryImage = course.images_url?.find(Boolean);
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
@@ -118,6 +116,21 @@ export function courseJsonLd(course: {
         availability: 'https://schema.org/InStock',
       },
     }),
-    url: `${SITE_URL}/courses/${course.id}`,
+    url: `${SITE_URL}/courses/${course.id}/preview`,
+  };
+}
+
+export function faqPageJsonLd(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answer,
+      },
+    })),
   };
 }

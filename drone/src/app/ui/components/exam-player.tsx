@@ -10,7 +10,8 @@ import type { ExamPool, ExamScope, ExamWithQuestions, ExamAttemptResult, Section
 interface ExamPlayerProps {
     courseId: number;
     scope: ExamScope;
-    scopeId?: number;
+    /** Unit / sub-unit ref (course_units.ref, e.g. "u101"). Omit for full_course. */
+    scopeRef?: string;
     label?: string;
     examPool?: ExamPool;
     questionCount?: number;
@@ -48,6 +49,14 @@ function clearDraft(examId: number) {
     } catch { /* non-fatal */ }
 }
 
+/** Human label for a breakdown row — prefers API-resolved titles, falls back to refs. */
+export function formatSectionLabel(s: SectionBreakdown): string {
+    if (!s.unit_ref) return 'Cross-section / Final';
+    const unit = s.unit_title || s.unit_ref;
+    const section = s.sub_unit_ref ? (s.sub_unit_title || s.sub_unit_ref) : null;
+    return section ? `${unit} · ${section}` : unit;
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function ExamProgressBar({ answered, total }: { answered: number; total: number }) {
@@ -70,6 +79,59 @@ function ExamProgressBar({ answered, total }: { answered: number; total: number 
                     className="h-full rounded-full bg-[var(--brand-primary)] transition-all duration-300"
                     style={{ width: `${pct}%` }}
                 />
+            </div>
+        </div>
+    );
+}
+
+function ExamQuestionPalette({
+    total,
+    answers,
+    questionIds,
+    onJump,
+}: {
+    total: number;
+    answers: Record<number, number>;
+    questionIds: number[];
+    onJump: (index: number) => void;
+}) {
+    const firstUnanswered = questionIds.findIndex((id) => answers[id] == null);
+
+    return (
+        <div className="mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-muted)]">
+                    Questions
+                </p>
+                {firstUnanswered >= 0 && (
+                    <button
+                        type="button"
+                        onClick={() => onJump(firstUnanswered)}
+                        className="text-xs font-medium text-[var(--brand-primary)] hover:opacity-80"
+                    >
+                        Jump to first unanswered
+                    </button>
+                )}
+            </div>
+            <div className="flex flex-wrap gap-2" role="navigation" aria-label="Question navigation">
+                {questionIds.map((qid, idx) => {
+                    const answered = answers[qid] != null;
+                    return (
+                        <button
+                            key={qid}
+                            type="button"
+                            onClick={() => onJump(idx)}
+                            aria-label={`Question ${idx + 1}${answered ? ', answered' : ', unanswered'}`}
+                            className={`h-8 min-w-8 px-2 text-xs font-mono rounded-md border transition-colors ${
+                                answered
+                                    ? 'border-[var(--brand-primary)]/50 bg-[var(--brand-primary)]/15 text-[var(--brand-foreground)]'
+                                    : 'border-[var(--surface-border)] bg-[var(--background)] text-[var(--brand-muted)] hover:border-[var(--brand-primary)]/40'
+                            }`}
+                        >
+                            {idx + 1}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );
@@ -113,7 +175,7 @@ function ExamSubmitControls({
 export default function ExamPlayer({
     courseId,
     scope,
-    scopeId,
+    scopeRef,
     label,
     examPool = 'scoped',
     questionCount,
@@ -130,7 +192,7 @@ export default function ExamPlayer({
     const [error, setError] = useState<string | null>(null);
     const phaseRef = useRef<Phase>('idle');
 
-    const scopeLabel = label ?? (scope === 'full_course' ? 'Full Course' : `Scope ${scopeId}`);
+    const scopeLabel = label ?? (scope === 'full_course' ? 'Full Course' : `Scope ${scopeRef}`);
     const examKindLabel = examPool === 'final_only' ? 'Final Exam' : 'Practice Exam';
     const helperText =
         description ??
@@ -180,7 +242,7 @@ export default function ExamPlayer({
             const generated = await generateExam({
                 course_id: courseId,
                 scope,
-                scope_ids: scopeId != null ? [scopeId] : [],
+                scope_refs: scopeRef != null ? [scopeRef] : [],
                 is_randomized: true,
                 exam_pool: examPool,
                 question_count: questionCount,
@@ -241,6 +303,12 @@ export default function ExamPlayer({
     const allAnswered = exam ? exam.questions.every((q) => answers[q.id] != null) : false;
     const answeredCount = exam ? exam.questions.filter((q) => answers[q.id] != null).length : 0;
     const remainingCount = exam ? exam.questions.length - answeredCount : 0;
+
+    const jumpToQuestion = useCallback((index: number) => {
+        const prefix = isPage ? 'exam-q-' : 'exam-q-inline-';
+        const el = document.getElementById(`${prefix}${index + 1}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [isPage]);
 
     // ── Idle / Generating ─────────────────────────────────────────────────────
 
@@ -320,6 +388,15 @@ export default function ExamPlayer({
     // ── Taking / Submitting ───────────────────────────────────────────────────
 
     if ((phase === 'taking' || phase === 'submitting') && exam) {
+        const palette = (
+            <ExamQuestionPalette
+                total={exam.questions.length}
+                answers={answers}
+                questionIds={exam.questions.map((q) => q.id)}
+                onJump={jumpToQuestion}
+            />
+        );
+
         const questionList = (
             <div className="space-y-6" role="list" aria-label="Exam questions">
                 {exam.questions.map((q, idx) => (
@@ -327,7 +404,7 @@ export default function ExamPlayer({
                         key={q.id}
                         role="listitem"
                         className={`p-5 border border-[var(--surface-border)] bg-[var(--background)] rounded-lg ${isPage ? 'scroll-mt-28' : ''}`}
-                        id={isPage ? `exam-q-${idx + 1}` : undefined}
+                        id={isPage ? `exam-q-${idx + 1}` : `exam-q-inline-${idx + 1}`}
                     >
                         <p className="text-xs font-mono text-[var(--brand-muted)] mb-2">
                             Question {idx + 1} of {exam.questions.length}
@@ -412,7 +489,10 @@ export default function ExamPlayer({
                         </button>
                     </div>
 
-                    <div className="pb-32">{questionList}</div>
+                    <div className="pb-32">
+                        {palette}
+                        {questionList}
+                    </div>
 
                     {error && (
                         <p className="fixed bottom-[4.5rem] left-0 right-0 z-40 text-center text-sm text-red-400 px-4 pointer-events-none" role="alert">
@@ -445,6 +525,7 @@ export default function ExamPlayer({
                         Cancel
                     </button>
                 </div>
+                {palette}
                 {questionList}
                 {error && <p className="text-xs text-red-400 mt-4" role="alert">{error}</p>}
                 <div className="mt-6">
@@ -497,7 +578,7 @@ export default function ExamPlayer({
                                 <div key={i} className="flex items-center gap-3 p-3 border border-[var(--surface-border)] rounded-lg bg-[var(--background)]">
                                     <div className="flex-1">
                                         <p className="text-xs text-[var(--brand-muted)]">
-                                            {s.unit_id === 0 ? 'Cross-section / Final' : `Unit ${s.unit_id}${s.sub_unit_id ? ` · Section ${s.sub_unit_id}` : ''}`}
+                                            {formatSectionLabel(s)}
                                         </p>
                                         {s.failed_standards.length > 0 && (
                                             <p className="text-xs text-red-400 font-mono mt-0.5">Failed: {s.failed_standards.join(', ')}</p>

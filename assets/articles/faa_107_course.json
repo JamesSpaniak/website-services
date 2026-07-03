@@ -7,12 +7,13 @@
     "images_url": [
         "https://media.thedroneedge.com/courses/35/9c2099d5-a2a4-4af6-8d5e-e518ae0502b1.png"
     ],
-    "price": "0",
+    "price": "29",
     "has_access": true,
     "units": [
         {
             "id": 1,
             "title": "PART 107 REGULATIONS",
+            "free_preview": true,
             "sub_title": "Rules for Civil Small Unmanned Aircraft Systems (sUAS)",
             "description": "Apply the FAA's Part 107 rules governing commercial sUAS operations, covering pilot roles, operational limitations, airspace requirements, Remote ID compliance, waivers, and regulations for night flight and flight over people and moving objects.",
             "text_content": "Part 107 governs civil small unmanned aircraft (under 55 pounds) in the NAS. This unit covers applicability, crew roles, operating rules, waivers, Remote ID, operations over people and moving objects, and night operations.",

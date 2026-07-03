@@ -11,6 +11,7 @@ import { getUnitMedia } from '@/app/lib/api-client';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import CourseImageStrip from './course-image-strip';
 import ExamPlayer from './exam-player';
+import { PROSE_COMPACT } from '@/app/lib/prose-classes';
 
 interface SectionProps {
   section: UnitData;
@@ -37,7 +38,7 @@ export default function SectionComponent({
   const [videoLoading, setVideoLoading] = useState(false);
 
   const needsSigning = isCourseVideo(video_url);
-  const subUnitScopeId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const subUnitScopeRef = String(id);
   const isLeaf = !sub_units || sub_units.length === 0;
 
   const fetchSignedUrl = useCallback(async () => {
@@ -64,22 +65,32 @@ export default function SectionComponent({
   return (
     <div className={`mt-4 ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
       <div className="border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
-        <div
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-5 text-left cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
+        <div className="w-full flex items-center justify-between p-5 text-left">
+          <button
+            type="button"
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-expanded={isExpanded}
+            className="flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer"
+          >
             <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">{title}</h3>
             <StatusIcon status={status} />
             <div className="flex items-center gap-2 text-[var(--brand-muted)]">
-                {text_content && <DocumentTextIcon className="h-4 w-4" title="Text Content Available" />}
-                {sectionImages.length > 0 && <PhotoIcon className="h-4 w-4" title="Images Available" />}
-                {video_url && <VideoCameraIcon className="h-4 w-4" title="Video Available" />}
+                {text_content && <DocumentTextIcon className="h-4 w-4" aria-hidden />}
+                {sectionImages.length > 0 && <PhotoIcon className="h-4 w-4" aria-hidden />}
+                {video_url && <VideoCameraIcon className="h-4 w-4" aria-hidden />}
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div onClick={(e) => e.stopPropagation()}><StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(id, newStatus)} /></div>
-            <ChevronRightIcon className={`h-5 w-5 text-[var(--brand-muted)] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(id, newStatus)} />
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? 'Collapse section' : 'Expand section'}
+              className="p-1 text-[var(--brand-muted)] hover:text-[var(--brand-foreground)]"
+            >
+              <ChevronRightIcon className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+            </button>
           </div>
         </div>
 
@@ -93,7 +104,7 @@ export default function SectionComponent({
               className="overflow-hidden"
             >
               <div className="px-5 pb-5 border-t border-[var(--surface-border)]">
-                {description && <div className="mt-4 prose prose-invert prose-sm max-w-none text-[var(--brand-muted)]" dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }} />}
+                {description && <div className={`mt-4 ${PROSE_COMPACT}`} dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }} />}
                 <div className="my-6 space-y-6">
                     {sectionImages.length > 0 && (
                         <CourseImageStrip images={sectionImages} alt={title} />
@@ -103,9 +114,9 @@ export default function SectionComponent({
                         <div className="animate-spin h-8 w-8 border-2 border-[var(--brand-primary)] border-t-transparent" style={{ borderRadius: '50%' }} />
                       </div>
                     )}
-                    {!videoLoading && resolvedVideoUrl && <VideoComponent src={resolvedVideoUrl} />}
+                    {!videoLoading && resolvedVideoUrl && <VideoComponent src={resolvedVideoUrl} title={title} />}
                 </div>
-                {text_content && <div className="mt-4 prose prose-invert prose-sm max-w-none text-[var(--brand-muted)]" dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
+                {text_content && <div className={`mt-4 ${PROSE_COMPACT}`} dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
 
                 {sub_units?.map((subUnit) => (
                   <SectionComponent
@@ -117,11 +128,11 @@ export default function SectionComponent({
                   />
                 ))}
 
-                {isLeaf && !Number.isNaN(subUnitScopeId) && (
+                {isLeaf && (
                   <ExamPlayer
                     courseId={courseId}
                     scope="sub_unit"
-                    scopeId={subUnitScopeId}
+                    scopeRef={subUnitScopeRef}
                     label={title}
                     questionCount={15}
                   />

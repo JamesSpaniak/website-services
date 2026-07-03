@@ -31,7 +31,7 @@ import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
 import { Repository, In } from 'typeorm';
 import { CourseService } from 'src/courses/course.service';
-import { CourseProgressService } from 'src/courses/course-progress.service';
+import { ProgressService } from 'src/progress/progress.service';
 import {
   GenerateExamDto,
   GenerateClassExamDto,
@@ -53,7 +53,7 @@ export class ExamController {
     private readonly examGeneratorService: ExamGeneratorService,
     private readonly examAttemptService: ExamAttemptService,
     private readonly courseService: CourseService,
-    private readonly courseProgressService: CourseProgressService,
+    private readonly progressService: ProgressService,
     @InjectRepository(Exam) private examRepository: Repository<Exam>,
     @InjectRepository(ClassExam) private classExamRepository: Repository<ClassExam>,
     @InjectRepository(Question) private questionRepository: Repository<Question>,
@@ -77,7 +77,7 @@ export class ExamController {
     @Body() dto: GenerateExamDto,
   ): Promise<ExamWithQuestionsDto> {
     await this.assertCourseAccess(req.user, dto.course_id);
-    await this.courseProgressService.ensureProgress(req.user.userId, dto.course_id);
+    await this.progressService.ensureProgress(req.user.userId, dto.course_id);
     const exam = await this.examGeneratorService.generate(dto, req.user.userId);
     return this.buildExamWithQuestions(exam);
   }
@@ -146,7 +146,7 @@ export class ExamController {
           assigned_at: ce.assigned_at,
           course_id: exam.course_id,
           scope: exam.scope,
-          scope_ids: exam.scope_ids,
+          scope_refs: exam.scope_refs,
           version: exam.version,
           is_randomized: exam.is_randomized,
           question_count: exam.question_ids.length,
@@ -273,7 +273,7 @@ export class ExamController {
       id: exam.id,
       course_id: exam.course_id,
       scope: exam.scope,
-      scope_ids: exam.scope_ids,
+      scope_refs: exam.scope_refs,
       is_randomized: exam.is_randomized,
       version: exam.version,
       created_at: exam.created_at,

@@ -38,10 +38,17 @@ export class Exam {
   exam_pool: ExamPool;
 
   /**
-   * The unit_id or sub_unit_id values this exam covers.
+   * The unit / sub-unit refs (course_units.ref) this exam covers.
    * For full_course exams this is empty ([]).
    */
-  @Column({ type: 'int', array: true })
+  @Column({ type: 'varchar', length: 64, array: true, default: '{}' })
+  scope_refs: string[];
+
+  /**
+   * @deprecated Legacy numeric payload ids, kept one release for rollback.
+   * Application code reads/writes scope_refs instead.
+   */
+  @Column({ type: 'int', array: true, default: '{}' })
   scope_ids: number[];
 
   /**

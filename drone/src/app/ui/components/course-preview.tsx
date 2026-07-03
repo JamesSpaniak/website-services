@@ -11,8 +11,8 @@ interface CoursePreviewProps {
     title: string;
     sub_title?: string;
     images_url?: string[];
-    image_url?: string;
     unitCount: number;
+    price?: number;
 }
 
 export default function CoursePreviewComponent({
@@ -20,10 +20,10 @@ export default function CoursePreviewComponent({
     title,
     sub_title,
     images_url,
-    image_url,
     unitCount,
+    price,
 }: CoursePreviewProps) {
-    const images = mergeCourseImages({ images_url, image_url });
+    const images = mergeCourseImages({ images_url });
     const [imgIdx, setImgIdx] = useState(0);
     const n = images.length;
 
@@ -32,7 +32,9 @@ export default function CoursePreviewComponent({
         setImgIdx((i) => (i + delta + n) % n);
     };
 
-    const courseHref = `/courses/${id}`;
+    const courseHref = `/courses/${id}/preview`;
+    const learnHref = `/courses/${id}`;
+    const displayPrice = Number(price) || 0;
 
     return (
         <article
@@ -96,9 +98,23 @@ export default function CoursePreviewComponent({
             >
                 <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">{title}</h3>
                 {sub_title && <p className="text-sm text-[var(--brand-muted)] mt-1 flex-grow">{sub_title}</p>}
-                <span className="mt-4 inline-block w-fit font-mono text-xs tracking-wide text-[var(--brand-muted)] border border-[var(--surface-border)] px-2 py-1" style={{ borderRadius: 'var(--radius-sm)' }}>
-                    {unitCount} {unitCount === 1 ? 'unit' : 'units'}
-                </span>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <span className="inline-block w-fit font-mono text-xs tracking-wide text-[var(--brand-muted)] border border-[var(--surface-border)] px-2 py-1" style={{ borderRadius: 'var(--radius-sm)' }}>
+                        {unitCount} {unitCount === 1 ? 'unit' : 'units'}
+                    </span>
+                    {displayPrice > 0 && (
+                        <span className="inline-block font-mono text-xs tracking-wide text-[var(--brand-foreground)] border border-[var(--brand-primary)]/30 bg-[var(--brand-primary)]/10 px-2 py-1" style={{ borderRadius: 'var(--radius-sm)' }}>
+                            ${displayPrice}
+                        </span>
+                    )}
+                </div>
+                <span className="mt-3 text-xs font-medium text-[var(--brand-primary)]">View details →</span>
+            </Link>
+            <Link
+                href={learnHref}
+                className="block px-5 pb-4 text-xs text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
+            >
+                Sign in to start learning
             </Link>
         </article>
     );

@@ -5,7 +5,7 @@ Generated from `Compiled questions Part 107 Testing.xlsx - test.csv`, `Compiled 
 - Raw rows: 466 (test) + 147 (end-of-unit)
 - Duplicates dropped: 152
 - **Unique questions: 461**
-- **Final-exam-only** (`standard=FINAL_EXAM`, `unit_id=null`): **77**
+- **Final-exam-only** (`standard=FINAL_EXAM`, `unit_ref=null`): **77**
 
 ## Bulk upload format
 
@@ -21,8 +21,8 @@ Authorization: Bearer <admin token>
   "questions": [
     {
       "course_id": 35,
-      "unit_id": 1,
-      "sub_unit_id": 11,
+      "unit_ref": "u1",
+      "sub_unit_ref": "u11",
       "question_text": "…",
       "choices": [
         {"id": 1, "text": "…", "is_correct": false},
@@ -31,6 +31,7 @@ Authorization: Bearer <admin token>
       ],
       "explanation": "…",
       "standard": null,
+      "figure_ref": null,
       "priority": 2,
       "difficulty": "medium",
       "status": "active"
@@ -47,7 +48,8 @@ Output file: `assets/articles/faa_107_questions.bulk.json` — 461 questions rea
 
 - `standard`: `"FINAL_EXAM"`
 - `priority`: `3` (supplemental — fills large exams last)
-- `unit_id` / `sub_unit_id`: `null` — **excluded** from unit and sub-unit quiz generation
+- `unit_ref` / `sub_unit_ref`: `null` — **excluded** from unit and sub-unit quiz generation
+- `figure_ref`: FAA-CT-8080-2H figure number when the question names one
 - `difficulty`: `hard` when a figure is required
 
 Review column `topical_unit_id` in the CSV shows which unit the question
@@ -58,49 +60,53 @@ belongs to topically before final-exam scoping.
 
 | Unit | Title | Questions |
 | ---: | --- | ---: |
-| 1 | Part 107 Regulations | 131 |
+| 1 | Part 107 Regulations | 130 |
 | 2 | Airports, Airspace & Data Sources | 34 |
-| 3 | Airspace Classifications | 15 |
-| 4 | Airport Operations | 53 |
-| 5 | Weather (Sources / METAR / TAF) | 17 |
+| 3 | Airspace Classifications | 21 |
+| 4 | Airport Operations | 51 |
+| 5 | Weather (Sources / METAR / TAF) | 13 |
 | 6 | Weather Effects on Aircraft Performance | 84 |
 | 7 | Loading & Performance | 17 |
-| 8 | Emergency Procedures | 1 |
-| 9 | Aeronautical Decision Making | 32 |
+| 8 | Emergency Procedures | 2 |
+| 9 | Aeronautical Decision Making | 31 |
+| 10 | ? | 1 |
 
 ## Counts by unit / sub-unit
 
 | Unit | Sub-unit | Questions |
 | ---: | ---: | ---: |
 | 1 | 11 | 8 |
-| 1 | 12 | 14 |
-| 1 | 14 | 8 |
-| 1 | 15 | 18 |
-| 1 | 16 | 13 |
-| 1 | 17 | 13 |
-| 1 | 131 | 21 |
-| 1 | 132 | 9 |
+| 1 | 12 | 1 |
+| 1 | 14 | 9 |
+| 1 | 122 | 1 |
+| 1 | 123 | 2 |
+| 1 | 124 | 1 |
+| 1 | 131 | 24 |
+| 1 | 132 | 10 |
 | 1 | 133 | 8 |
 | 1 | 134 | 4 |
 | 1 | 135 | 2 |
 | 1 | 137 | 3 |
 | 1 | 138 | 2 |
 | 1 | 139 | 5 |
-| 1 | — | 3 |
+| 1 | 151 | 10 |
+| 1 | 152 | 2 |
+| 1 | 153 | 2 |
+| 1 | 161 | 12 |
+| 1 | 171 | 13 |
+| 1 | — | 11 |
 | 2 | 22 | 10 |
-| 2 | 231 | 5 |
-| 2 | 241 | 19 |
+| 2 | 241 | 23 |
+| 2 | 243 | 1 |
 | 3 | 31 | 8 |
-| 3 | 321 | 5 |
+| 3 | 321 | 11 |
 | 3 | 334 | 1 |
 | 3 | 341 | 1 |
-| 4 | 41 | 16 |
 | 4 | 43 | 16 |
-| 4 | 45 | 2 |
+| 4 | 411 | 16 |
 | 4 | 421 | 17 |
 | 4 | 422 | 2 |
-| 5 | 51 | 5 |
-| 5 | 531 | 5 |
+| 5 | 531 | 6 |
 | 5 | 551 | 7 |
 | 6 | 611 | 32 |
 | 6 | 612 | 23 |
@@ -114,20 +120,21 @@ belongs to topically before final-exam scoping.
 | 6 | 671 | 1 |
 | 6 | 673 | 1 |
 | 7 | 71 | 17 |
-| 8 | 81 | 1 |
+| 8 | 81 | 2 |
 | 9 | 95 | 5 |
 | 9 | 911 | 20 |
-| 9 | 931 | 3 |
-| 9 | 932 | 1 |
+| 9 | 932 | 3 |
 | 9 | 941 | 3 |
+| 10 | 1061 | 1 |
 
 ## Items flagged for review
 
-**Total flagged:** 8
+**Total flagged:** 20
 
 Reasons:
 
-- (5) Matched unit but not a specific lesson
+- (14) Matched unit but not a specific lesson
+- (3) Low confidence path match
 - (3) No course path match
 
 All flagged questions are written into the JSON with `"status": "draft"` so they will be uploaded but excluded from exam generation until an admin reviews them. Once you confirm a unit / sub-unit mapping, flip the status to `active` (via PUT /questions/:id or by editing this JSON and re-importing — the import upserts by `id` if you keep IDs stable).
@@ -142,17 +149,18 @@ The Testing CSVs dedupe to **462 unique questions** (~29 fewer than the original
 
 ~77 questions require the FAA-CT-8080-2H supplement. They are scoped to full-course exams only (no `unit_id`). Students taking unit quizzes will not see them until the final. **Risk:** unit-level chart lessons have fewer practice questions unless you add non-figure variants.
 
-The question schema has no `figure_url` field yet — figures are not embedded.
+Figure-based questions carry `figure_ref` (FAA-CT-8080-2H figure number) so the
+exam player can link the supplement; images are not embedded.
 
 ### 3. `standard=FINAL_EXAM` is not filtered by the exam API today
 
-Exclusion from unit quizzes works via `unit_id=null`. The `FINAL_EXAM` tag is for reporting and future filtering; `ExamGeneratorService` does not yet read it.
+Exclusion from unit quizzes works via `unit_ref=null`. The `FINAL_EXAM` tag is for reporting and future filtering; `ExamGeneratorService` does not yet read it.
 
 ### 4. Classification method
 
 Questions are mapped using **Category**, **Sub Category**, and the full course hierarchy in `faa_107_course.json` (unit / section / lesson). Answer choices are **not** used for mapping. Spreadsheet columns `mapped_unit` / `mapped_topic` are omitted from review exports (often wrong).
 
-Rows needing attention: **`faa_107_questions_needs_review.csv`** (14 rows).
+Rows needing attention: **`faa_107_questions_needs_review.csv`** (26 rows).
 
 ### 5. Unit 8 (Emergency) still thin
 
@@ -168,20 +176,40 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 
 | Unit | Sub-unit | Title |
 | ---: | ---: | --- |
+| 1 | 121 | Remote Pilot In Command (RPIC) |
 | 1 | 13 | Operational Rules and Limitations |
 | 1 | 136 | Right-of-Way Rules and Operation Near Aircraft |
-| 2 | 21 | Introduction to Air Traffic and Airspace |
+| 1 | 140 | Operation Over People — General Rule |
+| 1 | 15 | Remote ID Requirements |
+| 1 | 16 | Flying Over People and Moving Objects |
+| 1 | 162 | Categories 1 and 2 |
+| 1 | 163 | Categories 3 and 4, Sustained Flight, and Crowds |
+| 1 | 164 | Operation Over Moving Vehicles |
+| 1 | 17 | Flying At Night Under Certain Conditions |
+| 1 | 172 | Night Flight Hazards and Mitigation |
+| 2 | 211 | Air Traffic by the Numbers |
+| 2 | 212 | National Airspace System (NAS) |
+| 2 | 213 | Air Traffic Control (ATC) |
 | 2 | 23 | Four Essential Airport Data Sources |
+| 2 | 231 | Chart Supplement U.S. (CSU) |
 | 2 | 232 | Notices to Airmen (NOTAMs) |
 | 2 | 233 | Automated Terminal Information Service (ATIS) |
 | 2 | 24 | Aeronautical Charts: Types and Interpretation |
-| 2 | 242 | Interpreting Airport and Airspace Symbols |
-| 2 | 243 | Obstacles and Maximum Elevation Figure (MEF) |
-| 3 | 32 | Controlled Airspace Classes (A, B, C, D, E, G) |
+| 3 | 311 | Airspace Symbols and Chart Literacy |
+| 3 | 32 | Controlled Airspace Overview |
 | 3 | 322 | Class B Airspace |
+| 3 | 3221 | Class B Chart Examples |
 | 3 | 323 | Class C Airspace |
+| 3 | 3231 | Class C Chart Examples |
 | 3 | 324 | Class D Airspace |
-| 3 | 325 | Class E and Class G Airspace |
+| 3 | 3241 | Class D Chart Example (KLUK) |
+| 3 | 3242 | Class D with Class E Extension |
+| 3 | 325 | Class E Fundamentals |
+| 3 | 326 | Class E Chart Examples — 700' and 1,200' AGL |
+| 3 | 327 | Class E2 Surface Areas |
+| 3 | 328 | Class E3 and E4 Extensions |
+| 3 | 329 | Class G Airspace |
+| 3 | 38 | Answering Airspace and Chart Questions |
 | 3 | 33 | Special Use Airspace |
 | 3 | 331 | Restricted Areas |
 | 3 | 332 | Prohibited Areas |
@@ -196,8 +224,13 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 | 3 | 346 | Terminal Radar Service Areas (TRSA) |
 | 3 | 347 | National Security Areas (NSA) |
 | 3 | 348 | Air Defense Identification Zones (ADIZ) |
-| 4 | 42 | Airport Runways and Orientation |
-| 4 | 44 | Airport Signs and Markings |
+| 4 | 412 | Towered and Non-Towered Airports |
+| 4 | 423 | Runways: Surface Aids, Hazards, and Orientation |
+| 4 | 441 | Airport Location and Mandatory Instruction Signs |
+| 4 | 442 | Direction, ILS Holding, and Runway Holding Markings |
+| 4 | 451 | Airport Security (SIDA) |
+| 4 | 452 | Wildlife Hazards Near Airports |
+| 5 | 51 | Aviation Weather Sources Overview |
 | 5 | 52 | Surface Aviation Weather Observations |
 | 5 | 53 | Aviation Routine Weather Report (METAR) Decoding |
 | 5 | 532 | Wind and Visibility |
@@ -210,9 +243,11 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 | 5 | 55 | Terminal Aerodrome Forecast (TAF) Decoding |
 | 5 | 552 | Valid Period and Core Forecast Elements |
 | 5 | 553 | Forecast Change Groups (FM, TEMPO, PROB) |
+| 6 | 60 | What Is Weather? |
 | 6 | 61 | Air Pressure, Density, and Altitude Effects |
 | 6 | 62 | Pressure, Humidity, and Performance |
 | 6 | 63 | Wind, Turbulence, and Severe Wind Hazards |
+| 6 | 633 | Operational Wind Risk Decisions |
 | 6 | 64 | Atmospheric Stability and Temperature Inversions |
 | 6 | 641 | Atmospheric Stability and Convective Currents |
 | 6 | 65 | Dew Point and Structural Icing Hazards |
@@ -260,13 +295,26 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 | 9 | 923 | Mitigating Risks: IMSAFE Checklist |
 | 9 | 924 | Mitigating Risks: PAVE Checklist |
 | 9 | 93 | Crew and Single-Pilot Resource Management |
+| 9 | 931 | Workload Management |
 | 9 | 933 | Situational Awareness |
 | 9 | 94 | Physiology and Vision |
 | 9 | 942 | Collision Threat Detection |
+| 10 | 101 | Radio Communication in the NAS |
+| 10 | 102 | Understanding Proper Radio Procedures |
+| 10 | 103 | Phonetic Alphabet |
+| 10 | 104 | Common Traffic Advisory Frequency (CTAF) |
+| 10 | 105 | Communication Frequencies and Chart Supplements |
+| 10 | 106 | Recommended Traffic Advisory Practices for Remote Pilots |
+| 10 | 1062 | UNICOM |
+| 10 | 1063 | MULTICOM |
+| 10 | 1064 | Flight Service Station (FSS) |
+| 10 | 107 | Aircraft Call Signs and Identification |
+| 10 | 108 | Standard Radio Calls for Incoming Aircraft |
+| 10 | 1081 | Initial 10-Mile Call |
 
 ### 4. Unclassified rows
 
-77 rows could not be confidently assigned. They are present in the JSON with `unit_id: null` and `status: draft`. Sample:
+77 rows could not be confidently assigned. They are present in the JSON with `unit_ref: null` and `status: draft`. Sample:
 
 - *(sheet `test` row 3)* `(Refer to FAA-CT-800-2H, Figure 21). What is the airport located approximately 47 degrees 40 minutes N latitude and 101 degrees 26 minutes w`
 - *(sheet `test` row 4)* `(Refer to FAA-CT-8080-2G, Figure 23) What’s the lower altitude limit of Class E airspace at Statesboro Bulloch County Airport (TBR)?`

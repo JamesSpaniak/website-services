@@ -21,7 +21,7 @@ const signupSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters long." }),
 });
 
-export default function LoginComponent() {
+export default function LoginComponent({ redirectPath }: { redirectPath?: string }) {
     const { login } = useAuth();
     const [mode, setMode] = useState<AuthMode>('login');
     const [formData, setFormData] = useState({

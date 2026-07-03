@@ -10,8 +10,10 @@ function q(partial: Partial<Question> & { id: number; priority: number }): Quest
   return {
     id: partial.id,
     course_id: 35,
-    unit_id: partial.unit_id ?? 1,
-    sub_unit_id: partial.sub_unit_id ?? null,
+    unit_ref: partial.unit_ref === undefined ? 'u1' : partial.unit_ref,
+    sub_unit_ref: partial.sub_unit_ref ?? null,
+    unit_id: null,
+    sub_unit_id: null,
     question_text: `Q${partial.id}`,
     choices: [],
     explanation: null,
@@ -58,11 +60,11 @@ describe('ExamGeneratorService', () => {
 
   beforeEach(async () => {
     questions = [
-      q({ id: 1, priority: 1, unit_id: 1 }),
-      q({ id: 2, priority: 1, unit_id: 1 }),
-      q({ id: 3, priority: 1, unit_id: 1 }),
-      q({ id: 4, priority: 2, unit_id: 1 }),
-      q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_id: null }),
+      q({ id: 1, priority: 1, unit_ref: 'u1' }),
+      q({ id: 2, priority: 1, unit_ref: 'u1' }),
+      q({ id: 3, priority: 1, unit_ref: 'u1' }),
+      q({ id: 4, priority: 2, unit_ref: 'u1' }),
+      q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_ref: null }),
     ];
 
     const qb = {
@@ -92,7 +94,7 @@ describe('ExamGeneratorService', () => {
     const dto: GenerateExamDto = {
       course_id: 35,
       scope: 'unit',
-      scope_ids: [1],
+      scope_refs: ['u1'],
       question_count: 2,
       is_randomized: false,
     };
@@ -100,10 +102,29 @@ describe('ExamGeneratorService', () => {
     const exam = await service.generate(dto, 99);
     expect(exam.question_ids).toHaveLength(2);
     expect(exam.question_ids).toEqual([1, 2]);
+    expect(exam.scope_refs).toEqual(['u1']);
+  });
+
+  it('maps legacy numeric scope_ids to canonical refs', async () => {
+    const dto: GenerateExamDto = {
+      course_id: 35,
+      scope: 'unit',
+      scope_ids: [1],
+      is_randomized: false,
+    };
+
+    const exam = await service.generate(dto, 99);
+    expect(exam.scope_refs).toEqual(['u1']);
+
+    const qb = questionRepo.createQueryBuilder.mock.results[0].value;
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'q.unit_ref = ANY(:refs)',
+      { refs: ['u1'] },
+    );
   });
 
   it('applies final_only pool filter', async () => {
-    questions = [q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_id: null })];
+    questions = [q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_ref: null })];
 
     const dto: GenerateExamDto = {
       course_id: 35,
@@ -122,21 +143,21 @@ describe('ExamGeneratorService', () => {
     );
   });
 
-  it('constrains randomized exam reuse to identical scope_ids (H3)', async () => {
+  it('constrains randomized exam reuse to identical scope_refs (H3)', async () => {
     const qb = makeReuseQb(null);
 
     const dto: GenerateExamDto = {
       course_id: 35,
       scope: 'unit',
-      scope_ids: [6, 5],
+      scope_refs: ['u6', 'u5'],
       // is_randomized omitted → defaults to true, reuse path active
     };
 
     await service.generate(dto, 99);
 
     expect(qb.andWhere).toHaveBeenCalledWith(
-      'e.scope_ids <@ :ids::int[] AND e.scope_ids @> :ids::int[]',
-      { ids: [5, 6] },
+      'e.scope_refs <@ :refs::varchar[] AND e.scope_refs @> :refs::varchar[]',
+      { refs: ['u5', 'u6'] },
     );
     // No reusable exam → a fresh one is created
     expect(examRepo.save).toHaveBeenCalled();
@@ -149,7 +170,7 @@ describe('ExamGeneratorService', () => {
     const dto: GenerateExamDto = {
       course_id: 35,
       scope: 'unit',
-      scope_ids: [5],
+      scope_refs: ['u5'],
     };
 
     const exam = await service.generate(dto, 99);

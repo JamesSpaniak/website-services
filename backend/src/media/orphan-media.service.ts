@@ -6,7 +6,6 @@ import { Course } from '../courses/types/course.entity';
 import { User } from '../users/types/user.entity';
 import { CourseDetails, UnitData } from '../courses/types/course.dto';
 import { MediaService } from './media.service';
-import { migrateCoursePayloadImages } from '../courses/course-payload.util';
 
 /**
  * Files younger than this are considered in-flight (e.g. bulk upload followed
@@ -97,7 +96,6 @@ export class OrphanMediaService {
         } catch {
             return;
         }
-        migrateCoursePayloadImages(payload);
         if (payload.images_url?.length) {
             for (const u of payload.images_url) this.urlToKey(u, keys);
         }
