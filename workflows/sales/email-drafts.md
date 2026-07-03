@@ -1,6 +1,6 @@
 # School Outreach Email Templates
 
-These are reusable templates for cold sales outreach to high schools and the districts that serve them. Primary audience: CTE directors, STEM/curriculum coordinators, principals, superintendents, and the teaching-and-learning, career-readiness, and grants leads listed in `docs/contact-collection.md`.
+These are reusable templates for cold sales outreach to high schools and the districts that serve them. Primary audience: CTE directors, STEM/curriculum coordinators, principals, superintendents, and the teaching-and-learning, career-readiness, and grants leads listed in [`docs/sales/contact-collection.md`](../../docs/sales/contact-collection.md).
 
 Use these as starting points only. Personalize the first line, send a real human follow-up, and never overstate FAA pass rates, school adoption, grant eligibility, or guaranteed career outcomes.
 

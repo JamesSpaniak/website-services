@@ -1,6 +1,6 @@
 /**
  * General Sales Agreement body text — keep aligned with invoice/quote attachments.
- * See docs/legal-and-privacy-site-sync.md before changing.
+ * See docs/tech/legal-and-privacy-site-sync.md before changing.
  */
 export default function TermsOfServiceBody() {
   return (

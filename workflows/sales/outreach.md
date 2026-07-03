@@ -22,11 +22,11 @@ Use these as the first sales collateral until dedicated PDFs are ready.
 
 Internal references:
 
-- `docs/features.md` for current platform capabilities and roadmap gaps.
-- `docs/competitor-analysis.md` for buyer needs, positioning, and competitor patterns.
-- `docs/review-1year.md` and `docs/review-3year.md` for current quote/package examples.
-- `docs/review-1year-updates.md` and `docs/review-3year-updates.md` for quote and Appendix A readiness checks.
-- `docs/legal-and-privacy-site-sync.md` for privacy, accessibility, consent, and legal URL risks.
+- [`docs/sales/features.md`](../../docs/sales/features.md) for current platform capabilities and roadmap gaps.
+- [`docs/sales/competitor-analysis.md`](../../docs/sales/competitor-analysis.md) for buyer needs, positioning, and competitor patterns.
+- [`docs/tech/legal-and-privacy-site-sync.md`](../../docs/tech/legal-and-privacy-site-sync.md) for privacy, accessibility, consent, and legal URL risks.
+
+Quote/package docs (`review-1year.md`, etc.) — **not yet in repo**; add under `docs/sales/` when ready.
 
 ## Manual-first workflow
 

@@ -1,6 +1,6 @@
 # Product features — implemented, roadmap, and school positioning
 
-This document summarizes **what the platform does today** (from [`frontend-data.md`](./frontend-data.md) and [`backend-data.md`](./backend-data.md)), **what we are strengthening in parallel** (question bank scale and instructional quality), and **differentiators we can build** against typical drone-education competitors (see [`competitor-analysis.md`](./competitor-analysis.md)).
+This document summarizes **what the platform does today** (from [`frontend-data.md`](../tech/frontend-data.md) and [`backend-data.md`](../tech/backend-data.md)), **what we are strengthening in parallel** (question bank scale and instructional quality), and **differentiators we can build** against typical drone-education competitors (see [`competitor-analysis.md`](./competitor-analysis.md)).
 
 ---
 
@@ -140,10 +140,10 @@ These are **not all implemented**; they address typical gaps vs larger curriculu
 
 ## Related docs
 
-- [`frontend-data.md`](./frontend-data.md) — routes, client API map, guards.  
-- [`backend-data.md`](./backend-data.md) — entities, permissions, REST map.  
-- [`competitor-analysis.md`](./competitor-analysis.md) — market segments and competitor patterns.  
-- [`course-editing-roadmap.md`](./course-editing-roadmap.md) — course admin UI depth.
+- [`frontend-data.md`](../tech/frontend-data.md) — routes, client API map, guards.
+- [`backend-data.md`](../tech/backend-data.md) — entities, permissions, REST map.
+- [`competitor-analysis.md`](./competitor-analysis.md) — market segments and competitor patterns.
+- [`course-editing-roadmap.md`](../tech/course-editing-roadmap.md) — course admin UI depth.
 
 ---
 
