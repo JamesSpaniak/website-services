@@ -6,7 +6,7 @@ Implementation planning document for quizzes/practice exams, end-of-course final
 
 | Doc | Purpose |
 | --- | --- |
-| [`features.md`](./features.md) | Product capabilities and school positioning |
+| [`features.md`](../sales/features.md) | Product capabilities and school positioning |
 | [`backend-data.md`](./backend-data.md) | API routes and entity overview |
 | [`course-editing-roadmap.md`](./course-editing-roadmap.md) | Course payload authoring |
 | [`../assets/articles/faa_107_questions_gaps.md`](../assets/articles/faa_107_questions_gaps.md) | Part 107 import stats, sub-unit coverage, import risks |

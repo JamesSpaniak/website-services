@@ -1,6 +1,6 @@
 # Contact collection plan
 
-This document plans a script-assisted workflow for collecting school outreach contacts from public education websites. The goal is not to send automated email. The goal is to build a reviewed, source-backed contact list that can feed the manual outreach workflow in `docs/outreach-workflow.md`.
+This document plans a script-assisted workflow for collecting school outreach contacts from public education websites. The goal is not to send automated email. The goal is to build a reviewed, source-backed contact list that can feed the manual outreach workflow in [`workflows/sales/outreach.md`](../../workflows/sales/outreach.md).
 
 Start with public pages only, keep the source URL for every record, and require human review before a contact is marked outreach-ready.
 
@@ -353,7 +353,7 @@ Third milestone:
 
 Fourth milestone:
 
-- Export approved contacts to the outreach tracker schema in `docs/outreach-workflow.md`.
+- Export approved contacts to the outreach tracker schema in [`workflows/sales/outreach.md`](../../workflows/sales/outreach.md).
 - Add a manual review UI or spreadsheet workflow.
 - Add incremental runs that update existing rows instead of replacing files.
 

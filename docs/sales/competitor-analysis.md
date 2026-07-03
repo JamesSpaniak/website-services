@@ -1,6 +1,6 @@
 # Drone education & technology courses — competitor and curriculum analysis
 
-This document compares how drone **education products** are positioned (curriculum depth, Part 107 alignment, modality, price band) and maps **buyer segments**, **regions**, and **feature patterns**. Raw vendor notes and hour/cost figures from internal research live in [`../assets/competitor.txt`](../assets/competitor.txt); figures below should be treated as **snapshot / illustrative** — verify current pricing and scope before commercial use.
+This document compares how drone **education products** are positioned (curriculum depth, Part 107 alignment, modality, price band) and maps **buyer segments**, **regions**, and **feature patterns**. Raw vendor notes and hour/cost figures from internal research live in [`../../assets/competitor.txt`](../../assets/competitor.txt); figures below should be treated as **snapshot / illustrative** — verify current pricing and scope before commercial use.
 
 ---
 

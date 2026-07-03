@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-/** Keep in sync with §10 of Sales Agreement and docs/legal-and-privacy-site-sync.md */
+/** Keep in sync with §10 of Sales Agreement and docs/tech/legal-and-privacy-site-sync.md */
 const PRIVACY_LAST_UPDATED = '2026-04-21';
 
 export default function PrivacyPage() {
