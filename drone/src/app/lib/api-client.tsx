@@ -35,25 +35,14 @@ interface ResetPasswordPayload {
     password: string;
 }
 
-// --- Token Management ---
-const getTokens = () => {
-    if (typeof window === 'undefined') return null;
-    const access_token = localStorage.getItem('access_token');
-    const refresh_token = localStorage.getItem('refresh_token');
-    return { access_token, refresh_token };
-};
+// --- Authentication ---
+// Auth tokens live in HttpOnly cookies set by the backend (and forwarded by
+// the Next /api proxy). They are never readable from JavaScript; the browser
+// attaches them automatically on same-origin requests.
 
-const setTokens = (access_token: string, refresh_token: string) => {
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
-    document.cookie = `access_token=${access_token}; path=/; max-age=86400; SameSite=Lax`;
-};
-
-const clearTokens = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    document.cookie = 'access_token=; path=/; max-age=0';
-};
+/** Auth endpoints where a 401 means "bad credentials", not "expired session". */
+const isAuthEndpoint = (endpoint: string) =>
+    endpoint === 'auth/login' || endpoint === 'auth/refresh' || endpoint === 'auth/logout';
 
 // --- Core API Function ---
 const apiClient = async (endpoint: string, options: RequestInit = {}) => {
@@ -61,54 +50,27 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
     const startTime = Date.now();
     const shouldLogTimings = process.env.NEXT_PUBLIC_LOG_API_TIMINGS === 'true';
 
-    const tokens = getTokens();
-
     const headers = new Headers(options.headers);
     headers.set('Content-Type', 'application/json');
     headers.set('X-Request-Id', requestId);
-
-    if (tokens?.access_token) {
-        headers.set('Authorization', `Bearer ${tokens.access_token}`);
-    }
     options.headers = headers;
 
     try {
         let response = await fetch(buildUrl(endpoint), options);
 
-        if (response.status === 401) {
-            const { refresh_token } = tokens || {};
-            if (!refresh_token) {
-                clearTokens();
+        if (response.status === 401 && typeof window !== 'undefined' && !isAuthEndpoint(endpoint)) {
+            // Access token expired — try a cookie-based refresh, then retry once.
+            const refreshResponse = await fetch(buildUrl('auth/refresh'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Request-Id': uuidv4() },
+                body: JSON.stringify({}),
+            });
+
+            if (!refreshResponse.ok) {
                 throw new Error("Session expired. Please log in again.");
             }
 
-            try {
-                const refreshResponse = await fetch(buildUrl('auth/refresh'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Request-Id': uuidv4() },
-                    body: JSON.stringify({ refresh_token }),
-                });
-
-                if (!refreshResponse.ok) {
-                    clearTokens();
-                    throw new Error("Session expired. Please log in again.");
-                }
-
-                const newTokens = (await refreshResponse.json()) as {
-                    access_token: string;
-                    refresh_token: string;
-                };
-                setTokens(newTokens.access_token, newTokens.refresh_token);
-
-                // Retry original request with new token
-                headers.set('Authorization', `Bearer ${newTokens.access_token}`);
-                response = await fetch(buildUrl(endpoint), options);
-
-            } catch (e) {
-                clearTokens();
-                logger.error(e as Error, { message: 'Failed to refresh token' });
-                throw new Error("Session expired. Please log in again.");
-            }
+            response = await fetch(buildUrl(endpoint), options);
         }
 
         if (shouldLogTimings) {
@@ -147,27 +109,24 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 const login = async (username: string, password: string) => {
+    // The backend sets HttpOnly auth cookies on this response.
     const response = await apiClient('auth/login', {
         method: 'POST',
         body: JSON.stringify({ username, password }),
     });
-    setTokens(response.access_token, response.refresh_token);
     return response.user;
 };
 
 async function logout() {
-    const { refresh_token } = getTokens() || {};
-    if (refresh_token) {
-        try {
-            await apiClient('auth/logout', {
-                method: 'POST',
-                body: JSON.stringify({ refresh_token }),
-            });
-        } catch (error) {
-            logger.error(error as Error, { message: 'Logout failed on server' });
-        }
+    // The backend invalidates the session from the refresh cookie and clears both cookies.
+    try {
+        await apiClient('auth/logout', {
+            method: 'POST',
+            body: JSON.stringify({}),
+        });
+    } catch (error) {
+        logger.error(error as Error, { message: 'Logout failed on server' });
     }
-    clearTokens();
 }
 
 async function getArticles(): Promise<ArticleSlim[]> {
@@ -686,8 +645,6 @@ export {
     purchaseCourse,
     logToServer,
     createPaymentIntent,
-    getTokens,
-    clearTokens,
     uploadMedia,
     deleteMedia,
     listMedia,

@@ -147,15 +147,13 @@ export class CourseController {
       @Body() course: CourseDetails
     ): Promise<Course> {
         migrateCoursePayloadImages(course);
-        const updatedCourseData: Course = {
+        const updatedCourseData: Partial<Course> = {
             title: course.title,
             payload: JSON.stringify(course),
             updated_at: new Date(),
-            hidden: undefined,
-            purchased_by_users: undefined,
             price: course.price
         }
-        return this.courseService.updateCourse(id, updatedCourseData);
+        return this.courseService.updateCourse(id, updatedCourseData as Course);
     }
 
     /**

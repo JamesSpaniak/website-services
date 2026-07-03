@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './types/course.entity';
 import { Repository } from 'typeorm';
@@ -79,9 +79,14 @@ export class CourseService {
 
   async updateCourse(id: number, course: Course): Promise<Course> {
     const existing = await this.courseRepository.findOne({ where: { id: id } });
+    if (!existing) {
+      throw new NotFoundException(`Course with ID ${id} not found`);
+    }
     course.submitted_at = existing.submitted_at;
     course.hidden = existing.hidden;
-    course.purchased_by_users = existing.purchased_by_users;
+    // Note: purchased_by_users is a relation and cannot be persisted through
+    // repository.update() — it must never be assigned here.
+    delete course.purchased_by_users;
     course.updated_at = new Date();
 
     await this.courseRepository.update(id, course);

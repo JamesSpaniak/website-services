@@ -519,7 +519,6 @@ export default function ExamPlayer({
                         {exam.questions.map((q, idx) => {
                             const a = answerMap.get(q.id);
                             const isCorrect = a?.is_correct ?? false;
-                            const correctChoiceId = a?.correct_choice_id;
                             return (
                                 <div key={q.id} className={`p-4 border rounded-lg ${isCorrect ? 'border-green-500/20 bg-green-500/5' : 'border-red-500/20 bg-red-500/5'}`}>
                                     <div className="flex items-start gap-2 mb-3">
@@ -535,7 +534,6 @@ export default function ExamPlayer({
                                     <div className="space-y-1.5 pl-6">
                                         {q.choices.map((choice) => {
                                             const wasSelected = a?.selected_choice_id === choice.id;
-                                            const isTheCorrectChoice = correctChoiceId === choice.id;
 
                                             return (
                                                 <div
@@ -545,32 +543,25 @@ export default function ExamPlayer({
                                                             ? 'bg-green-500/15 text-green-300'
                                                             : wasSelected && !isCorrect
                                                               ? 'bg-red-500/15 text-red-300'
-                                                              : isTheCorrectChoice
-                                                                ? 'bg-green-500/8 text-green-400'
-                                                                : 'text-[var(--brand-muted)]'
+                                                              : 'text-[var(--brand-muted)]'
                                                     }`}
                                                 >
                                                     {wasSelected && isCorrect && <CheckCircleIcon className="h-3.5 w-3.5 shrink-0" />}
                                                     {wasSelected && !isCorrect && <XCircleIcon className="h-3.5 w-3.5 shrink-0" />}
-                                                    {!wasSelected && isTheCorrectChoice && <CheckCircleIcon className="h-3.5 w-3.5 shrink-0" />}
                                                     <span>{choice.text}</span>
                                                     {wasSelected && (
                                                         <span className="ml-auto text-xs opacity-70">
                                                             {isCorrect ? 'Your answer ✓' : 'Your answer'}
                                                         </span>
                                                     )}
-                                                    {!wasSelected && isTheCorrectChoice && (
-                                                        <span className="ml-auto text-xs opacity-70">Correct answer</span>
-                                                    )}
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                    {!isCorrect && a?.explanation && (
-                                        <div className="mt-3 ml-6 p-3 rounded-lg bg-[var(--background)] border border-[var(--surface-border)]">
-                                            <p className="text-xs font-semibold text-[var(--brand-muted)] mb-1">Explanation</p>
-                                            <p className="text-sm text-[var(--brand-foreground)] leading-relaxed">{a.explanation}</p>
-                                        </div>
+                                    {!isCorrect && (
+                                        <p className="mt-3 ml-6 text-xs text-[var(--brand-muted)]">
+                                            Review this topic in the course material, then retake the exam.
+                                        </p>
                                     )}
                                 </div>
                             );

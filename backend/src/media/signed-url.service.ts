@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
 
 @Injectable()
@@ -23,7 +23,13 @@ export class SignedUrlService {
         const url = `https://${this.cloudfrontDomain}/${s3Key}`;
 
         if (!this.enabled) {
-            this.logger.warn('CloudFront signing not configured — returning unsigned URL');
+            // Fail closed in production: returning an unsigned URL would let
+            // paid course media be fetched (and shared) without access checks.
+            if (process.env.NODE_ENV === 'production') {
+                this.logger.error('CloudFront signing not configured in production — refusing to serve unsigned media URL');
+                throw new InternalServerErrorException('Media signing is not configured.');
+            }
+            this.logger.warn('CloudFront signing not configured — returning unsigned URL (non-production only)');
             return url;
         }
 

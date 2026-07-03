@@ -1,6 +1,38 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { IsString, IsNumber, IsOptional, IsEnum, ValidateNested, IsArray, IsBoolean } from 'class-validator';
+import {
+    Allow,
+    IsString,
+    IsNumber,
+    IsOptional,
+    IsEnum,
+    ValidateNested,
+    IsArray,
+    IsBoolean,
+    registerDecorator,
+    ValidationOptions,
+} from 'class-validator';
+
+/**
+ * Accepts string OR number values. Unit IDs are numbers in stored course
+ * payloads but typed as strings in the DTO layer; until the ID migration
+ * standardizes on strings, validation must tolerate both.
+ */
+function IsStringOrNumber(validationOptions?: ValidationOptions) {
+    return function (object: object, propertyName: string) {
+        registerDecorator({
+            name: 'isStringOrNumber',
+            target: object.constructor,
+            propertyName,
+            options: validationOptions,
+            validator: {
+                validate: (value: unknown) =>
+                    typeof value === 'string' || typeof value === 'number',
+                defaultMessage: () => `${propertyName} must be a string or a number`,
+            },
+        });
+    };
+}
 
 export enum ProgressStatus {
     NOT_STARTED = 'NOT_STARTED',
@@ -117,13 +149,31 @@ export class ExamData {
 export class UnitData {
     @ApiProperty()
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
-    @IsString()
+    @IsStringOrNumber()
     id: string;
 
     @ApiProperty()
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
     @IsString()
     title: string;
+
+    @ApiPropertyOptional()
+    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
+    @IsOptional()
+    @IsString()
+    sub_title?: string;
+
+    /** Legacy field present on some stored unit payloads; kept so whitelist doesn't strip it. */
+    @ApiPropertyOptional()
+    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
+    @Allow()
+    price?: number | string;
+
+    /** Legacy field present on some stored unit payloads; kept so whitelist doesn't strip it. */
+    @ApiPropertyOptional()
+    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
+    @Allow()
+    has_access?: boolean;
 
     @ApiPropertyOptional()
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
@@ -179,32 +229,76 @@ export class UnitData {
 }
 
 export class CourseDetails {
+    @ApiPropertyOptional()
+    @Allow()
     id: number;
 
+    @ApiProperty()
+    @IsString()
     title: string;
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
     sub_title: string;
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
     description: string;
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
     text_content?: string;
 
+    @ApiPropertyOptional({ type: [String] })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
     images_url?: string[];
 
     /** @deprecated Merged into `images_url` on read/write. */
+    @ApiPropertyOptional({ deprecated: true })
+    @IsOptional()
+    @IsString()
     image_url?: string;
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
     video_url?: string;
 
+    /** CSS object-position for hero images, e.g. "center", "top", "center 30%". */
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
+    image_focal_point?: string;
+
+    @ApiPropertyOptional({ type: () => [UnitData] })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UnitData)
     units?: UnitData[];
 
+    @ApiPropertyOptional({ enum: ProgressStatus })
+    @IsOptional()
+    @IsEnum(ProgressStatus)
     status?: ProgressStatus;
 
+    /** Stored as a number, but legacy payloads carry a string (e.g. "0"). */
+    @ApiPropertyOptional()
+    @Allow()
     price: number;
 
+    @ApiPropertyOptional()
+    @Allow()
     has_access: boolean;
 
     /** Latest full-course practice / final scores from progress (when user has access). */
+    @ApiPropertyOptional()
+    @Allow()
     exam_summary?: {
         practice?: { score: number; taken_at: string } | null;
         final?: { score: number; taken_at: string } | null;

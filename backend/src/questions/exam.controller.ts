@@ -20,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from 'src/users/types/role.enum';
+import { OrganizationMember } from 'src/organizations/types/organization-member.entity';
+import { OrgRole } from 'src/organizations/types/org-role.enum';
 import { ManagerOrAdminGuard } from './guards/manager-or-admin.guard';
 import { ExamGeneratorService } from './exam-generator.service';
 import { ExamAttemptService } from './exam-attempt.service';
@@ -55,6 +57,8 @@ export class ExamController {
     @InjectRepository(Exam) private examRepository: Repository<Exam>,
     @InjectRepository(ClassExam) private classExamRepository: Repository<ClassExam>,
     @InjectRepository(Question) private questionRepository: Repository<Question>,
+    @InjectRepository(OrganizationMember)
+    private memberRepository: Repository<OrganizationMember>,
   ) {}
 
   // ── Static routes first (must precede :examId to avoid route capture) ────────
@@ -93,6 +97,7 @@ export class ExamController {
     @Request() req,
     @Body() dto: GenerateClassExamDto,
   ): Promise<{ exam: ExamWithQuestionsDto; class_exam_id: number }> {
+    await this.assertManagesOrg(req.user, dto.organization_id);
     await this.assertCourseAccess(req.user, dto.course_id);
     const { exam, classExam } = await this.examGeneratorService.generateClassExam(
       dto,
@@ -114,8 +119,10 @@ export class ExamController {
   @UseGuards(ManagerOrAdminGuard)
   @Get('class')
   async listClassExams(
+    @Request() req,
     @Query('orgId', ParseIntPipe) orgId: number,
   ): Promise<ClassExamSummaryDto[]> {
+    await this.assertManagesOrg(req.user, orgId);
     const classExams = await this.classExamRepository.find({
       where: { organization_id: orgId },
       order: { assigned_at: 'DESC' },
@@ -161,7 +168,12 @@ export class ExamController {
     @Request() req,
     @Param('classExamId', ParseIntPipe) classExamId: number,
   ): Promise<ClassExamResultsDto> {
-    return this.examAttemptService.getClassResults(classExamId, req.user.userId);
+    const classExam = await this.classExamRepository.findOne({
+      where: { id: classExamId },
+    });
+    if (!classExam) throw new NotFoundException(`ClassExam ${classExamId} not found`);
+    await this.assertManagesOrg(req.user, classExam.organization_id);
+    return this.examAttemptService.getClassResults(classExamId);
   }
 
   // ── Dynamic routes (:examId) ───────────────────────────────────────────────
@@ -221,6 +233,28 @@ export class ExamController {
     const hasAccess = await this.courseService.hasAccess(courseId, user);
     if (!hasAccess) {
       throw new ForbiddenException('You do not have access to this course.');
+    }
+  }
+
+  /**
+   * Verifies the caller manages the *specific* organization being targeted.
+   * ManagerOrAdminGuard only checks the caller is a manager somewhere; without
+   * this check any manager could read or assign into other organizations.
+   */
+  private async assertManagesOrg(
+    user: { userId: number; role: Role },
+    organizationId: number,
+  ): Promise<void> {
+    if (user.role === Role.Admin) return;
+    const membership = await this.memberRepository.findOne({
+      where: {
+        userId: user.userId,
+        organizationId,
+        role: OrgRole.Manager,
+      },
+    });
+    if (!membership) {
+      throw new ForbiddenException('You do not manage this organization.');
     }
   }
 

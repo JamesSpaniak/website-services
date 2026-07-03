@@ -120,8 +120,13 @@ export class UsersService {
     if (!user) {
         throw new NotFoundException(`User with ID ${id} not found`);
     }
-    // Merge the validated DTO into the user entity
-    this.userRepository.merge(user, data);
+    // Explicitly pick the updatable profile fields. Never merge the raw body:
+    // extra keys (role, password, token_version, ...) must not reach the
+    // entity even if the global ValidationPipe configuration regresses.
+    if (data.email !== undefined) user.email = data.email;
+    if (data.first_name !== undefined) user.first_name = data.first_name;
+    if (data.last_name !== undefined) user.last_name = data.last_name;
+    if (data.picture_url !== undefined) user.picture_url = data.picture_url;
     user.token_version = (user.token_version || 0) + 1;
     return this.userRepository.save(user);
   }
