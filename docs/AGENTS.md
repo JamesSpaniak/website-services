@@ -9,7 +9,7 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 - **`terraform/`** + **`pipeline.sh`** — AWS infra and deploy (currently one production stack; see environment plan).
 - **`docs/`** — Reference documentation by domain (`tech`, `sales`, `marketing`).
 - **`workflows/`** — Executable runbooks (sales outreach, deploy, content pipeline).
-- **`assets/`** — Course JSON, article outlines, brand files, news drafts, competitor research.
+- **`assets/`** — Course JSON, article outlines, brand files, news drafts.
 - **`scripts/`** — Python/shell helpers; not all are safe to run without review.
 - **`data/outreach/`** — Generated contact lists and email drafts (may contain PII).
 
@@ -26,7 +26,7 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 2. Use [`workflows/sales/email-drafts.md`](../workflows/sales/email-drafts.md) for templates; personalize first line.
 3. Do not invent FAA pass rates, school adoption counts, or grant eligibility.
 4. Product claims: verify against [`docs/sales/features.md`](sales/features.md) and live site.
-5. Competitor figures: treat [`docs/sales/competitor-analysis.md`](sales/competitor-analysis.md) and [`assets/competitor.txt`](../assets/competitor.txt) as snapshots — verify before external use.
+5. Competitor figures: treat [`docs/sales/competitor-analysis.md`](sales/competitor-analysis.md) (Appendix A) as a snapshot — verify before external use.
 
 ## Safe vs sensitive operations
 
@@ -34,7 +34,7 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 |-----------------|---------------------------|
 | Edit frontend/backend with tests locally | `./pipeline.sh` deploy to AWS |
 | Draft outreach email in chat | Sending email or importing contacts to a CRM |
-| Update course JSON in `assets/articles/` | Bulk DB migrations on production |
+| Update course JSON in `assets/courses/` | Bulk DB migrations on production |
 | Run contact scripts locally | Committing `data/outreach/*.csv` |
 | Terraform plan | Terraform apply (especially prod tfvars) |
 
@@ -50,8 +50,8 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 | Positioning, competitors, contact strategy | `docs/sales/` |
 | SEO/GEO, brand, content strategy | `docs/marketing/` |
 | Repeatable process steps | `workflows/<domain>/` |
-| Course/article source data | `assets/articles/`, `assets/news/` |
-| Brand logos and mockups | `assets/Logo/`, `assets/Assets/` |
+| Course/article source data | `assets/courses/`, `assets/articles/`, `assets/news/` |
+| Brand logos and mockups | `assets/visuals/Logo/`, `assets/visuals/Assets/` |
 | Outreach outputs | `data/outreach/` |
 
 ## Cross-links agents often need

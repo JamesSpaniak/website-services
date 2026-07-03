@@ -1,4 +1,5 @@
-# compiled output
+scripts/.venv/
+scripts/__pycache__/
 */dist
 */node_modules
 data/*
@@ -154,5 +155,5 @@ crash.log
 .terraform.lock.hcl
 
 # Brand deck — too large for GitHub (>100MB); keep locally or in cloud storage
-assets/Presentation/VisualIdentityDroneEdge.pdf
-assets/Presentation/*.pdf
+assets/visuals/Presentation/VisualIdentityDroneEdge.pdf
+assets/visuals/Presentation/*.pdf

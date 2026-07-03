@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Parse assets/fulllogs.csv (VPC flow log export) and print summary statistics."""
+"""Parse assets/archive/fulllogs.csv (VPC flow log export) and print summary statistics."""
 import csv
 import sys
 from collections import defaultdict
@@ -24,7 +24,7 @@ def is_private(ip: str) -> bool:
     return False
 
 def main():
-    p = Path(__file__).resolve().parent.parent / "assets" / "fulllogs.csv"
+    p = Path(__file__).resolve().parent.parent / "assets" / "archive" / "fulllogs.csv"
     if not p.exists():
         print(f"File not found: {p}", file=sys.stderr)
         sys.exit(1)

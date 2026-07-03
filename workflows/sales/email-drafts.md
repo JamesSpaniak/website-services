@@ -4,6 +4,16 @@ These are reusable templates for cold sales outreach to high schools and the dis
 
 Use these as starting points only. Personalize the first line, send a real human follow-up, and never overstate FAA pass rates, school adoption, grant eligibility, or guaranteed career outcomes.
 
+## Product truth (read first)
+
+**Live today:** Safety Track — FAA Part 107 structured course, 600+ practice questions, org accounts, manager dashboard.
+
+**Roadmap (do not sell as available):** Creative Track (video/photo), STEM Track (AI & drones).
+
+For all outbound in 2026, **lead with Part 107 + teacher visibility**. Use three-track language only as *pathway vision* ("students can grow from Part 107 into media and applied STEM as we ship those tracks") — not as "three courses you can buy today."
+
+See [`docs/sales/positioning.md`](../../docs/sales/positioning.md) and [`docs/sales/go-to-market-review.md`](../../docs/sales/go-to-market-review.md).
+
 ## How to Use
 
 - **Length target.** First-touch emails should stay under 100 words. Follow-ups should stay under 60. Busy school administrators skim on mobile.
@@ -12,15 +22,15 @@ Use these as starting points only. Personalize the first line, send a real human
 - **Pick one angle.** Safety, Creative, STEM, career pathway, or funding. Do not stack angles in a first email.
 - **Send from a real person.** Always sign with a name. Never use "team" signatures for first-touch.
 
-## Our Three Tracks
+## Our Three Tracks (naming + status)
 
-Use the named tracks consistently across emails so they become recognizable:
+Use track names consistently; always pair with status when describing the product:
 
-- **Safety Track** — FAA Part 107 preparation, airspace awareness, safe flight habits, risk planning, and responsible operation.
-- **Creative Track** — drone photography, videography, storytelling, mapping, and portfolio-quality aerial media projects.
-- **STEM Track** — flight systems, electronics, weather, data, problem solving, and applied engineering habits.
+- **Safety Track** — **Live.** FAA Part 107 preparation, airspace awareness, safe flight habits, risk planning, and responsible operation.
+- **Creative Track** — **Coming soon.** Drone photography, videography, storytelling, mapping, and portfolio-quality aerial media projects.
+- **STEM Track** — **Coming soon.** Flight systems, electronics, weather, data, problem solving, and applied engineering habits.
 
-Students can mix tracks. Teachers can assign one track or build a full pathway.
+First-touch emails should sell **Safety / Part 107**. Mention the full three-track vision in follow-ups or when the buyer asks about media or CS pathways.
 
 ## Strengths to Highlight
 
@@ -79,9 +89,27 @@ Follow-up subjects:
 
 Keep subjects under 60 characters so they survive in mobile previews.
 
+## Recommended first-touch (Part 107 lead — use by default)
+
+```text
+Hi [Name],
+
+I saw [personalization detail] at [School/District] and wanted to ask if you are building or exploring a drone / FAA Part 107 pathway for students.
+
+Drone Edge is browser-based Part 107 prep with structured units, 600+ practice questions, and a manager dashboard so teachers see cohort progress — async, hybrid, or teacher-led.
+
+Worth a 15-minute call this month?
+
+https://thedroneedge.com/schools
+
+Best,
+James
+Drone Edge
+```
+
 ## Initial Outreach Templates
 
-Each template targets a specific role. All are kept short on purpose.
+Each template targets a specific role. All are kept short on purpose. **Update three-track lines to Part 107–first** until Creative and STEM ship (see Product truth above).
 
 ### 1. General First-Touch (any role)
 

@@ -1,4 +1,4 @@
-# Full logs analysis — `assets/fulllogs.csv`
+# Full logs analysis — `assets/archive/fulllogs.csv`
 
 ## Overview
 

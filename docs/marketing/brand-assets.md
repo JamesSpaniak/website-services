@@ -1,43 +1,38 @@
 # Brand & marketing assets
 
-Index of design and content assets under [`assets/`](../../assets/). Files stay in place to avoid breaking paths in scripts and the app.
+Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to avoid breaking script paths.
 
 ## Brand identity
 
 | Path | Contents |
 |------|----------|
-| [`assets/Logo/`](../../assets/Logo/) | SVG, PNG, PDF — logo and icon (black/white) |
-| [`assets/Colors/`](../../assets/Colors/) | Brand color reference |
-| [`assets/Fonts/`](../../assets/Fonts/) | Font links / licensing notes |
-| [`assets/Assets/Gradients/`](../../assets/Assets/Gradients/) | Gradient backgrounds |
-| [`assets/Assets/Social/`](../../assets/Assets/Social/) | Social media template images |
-| [`assets/Assets/Mockups/`](../../assets/Assets/Mockups/) | Device and scene mockups (Cap, Drone, iPad, etc.) |
-| [`assets/Prompt Guide/`](../../assets/Prompt%20Guide/) | Image/content prompt guide (docx) |
+| [`assets/visuals/Logo/`](../../assets/visuals/Logo/) | SVG, PNG, PDF — logo and icon (black/white) |
+| [`assets/visuals/Colors/`](../../assets/visuals/Colors/) | Brand color reference |
+| [`assets/visuals/Fonts/`](../../assets/visuals/Fonts/) | Font links / licensing notes |
+| [`assets/visuals/Assets/Gradients/`](../../assets/visuals/Assets/Gradients/) | Gradient backgrounds |
+| [`assets/visuals/Assets/Social/`](../../assets/visuals/Assets/Social/) | Social media template images |
+| [`assets/visuals/Assets/Mockups/`](../../assets/visuals/Assets/Mockups/) | Device and scene mockups |
+| [`assets/visuals/Prompt Guide/`](../../assets/visuals/Prompt%20Guide/) | Image/content prompt guide (docx) |
+| [`assets/visuals/Presentation/`](../../assets/visuals/Presentation/) | Visual identity PDF |
 
 ## Public web assets
 
 | Path | Contents |
 |------|----------|
-| [`drone/public/`](../../drone/public/) | Static files served by Next.js (favicons, article fallbacks) |
-| CloudFront `media.thedroneedge.com` | Uploaded course/article video and images (production S3) |
+| [`drone/public/`](../../drone/public/) | Static files served by Next.js |
+| CloudFront `media.thedroneedge.com` | Uploaded course/article video and images |
 
-## Editorial & SEO content
+## Editorial content
 
 | Path | Contents |
 |------|----------|
 | [`assets/news/`](../../assets/news/) | Article drafts (`.txt`), import JSON, hero images |
-| [`assets/news/articles/manifest.json`](../../assets/news/articles/manifest.json) | Batch manifest for news imports |
-| [`assets/competitor.txt`](../../assets/competitor.txt) | Raw competitor research (see sales doc) |
-
-## Course & instructional content
-
-| Path | Contents |
-|------|----------|
-| [`assets/articles/`](../../assets/articles/) | FAA 107 course JSON, outlines, question CSVs |
-| [`assets/videos/`](../../assets/videos/) | Source video files for upload/transcode |
+| [`assets/articles/`](../../assets/articles/) | Standalone article import JSON |
+| [`assets/courses/`](../../assets/courses/) | Course JSON and question bank artifacts |
+| [`article-inventory.md`](article-inventory.md) | Repo vs prod CMS status, slugs, prod IDs |
 
 ## Usage notes
 
 - Prefer **Logo/SVG** for web; PNG for slides and email.
-- News images: run `scripts/brand_story11_images.py` or place under `assets/news/images/`.
-- Do not commit large binary churn without need; course JSON and news JSON are the usual commit targets.
+- News images: `scripts/brand_story11_images.py` or `assets/news/images/`.
+- Course JSON and news JSON are the usual commit targets; avoid large binary churn.

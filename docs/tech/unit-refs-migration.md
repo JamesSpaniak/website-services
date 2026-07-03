@@ -70,10 +70,10 @@ so the `progress.payload` drop is a no-op in practice.
 
 | Step | Action | Why this order |
 | --- | --- | --- |
-| 1 | **Upload the updated `assets/articles/faa_107_course.json`** to production via the admin course editor (`PUT /courses/35`) while the *old* code is still running. The old code accepts the numeric-id JSON as-is. | The migration in step 2 walks whatever payload is in the DB. Uploading first means units 7 and 10 get refs, `course_units` rows, and corrected question links in the same migration pass. |
+| 1 | **Upload the updated `assets/courses/faa_107_course.json`** to production via the admin course editor (`PUT /courses/35`) while the *old* code is still running. The old code accepts the numeric-id JSON as-is. | The migration in step 2 walks whatever payload is in the DB. Uploading first means units 7 and 10 get refs, `course_units` rows, and corrected question links in the same migration pass. |
 | 2 | **Deploy the backend.** Migration `1745100006000` runs at boot: rewrites payloads to refs, builds `course_units`, backfills `questions.unit_ref`, `exams.scope_refs`, `progress.unit_statuses`; drops `progress.payload`. | Single atomic transformation of content + links. |
 | 3 | **Deploy the frontend.** It sends `scope_refs` / `unit_ref` and reads titled breakdowns. | New backend accepts both old and new field names, so frontend can lag the backend safely — never lead it. |
-| 4 | **Re-import the question bank**: upload the regenerated `assets/articles/faa_107_questions.bulk.json` (admin → Question Bank → Import JSON, or `POST /questions/import`). | The regenerated file uses string refs (including `u10x` for Unit 10) which are validated against `course_units` — this import only succeeds **after** steps 1–2. |
+| 4 | **Re-import the question bank**: upload the regenerated `assets/courses/faa_107_questions.bulk.json` (admin → Question Bank → Import JSON, or `POST /questions/import`). | The regenerated file uses string refs (including `u10x` for Unit 10) which are validated against `course_units` — this import only succeeds **after** steps 1–2. |
 
 **Alternative (also safe): code first, then JSON.** If the backend deploys
 before the JSON upload, the migration transforms the *old* course payload, and

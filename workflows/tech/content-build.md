@@ -1,35 +1,31 @@
 # Content build workflow
 
-Rebuild course units, questions, and media from source assets in `assets/`.
+Rebuild course questions and publish course/article/media assets.
 
-## FAA 107 course units (from outlines)
+## FAA 107 course
 
-Rebuild scripts live in `scripts/`:
-
-| Script | Unit |
-|--------|------|
-| `rebuild_unit1_regulations.py` | Unit 1 — Regulations |
-| `rebuild_unit2_airports.py` | Unit 2 — Airports |
-| `rebuild_unit3_airspace.py` | Unit 3 — Airspace |
-| `rebuild_unit4_airport_operations.py` | Unit 4 — Airport operations |
-
-Source outlines: `assets/articles/*.docx`, `assets/articles/*.txt`
-
-Output: updates `assets/articles/faa_107_course.json` (review diff before admin upload).
-
-## Question bank
-
-```bash
-python3 scripts/build_faa_107_questions.py
-```
+| Step | Action |
+|------|--------|
+| Edit structure | `assets/courses/faa_107_course.json` or admin course editor |
+| Source outlines | Reference only: `assets/courses/outlines/` |
+| Regenerate questions | `python3 scripts/build_faa_107_questions.py` |
+| Review mapping | `assets/courses/faa_107_questions_review.csv`, `faa_107_questions_gaps.md` |
+| Publish course | Admin `PUT /courses/:id` or API |
+| Import questions | `assets/courses/faa_107_questions.bulk.json` via admin or API |
 
 See [`docs/tech/exam-generator-and-course-linking.md`](../../docs/tech/exam-generator-and-course-linking.md).
 
-## Publish course to production DB
+Optional maintenance scripts (run once when needed, not part of deploy):
 
-1. Validate JSON locally / staging.
-2. Admin course editor or API `PUT /courses/:id` with updated payload.
-3. Follow [`docs/tech/unit-refs-migration.md`](../../docs/tech/unit-refs-migration.md) when changing unit refs.
+- `scripts/refactor_course_goals.py` — merge description into `text_content`
+- `scripts/plaintext_course_text_content.py` — strip markdown from unit bodies
+- `scripts/export_general_operations_review.py` — ops-category review CSV
+
+## Article import JSON
+
+Legacy batch payloads: `assets/articles/*.json` → admin article editor.
+
+News pipeline: [`workflows/marketing/content-and-seo.md`](../marketing/content-and-seo.md) (`assets/news/`).
 
 ## Video upload
 
@@ -37,7 +33,7 @@ See [`docs/tech/exam-generator-and-course-linking.md`](../../docs/tech/exam-gene
 ./scripts/bulk-upload-videos.sh
 ```
 
-Raw uploads → S3 raw bucket → MediaConvert → HLS on media CloudFront.
+Source files: `assets/videos/` → S3 raw bucket → MediaConvert → HLS on media CloudFront.
 
 ## API types (after backend DTO changes)
 

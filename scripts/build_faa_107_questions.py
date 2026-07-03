@@ -3,16 +3,16 @@
 Build a bulk-upload JSON for the FAA Part 107 question bank.
 
 Reads:
-  - assets/articles/Compiled questions Part 107 Testing.xlsx - test.csv
-  - assets/articles/Compiled questions Part 107 Testing.xlsx - end of unit questions.csv
-  - assets/articles/faa_107_course.json
+  - assets/courses/Compiled questions Part 107 Testing.xlsx - test.csv
+  - assets/courses/Compiled questions Part 107 Testing.xlsx - end of unit questions.csv
+  - assets/courses/faa_107_course.json
 
 Writes:
-  - assets/articles/faa_107_questions.bulk.json          POST body for /questions/import
-  - assets/articles/faa_107_questions_review.csv           full mapping review (all questions)
-  - assets/articles/faa_107_questions_needs_review.csv     rows needing mapping attention
-  - assets/articles/faa_107_course_leaf_paths.csv          canonical leaf lessons
-  - assets/articles/faa_107_questions_gaps.md              gap report + risks
+  - assets/courses/faa_107_questions.bulk.json          POST body for /questions/import
+  - assets/courses/faa_107_questions_review.csv           full mapping review (all questions)
+  - assets/courses/faa_107_questions_needs_review.csv     rows needing mapping attention
+  - assets/courses/faa_107_course_leaf_paths.csv          canonical leaf lessons
+  - assets/courses/faa_107_questions_gaps.md              gap report + risks
 
 Final-exam-only questions use standard="FINAL_EXAM", priority=3, unit_ref=null,
 sub_unit_ref=null so they only appear in full_course exam generation (see ExamGeneratorService).
@@ -42,7 +42,7 @@ from course_question_mapper import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ROOT / "assets" / "articles"
+ASSETS = ROOT / "assets" / "courses"
 CSV_TEST = ASSETS / "Compiled questions Part 107 Testing.xlsx - test.csv"
 CSV_EOU = ASSETS / "Compiled questions Part 107 Testing.xlsx - end of unit questions.csv"
 COURSE_JSON = ASSETS / "faa_107_course.json"

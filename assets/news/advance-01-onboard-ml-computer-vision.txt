@@ -57,7 +57,7 @@ NEXT ADVANCEMENT (HOW CLOSE?)
 Yes: this line of work is near the next step. Generalizable world models and lightweight multimodal reasoning (vision plus language or mission graphs) on board, plus better calibration under distribution shift. The gap is less a slightly better detector and more closed-loop planning under uncertainty with certifiable behavior. Expect incremental releases over roughly 3-7 years rather than a single breakthrough moment.
 
 ────────────────────────────────────────────────────────────
-HEADER IMAGES (Social theme — assets/Assets/Social)
+HEADER IMAGES (Social theme — assets/visuals/Assets/Social)
 ────────────────────────────────────────────────────────────
 Primary hero (targeting / detection HUD):
   /images/articles/advance-01-hero-cv-targeting.png

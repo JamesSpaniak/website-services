@@ -11,8 +11,8 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "assets" / "news" / "images"
 PUBLIC_DIR = ROOT / "drone" / "public" / "images" / "articles"
-ICON_SVG = ROOT / "assets" / "Logo" / "SVG" / "Icon" / "IconWhite.svg"
-LOGO_SVG = ROOT / "assets" / "Logo" / "SVG" / "Logo" / "LogoWhite.svg"
+ICON_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Icon" / "IconWhite.svg"
+LOGO_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Logo" / "LogoWhite.svg"
 ICON_PNG = OUT_DIR / "icon-white.png"
 LOGO_PNG = OUT_DIR / "logo-white.png"
 FONTS = ROOT / "drone" / "node_modules" / "@fontsource"
