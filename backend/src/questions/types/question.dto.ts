@@ -38,12 +38,26 @@ export class CreateQuestionDto {
   @IsInt()
   course_id: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Top-level unit ref from course_units (e.g. "u10"). Null = full-course question.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  unit_ref?: string | null;
+
+  @ApiPropertyOptional({ description: 'Lesson/sub-unit ref from course_units (e.g. "u101").' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  sub_unit_ref?: string | null;
+
+  /** @deprecated Legacy numeric payload id — converted to unit_ref on import. */
+  @ApiPropertyOptional({ deprecated: true })
   @IsOptional()
   @IsInt()
   unit_id?: number | null;
 
-  @ApiPropertyOptional()
+  /** @deprecated Legacy numeric payload id — converted to sub_unit_ref on import. */
+  @ApiPropertyOptional({ deprecated: true })
   @IsOptional()
   @IsInt()
   sub_unit_id?: number | null;
@@ -140,15 +154,17 @@ export class UpdateQuestionDto {
   @IsEnum(['active', 'draft', 'archived'])
   status?: QuestionStatus;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Top-level unit ref from course_units (e.g. "u10").' })
   @IsOptional()
-  @IsInt()
-  unit_id?: number | null;
+  @IsString()
+  @MaxLength(64)
+  unit_ref?: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Lesson/sub-unit ref from course_units (e.g. "u101").' })
   @IsOptional()
-  @IsInt()
-  sub_unit_id?: number | null;
+  @IsString()
+  @MaxLength(64)
+  sub_unit_ref?: string | null;
 }
 
 /**
@@ -213,9 +229,17 @@ export class GenerateExamDto {
   scope: ExamScope;
 
   @ApiPropertyOptional({
-    type: [Number],
-    description: 'unit_id or sub_unit_id values to include. Empty for full_course.',
+    type: [String],
+    description: 'Unit or sub-unit refs (course_units.ref) to include. Empty for full_course.',
   })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(64, { each: true })
+  scope_refs?: string[];
+
+  /** @deprecated Legacy numeric ids — mapped to scope_refs ("u{n}") when scope_refs is absent. */
+  @ApiPropertyOptional({ type: [Number], deprecated: true })
   @IsOptional()
   @IsArray()
   @IsInt({ each: true })
@@ -384,8 +408,8 @@ export class ExamWithQuestionsDto {
   @ApiProperty()
   scope: ExamScope;
 
-  @ApiProperty({ type: [Number] })
-  scope_ids: number[];
+  @ApiProperty({ type: [String] })
+  scope_refs: string[];
 
   @ApiProperty()
   is_randomized: boolean;
@@ -428,8 +452,8 @@ export class ClassExamSummaryDto {
   @ApiProperty({ enum: ['sub_unit', 'unit', 'full_course'] })
   scope: ExamScope;
 
-  @ApiProperty({ type: [Number] })
-  scope_ids: number[];
+  @ApiProperty({ type: [String] })
+  scope_refs: string[];
 
   @ApiProperty()
   version: string;
@@ -446,7 +470,7 @@ export class ClassExamSummaryDto {
 export interface ExamScoreSnapshot {
   exam_id: number;
   scope: ExamScope;
-  scope_ids: number[];
+  scope_refs: string[];
   /** Set for exams generated after exam_pool column exists */
   exam_pool?: ExamPool;
   score: number;

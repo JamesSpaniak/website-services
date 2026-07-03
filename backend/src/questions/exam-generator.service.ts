@@ -37,7 +37,7 @@ export class ExamGeneratorService {
     if (dto.is_randomized !== false) {
       // Set equality (mutual containment) so a pending exam for one unit is
       // never returned for a request that covers different units.
-      const scopeIds = (dto.scope_ids ?? []).slice().sort((a, b) => a - b);
+      const scopeRefs = this.resolveScopeRefs(dto).slice().sort();
       const recent = await this.examRepository
         .createQueryBuilder('e')
         .leftJoin('exam_attempts', 'ea', 'ea.exam_id = e.id AND ea.user_id = :uid', { uid: userId })
@@ -46,7 +46,7 @@ export class ExamGeneratorService {
         .andWhere('e.scope = :scope', { scope: dto.scope })
         .andWhere('e.exam_pool = :pool', { pool: this.resolveExamPool(dto) })
         .andWhere('e.generated_by = :gb', { gb: 'student' })
-        .andWhere('e.scope_ids <@ :ids::int[] AND e.scope_ids @> :ids::int[]', { ids: scopeIds })
+        .andWhere('e.scope_refs <@ :refs::varchar[] AND e.scope_refs @> :refs::varchar[]', { refs: scopeRefs })
         .andWhere('ea.id IS NULL')
         .orderBy('e.created_at', 'DESC')
         .getOne();
@@ -162,6 +162,15 @@ export class ExamGeneratorService {
     return dto.exam_pool ?? 'scoped';
   }
 
+  /**
+   * Resolves the requested scope to unit refs. Prefers scope_refs; legacy
+   * numeric scope_ids map deterministically to their canonical refs ("u{n}").
+   */
+  private resolveScopeRefs(dto: GenerateExamDto): string[] {
+    if (dto.scope_refs?.length) return dto.scope_refs;
+    return (dto.scope_ids ?? []).map((id) => `u${id}`);
+  }
+
   private applyExamPoolFilter(
     qb: SelectQueryBuilder<Question>,
     examPool: ExamPool,
@@ -182,15 +191,18 @@ export class ExamGeneratorService {
       .where('q.course_id = :courseId', { courseId: dto.course_id })
       .andWhere('q.status = :status', { status: 'active' });
 
+    const scopeRefs = this.resolveScopeRefs(dto);
     if (dto.scope === 'full_course') {
       // No unit/sub_unit filter
-    } else if (dto.scope === 'unit' && dto.scope_ids?.length) {
-      qb.andWhere('q.unit_id = ANY(:ids)', { ids: dto.scope_ids });
-    } else if (dto.scope === 'sub_unit' && dto.scope_ids?.length) {
-      qb.andWhere('q.sub_unit_id = ANY(:ids)', { ids: dto.scope_ids });
+    } else if (dto.scope === 'unit' && scopeRefs.length) {
+      // unit_ref is denormalized on every question (always the top-level
+      // unit), so a unit scope naturally includes all descendant lessons.
+      qb.andWhere('q.unit_ref = ANY(:refs)', { refs: scopeRefs });
+    } else if (dto.scope === 'sub_unit' && scopeRefs.length) {
+      qb.andWhere('q.sub_unit_ref = ANY(:refs)', { refs: scopeRefs });
     } else {
       throw new BadRequestException(
-        `scope_ids must be provided for scope="${dto.scope}".`,
+        `scope_refs must be provided for scope="${dto.scope}".`,
       );
     }
 
@@ -209,7 +221,8 @@ export class ExamGeneratorService {
     const exam = this.examRepository.create({
       course_id: dto.course_id,
       scope: dto.scope,
-      scope_ids: dto.scope_ids ?? [],
+      scope_refs: this.resolveScopeRefs(dto),
+      scope_ids: [],
       exam_pool: this.resolveExamPool(dto),
       question_ids: questions.map((q) => q.id),
       is_randomized: dto.is_randomized !== false,
@@ -222,10 +235,10 @@ export class ExamGeneratorService {
   }
 
   private buildDedupKey(dto: GenerateClassExamDto): string {
-    const ids = (dto.scope_ids ?? []).slice().sort((a, b) => a - b).join(',');
+    const refs = this.resolveScopeRefs(dto).slice().sort().join(',');
     const count = dto.question_count ?? 'all';
     const pool = this.resolveExamPool(dto);
-    return `${dto.course_id}:${dto.scope}:${ids}:${dto.version ?? 'v1'}:${count}:${pool}:fixed`;
+    return `${dto.course_id}:${dto.scope}:${refs}:${dto.version ?? 'v1'}:${count}:${pool}:fixed`;
   }
 }
 

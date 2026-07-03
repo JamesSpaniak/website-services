@@ -2,6 +2,7 @@ import { DataSourceOptions } from 'typeorm';
 import { Article } from '../articles/types/article.entity';
 import { User } from '../users/types/user.entity';
 import { Course } from '../courses/types/course.entity';
+import { CourseUnit } from '../courses/types/course-unit.entity';
 import { Progress } from '../progress/types/progress.entity';
 import { Session } from '../auth/types/session.entity';
 import { Organization } from '../organizations/types/organization.entity';
@@ -30,6 +31,7 @@ const defaultConnection: DataSourceOptions = {
     entities: [
         Article,
         Course,
+        CourseUnit,
         User,
         Progress,
         Session,

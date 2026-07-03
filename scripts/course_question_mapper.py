@@ -31,12 +31,12 @@ def _tokens(s: str) -> set[str]:
     return {t for t in _norm(s).split() if len(t) > 2 and t not in stop}
 
 
-def unit_id_from_node_id(node_id: int) -> int:
-    if node_id < 10:
-        return node_id
-    if node_id < 100:
-        return node_id // 10
-    return node_id // 100
+def unit_ref(node_id: int | str) -> str:
+    """Canonical string ref for a payload id: numeric ids become "u{n}" (matches
+    the backend's toUnitRef normalization); string ids pass through trimmed."""
+    if isinstance(node_id, int) or (isinstance(node_id, str) and node_id.strip().isdigit()):
+        return f"u{int(node_id)}"
+    return str(node_id).strip()
 
 
 @dataclass
@@ -44,7 +44,7 @@ class CourseNode:
     id: int
     title: str
     path: tuple[str, ...]  # includes this node's title
-    unit_id: int
+    unit_id: int  # legacy id of the TOP-LEVEL unit this node lives under
     is_leaf: bool
     norm_path: str = ""
     norm_title: str = ""
@@ -54,28 +54,47 @@ class CourseNode:
         self.norm_path = _norm(" > ".join(self.path))
         self.norm_title = _norm(self.path[-1])
 
+    @property
+    def ref(self) -> str:
+        return unit_ref(self.id)
+
+    @property
+    def unit_ref(self) -> str:
+        return unit_ref(self.unit_id)
+
 
 def load_course_index(path: Path = COURSE_JSON) -> dict[int, CourseNode]:
+    """
+    Walk the course tree. unit_id is derived from the top-level ancestor in the
+    tree (NOT from numeric-prefix math, which breaks for unit 10: node 101 is
+    a child of unit 10, but 101 // 100 == 1).
+    """
     data = json.loads(path.read_text(encoding="utf-8"))
     nodes: dict[int, CourseNode] = {}
 
-    def walk(items: list, prefix: tuple[str, ...]) -> None:
+    def walk(items: list, prefix: tuple[str, ...], root_id: int | None) -> None:
         for item in items:
             title = (item.get("title") or "").strip()
             path = prefix + (title,)
             subs = item.get("sub_units") or []
+            node_id = int(item["id"])
+            top_id = root_id if root_id is not None else node_id
             node = CourseNode(
-                id=int(item["id"]),
+                id=node_id,
                 title=title,
                 path=path,
-                unit_id=unit_id_from_node_id(int(item["id"])),
+                unit_id=top_id,
                 is_leaf=len(subs) == 0,
             )
+            if node.id in nodes:
+                raise ValueError(
+                    f"Duplicate unit id {node.id} in {path!r} — "
+                    f"already used by {nodes[node.id].path!r}"
+                )
             nodes[node.id] = node
-            walk(subs, path)
+            walk(subs, path, top_id)
 
-    for top in data.get("units", []):
-        walk([top], ())
+    walk(data.get("units", []), (), None)
 
     _attach_aliases(nodes)
     return nodes
@@ -772,6 +791,8 @@ def course_paths_report(nodes: dict[int, CourseNode] | None = None) -> list[dict
             rows.append({
                 "unit_id": node.unit_id,
                 "sub_unit_id": node.id,
+                "unit_ref": node.unit_ref,
+                "sub_unit_ref": node.ref,
                 "course_path": " > ".join(node.path),
             })
     return rows

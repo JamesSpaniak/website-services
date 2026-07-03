@@ -24,18 +24,21 @@
 
 ## Backend course data state
 
-**Storage:** `courses.payload` is a **JSON string** of `CourseDetails` (not normalized per-column). **`migrateCoursePayloadImages`** (`backend/src/courses/course-payload.util.ts`) runs on **create/update** and on **read paths** so that:
+**Storage:** `courses.payload` is a **JSON string** of `CourseDetails` (not normalized per-column). Unit refs are normalized on save via `course-unit.util.ts`; the `course_units` table indexes the tree for queries and progress.
 
-- **`images_url: string[]`** is canonical for course root and every `UnitData` node.
-- Legacy **`image_url`** (single) is merged into `images_url` and removed from the merged object.
+**Freemium:** Set `free_preview: true` on a top-level unit to expose its content (and descendants) without purchase. Course price is stored on the `courses.price` column (e.g. `$29` for FAA 107).
+
+**Public marketing:** `GET /courses/:id/public` returns a stripped payload for SSR at `/courses/:id/preview`.
 
 **Related code:**
 
-- **Media cleanup / orphan detection:** `CourseService.collectCourseMediaUrls`, `OrphanMediaService` — collect all strings in `images_url` arrays.
-- **Progress blobs:** `ProgressService.initializeProgressPayload` strips `images_url` / `image_url` from unit snapshots where titles/descriptions are stripped (same as before for PII-ish content trimming).
-- **Course + progress merge:** `CourseProgressService.getCourseWithProgress` — migrated payload before merge.
+- **Unit index:** `CourseUnitService`, `course_units` table, migration `1745100006000-StringUnitRefsAndCourseUnits.ts`.
+- **Progress:** `ProgressService.getCourseWithProgress` overlays `unit_statuses` and applies freemium redaction via `redactUnitsForFreemium`.
+- **Media cleanup / orphan detection:** `CourseService.collectCourseMediaUrls`, `OrphanMediaService`.
 
-**API:** Swagger types live in `backend/src/courses/types/course.dto.ts` (`UnitData`, `CourseDetails`).
+**API:** Swagger types in `backend/src/courses/types/course.dto.ts`. Regenerate frontend types with `npm run generate:api-types` in `drone/` (requires a running backend).
+
+**Legacy note:** `migrateCoursePayloadImages` / `course-payload.util.ts` were removed in the PR 3 unit-ref migration; image normalization now happens in the save path.
 
 ---
 

@@ -9,12 +9,15 @@ export interface QuestionChoice {
 export interface Question {
   id: number;
   course_id: number;
-  unit_id: number | null;
-  sub_unit_id: number | null;
+  /** Top-level unit ref (course_units.ref, e.g. "u10"). Null = full-course. */
+  unit_ref: string | null;
+  /** Lesson/sub-unit ref (e.g. "u101"). Null = unit-level question. */
+  sub_unit_ref: string | null;
   question_text: string;
   choices: QuestionChoice[];
   explanation: string | null;
   standard: string | null;
+  figure_ref?: string | null;
   priority: 1 | 2 | 3;
   difficulty: 'easy' | 'medium' | 'hard';
   status: 'active' | 'draft' | 'archived';
@@ -24,12 +27,13 @@ export interface Question {
 
 export interface CreateQuestionPayload {
   course_id: number;
-  unit_id?: number | null;
-  sub_unit_id?: number | null;
+  unit_ref?: string | null;
+  sub_unit_ref?: string | null;
   question_text: string;
   choices: QuestionChoice[];
   explanation?: string | null;
   standard?: string | null;
+  figure_ref?: string | null;
   priority?: number;
   difficulty?: 'easy' | 'medium' | 'hard';
   status?: 'active' | 'draft' | 'archived';
@@ -60,7 +64,8 @@ export type ExamPool = 'scoped' | 'final_only' | 'all';
 export interface GenerateExamPayload {
   course_id: number;
   scope: ExamScope;
-  scope_ids?: number[];
+  /** Unit / sub-unit refs (course_units.ref). Empty for full_course. */
+  scope_refs?: string[];
   is_randomized?: boolean;
   version?: string;
   question_count?: number;
@@ -85,7 +90,7 @@ export interface ExamWithQuestions {
   id: number;
   course_id: number;
   scope: ExamScope;
-  scope_ids: number[];
+  scope_refs: string[];
   is_randomized: boolean;
   version: string;
   questions: ExamQuestionDto[];
@@ -98,8 +103,12 @@ export interface SubmitExamAnswer {
 }
 
 export interface SectionBreakdown {
-  unit_id: number;
-  sub_unit_id: number | null;
+  /** Null for cross-section / final-exam questions. */
+  unit_ref: string | null;
+  sub_unit_ref: string | null;
+  /** Display titles resolved by the API from the course unit index. */
+  unit_title?: string | null;
+  sub_unit_title?: string | null;
   correct: number;
   total: number;
   score_percent: number;
@@ -139,7 +148,7 @@ export interface ClassExamSummary {
   assigned_at: string;
   course_id: number;
   scope: ExamScope;
-  scope_ids: number[];
+  scope_refs: string[];
   version: string;
   is_randomized: boolean;
   question_count: number;

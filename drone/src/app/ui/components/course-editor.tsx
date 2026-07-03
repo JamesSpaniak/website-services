@@ -152,7 +152,7 @@ export default function CourseEditor({ course, onSave, onCancel }: CourseEditorP
             setDescription(str(parsed.description));
             setTextContent(str(parsed.text_content));
             setHeroImages(
-                mergeCourseImages(parsed as { images_url?: string[]; image_url?: string }),
+                mergeCourseImages(parsed as { images_url?: string[] }),
             );
             setVideoUrl(str(parsed.video_url));
             setImageFocalPoint(str(parsed.image_focal_point));
@@ -424,7 +424,6 @@ function UnitEditor({
         const t = trimImageUrls(next);
         onUpdateById(unit.id, {
             images_url: t !== undefined ? next : undefined,
-            image_url: undefined,
         });
     };
 

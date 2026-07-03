@@ -59,15 +59,22 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 
 ### `courses`
 
-- `title` (unique), `payload` (JSON string of `CourseDetails`: units, exams, etc.), `price`, `hidden`.
-- **`CourseDetails` media:** `images_url` (string array) on the course root and on each `UnitData` node for hero/gallery images; legacy single `image_url` in stored JSON is merged into `images_url` by **`migrateCoursePayloadImages`** on read/write (`backend/src/courses/course-payload.util.ts`). Video remains `video_url` where applicable.
+- `title` (unique), `payload` (JSON string of `CourseDetails`: unit tree with **string unit refs**), `price`, `hidden`.
+- **`CourseDetails` media:** `images_url` (string array) on the course root and on each `UnitData` node for hero/gallery images (legacy `image_url` was merged into `images_url` by migration `1745100006000` and removed). Video remains `video_url` where applicable.
 - M2M: **`purchased_by_users`** (users), **`organizations`** (orgs that may grant access via `organization_courses`).
+
+### `course_units`
+
+- Normalized index of the payload's unit tree, rebuilt transactionally on every course save (`CourseUnitService.rebuild`).
+- Per node: `course_id` + `ref` (unique pair), `parent_ref`, `legacy_id` (old numeric id, when derivable), `path`, `depth`, `position`, `title`.
+- Referenced by `questions.unit_ref`/`sub_unit_ref` and `exams.scope_refs` (by convention — validated on write, no FK).
+- See [`unit-refs-migration.md`](./unit-refs-migration.md).
 
 ### `progress`
 
 - Per user + course: **`userId`**, **`courseId`** (unique pair).
-- `payload` (JSONB): snapshot/progress shape aligned with course structure.
-- `status`, `units_completed`, `units_total`, `latest_exam_score`, `updated_at`.
+- `unit_statuses` (JSONB): map of unit `ref` → `ProgressStatus` (replaced the old full-payload copy).
+- `status`, `units_completed`, `units_total`, `exam_scores` (JSONB snapshots keyed by scope_refs/pool), `latest_exam_score` (final exams only), `updated_at`.
 
 ### `articles`
 
@@ -180,13 +187,12 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | GET | `/courses` | Optional JWT | Public list; `has_access` if logged in. |
-| GET | `/courses/:id` | JWT | Full course + progress; access enforced in service. |
-| POST | `/courses` | JWT + **Admin** | Create. |
-| PUT | `/courses/:id` | JWT + **Admin** | Update. |
+| GET | `/courses/:id/public` | — | Marketing payload (titles/outline/hero; no lesson content). |
+| GET | `/courses/:id` | JWT | Full course + progress; freemium redaction when unpurchased (`free_preview` units stay open). |
+| POST | `/courses` | JWT + **Admin** | Create; normalizes unit ids to refs + rebuilds `course_units`. |
+| PUT | `/courses/:id` | JWT + **Admin** | Update; same normalization/rebuild. |
 | DELETE | `/courses/:id` | JWT + **Admin** | |
-| PATCH | `/courses/:courseId/units/:unitId` | JWT | Unit progress. |
-| GET | `/courses/:courseId/units/:unitId/media` | JWT | Signed video URL; requires course access. |
-| POST | `/courses/:courseId/units/:unitId/exam/submit` | JWT | Exam submit. |
+| GET | `/courses/:courseId/units/:unitId/media` | JWT | Signed video URL; requires purchase **or** a `free_preview` unit branch. `:unitId` is the unit **ref**. |
 
 ### Progress — `/progress` (alternate surface)
 
@@ -195,8 +201,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | GET | `/progress/courses` | JWT | All courses with progress. |
 | POST | `/progress/courses/:courseId/reset` | JWT | Reset course progress. |
 | PATCH | `/progress/courses/:courseId` | JWT | Course-level status. |
-| PATCH | `/progress/courses/:courseId/units/:unitId` | JWT | Unit progress. |
-| POST | `/progress/courses/:courseId/units/:unitId/exam/submit` | JWT | Exam submit. |
+| PATCH | `/progress/courses/:courseId/units/:unitId` | JWT | Unit progress; `:unitId` is the unit **ref** (validated against `course_units`). |
 
 ### Articles — `/articles`
 

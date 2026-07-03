@@ -9,7 +9,9 @@ import { UsersService } from '../src/users/user.service';
 import { User } from '../src/users/types/user.entity';
 import { Role } from '../src/users/types/role.enum';
 import { Course } from '../src/courses/types/course.entity';
-import { CourseDetails } from '../src/courses/types/course.dto';
+import { CourseUnit } from '../src/courses/types/course-unit.entity';
+import { CourseDetails, ProgressStatus } from '../src/courses/types/course.dto';
+import { Progress } from '../src/progress/types/progress.entity';
 import { Organization } from '../src/organizations/types/organization.entity';
 import { OrganizationMember } from '../src/organizations/types/organization-member.entity';
 import { OrgRole } from '../src/organizations/types/org-role.enum';
@@ -23,6 +25,8 @@ describe('API (e2e)', () => {
   let dataSource: DataSource;
   let userRepository: Repository<User>;
   let courseRepository: Repository<Course>;
+  let courseUnitRepository: Repository<CourseUnit>;
+  let progressRepository: Repository<Progress>;
   let organizationRepository: Repository<Organization>;
   let memberRepository: Repository<OrganizationMember>;
   let examRepository: Repository<Exam>;
@@ -48,19 +52,6 @@ describe('API (e2e)', () => {
         video_url: 'https://example.com/unit.mp4',
         images_url: ['https://example.com/unit.png'],
         sub_units: [],
-        exam: {
-          retries_allowed: 1,
-          questions: [
-            {
-              id: 1,
-              question: 'Question 1',
-              answers: [
-                { id: 1, text: 'A', correct: true },
-                { id: 2, text: 'B', correct: false },
-              ],
-            },
-          ],
-        },
       },
     ],
     status: undefined,
@@ -70,7 +61,7 @@ describe('API (e2e)', () => {
 
   const truncateAll = async () => {
     await dataSource.query(
-      'TRUNCATE TABLE "sessions", "progress", "user_courses_purchased", "courses", "users", "articles", ' +
+      'TRUNCATE TABLE "sessions", "progress", "user_courses_purchased", "courses", "course_units", "users", "articles", ' +
       '"organizations", "organization_members", "exams", "exam_attempts", "class_exams", "questions" ' +
       'RESTART IDENTITY CASCADE;',
     );
@@ -139,6 +130,8 @@ describe('API (e2e)', () => {
     dataSource = app.get(DataSource);
     userRepository = app.get<Repository<User>>(getRepositoryToken(User));
     courseRepository = app.get<Repository<Course>>(getRepositoryToken(Course));
+    courseUnitRepository = app.get<Repository<CourseUnit>>(getRepositoryToken(CourseUnit));
+    progressRepository = app.get<Repository<Progress>>(getRepositoryToken(Progress));
     organizationRepository = app.get<Repository<Organization>>(getRepositoryToken(Organization));
     memberRepository = app.get<Repository<OrganizationMember>>(getRepositoryToken(OrganizationMember));
     examRepository = app.get<Repository<Exam>>(getRepositoryToken(Exam));
@@ -331,7 +324,7 @@ describe('API (e2e)', () => {
   });
 
   describe('course update with whitelist validation (C1 prep)', () => {
-    it('accepts numeric unit ids and image_focal_point, strips unknown keys', async () => {
+    it('normalizes numeric unit ids to refs, keeps image_focal_point, strips unknown keys', async () => {
       const course = await createCourse('Whitelist Course');
       await createUser(Role.Admin, 'courseadmin', 'courseadmin@example.com');
       const token = await loginAndGetToken('courseadmin');
@@ -342,7 +335,7 @@ describe('API (e2e)', () => {
         totally_unknown_key: 'should be stripped',
         units: [
           {
-            id: 11, // numeric id, as stored in real payloads
+            id: 11, // legacy numeric id, as stored in real payloads
             title: 'Unit 1.1',
             sub_title: 'Numeric ID unit',
             description: 'desc',
@@ -359,7 +352,7 @@ describe('API (e2e)', () => {
         .expect(200);
 
       const savedPayload = JSON.parse(response.body.payload);
-      expect(savedPayload.units[0].id).toBe(11);
+      expect(savedPayload.units[0].id).toBe('u11'); // numeric → canonical ref
       expect(savedPayload.units[0].sub_title).toBe('Numeric ID unit');
       expect(savedPayload.image_focal_point).toBe('center 30%');
       expect(savedPayload).not.toHaveProperty('totally_unknown_key');
@@ -393,7 +386,9 @@ describe('API (e2e)', () => {
 
       const question = await questionRepository.save({
         course_id: course.id,
-        unit_id: 1,
+        unit_ref: 'u1',
+        sub_unit_ref: null,
+        unit_id: null,
         sub_unit_id: null,
         question_text: 'What is 2+2?',
         choices: [
@@ -412,7 +407,8 @@ describe('API (e2e)', () => {
         course_id: course.id,
         scope: 'unit' as const,
         exam_pool: 'scoped' as const,
-        scope_ids: [1],
+        scope_refs: ['u1'],
+        scope_ids: [],
         question_ids: [question.id],
         is_randomized: true,
         version: 'v1',
@@ -458,7 +454,7 @@ describe('API (e2e)', () => {
         .send({
           course_id: course.id,
           scope: 'unit',
-          scope_ids: [1],
+          scope_refs: ['u1'],
           organization_id: orgB.id,
         })
         .expect(403);
@@ -496,7 +492,9 @@ describe('API (e2e)', () => {
 
       const question = await questionRepository.save({
         course_id: course.id,
-        unit_id: 1,
+        unit_ref: 'u1',
+        sub_unit_ref: null,
+        unit_id: null,
         sub_unit_id: null,
         question_text: 'Pick the correct answer.',
         choices: [
@@ -515,7 +513,8 @@ describe('API (e2e)', () => {
         course_id: course.id,
         scope: 'unit' as const,
         exam_pool: 'scoped' as const,
-        scope_ids: [1],
+        scope_refs: ['u1'],
+        scope_ids: [],
         question_ids: [question.id],
         is_randomized: true,
         version: 'v1',
@@ -560,6 +559,216 @@ describe('API (e2e)', () => {
       expect(response.body.answers[0].is_correct).toBe(true);
       expect(response.body.answers[0]).not.toHaveProperty('correct_choice_id');
       expect(response.body.answers[0]).not.toHaveProperty('explanation');
+    });
+  });
+
+  describe('unit refs data model (PR 3)', () => {
+    /** Creates a course through the API so course_units is built. */
+    const createCourseViaApi = async (token: string, title: string) => {
+      const body = {
+        ...seedCoursePayload(title),
+        units: [
+          {
+            id: 1, // legacy numeric — normalized to u1
+            title: 'Regulations',
+            text_content: 'unit content',
+            sub_units: [
+              { id: 11, title: 'Applicability', text_content: 'lesson content', sub_units: [] },
+              { id: 13, title: 'Operational Rules', text_content: 'lesson content', sub_units: [] },
+            ],
+          },
+          {
+            id: 10, // the unit that collided with prefix math
+            title: 'Radio Communications',
+            text_content: 'unit content',
+            sub_units: [
+              { id: 101, title: 'Radio in the NAS', text_content: 'lesson content', sub_units: [] },
+            ],
+          },
+        ],
+      };
+      const response = await request(app.getHttpServer())
+        .post('/courses')
+        .set('Authorization', `Bearer ${token}`)
+        .send(body)
+        .expect(201);
+      return response.body as Course;
+    };
+
+    const seedQuestion = (courseId: number, unitRef: string, subUnitRef: string | null, text: string) =>
+      questionRepository.save({
+        course_id: courseId,
+        unit_ref: unitRef,
+        sub_unit_ref: subUnitRef,
+        unit_id: null,
+        sub_unit_id: null,
+        question_text: text,
+        choices: [
+          { id: 1, text: 'A', is_correct: true },
+          { id: 2, text: 'B', is_correct: false },
+        ],
+        explanation: null,
+        standard: null,
+        figure_ref: null,
+        priority: 1,
+        difficulty: 'medium' as const,
+        status: 'active' as const,
+      });
+
+    it('rebuilds course_units with normalized refs, parent refs, and legacy ids on save', async () => {
+      await createUser(Role.Admin, 'refsadmin', 'refsadmin@example.com');
+      const token = await loginAndGetToken('refsadmin');
+      const course = await createCourseViaApi(token, 'Refs Course');
+
+      const rows = await courseUnitRepository.find({
+        where: { course_id: course.id },
+        order: { depth: 'ASC', position: 'ASC' },
+      });
+      expect(rows.map((r) => r.ref).sort()).toEqual(['u1', 'u10', 'u101', 'u11', 'u13']);
+
+      const u101 = rows.find((r) => r.ref === 'u101');
+      expect(u101.parent_ref).toBe('u10'); // owned by unit 10, not prefix-math unit 1
+      expect(u101.legacy_id).toBe(101);
+      expect(u101.depth).toBe(1);
+
+      // Payload ids were rewritten to refs
+      const saved = await courseRepository.findOneBy({ id: course.id });
+      const payload = JSON.parse(saved.payload);
+      expect(payload.units.map((u: { id: string }) => u.id)).toEqual(['u1', 'u10']);
+
+      // Re-uploading the same payload is idempotent (same refs, no dupes)
+      await request(app.getHttpServer())
+        .put(`/courses/${course.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(payload)
+        .expect(200);
+      const rowsAfter = await courseUnitRepository.find({ where: { course_id: course.id } });
+      expect(rowsAfter.map((r) => r.ref).sort()).toEqual(['u1', 'u10', 'u101', 'u11', 'u13']);
+    });
+
+    it('generates ref-scoped exams without unit 1 / unit 10 collisions', async () => {
+      await createUser(Role.Admin, 'refsexam', 'refsexam@example.com');
+      const token = await loginAndGetToken('refsexam');
+      const course = await createCourseViaApi(token, 'Refs Exam Course');
+
+      const q1 = await seedQuestion(course.id, 'u1', 'u11', 'Unit 1 question');
+      const q10 = await seedQuestion(course.id, 'u10', 'u101', 'Unit 10 question');
+
+      const unit1 = await request(app.getHttpServer())
+        .post('/exams/generate')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ course_id: course.id, scope: 'unit', scope_refs: ['u1'] })
+        .expect(201);
+      expect(unit1.body.scope_refs).toEqual(['u1']);
+      expect(unit1.body.questions.map((q: { id: number }) => q.id)).toEqual([q1.id]);
+
+      const unit10 = await request(app.getHttpServer())
+        .post('/exams/generate')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ course_id: course.id, scope: 'unit', scope_refs: ['u10'] })
+        .expect(201);
+      expect(unit10.body.questions.map((q: { id: number }) => q.id)).toEqual([q10.id]);
+    });
+
+    it('maps legacy scope_ids to refs on generate', async () => {
+      await createUser(Role.Admin, 'legacyscope', 'legacyscope@example.com');
+      const token = await loginAndGetToken('legacyscope');
+      const course = await createCourseViaApi(token, 'Legacy Scope Course');
+      await seedQuestion(course.id, 'u1', null, 'Legacy scoped question');
+
+      const response = await request(app.getHttpServer())
+        .post('/exams/generate')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ course_id: course.id, scope: 'unit', scope_ids: [1] })
+        .expect(201);
+
+      expect(response.body.scope_refs).toEqual(['u1']);
+      expect(response.body.questions).toHaveLength(1);
+    });
+
+    it('returns titled section breakdown on submit', async () => {
+      await createUser(Role.Admin, 'breakdown', 'breakdown@example.com');
+      const token = await loginAndGetToken('breakdown');
+      const course = await createCourseViaApi(token, 'Breakdown Course');
+      const question = await seedQuestion(course.id, 'u1', 'u11', 'Breakdown question');
+
+      const generated = await request(app.getHttpServer())
+        .post('/exams/generate')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ course_id: course.id, scope: 'unit', scope_refs: ['u1'] })
+        .expect(201);
+
+      const submit = await request(app.getHttpServer())
+        .post(`/exams/${generated.body.id}/submit`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ answers: [{ question_id: question.id, selected_choice_id: 1 }] })
+        .expect(201);
+
+      const breakdown = submit.body.section_breakdown;
+      expect(breakdown).toHaveLength(1);
+      expect(breakdown[0].unit_ref).toBe('u1');
+      expect(breakdown[0].sub_unit_ref).toBe('u11');
+      expect(breakdown[0].unit_title).toBe('Regulations');
+      expect(breakdown[0].sub_unit_title).toBe('Applicability');
+      expect(breakdown[0].score_percent).toBe(100);
+    });
+
+    it('tracks unit progress by ref in unit_statuses and rejects unknown refs', async () => {
+      await createUser(Role.Admin, 'refprogress', 'refprogress@example.com');
+      const token = await loginAndGetToken('refprogress');
+      const course = await createCourseViaApi(token, 'Ref Progress Course');
+
+      const response = await request(app.getHttpServer())
+        .patch(`/progress/courses/${course.id}/units/u11`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: ProgressStatus.COMPLETED })
+        .expect(200);
+      expect(response.body.status).toBe(ProgressStatus.COMPLETED);
+
+      const user = await userRepository.findOneBy({ username: 'refprogress' });
+      const progress = await progressRepository.findOneBy({
+        userId: user.id,
+        courseId: course.id,
+      });
+      expect(progress.unit_statuses).toEqual({ u11: ProgressStatus.COMPLETED });
+      expect(progress.units_total).toBe(5);
+      expect(progress.units_completed).toBe(1);
+
+      await request(app.getHttpServer())
+        .patch(`/progress/courses/${course.id}/units/no-such-ref`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: ProgressStatus.COMPLETED })
+        .expect(404);
+    });
+
+    it('validates question refs against course_units on import', async () => {
+      await createUser(Role.Admin, 'importrefs', 'importrefs@example.com');
+      const token = await loginAndGetToken('importrefs');
+      const course = await createCourseViaApi(token, 'Import Refs Course');
+
+      const question = (unitRef: string) => ({
+        course_id: course.id,
+        question_text: `Question for ${unitRef}`,
+        choices: [
+          { id: 1, text: 'A', is_correct: true },
+          { id: 2, text: 'B', is_correct: false },
+        ],
+        unit_ref: unitRef,
+        priority: 2,
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/questions/import')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          course_id: course.id,
+          questions: [question('u1'), question('u999')],
+        })
+        .expect(201);
+
+      // Valid ref imported; unknown ref skipped (not silently mislinked)
+      expect(response.body.created).toBe(1);
+      expect(response.body.skipped).toBe(1);
     });
   });
 

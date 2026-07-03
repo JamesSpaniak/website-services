@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
 import { createPaymentIntent, getCourseById } from '@/app/lib/api-client';
 import ImageComponent from './image';
@@ -19,12 +19,38 @@ import { logger } from '@/app/lib/logger';
 interface PurchaseFlowProps {
     course: CourseData;
     onPurchaseSuccess: () => void;
+    redirectPath?: string;
 }
 
-export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlowProps) {
+function useStripeElementStyle() {
+    const [style, setStyle] = useState({
+        base: { fontSize: '16px', color: '#e5e7eb', '::placeholder': { color: '#9ca3af' } },
+        invalid: { color: '#f87171' },
+    });
+
+    useEffect(() => {
+        const root = document.documentElement;
+        const fg = getComputedStyle(root).getPropertyValue('--brand-foreground').trim() || '#e5e7eb';
+        const muted = getComputedStyle(root).getPropertyValue('--brand-muted').trim() || '#9ca3af';
+        const danger = getComputedStyle(root).getPropertyValue('--brand-danger').trim() || '#f87171';
+        setStyle({
+            base: { fontSize: '16px', color: fg, '::placeholder': { color: muted } },
+            invalid: { color: danger },
+        });
+    }, []);
+
+    return style;
+}
+
+export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }: PurchaseFlowProps) {
     const { user } = useAuth();
     const stripe = useStripe();
     const elements = useElements();
+    const cardStyle = useStripeElementStyle();
+    const loginHref = useMemo(() => {
+        const base = redirectPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/courses');
+        return `/login?redirect=${encodeURIComponent(base)}`;
+    }, [redirectPath]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -93,7 +119,7 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
                 <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8">
                     <h2 className="text-2xl font-bold text-[var(--brand-foreground)]">Please Log In</h2>
                     <p className="mt-2 text-[var(--brand-muted)]">You need to be logged in to purchase this course.</p>
-                    <Link href="/login" className="mt-4 inline-block px-6 py-2 text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
+                    <Link href={loginHref} className="mt-4 inline-block px-6 py-2 text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
                         Login or Sign Up
                     </Link>
                 </div>
@@ -128,12 +154,7 @@ export default function PurchaseFlow({ course, onPurchaseSuccess }: PurchaseFlow
                     <h2 className="text-xl font-semibold text-[var(--brand-foreground)]">Payment Information</h2>
                     <div className="mt-4 p-4 border border-[var(--surface-border)] rounded-lg bg-[var(--comment-secondary-bg)]">
                         {/* This is the Stripe Card Element for securely collecting card details */}
-                        <CardElement options={{
-                            style: {
-                                base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } },
-                                invalid: { color: '#9e2146' },
-                            }
-                        }} />
+                        <CardElement options={{ style: cardStyle }} />
                     </div>
                 </div>
 

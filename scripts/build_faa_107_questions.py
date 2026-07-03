@@ -14,8 +14,11 @@ Writes:
   - assets/articles/faa_107_course_leaf_paths.csv          canonical leaf lessons
   - assets/articles/faa_107_questions_gaps.md              gap report + risks
 
-Final-exam-only questions use standard="FINAL_EXAM", priority=3, unit_id=null,
-sub_unit_id=null so they only appear in full_course exam generation (see ExamGeneratorService).
+Final-exam-only questions use standard="FINAL_EXAM", priority=3, unit_ref=null,
+sub_unit_ref=null so they only appear in full_course exam generation (see ExamGeneratorService).
+
+The bulk JSON uses string unit refs (course_units.ref, e.g. "u101") — the
+mapper works with legacy numeric ids internally and converts on output.
 
 Run:  python3 scripts/build_faa_107_questions.py
 """
@@ -35,6 +38,7 @@ from course_question_mapper import (
     hierarchy_for_sub_unit,
     load_course_index,
     map_question_to_course,
+    unit_ref,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -726,6 +730,17 @@ def tag_final_exam_only(row: Row) -> None:
     row.classified_by = (row.classified_by + " → FINAL_EXAM").strip(" →")
 
 
+_FIGURE_RE = re.compile(
+    r"refer to[^.]{0,60}?figure\s+(\d+[A-Za-z]?)", re.IGNORECASE,
+)
+
+
+def extract_figure_ref(question: str) -> str | None:
+    """FAA-CT-8080-2H figure number referenced by the question (e.g. "23")."""
+    m = _FIGURE_RE.search(question)
+    return m.group(1) if m else None
+
+
 def to_import_dto(row: Row) -> dict:
     # choices: stable 1-based ids
     choices = []
@@ -736,8 +751,9 @@ def to_import_dto(row: Row) -> dict:
             "is_correct": (idx - 1) == row.answer_idx,  # type: ignore[attr-defined]
         })
 
+    figure_ref = extract_figure_ref(row.question)
     difficulty = "medium"
-    if re.search(r"refer to (figure|faa[- ]?ct)", row.question, re.IGNORECASE):
+    if figure_ref or re.search(r"refer to (figure|faa[- ]?ct)", row.question, re.IGNORECASE):
         difficulty = "hard"
 
     priority = 3 if row.final_exam_only else 2
@@ -745,12 +761,15 @@ def to_import_dto(row: Row) -> dict:
 
     return {
         "course_id": COURSE_ID,
-        "unit_id": row.unit_id,
-        "sub_unit_id": row.sub_unit_id,
+        # String refs (course_units.ref). The backend still accepts legacy
+        # numeric unit_id/sub_unit_id, but refs are the canonical form.
+        "unit_ref": unit_ref(row.unit_id) if row.unit_id is not None else None,
+        "sub_unit_ref": unit_ref(row.sub_unit_id) if row.sub_unit_id is not None else None,
         "question_text": row.question,
         "choices": choices,
         "explanation": row.explanation or None,
         "standard": standard,
+        "figure_ref": figure_ref,
         "priority": priority,
         "difficulty": difficulty,
         "status": "draft" if row.needs_review else "active",
@@ -823,7 +842,7 @@ def main() -> None:
         f"- Raw rows: {len(test_rows)} (test) + {len(eou_rows)} (end-of-unit)",
         f"- Duplicates dropped: {dupes_dropped}",
         f"- **Unique questions: {len(all_rows)}**",
-        f"- **Final-exam-only** (`standard={FINAL_EXAM_STANDARD}`, `unit_id=null`): **{final_exam_count}**",
+        f"- **Final-exam-only** (`standard={FINAL_EXAM_STANDARD}`, `unit_ref=null`): **{final_exam_count}**",
         "",
         "## Bulk upload format",
         "",
@@ -839,8 +858,8 @@ def main() -> None:
         "  \"questions\": [",
         "    {",
         "      \"course_id\": 35,",
-        "      \"unit_id\": 1,",
-        "      \"sub_unit_id\": 11,",
+        "      \"unit_ref\": \"u1\",",
+        "      \"sub_unit_ref\": \"u11\",",
         "      \"question_text\": \"…\",",
         "      \"choices\": [",
         "        {\"id\": 1, \"text\": \"…\", \"is_correct\": false},",
@@ -849,6 +868,7 @@ def main() -> None:
         "      ],",
         "      \"explanation\": \"…\",",
         "      \"standard\": null,",
+        "      \"figure_ref\": null,",
         "      \"priority\": 2,",
         "      \"difficulty\": \"medium\",",
         "      \"status\": \"active\"",
@@ -865,7 +885,8 @@ def main() -> None:
         "",
         "- `standard`: `\"FINAL_EXAM\"`",
         "- `priority`: `3` (supplemental — fills large exams last)",
-        "- `unit_id` / `sub_unit_id`: `null` — **excluded** from unit and sub-unit quiz generation",
+        "- `unit_ref` / `sub_unit_ref`: `null` — **excluded** from unit and sub-unit quiz generation",
+        "- `figure_ref`: FAA-CT-8080-2H figure number when the question names one",
         "- `difficulty`: `hard` when a figure is required",
         "",
         "Review column `topical_unit_id` in the CSV shows which unit the question",
@@ -940,11 +961,12 @@ def main() -> None:
         "will not see them until the final. **Risk:** unit-level chart lessons have fewer "
         "practice questions unless you add non-figure variants.",
         "",
-        "The question schema has no `figure_url` field yet — figures are not embedded.",
+        "Figure-based questions carry `figure_ref` (FAA-CT-8080-2H figure number) so the",
+        "exam player can link the supplement; images are not embedded.",
         "",
         "### 3. `standard=FINAL_EXAM` is not filtered by the exam API today",
         "",
-        "Exclusion from unit quizzes works via `unit_id=null`. The `FINAL_EXAM` tag is "
+        "Exclusion from unit quizzes works via `unit_ref=null`. The `FINAL_EXAM` tag is "
         "for reporting and future filtering; `ExamGeneratorService` does not yet read it.",
         "",
         "### 4. Classification method",
@@ -1004,7 +1026,7 @@ def main() -> None:
         lines.append("None — every row landed somewhere.")
     else:
         lines.append(f"{len(unclassified)} rows could not be confidently assigned. "
-                     "They are present in the JSON with `unit_id: null` and "
+                     "They are present in the JSON with `unit_ref: null` and "
                      "`status: draft`. Sample:")
         lines.append("")
         for r in unclassified[:20]:
@@ -1018,9 +1040,13 @@ def main() -> None:
     paths_csv = ASSETS / "faa_107_course_leaf_paths.csv"
     with paths_csv.open("w", newline="") as fh:
         pw = csv.writer(fh)
-        pw.writerow(["unit_id", "sub_unit_id", "course_path"])
+        pw.writerow(["unit_id", "sub_unit_id", "unit_ref", "sub_unit_ref", "course_path"])
         for row in leaf_paths:
-            pw.writerow([row["unit_id"], row["sub_unit_id"], row["course_path"]])
+            pw.writerow([
+                row["unit_id"], row["sub_unit_id"],
+                row["unit_ref"], row["sub_unit_ref"],
+                row["course_path"],
+            ])
 
     # Console summary
     print(f"Wrote {OUT_JSON.relative_to(ROOT)}  ({len(all_rows)} questions)")

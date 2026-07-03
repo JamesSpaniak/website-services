@@ -2,20 +2,22 @@
 
 import LoginComponent from '../ui/components/login';
 import { useAuth } from '../lib/auth-context';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 import LoadingComponent from '../ui/components/loading';
 import PageShell from '../ui/components/page-shell';
 
-export default function LoginPage() {
+function LoginPageInner() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect');
 
     useEffect(() => {
         if (!isLoading && user) {
-            router.replace('/profile');
+            router.replace(redirect && redirect.startsWith('/') ? redirect : '/profile');
         }
-    }, [user, isLoading, router]);
+    }, [user, isLoading, router, redirect]);
 
     if (isLoading || user) {
         return <LoadingComponent />;
@@ -23,7 +25,15 @@ export default function LoginPage() {
 
     return (
         <PageShell maxWidthClass="max-w-lg">
-            <LoginComponent />
+            <LoginComponent redirectPath={redirect ?? undefined} />
         </PageShell>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoadingComponent />}>
+            <LoginPageInner />
+        </Suspense>
     );
 }

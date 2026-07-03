@@ -1,17 +1,16 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CourseService } from "./course.service";
-import { CourseDetails, UnitData, UpdateProgressDto } from "./types/course.dto";
+import { CourseDetails, UnitData } from "./types/course.dto";
 import { Course } from "./types/course.entity";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/users/role.guard";
 import { Roles } from "src/users/role.decorator";
 import { Role } from "src/users/types/role.enum";
-import { CourseProgressService } from "./course-progress.service";
+import { ProgressService } from "src/progress/progress.service";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { plainToInstance } from "class-transformer";
 import { OptionalJwtAuthGuard } from "src/auth/optional-jwt-auth.guard";
 import { SignedUrlService } from "src/media/signed-url.service";
-import { migrateCoursePayloadImages } from "./course-payload.util";
+import { isUnitPreviewAccessible } from "./course-access.util";
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -21,7 +20,7 @@ export class CourseController {
 
   constructor(
       private readonly courseService: CourseService,
-      private readonly courseProgressService: CourseProgressService,
+      private readonly progressService: ProgressService,
       private readonly signedUrlService: SignedUrlService,
   ) {}
 
@@ -40,10 +39,8 @@ export class CourseController {
       
       const courseDetailsPromises = courses.map(async (course) => {
         const payload: CourseDetails = JSON.parse(course.payload);
-        migrateCoursePayloadImages(payload);
-        payload.units.forEach((unit) => {
+        payload.units?.forEach((unit) => {
             unit.sub_units = [];
-            unit.exam = undefined;
             unit.text_content = undefined;
         })
 
@@ -61,6 +58,19 @@ export class CourseController {
       });
 
       return Promise.all(courseDetailsPromises);
+    }
+
+    /**
+     * Public marketing view for a course (no auth). Content fields are stripped;
+     * titles, descriptions, price, and hero media remain for SEO and sales.
+     */
+    @ApiOperation({ summary: 'Get public marketing details for a course' })
+    @ApiResponse({ status: 200, description: 'Public course marketing payload.', type: CourseDetails })
+    @ApiResponse({ status: 404, description: 'Course not found.' })
+    @SerializeOptions({ groups: ['COURSE_LIST'] })
+    @Get(':id/public')
+    async getPublicCourseById(@Param('id', ParseIntPipe) id: number): Promise<CourseDetails> {
+      return this.courseService.getPublicCourseById(id);
     }
 
     /**
@@ -84,8 +94,8 @@ export class CourseController {
         throw new UnauthorizedException();
       }
       this.logger.log(`User '${req.user.username}' requesting course ID ${id}`);
-      // The service layer now handles all access logic and data shaping.
-      return this.courseProgressService.getCourseWithProgress(req.user, id);
+      const hasAccess = await this.courseService.hasAccess(id, req.user);
+      return this.progressService.getCourseWithProgress(req.user.userId, id, hasAccess);
     }
   
     /**
@@ -103,15 +113,7 @@ export class CourseController {
     async createCourse(
       @Body() course: CourseDetails
     ): Promise<Course> {
-        migrateCoursePayloadImages(course);
-        const courseEntity: Course  = {
-            payload: JSON.stringify(course),
-            title: course.title,
-            hidden: false,
-            purchased_by_users: [],
-            price: course.price
-        }
-      return this.courseService.saveCourse(courseEntity)
+      return this.courseService.createCourseFromPayload(course);
     }
   
     /**
@@ -146,43 +148,9 @@ export class CourseController {
       @Param('id', ParseIntPipe) id: number,
       @Body() course: CourseDetails
     ): Promise<Course> {
-        migrateCoursePayloadImages(course);
-        const updatedCourseData: Partial<Course> = {
-            title: course.title,
-            payload: JSON.stringify(course),
-            updated_at: new Date(),
-            price: course.price
-        }
-        return this.courseService.updateCourse(id, updatedCourseData as Course);
+      return this.courseService.updateCourseFromPayload(id, course);
     }
 
-    /**
-     * Updates the progress status of a specific unit for the authenticated user.
-     * @param req The Express request object.
-     * @param courseId The ID of the course containing the unit.
-     * @param unitId The ID of the unit to update.
-     * @param updateProgressDto DTO containing the new status.
-     * @returns The updated unit data.
-     */
-    @ApiOperation({ summary: "Update a user's progress for a specific unit" })
-    @ApiResponse({ status: 200, description: 'The unit progress has been updated.'})
-    @Patch(':courseId/units/:unitId')
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    async updateUnitProgress(
-      @Request() req,
-      @Param('courseId', ParseIntPipe) courseId: number,
-      @Param('unitId') unitId: string,
-      @Body() updateProgressDto: UpdateProgressDto,
-    ) {
-      return this.courseProgressService.updateUnitProgress(
-        req.user.userId,
-        courseId,
-        unitId,
-        updateProgressDto.status,
-      );
-    }
-  
     /**
      * Returns a signed video URL for a specific unit in a course.
      * Generates the URL lazily — only for the unit the user is viewing.
@@ -198,18 +166,17 @@ export class CourseController {
       @Param('courseId', ParseIntPipe) courseId: number,
       @Param('unitId') unitId: string,
     ): Promise<{ video_url?: string }> {
-      const hasAccess = await this.courseService.hasAccess(courseId, req.user);
-      if (!hasAccess) {
-        throw new ForbiddenException('You do not have access to this course.');
-      }
-
       const course = await this.courseService.getCourseById(courseId);
       if (!course) {
         throw new NotFoundException(`Course with ID ${courseId} not found`);
       }
 
       const payload: CourseDetails = JSON.parse(course.payload);
-      migrateCoursePayloadImages(payload);
+      const hasAccess = await this.courseService.hasAccess(courseId, req.user);
+      if (!hasAccess && !isUnitPreviewAccessible(payload.units, unitId)) {
+        throw new ForbiddenException('You do not have access to this course.');
+      }
+
       const unit = this.findUnit(payload.units, unitId);
       if (!unit) {
         throw new NotFoundException(`Unit with ID ${unitId} not found`);

@@ -13,6 +13,7 @@ import { Question } from './types/question.entity';
 import { Progress } from '../progress/types/progress.entity';
 import { User } from '../users/types/user.entity';
 import { OrganizationMember } from '../organizations/types/organization-member.entity';
+import { CourseUnit } from '../courses/types/course-unit.entity';
 import {
   SubmitExamAttemptDto,
   ExamAttemptResultDto,
@@ -40,6 +41,8 @@ export class ExamAttemptService {
     private userRepository: Repository<User>,
     @InjectRepository(OrganizationMember)
     private memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(CourseUnit)
+    private courseUnitRepository: Repository<CourseUnit>,
   ) {}
 
   // ── Submission ─────────────────────────────────────────────────────────────
@@ -104,7 +107,7 @@ export class ExamAttemptService {
     const score = Math.round((correctCount / questions.length) * 100);
 
     // Build per-section breakdown
-    const breakdown = this.buildBreakdown(scoredAnswers, questions);
+    const breakdown = await this.buildBreakdown(scoredAnswers, questions, exam.course_id);
 
     // Upsert: delete existing then insert fresh so updated_at reflects now
     await this.attemptRepository.delete({ user_id: userId, exam_id: examId });
@@ -212,14 +215,15 @@ export class ExamAttemptService {
 
   // ── Internal helpers ───────────────────────────────────────────────────────
 
-  private buildBreakdown(
+  private async buildBreakdown(
     scoredAnswers: AttemptAnswer[],
     questions: Question[],
-  ): SectionBreakdown[] {
-    // Group questions by unit_id / sub_unit_id
+    courseId: number,
+  ): Promise<SectionBreakdown[]> {
+    // Group questions by unit_ref / sub_unit_ref
     const sectionMap = new Map<string, {
-      unit_id: number;
-      sub_unit_id: number | null;
+      unit_ref: string | null;
+      sub_unit_ref: string | null;
       correct: number;
       total: number;
       failed_standards: Set<string>;
@@ -231,11 +235,11 @@ export class ExamAttemptService {
       const q = questionById.get(answer.question_id);
       if (!q) continue;
 
-      const key = `${q.unit_id ?? 0}:${q.sub_unit_id ?? 0}`;
+      const key = `${q.unit_ref ?? ''}:${q.sub_unit_ref ?? ''}`;
       if (!sectionMap.has(key)) {
         sectionMap.set(key, {
-          unit_id: q.unit_id ?? 0,
-          sub_unit_id: q.sub_unit_id,
+          unit_ref: q.unit_ref,
+          sub_unit_ref: q.sub_unit_ref,
           correct: 0,
           total: 0,
           failed_standards: new Set(),
@@ -251,9 +255,19 @@ export class ExamAttemptService {
       }
     }
 
+    // Resolve display titles from the course unit index so clients don't
+    // have to cross-reference refs against the course payload.
+    const units = await this.courseUnitRepository.find({
+      where: { course_id: courseId },
+      select: ['ref', 'title'],
+    });
+    const titleByRef = new Map(units.map((u) => [u.ref, u.title]));
+
     return Array.from(sectionMap.values()).map((s) => ({
-      unit_id: s.unit_id,
-      sub_unit_id: s.sub_unit_id,
+      unit_ref: s.unit_ref,
+      sub_unit_ref: s.sub_unit_ref,
+      unit_title: s.unit_ref ? (titleByRef.get(s.unit_ref) ?? null) : null,
+      sub_unit_title: s.sub_unit_ref ? (titleByRef.get(s.sub_unit_ref) ?? null) : null,
       correct: s.correct,
       total: s.total,
       score_percent: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
@@ -282,7 +296,7 @@ export class ExamAttemptService {
       const snapshot: ExamScoreSnapshot = {
         exam_id: exam.id,
         scope: exam.scope,
-        scope_ids: exam.scope_ids,
+        scope_refs: exam.scope_refs ?? [],
         exam_pool: exam.exam_pool ?? 'scoped',
         score,
         section_breakdown: breakdown,
@@ -307,7 +321,7 @@ export class ExamAttemptService {
       // Group by (scope, exam_pool, scope_ids key), keep only the 10 most recent per group.
       const groups = new Map<string, ExamScoreSnapshot[]>();
       for (const s of updated) {
-        const key = `${s.scope}:${s.exam_pool ?? 'scoped'}:${(s.scope_ids ?? []).join(',')}`;
+        const key = `${s.scope}:${s.exam_pool ?? 'scoped'}:${(s.scope_refs ?? []).join(',')}`;
         const arr = groups.get(key) ?? [];
         arr.push(s);
         groups.set(key, arr);

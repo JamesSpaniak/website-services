@@ -56,7 +56,9 @@ export default function CoursePage() {
                         <CoursePreviewComponent
                             key={`crs-${course.id} `}
                             {...course}
-                            unitCount={course.units?.length || 0} />
+                            unitCount={course.units?.length || 0}
+                            price={Number(course.price) || 0}
+                        />
                     ))
                 ) : (
                     <p className="text-[var(--brand-muted)] font-mono text-sm col-span-full">No courses found.</p>

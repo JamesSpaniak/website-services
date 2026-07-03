@@ -3,6 +3,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/app/lib/auth-context';
 import ManagerGuard from '@/app/ui/components/manager-guard';
+import {
+    AUDIT_ACTION_TONE,
+    ORG_ROLE_TONE,
+    PROGRESS_STATUS_TONE,
+    progressBarTone,
+} from '@/app/lib/status-tones';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import {
@@ -237,8 +243,8 @@ function MembersTab({ orgId, onError, onRefresh }: { orgId: number; onError: (ms
                             </td>
                             <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm text-[var(--brand-muted)]">{member.email}</td>
                             <td className="px-4 sm:px-6 py-4 text-sm">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    member.role === 'manager' ? 'bg-purple-100 text-purple-800' : 'bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)]'
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                                    ORG_ROLE_TONE[member.role] ?? ORG_ROLE_TONE.member
                                 }`}>
                                     {member.role}
                                 </span>
@@ -251,7 +257,7 @@ function MembersTab({ orgId, onError, onRefresh }: { orgId: number; onError: (ms
                                     {member.role === 'member' ? (
                                         <button
                                             onClick={() => handleRoleChange(member.user_id, 'manager')}
-                                            className="p-1.5 text-purple-600 hover:text-purple-800 rounded hover:bg-purple-50"
+                                            className="p-1.5 text-violet-400 hover:text-violet-300 rounded hover:bg-violet-500/10"
                                             title="Promote to Manager"
                                         >
                                             <ArrowUpIcon className="h-4 w-4" />
@@ -385,8 +391,8 @@ function InvitesTab({ orgId, onError }: { orgId: number; onError: (msg: string) 
                                 <tr key={invite.id} className={`hover:bg-[var(--comment-secondary-bg)] ${invite.used || isExpired ? 'opacity-60' : ''}`}>
                                     <td className="px-4 sm:px-6 py-4 text-sm font-mono font-medium text-[var(--brand-foreground)]">{invite.code}</td>
                                     <td className="px-4 sm:px-6 py-4 text-sm">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                            invite.role === 'manager' ? 'bg-purple-100 text-purple-800' : 'bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)]'
+                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                                            ORG_ROLE_TONE[invite.role] ?? ORG_ROLE_TONE.member
                                         }`}>
                                             {invite.role === 'manager' ? 'Manager' : 'Student'}
                                         </span>
@@ -566,10 +572,8 @@ function ProgressSummaryTable({ members, orgId }: { members: MemberCourseProgres
                                     <span className="block text-xs text-[var(--brand-muted)]">@{m.username}</span>
                                 </td>
                                 <td className="px-4 sm:px-6 py-3 text-sm">
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                        m.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                                        m.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-                                        'bg-[var(--comment-secondary-bg)] text-[var(--brand-muted)]'
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                                        PROGRESS_STATUS_TONE[m.status] ?? PROGRESS_STATUS_TONE.NOT_STARTED
                                     }`}>
                                         {m.status.replace('_', ' ')}
                                     </span>
@@ -581,7 +585,7 @@ function ProgressSummaryTable({ members, orgId }: { members: MemberCourseProgres
                                     <div className="flex items-center gap-2">
                                         <div className="w-24 bg-[var(--surface-border)] rounded-full h-2">
                                             <div
-                                                className={`h-2 rounded-full ${pct === 100 ? 'bg-green-500' : 'bg-blue-500'}`}
+                                                className={`h-2 rounded-full ${progressBarTone(pct)}`}
                                                 style={{ width: `${pct}%` }}
                                             />
                                         </div>
@@ -610,16 +614,16 @@ function ProgressSummaryTable({ members, orgId }: { members: MemberCourseProgres
 }
 
 const ACTION_LABELS: Record<string, { label: string; color: string }> = {
-    LOGIN: { label: 'Logged in', color: 'bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)]' },
-    REGISTER: { label: 'Registered', color: 'bg-green-100 text-green-700' },
-    VERIFY_EMAIL: { label: 'Verified email', color: 'bg-green-100 text-green-700' },
-    COURSE_STARTED: { label: 'Started a course', color: 'bg-blue-100 text-blue-700' },
-    UNIT_COMPLETED: { label: 'Completed a unit', color: 'bg-indigo-100 text-indigo-700' },
-    EXAM_SUBMITTED: { label: 'Submitted an exam', color: 'bg-purple-100 text-purple-700' },
-    COURSE_COMPLETED: { label: 'Completed a course', color: 'bg-emerald-100 text-emerald-700' },
-    PROGRESS_RESET: { label: 'Reset progress', color: 'bg-red-100 text-red-700' },
-    COURSE_PURCHASED: { label: 'Purchased a course', color: 'bg-yellow-100 text-yellow-700' },
-    PRO_UPGRADE: { label: 'Upgraded to Pro', color: 'bg-amber-100 text-amber-700' },
+    LOGIN: { label: 'Logged in', color: AUDIT_ACTION_TONE.LOGIN },
+    REGISTER: { label: 'Registered', color: AUDIT_ACTION_TONE.REGISTER },
+    VERIFY_EMAIL: { label: 'Verified email', color: AUDIT_ACTION_TONE.VERIFY_EMAIL },
+    COURSE_STARTED: { label: 'Started a course', color: AUDIT_ACTION_TONE.COURSE_STARTED },
+    UNIT_COMPLETED: { label: 'Completed a unit', color: AUDIT_ACTION_TONE.UNIT_COMPLETED },
+    EXAM_SUBMITTED: { label: 'Submitted an exam', color: AUDIT_ACTION_TONE.EXAM_SUBMITTED },
+    COURSE_COMPLETED: { label: 'Completed a course', color: AUDIT_ACTION_TONE.COURSE_COMPLETED },
+    PROGRESS_RESET: { label: 'Reset progress', color: AUDIT_ACTION_TONE.PROGRESS_RESET },
+    COURSE_PURCHASED: { label: 'Purchased a course', color: AUDIT_ACTION_TONE.COURSE_PURCHASED },
+    PRO_UPGRADE: { label: 'Upgraded to Pro', color: AUDIT_ACTION_TONE.PRO_UPGRADE },
 };
 
 function formatActionMeta(action: string, metadata: Record<string, unknown> | null): string {
@@ -651,7 +655,7 @@ function ExamsTab({ orgId, onError }: { orgId: number; onError: (msg: string) =>
     // Form state
     const [courseId, setCourseId] = useState<number | ''>('');
     const [scope, setScope] = useState<'full_course' | 'unit' | 'sub_unit'>('full_course');
-    const [scopeIds, setScopeIds] = useState('');
+    const [scopeRefs, setScopeRefs] = useState('');
     const [version, setVersion] = useState('v1');
     const [isRandomized, setIsRandomized] = useState(true);
     const [questionCount, setQuestionCount] = useState('');
@@ -684,20 +688,22 @@ function ExamsTab({ orgId, onError }: { orgId: number; onError: (msg: string) =>
 
     const handleGenerate = async () => {
         if (!courseId) return onError('Select a course first.');
-        if ((scope === 'unit' || scope === 'sub_unit') && !scopeIds.trim()) {
-            return onError('Enter at least one scope ID (unit or sub-unit number).');
+        if ((scope === 'unit' || scope === 'sub_unit') && !scopeRefs.trim()) {
+            return onError('Enter at least one scope ref (unit or sub-unit ref, e.g. u1).');
         }
-        const parsedIds = scopeIds
+        const parsedRefs = scopeRefs
             .split(',')
-            .map((s) => parseInt(s.trim(), 10))
-            .filter((n) => !isNaN(n));
+            .map((s) => s.trim())
+            // Bare numbers are accepted as legacy ids and normalized to refs
+            .map((s) => (/^\d+$/.test(s) ? `u${s}` : s))
+            .filter(Boolean);
 
         setGenerating(true);
         try {
             const result = await generateClassExam({
                 course_id: Number(courseId),
                 scope,
-                scope_ids: scope === 'full_course' ? [] : parsedIds,
+                scope_refs: scope === 'full_course' ? [] : parsedRefs,
                 is_randomized: isRandomized,
                 version: version.trim() || 'v1',
                 question_count: questionCount ? parseInt(questionCount) : undefined,
@@ -709,7 +715,7 @@ function ExamsTab({ orgId, onError }: { orgId: number; onError: (msg: string) =>
             setShowForm(false);
             // Reset form
             setScope('full_course');
-            setScopeIds('');
+            setScopeRefs('');
             setVersion('v1');
             setIsRandomized(true);
             setQuestionCount('');
@@ -781,18 +787,18 @@ function ExamsTab({ orgId, onError }: { orgId: number; onError: (msg: string) =>
                             </select>
                         </div>
 
-                        {/* Scope IDs */}
+                        {/* Scope refs */}
                         {scope !== 'full_course' && (
                             <div>
                                 <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">
-                                    {scope === 'unit' ? 'Unit ID(s)' : 'Sub-unit ID(s)'} *
+                                    {scope === 'unit' ? 'Unit ref(s)' : 'Sub-unit ref(s)'} *
                                     <span className="font-normal ml-1 text-[var(--brand-muted)]">(comma-separated)</span>
                                 </label>
                                 <input
                                     type="text"
-                                    value={scopeIds}
-                                    onChange={(e) => setScopeIds(e.target.value)}
-                                    placeholder="e.g. 1, 2, 3"
+                                    value={scopeRefs}
+                                    onChange={(e) => setScopeRefs(e.target.value)}
+                                    placeholder="e.g. u1, u2, u31"
                                     className="w-full px-3 py-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)]"
                                 />
                             </div>
@@ -923,7 +929,7 @@ function ExamsTab({ orgId, onError }: { orgId: number; onError: (msg: string) =>
                             const courseName = courses.find((c) => c.id === e.course_id)?.title ?? `Course ${e.course_id}`;
                             const scopeLabel = e.scope === 'full_course'
                                 ? 'Full Course'
-                                : `${SCOPE_LABELS[e.scope]} ${e.scope_ids.join(', ')}`;
+                                : `${SCOPE_LABELS[e.scope]} ${e.scope_refs.join(', ')}`;
                             return (
                                 <tr key={e.class_exam_id} className="hover:bg-[var(--comment-secondary-bg)]">
                                     <td className="px-4 sm:px-6 py-4">
@@ -1010,21 +1016,27 @@ function ClassExamResultsPanel({
         const courseName = courses.find((c) => c.id === summary.course_id)?.title ?? `course-${summary.course_id}`;
 
         // Collect every unique section key that appears in any student's breakdown,
-        // sorted by unit_id then sub_unit_id so columns are in a consistent order.
-        const sectionKeySet = new Map<string, { unit_id: number; sub_unit_id: number | null }>();
+        // sorted by ref so columns are in a consistent order.
+        type SectionKey = { unit_ref: string | null; sub_unit_ref: string | null; unit_title?: string | null; sub_unit_title?: string | null };
+        const sectionKey = (sb: SectionKey) => `${sb.unit_ref ?? ''}:${sb.sub_unit_ref ?? ''}`;
+        const sectionKeySet = new Map<string, SectionKey>();
         for (const s of results.students) {
             for (const sb of s.section_breakdown ?? []) {
-                const key = `${sb.unit_id}:${sb.sub_unit_id ?? ''}`;
-                if (!sectionKeySet.has(key)) sectionKeySet.set(key, { unit_id: sb.unit_id, sub_unit_id: sb.sub_unit_id });
+                const key = sectionKey(sb);
+                if (!sectionKeySet.has(key)) sectionKeySet.set(key, sb);
             }
         }
         const sections = Array.from(sectionKeySet.values()).sort((a, b) =>
-            a.unit_id !== b.unit_id ? a.unit_id - b.unit_id : (a.sub_unit_id ?? 0) - (b.sub_unit_id ?? 0),
+            sectionKey(a).localeCompare(sectionKey(b), undefined, { numeric: true }),
         );
         const hasBreakdown = sections.length > 0;
 
-        const sectionHeader = (s: { unit_id: number; sub_unit_id: number | null }) =>
-            s.sub_unit_id != null ? `Unit ${s.unit_id} / Section ${s.sub_unit_id} (%)` : `Unit ${s.unit_id} (%)`;
+        const sectionHeader = (s: SectionKey) => {
+            if (!s.unit_ref) return 'Cross-section / Final (%)';
+            const unit = s.unit_title || s.unit_ref;
+            const sub = s.sub_unit_ref ? (s.sub_unit_title || s.sub_unit_ref) : null;
+            return sub ? `${unit} / ${sub} (%)` : `${unit} (%)`;
+        };
 
         const header = [
             'Username',
@@ -1037,11 +1049,11 @@ function ClassExamResultsPanel({
 
         const dataRows = results.students.map((s) => {
             const breakdownMap = new Map(
-                (s.section_breakdown ?? []).map((sb) => [`${sb.unit_id}:${sb.sub_unit_id ?? ''}`, sb]),
+                (s.section_breakdown ?? []).map((sb) => [sectionKey(sb), sb]),
             );
             const sectionScores = hasBreakdown
                 ? sections.map((sec) => {
-                      const sb = breakdownMap.get(`${sec.unit_id}:${sec.sub_unit_id ?? ''}`);
+                      const sb = breakdownMap.get(sectionKey(sec));
                       return sb != null ? String(sb.score_percent) : '—';
                   })
                 : [];
@@ -1071,7 +1083,7 @@ function ClassExamResultsPanel({
 
     const scopeLabel = summary.scope === 'full_course'
         ? 'Full Course'
-        : `${SCOPE_LABELS[summary.scope]} ${summary.scope_ids.join(', ')}`;
+        : `${SCOPE_LABELS[summary.scope]} ${summary.scope_refs.join(', ')}`;
 
     return (
         <div className="mb-6 bg-[var(--surface)] border border-[var(--surface-border)] rounded-xl overflow-hidden">

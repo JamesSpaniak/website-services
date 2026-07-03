@@ -3,20 +3,18 @@ import { Expose, Type } from 'class-transformer';
 import {
     Allow,
     IsString,
-    IsNumber,
     IsOptional,
     IsEnum,
     ValidateNested,
     IsArray,
-    IsBoolean,
     registerDecorator,
     ValidationOptions,
 } from 'class-validator';
 
 /**
- * Accepts string OR number values. Unit IDs are numbers in stored course
- * payloads but typed as strings in the DTO layer; until the ID migration
- * standardizes on strings, validation must tolerate both.
+ * Accepts string OR number values. Stored payloads use string refs, but
+ * legacy course JSON uploads still carry numeric unit ids; the save path
+ * normalizes them to string refs (see course-unit.util.ts).
  */
 function IsStringOrNumber(validationOptions?: ValidationOptions) {
     return function (object: object, propertyName: string) {
@@ -42,111 +40,12 @@ export enum ProgressStatus {
 
 // --- DTO Classes for Swagger and class-transformer ---
 
-export class AnswerData {
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsNumber()
-    id: number;
-
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsString()
-    text: string;
-
-    @ApiPropertyOptional({ description: 'Only available in course definition, not in progress.' })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @IsBoolean()
-    correct?: boolean;
-}
-
-export class QuestionData {
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsNumber()
-    id: number;
-
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsString()
-    question: string;
-
-    @ApiProperty({ type: () => [AnswerData] })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @ValidateNested({ each: true })
-    @Type(() => AnswerData)
-    @IsArray()
-    answers: AnswerData[];
-}
-
-export class UserAnswer {
-    @ApiProperty()
-    @IsNumber()
-    questionId: number;
-
-    @ApiProperty()
-    @IsNumber()
-    selectedAnswerId: number;
-}
-
-export class ExamResult {
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsNumber()
-    score: number;
-
-    @ApiProperty({ type: [UserAnswer] })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @ValidateNested({ each: true })
-    @Type(() => UserAnswer)
-    answers: UserAnswer[];
-
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    submittedAt: Date;
-}
-
-export class ExamData {
-    @ApiProperty({ type: () => [QuestionData] })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @ValidateNested({ each: true })
-    @Type(() => QuestionData)
-    questions: QuestionData[];
-
-    @ApiProperty()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsNumber()
-    retries_allowed: number;
-
-    @ApiPropertyOptional()
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @IsNumber()
-    retries_taken?: number;
-
-    @ApiPropertyOptional({ enum: ProgressStatus })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @IsEnum(ProgressStatus)
-    status?: ProgressStatus;
-
-    @ApiPropertyOptional({ type: () => ExamResult })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => ExamResult)
-    result?: ExamResult;
-
-    @ApiPropertyOptional({ type: () => [ExamResult] })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => ExamResult)
-    previous_results?: ExamResult[];
-}
-
 export class UnitData {
+    /**
+     * Stable string ref, unique across the whole course tree (e.g. "u101" or
+     * a UUID from the editor). Legacy payloads may still send numbers; the
+     * save path normalizes them via toUnitRef().
+     */
     @ApiProperty()
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
     @IsStringOrNumber()
@@ -200,13 +99,6 @@ export class UnitData {
     @IsString({ each: true })
     images_url?: string[];
 
-    /** @deprecated Merged into `images_url` on read/write. */
-    @ApiPropertyOptional({ deprecated: true })
-    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
-    @IsOptional()
-    @IsString()
-    image_url?: string;
-
     @ApiPropertyOptional({ type: () => [UnitData] })
     @Expose({ groups: ['COURSE_DETAILS'] })
     @IsOptional()
@@ -214,18 +106,17 @@ export class UnitData {
     @Type(() => UnitData)
     sub_units?: UnitData[];
 
-    @ApiPropertyOptional({ type: () => ExamData })
-    @Expose({ groups: ['COURSE_DETAILS'] })
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => ExamData)
-    exam?: ExamData;
-
     @ApiPropertyOptional({ enum: ProgressStatus })
     @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
     @IsOptional()
     @IsEnum(ProgressStatus)
     status?: ProgressStatus;
+
+    /** When true, this unit (and its descendants) are free without purchase. */
+    @ApiPropertyOptional()
+    @Expose({ groups: ['COURSE_LIST', 'COURSE_DETAILS'] })
+    @Allow()
+    free_preview?: boolean;
 }
 
 export class CourseDetails {
@@ -257,12 +148,6 @@ export class CourseDetails {
     @IsArray()
     @IsString({ each: true })
     images_url?: string[];
-
-    /** @deprecated Merged into `images_url` on read/write. */
-    @ApiPropertyOptional({ deprecated: true })
-    @IsOptional()
-    @IsString()
-    image_url?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
@@ -311,12 +196,4 @@ export class UpdateProgressDto {
     @ApiProperty({ enum: ProgressStatus, description: 'The new progress status.' })
     @IsEnum(ProgressStatus)
     status: ProgressStatus;
-}
-
-export class SubmitExamDto {
-    @ApiProperty({ type: [UserAnswer], description: 'The user\'s answers to the exam questions.' })
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => UserAnswer)
-    answers: UserAnswer[];
 }

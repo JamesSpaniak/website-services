@@ -1,37 +1,44 @@
 'use client';
 
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from './auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import LoadingComponent from '../ui/components/loading';
 
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-export default function AuthGuard({ children }: AuthGuardProps) {
+function AuthGuardInner({ children }: AuthGuardProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // If the initial authentication check is complete and there is no user,
-    // redirect to the login page.
     if (!isLoading && !user) {
-      // Using `replace` prevents the user from navigating "back" to the protected page.
-      router.replace('/login');
+      const query = searchParams.toString();
+      const redirect = `${pathname}${query ? `?${query}` : ''}`;
+      router.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user, router, pathname, searchParams]);
 
-  // While the authentication status is being checked, show a loading screen.
   if (isLoading) {
     return <LoadingComponent />;
   }
 
-  // If a user is found, render the protected page content.
   if (user) {
     return <>{children}</>;
   }
 
-  // If there's no user, the redirect is in progress. Show a loading screen to prevent content flicker.
   return <LoadingComponent />;
+}
+
+export default function AuthGuard({ children }: AuthGuardProps) {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <AuthGuardInner>{children}</AuthGuardInner>
+    </Suspense>
+  );
 }

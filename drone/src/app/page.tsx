@@ -49,7 +49,7 @@ const COURSE_TRACKS = [
     title: 'Video & Photography',
     tagline: 'From flight to final cut',
     desc: 'Camera settings, cinematic composition, and professional editing in DaVinci Resolve. A complete production pipeline for aerial storytelling.',
-    href: '/courses',
+    href: '/courses/tracks/video',
   },
   {
     id: 'ai',
@@ -59,7 +59,7 @@ const COURSE_TRACKS = [
     title: 'AI & Drones',
     tagline: 'Machine learning meets autonomous flight',
     desc: 'Python, computer vision, and autonomous navigation using drones as the hands-on platform. Built for STEM programs and CS classes.',
-    href: '/courses',
+    href: '/courses/tracks/ai',
   },
 ] as const;
 
@@ -117,18 +117,18 @@ export default async function Home() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/articles"
+              href="/courses"
               className="inline-flex items-center justify-center min-h-[44px] bg-[var(--brand-primary)] text-[var(--brand-black)] font-medium text-sm tracking-wide px-5 hover:opacity-90 transition-opacity ring-focus touch-manipulation"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Articles
+              Courses
             </Link>
             <Link
-              href="/courses"
+              href="/articles"
               className="inline-flex items-center justify-center min-h-[44px] border border-[var(--surface-border)] text-[var(--brand-foreground)] font-medium text-sm tracking-wide px-5 hover:bg-[var(--surface)] transition-colors ring-focus touch-manipulation"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Courses
+              Articles
             </Link>
             <HomeAuthCta />
           </div>

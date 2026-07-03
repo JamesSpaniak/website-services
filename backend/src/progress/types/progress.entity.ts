@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/types/user.entity';
 import { Course } from '../../courses/types/course.entity';
-import { CourseDetails } from '../../courses/types/course.dto';
+import { ProgressStatus } from '../../courses/types/course.dto';
 import { ExamScoreSnapshot } from '../../questions/types/question.dto';
 
 @Entity('progress')
@@ -32,8 +32,14 @@ export class Progress {
     @JoinColumn({ name: 'courseId' })
     course: Course;
 
-    @Column({ type: 'jsonb' })
-    payload: CourseDetails;
+    /**
+     * Per-unit progress status keyed by unit ref (e.g. { "u11": "COMPLETED" }).
+     * Only non-NOT_STARTED entries are stored; refs not present default to
+     * NOT_STARTED. Refs that no longer exist in the course tree are ignored
+     * on read — course restructuring never corrupts or resets progress.
+     */
+    @Column({ type: 'jsonb', default: () => "'{}'" })
+    unit_statuses: Record<string, ProgressStatus>;
 
     @Column({ type: 'varchar', default: 'NOT_STARTED' })
     status: string;

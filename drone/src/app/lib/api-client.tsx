@@ -145,6 +145,10 @@ async function getCourseById(id: number): Promise<CourseData> {
     return apiClient(`courses/${id}`, { method: 'GET' });
 }
 
+async function getPublicCourseById(id: number): Promise<CourseData> {
+    return apiClient(`courses/${id}/public`, { method: 'GET' });
+}
+
 async function getUser(username: string): Promise<UserDto | Error> {
     return apiClient(`users/${username}`, { method: 'GET' });
 }
@@ -633,6 +637,7 @@ export {
     getArticles,
     getCourses,
     getCourseById,
+    getPublicCourseById,
     getProfile,
     getUser,
     login,
