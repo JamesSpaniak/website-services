@@ -1,6 +1,6 @@
 # Drone education & technology courses — competitor and curriculum analysis
 
-This document compares how drone **education products** are positioned (curriculum depth, Part 107 alignment, modality, price band) and maps **buyer segments**, **regions**, and **feature patterns**. Raw vendor notes and hour/cost figures from internal research live in [`../../assets/competitor.txt`](../../assets/competitor.txt); figures below should be treated as **snapshot / illustrative** — verify current pricing and scope before commercial use.
+This document compares how drone **education products** are positioned (curriculum depth, Part 107 alignment, modality, price band) and maps **buyer segments**, **regions**, and **feature patterns**. Figures are **snapshot / illustrative** from internal research (Apr 2026) — verify current pricing and scope on vendor sites before commercial use.
 
 ---
 
@@ -85,7 +85,7 @@ From the internal comparison matrix, programs differ sharply on:
 
 ## 4. Competitor landscape — feature patterns (illustrative)
 
-The following **does not** enumerate every vendor; it summarizes **patterns** seen in the market and in [`assets/competitor.txt`](../assets/competitor.txt) (named examples there include **Iconic Drone, USI, Drone Legends, PaTTAN, Drone Cadet, Drone Launch Academy, Drone Darts / DARTdrones**, etc.). Individual deep-dives: **DARTdrones** [§5], **Drone Launch Academy** [§6], **Iconic Drone** [§7], **USI** [§8], **Drone Legends** [§9], **PaTTAN** [§10], **Drone Cadet** [§11]. Synthesis and "best of" analysis in [§12].
+The following **does not** enumerate every vendor; it summarizes **patterns** seen in the market and in the internal comparison matrix (Appendix A). Named examples include **Iconic Drone, USI, Drone Legends, PaTTAN, Drone Cadet, Drone Launch Academy, Drone Darts / DARTdrones**, etc. Individual deep-dives: **DARTdrones** [§5], **Drone Launch Academy** [§6], **Iconic Drone** [§7], **USI** [§8], **Drone Legends** [§9], **PaTTAN** [§10], **Drone Cadet** [§11]. Synthesis and "best of" analysis in [§12].
 
 | Dimension | Low end / gap risk | Mid / blended | Premium / comprehensive |
 |-----------|---------------------|---------------|-------------------------|
@@ -118,7 +118,7 @@ The following **does not** enumerate every vendor; it summarizes **patterns** se
 - **Funnel & packaging:** **À-la-carte units**, **free unit** samples, **sneak peek** and **lead magnets** (guides, previews); **in-person** full-day courses at a **premium** vs online.
 - **Curriculum breadth:** Explicit **Part 107** units (regulations, charts, airports, weather, CRM, loading, physiology, night ops, etc.); instructor roster marketed heavily (e.g. military / airline / public safety backgrounds).
 
-Internal spreadsheet rows that cite **“Drone Darts”** at **high all-in curriculum totals** (e.g. **~\$8k+** in [`assets/competitor.txt`](../assets/competitor.txt)) reflect **enterprise / school licensing**, not the low **consumer** online SKU — **compare tier to tier** when benchmarking.
+Internal spreadsheet rows that cite **“Drone Darts”** at **high all-in curriculum totals** (e.g. **~\$8k+** in Appendix A) reflect **enterprise / school licensing**, not the low **consumer** online SKU — **compare tier to tier** when benchmarking.
 
 ### 5.2 vs Drone Edge (this platform)
 
@@ -392,9 +392,59 @@ These features work **across segments** or can be selectively enabled per tier:
 
 ---
 
+## Appendix A — Internal spreadsheet snapshot (Apr 2026)
+
+Captured from an internal curriculum comparison worksheet. Vendor names in the original sheet are preserved where present; early rows were unlabeled. **Re-verify all pricing before external use.**
+
+### A.1 Named vendor matrix (Part 107 focus)
+
+| Vendor | Instructional hours (incl. activities) | Curriculum cost | Test prep in base? | Test-prep question count | Digital workbook add-on | Part 107 total (as noted) | Analyst notes (abridged) |
+|--------|----------------------------------------|-----------------|--------------------|---------------------------|-------------------------|---------------------------|---------------------------|
+| **Iconic Drone** | 87 | ~\$1,000 | No | 700 | ~\$49 | ~\$3,905 | Quality; recorded video; no PowerPoints; cyber/CAP transfer-friendly; students likely exam-ready |
+| **USI** | — | ~\$1,000 | Yes | 85 | ~\$2,205 | — | Major holes; ~4-week class; not semester-scale; incomplete video; **would not pass** without supplements |
+| **Drone Legends** | 18 | ~\$1,485 | Yes | — | — | ~\$1,485 | Major holes; ~3-week class; **would not pass** |
+| **PaTTAN** | 14 | Free | Yes | — | — | \$0 | Short / gap-heavy vs semester needs |
+| **Drone Edge** (internal row) | 90 | ~\$3,375 | Yes | 735 | Included | ~\$3,375 | Quality; video + games + flashcards + PowerPoints; cyber/CAP continuity; Chichester Drone lineage; exam-ready positioning |
+| **Drone Cadet** | 75 | ~\$8,750 | Yes | 600 | — | ~\$8,750 | Quality; video + review games/activities; exam-ready positioning |
+| **Drone Launch Academy** | — | ~\$2,000 | — | — | — | — | Listed in matrix; see [§6] for public snapshot |
+| **Drone Darts / DARTdrones** | — | — | — | — | — | — | See [§5]; high totals often **B2B / school** licensing |
+
+### A.2 Unlabeled early rows (qualitative only)
+
+Early worksheet rows compared packages without consistent vendor labels. Recurring themes:
+
+| End-of-unit Q count (approx.) | Activities | Workbook / test prep | Total price (approx.) | Assessment |
+|-------------------------------|------------|----------------------|------------------------|------------|
+| 200 | Some flying + supplements | Included | ~\$6,000 | Quality; videos; likely exam-ready |
+| 15 | No | Free | Free | **Major holes**; ~3 weeks; **not exam-ready** |
+| 365 | Some | Included | ~\$1,485 | **Major holes**; ~4 weeks; **not exam-ready** |
+| 435 | Yes | Included | ~\$3,375 | Strong; video + games + escape rooms + PPT; standards-aligned; online/cyber/CAP; Chichester support |
+| 250 | Some (flying-heavy) | Included | ~\$11,000 | Expensive; flying vs test-content skew; likely pass with caveats |
+| 0 | No | — | — | **Programming-only** (Blockly/Python); **zero Part 107** |
+| 400 | Some | ~\$2,940 workbook | ~\$3,940 | Video-heavy; minimal PPT; cyber/CAP transfer; likely exam-ready |
+| 0 | Flying / club | — | ~\$5,580 (incl. hardware) | **Grades 7–9 STEM**, not 107; club-length; vendor drones required |
+| 300 | Yes | Included | ~\$7,000 | Good video; no PPT; may need supplements for exam |
+| 0 | Some (flying) | Included | ~\$6,000 | Flying-focused; **not 107-aligned**; **not exam-ready** without supplements |
+
+### A.3 Add-on modules (as noted)
+
+| Module | Instructional hours (approx.) | Price signal | Notes |
+|--------|-------------------------------|--------------|-------|
+| Drone Photo & Video | 15 | ~\$750 (Drone Edge column) | Quality add-on; Chichester lineage |
+| Drone Entrepreneurship | 15 | ~\$50/unit-style pricing in sheet | Offered by some vendors (entrepreneurship flag in matrix) |
+
+### A.4 Implementation cost bands (worksheet footer)
+
+| Line item | Range noted |
+|-----------|-------------|
+| Teacher-led delivery | \$2,500 – \$5,000 |
+| Equipment | \$2,000 – \$4,000 |
+
+---
+
 ## 14. Sources
 
-- Internal spreadsheet and comments: [`assets/competitor.txt`](../assets/competitor.txt).
+- Internal curriculum comparison worksheet (captured in Appendix A; formerly `assets/competitor.txt`).
 - DARTdrones: [dartdrones.com/part-107-commercial-license](https://www.dartdrones.com/part-107-commercial-license/).
 - Drone Launch Academy: [dronelaunchacademy.com/pricing-tier-test](https://dronelaunchacademy.com/pricing-tier-test/).
 - Iconic Drone: [iconicdrone.net/what-we-do](https://www.iconicdrone.net/what-we-do).
@@ -406,4 +456,4 @@ These features work **across segments** or can be selectively enabled per tier:
 
 ---
 
-*Last updated: Full competitor snapshots (DARTdrones, Drone Launch Academy, Iconic Drone, USI, Drone Legends, PaTTAN, Drone Cadet) + synthesis added Apr 2026.*
+*Last updated: Appendix A captures former `competitor.txt` spreadsheet (Jul 2026). Full vendor snapshots + synthesis Apr 2026.*

@@ -191,7 +191,7 @@ Hi [Name],
 
 Just following up on my note about Drone Edge for school drone programs.
 
-The short version: schools can use it for FAA Part 107 preparation, drone video/photo, and AI + drones tracks, with org-level progress visibility for teachers or program managers.
+The short version: structured FAA Part 107 prep is live today — units, 600+ practice questions, and org-level progress visibility for teachers. Creative and STEM tracks are on our roadmap for the full pathway vision.
 
 If this is not your area, is there someone on the CTE, STEM, or workforce side I should ask instead?
 

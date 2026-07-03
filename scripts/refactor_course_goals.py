@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COURSE_PATH = ROOT / "assets" / "articles" / "faa_107_course.json"
+COURSE_PATH = ROOT / "assets" / "courses" / "faa_107_course.json"
 
 # Unit 1 — recommended merge (learning goals + material already in repo; goals upgraded)
 GOAL_OVERRIDES: dict[int | str, str] = {

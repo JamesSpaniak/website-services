@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COURSE_JSON = ROOT / "assets" / "articles" / "faa_107_course.json"
+COURSE_JSON = ROOT / "assets" / "courses" / "faa_107_course.json"
 
 
 def _norm(s: str) -> str:

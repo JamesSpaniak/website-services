@@ -40,7 +40,7 @@ Authorization: Bearer <admin token>
 }
 ```
 
-Output file: `assets/articles/faa_107_questions.bulk.json` — 461 questions ready to upload.
+Output file: `assets/courses/faa_107_questions.bulk.json` — 461 questions ready to upload.
 
 ## Final-exam-only questions
 

@@ -9,8 +9,8 @@ Implementation planning document for quizzes/practice exams, end-of-course final
 | [`features.md`](../sales/features.md) | Product capabilities and school positioning |
 | [`backend-data.md`](./backend-data.md) | API routes and entity overview |
 | [`course-editing-roadmap.md`](./course-editing-roadmap.md) | Course payload authoring |
-| [`../assets/articles/faa_107_questions_gaps.md`](../assets/articles/faa_107_questions_gaps.md) | Part 107 import stats, sub-unit coverage, import risks |
-| [`../assets/articles/faa_107_general_operations_review.csv`](../assets/articles/faa_107_general_operations_review.csv) | 167 rows: spreadsheet K/L cleanup for content team |
+| [`../assets/courses/faa_107_questions_gaps.md`](../assets/courses/faa_107_questions_gaps.md) | Part 107 import stats, sub-unit coverage, import risks |
+| [`../assets/courses/faa_107_general_operations_review.csv`](../assets/courses/faa_107_general_operations_review.csv) | 167 rows: spreadsheet K/L cleanup for content team |
 | [`../scripts/build_faa_107_questions.py`](../scripts/build_faa_107_questions.py) | Bulk JSON builder from Testing CSVs |
 | [`../scripts/export_general_operations_review.py`](../scripts/export_general_operations_review.py) | Regenerate general-operations review export |
 
@@ -57,7 +57,7 @@ flowchart TB
 
 ### 1.1 Course structure (content linker)
 
-Course outline lives in **`courses.payload`** (`CourseDetails` JSON), e.g. `assets/articles/faa_107_course.json` for Part 107 (course id **35**).
+Course outline lives in **`courses.payload`** (`CourseDetails` JSON), e.g. `assets/courses/faa_107_course.json` for Part 107 (course id **35**).
 
 Unit ids are **stable string refs** (`course_units.ref`). Legacy numeric ids
 (`1`–`9`, `51`–`55`, `531`…) are normalized to `u{n}` on save (`101 → u101`);
@@ -85,7 +85,7 @@ Questions in the bank link via **`course_id`**, **`unit_ref`**, **`sub_unit_ref`
 
 **Bulk import:** `POST /questions/import` with body `{ course_id, questions: [...] }`. Export: `GET /questions/export?courseId=`. See `BulkImportDto` in `question.dto.ts`.
 
-**Part 107 import artifact:** `assets/articles/faa_107_questions.bulk.json` (461 unique questions from Testing CSVs). Regenerate with `python3 scripts/build_faa_107_questions.py`.
+**Part 107 import artifact:** `assets/courses/faa_107_questions.bulk.json` (461 unique questions from Testing CSVs). Regenerate with `python3 scripts/build_faa_107_questions.py`.
 
 ### 1.3 Exam scopes
 
@@ -241,7 +241,7 @@ flowchart LR
 
 1. Run DB migrations (`questions`, `exams`, `exam_attempts`).
 2. Deploy backend.
-3. **Bundle A:** Import `assets/articles/faa_107_questions.bulk.json` (admin UI or API).
+3. **Bundle A:** Import `assets/courses/faa_107_questions.bulk.json` (admin UI or API).
 4. Deploy frontend with Bundle B (generator + course exam UI + legacy removal).
 5. Smoke-test (see §6).
 

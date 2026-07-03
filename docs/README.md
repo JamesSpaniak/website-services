@@ -25,16 +25,19 @@ This repo runs **TheDroneEdge.com** (product) and the **go-to-market** work arou
 ### Sales (schools & B2B)
 
 1. Operating playbook: [`workflows/sales/outreach.md`](../workflows/sales/outreach.md)
-2. Email templates: [`workflows/sales/email-drafts.md`](../workflows/sales/email-drafts.md)
-3. Product pitch & capabilities: [`docs/sales/features.md`](sales/features.md)
-4. Competitor landscape: [`docs/sales/competitor-analysis.md`](sales/competitor-analysis.md)
-5. Contact collection plan: [`docs/sales/contact-collection.md`](sales/contact-collection.md)
+2. **Positioning & rep handoff:** [`docs/sales/positioning.md`](sales/positioning.md), [`rep-handoff.md`](sales/rep-handoff.md)
+3. **Packages & quotes:** [`docs/sales/packages.md`](sales/packages.md), [`quote-template.md`](sales/quote-template.md)
+4. Email templates: [`workflows/sales/email-drafts.md`](../workflows/sales/email-drafts.md)
+5. Product pitch & capabilities: [`docs/sales/features.md`](sales/features.md)
+6. Competitor landscape: [`docs/sales/competitor-analysis.md`](sales/competitor-analysis.md)
+7. Contact collection plan: [`docs/sales/contact-collection.md`](sales/contact-collection.md)
 
 ### Marketing / growth
 
 1. SEO & GEO strategy: [`docs/marketing/seo-geo-strategy.md`](marketing/seo-geo-strategy.md)
 2. Content & distribution cadence: [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md)
 3. Brand & media assets index: [`docs/marketing/brand-assets.md`](marketing/brand-assets.md)
+4. Article inventory (repo vs prod CMS): [`docs/marketing/article-inventory.md`](marketing/article-inventory.md)
 
 ## Agent & automation entry points
 

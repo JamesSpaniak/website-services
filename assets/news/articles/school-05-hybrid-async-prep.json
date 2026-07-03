@@ -1,0 +1,19 @@
+{
+  "slug": "school-05-hybrid-async-prep",
+  "title": "Hybrid and Async Part 107 Prep for Schools",
+  "sub_heading": "Weekly pacing patterns for BYOD classrooms, block schedules, and workforce cohorts that cannot meet daily.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "online Part 107 high school",
+    "hybrid drone course",
+    "async CTE drone",
+    "self-paced Part 107 school"
+  ],
+  "body_html": "<p><em>Draft — review before import. Add screenshots when available.</em></p>\n\n<p><strong>In short:</strong> Part 107 prep does not require every student in the same seat every day. Browser-based units support homework-first, lab-first, or fully async workforce models—with the manager dashboard flagging who fell behind.</p>\n\n<h2>Sample weekly rhythm (teacher-led hybrid)</h2>\n<ul>\n<li><strong>Mon:</strong> Introduce unit concept in class; assign two sections async</li>\n<li><strong>Wed:</strong> Review missed practice items; section quiz in class</li>\n<li><strong>Fri:</strong> Unit exam milestone or flight lab (optional hardware)</li>\n</ul>\n\n<h2>Block schedule variant</h2>\n<p>Long periods suit flight or sim lab; async sections assigned between block days. Dashboard check every block for completion gaps.</p>\n\n<h2>Workforce / community college</h2>\n<p>Fully async with weekly manager office hours. Success metric: steady section completion rate, not synchronized class bells.</p>\n\n<h2>BYOD and access</h2>\n<p>No app install; students need reliable browser access. Districts set device and privacy policies; share <a href=\"/privacy\">Privacy Notice</a> with IT early.</p>\n\n<p><a href=\"/schools/curriculum\">Curriculum overview</a> · <a href=\"/consultation\">Consultation</a></p>",
+  "marketability_review": "DRAFT. STEM/flexible delivery angle for outreach.",
+  "readability_review": "DRAFT ~400 words. Expand with real pacing after pilot debrief.",
+  "considerations": [
+    "DRAFT — add student UI screenshots",
+    "Cross-link school-01 after both published"
+  ]
+}

@@ -83,5 +83,45 @@
     "slug": "story-11-drone-careers",
     "title": "Drone Careers in 2026: Agriculture, Fire, Delivery, and Beyond the Hobby",
     "hero_image": "https://media.thedroneedge.com/articles/39/2e4a680e-15e5-4d52-8338-f5b11983645e.png"
+  },
+  {
+    "slug": "school-01-part-107-cte-classroom",
+    "title": "Part 107 in the High School CTE Classroom: Delivery Models and Teacher Visibility",
+    "hero_image": "/images/articles/school-01-part-107-cte-classroom-hero.png"
+  },
+  {
+    "slug": "school-02-funding-drone-programs",
+    "title": "Funding Drone Programs in Schools: Language That Helps (Without Overpromising)",
+    "hero_image": "/images/articles/school-02-funding-drone-programs-hero.png"
+  },
+  {
+    "slug": "school-03-pilot-vs-full-year",
+    "title": "Pilot Semester vs Full-Year Drone Programs: How Schools Start Small",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "school-04-kits-vs-curriculum",
+    "title": "Drone Kits vs Curriculum: What Schools Actually Need",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "school-05-hybrid-async-prep",
+    "title": "Hybrid and Async Part 107 Prep for Schools",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "b2c-01-part-107-study-guide",
+    "title": "How to Pass the Part 107 Exam: A 2026 Study Guide",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "b2c-02-practice-questions-prep",
+    "title": "Part 107 Practice Questions: What Good Prep Looks Like",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "b2c-03-twenty-nine-vs-ground-school",
+    "title": "$29 Part 107 Course vs Flight School Ground School: Which Fits You?",
+    "hero_image": "/images/articles/hero-default.svg"
   }
 ]

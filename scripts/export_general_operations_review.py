@@ -8,9 +8,9 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REVIEW = ROOT / "assets" / "articles" / "faa_107_questions_review.csv"
-OUT_CSV = ROOT / "assets" / "articles" / "faa_107_general_operations_review.csv"
-OUT_MD = ROOT / "assets" / "articles" / "faa_107_general_operations_review.md"
+REVIEW = ROOT / "assets" / "courses" / "faa_107_questions_review.csv"
+OUT_CSV = ROOT / "assets" / "courses" / "faa_107_general_operations_review.csv"
+OUT_MD = ROOT / "assets" / "courses" / "faa_107_general_operations_review.md"
 
 UNIT_NAMES = {
     1: "Unit 1 — Part 107 Regulations",
