@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { getCourseById } from '@/app/lib/api-client';
 import { trackCourseView } from '@/app/lib/analytics';
 import CourseComponent from '@/app/ui/components/course';
@@ -11,6 +11,7 @@ import { CourseData } from '@/app/lib/types/course';
 import AuthGuard from '@/app/lib/auth-guard';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { PURCHASE_QUERY } from '@/app/lib/auth-redirect';
 
 // Load the Stripe object. This is done outside of a component's render to avoid
 // recreating the Stripe object on every render.
@@ -18,6 +19,8 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 function SingleCoursePage() {
     const { courseId } = useParams();
+    const searchParams = useSearchParams();
+    const openPurchase = searchParams.get(PURCHASE_QUERY) === '1';
     const [course, setCourse] = useState<CourseData | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const [loading, setLoading] = useState(true);
@@ -62,7 +65,7 @@ function SingleCoursePage() {
     course.id = parseInt(courseId as string);
     return (
         <Elements stripe={stripePromise}>
-            <CourseComponent {...course} />
+            <CourseComponent {...course} initialShowPurchase={openPurchase} />
         </Elements>
     );
 }
@@ -73,7 +76,9 @@ function SingleCoursePage() {
 export default function ProtectedCoursePage() {
     return (
         <AuthGuard>
-            <SingleCoursePage />
+            <Suspense fallback={<LoadingComponent />}>
+                <SingleCoursePage />
+            </Suspense>
         </AuthGuard>
     );
 }

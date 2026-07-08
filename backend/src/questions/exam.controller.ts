@@ -28,6 +28,7 @@ import { ExamAttemptService } from './exam-attempt.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
+import { ExamAttempt } from './types/exam-attempt.entity';
 import { Question } from './types/question.entity';
 import { Repository, In } from 'typeorm';
 import { CourseService } from 'src/courses/course.service';
@@ -40,6 +41,7 @@ import {
   ExamWithQuestionsDto,
   ClassExamResultsDto,
   ClassExamSummaryDto,
+  AssignedClassExamDto,
 } from './types/question.dto';
 
 @ApiTags('Exams')
@@ -56,6 +58,7 @@ export class ExamController {
     private readonly progressService: ProgressService,
     @InjectRepository(Exam) private examRepository: Repository<Exam>,
     @InjectRepository(ClassExam) private classExamRepository: Repository<ClassExam>,
+    @InjectRepository(ExamAttempt) private examAttemptRepository: Repository<ExamAttempt>,
     @InjectRepository(Question) private questionRepository: Repository<Question>,
     @InjectRepository(OrganizationMember)
     private memberRepository: Repository<OrganizationMember>,
@@ -156,6 +159,57 @@ export class ExamController {
   }
 
   @ApiOperation({
+    summary: 'List class exams assigned to the current user',
+    description:
+      'Returns exams assigned to organizations the user belongs to, with optional attempt scores.',
+  })
+  @ApiResponse({ status: 200, type: [AssignedClassExamDto] })
+  @Get('class/assigned')
+  async listAssignedClassExams(@Request() req): Promise<AssignedClassExamDto[]> {
+    const memberships = await this.memberRepository.find({
+      where: { userId: req.user.userId },
+    });
+    if (memberships.length === 0) return [];
+
+    const orgIds = memberships.map((m) => m.organizationId);
+    const classExams = await this.classExamRepository.find({
+      where: { organization_id: In(orgIds) },
+      order: { assigned_at: 'DESC' },
+    });
+    if (classExams.length === 0) return [];
+
+    const examIds = [...new Set(classExams.map((ce) => ce.exam_id))];
+    const exams = await this.examRepository.findBy({ id: In(examIds) });
+    const examMap = new Map(exams.map((e) => [e.id, e]));
+
+    const attempts = await this.examAttemptRepository.find({
+      where: { user_id: req.user.userId, exam_id: In(examIds) },
+    });
+    const attemptMap = new Map(attempts.map((a) => [a.exam_id, a]));
+
+    return classExams
+      .map((ce) => {
+        const exam = examMap.get(ce.exam_id);
+        if (!exam) return null;
+        const attempt = attemptMap.get(ce.exam_id);
+        return {
+          class_exam_id: ce.id,
+          exam_id: ce.exam_id,
+          course_id: exam.course_id,
+          label: ce.label,
+          due_date: ce.due_date,
+          assigned_at: ce.assigned_at,
+          question_count: exam.question_ids.length,
+          scope: exam.scope,
+          attempt: attempt
+            ? { score: attempt.score, taken_at: attempt.completed_at }
+            : null,
+        };
+      })
+      .filter(Boolean) as AssignedClassExamDto[];
+  }
+
+  @ApiOperation({
     summary: 'Get results for a class exam (Manager/Admin)',
     description:
       'Returns scores and section breakdowns for all students in the organization. ' +
@@ -191,7 +245,7 @@ export class ExamController {
   ): Promise<ExamWithQuestionsDto> {
     const exam = await this.examRepository.findOne({ where: { id: examId } });
     if (!exam) throw new NotFoundException(`Exam ${examId} not found`);
-    await this.assertCourseAccess(req.user, exam.course_id);
+    await this.assertExamAccess(req.user, exam);
     return this.buildExamWithQuestions(exam);
   }
 
@@ -210,7 +264,7 @@ export class ExamController {
   ): Promise<ExamAttemptResultDto> {
     const exam = await this.examRepository.findOne({ where: { id: examId } });
     if (!exam) throw new NotFoundException(`Exam ${examId} not found`);
-    await this.assertCourseAccess(req.user, exam.course_id);
+    await this.assertExamAccess(req.user, exam);
     return this.examAttemptService.submit(req.user.userId, examId, dto);
   }
 
@@ -232,6 +286,32 @@ export class ExamController {
   ): Promise<void> {
     const hasAccess = await this.courseService.hasAccess(courseId, user);
     if (!hasAccess) {
+      throw new ForbiddenException('You do not have access to this course.');
+    }
+  }
+
+  /**
+   * Course purchase grants access; org-assigned class exams grant access without purchase.
+   */
+  private async assertExamAccess(
+    user: { userId: number; role: Role },
+    exam: Exam,
+  ): Promise<void> {
+    const hasAccess = await this.courseService.hasAccess(exam.course_id, user);
+    if (hasAccess) return;
+
+    const memberships = await this.memberRepository.find({
+      where: { userId: user.userId },
+    });
+    if (memberships.length === 0) {
+      throw new ForbiddenException('You do not have access to this course.');
+    }
+
+    const orgIds = memberships.map((m) => m.organizationId);
+    const assignment = await this.classExamRepository.findOne({
+      where: { exam_id: exam.id, organization_id: In(orgIds) },
+    });
+    if (!assignment) {
       throw new ForbiddenException('You do not have access to this course.');
     }
   }

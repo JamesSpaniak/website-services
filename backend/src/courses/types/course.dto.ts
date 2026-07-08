@@ -188,6 +188,18 @@ export class CourseDetails {
         practice?: { score: number; taken_at: string } | null;
         final?: { score: number; taken_at: string } | null;
     };
+
+    /**
+     * Active practice-pool question counts keyed by unit ref / sub-unit ref.
+     * Refs with zero questions are omitted. Lets the frontend hide exam CTAs
+     * for scopes with no question bank content.
+     */
+    @ApiPropertyOptional()
+    @Allow()
+    question_counts?: {
+        unit: Record<string, number>;
+        sub_unit: Record<string, number>;
+    };
 }
 
 // --- DTOs for specific endpoint actions ---

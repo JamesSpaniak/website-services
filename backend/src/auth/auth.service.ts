@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/types/user.entity';
@@ -38,11 +38,6 @@ export class AuthService {
     }
 
     this.logger.debug(`User found: id=${user.id}, email=${user.email}, verified=${user.is_email_verified}, role=${user.role}`);
-
-    if (!user.is_email_verified) {
-      this.logger.warn(`Login rejected: email not verified for user="${username}" (id=${user.id})`);
-      return null;
-    }
 
     const passwordMatch = await UsersService.comparePassword(pass, user.password);
     if (!passwordMatch) {
@@ -138,6 +133,36 @@ export class AuthService {
     return { message: 'Email verified successfully.' };
   }
 
+  async resendVerificationEmail(userId: number): Promise<{ message: string }> {
+    const user = await this.usersService.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+    if (user.is_email_verified) {
+      throw new BadRequestException('Email is already verified.');
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    user.email_verification_token = verificationToken;
+    user.email_verification_expires_at = expiresAt;
+    await this.usersService['userRepository'].save(user);
+
+    const verifyLink = `${this.configService.get<string>('FRONTEND_URL')}/verify-email?token=${verificationToken}`;
+    try {
+      await this.emailService.sendEmailVerification(user, verifyLink);
+    } catch (err) {
+      this.logger.error(
+        `Failed to send verification email for user="${user.username}" (id=${user.id}): ${(err as Error).message}`,
+      );
+    }
+
+    this.logger.log(`Verification email resent for user="${user.username}" (id=${user.id})`);
+    return { message: 'Verification email sent.' };
+  }
+
   async login(user: User): Promise<{ access_token: string; refresh_token: string }> {
     this.logger.debug(`Creating session for user="${user.username}" (id=${user.id}, role=${user.role})`);
 
@@ -146,6 +171,7 @@ export class AuthService {
       sub: user.id,
       role: user.role,
       token_version: user.token_version,
+      email_verified: user.is_email_verified,
     };
     const access_token = this.jwtService.sign(access_token_payload);
 
@@ -214,6 +240,7 @@ export class AuthService {
       sub: user.id,
       role: user.role,
       token_version: user.token_version,
+      email_verified: user.is_email_verified,
     };
 
     this.logger.debug(`Token refreshed for user="${user.username}" (id=${user.id})`);

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, IsDate, IsArray, IsNumber, IsUrl } from 'class-validator';
 import { Role } from './role.enum';
 
@@ -43,6 +43,11 @@ export class UserFull extends UserSlim {
     @ApiProperty({ enum: Role })
     @Expose()
     role: Role;
+
+    @ApiProperty()
+    @Expose()
+    @Transform(({ obj }) => obj.is_email_verified ?? false)
+    email_verified: boolean;
 
     @ApiPropertyOptional()
     @Expose()

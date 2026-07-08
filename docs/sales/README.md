@@ -9,6 +9,7 @@ Positioning, market research, and contact strategy for school and B2B sales.
 | [rep-handoff.md](rep-handoff.md) | Day-one schools rep guide — demo, qualification, objections |
 | [quote-template.md](quote-template.md) | Copy-paste quote skeleton for B2B deals |
 | [go-to-market-review.md](go-to-market-review.md) | GTM review — positioning, outreach, content, rep readiness |
+| [../TODO.md](../TODO.md) | Open items backlog (sales + cross-team) |
 | [features.md](features.md) | Product capabilities, school pitch, roadmap gaps |
 | [competitor-analysis.md](competitor-analysis.md) | Drone education market and curriculum comparison |
 | [contact-collection.md](contact-collection.md) | Contact scraping plan, schema, script design |
@@ -24,6 +25,6 @@ Positioning, market research, and contact strategy for school and B2B sales.
 
 **Scripts:** `scripts/collect_school_contacts.py`, `scripts/draft_contact_emails.py`, `scripts/contact_sources.yaml`
 
-**Data:** `data/outreach/` (candidates, drafts, reports — review before commit)
+**Data:** `outreach/` (candidates, drafts, reports — review before commit)
 
 **Research:** [`docs/sales/competitor-analysis.md`](competitor-analysis.md) (Appendix A — internal matrix)

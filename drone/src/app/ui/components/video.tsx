@@ -57,7 +57,13 @@ function HlsPlayer({
     const video = videoRef.current;
     if (!video || !src) return;
 
+    // Paid course streams are authorized via CloudFront signed cookies set by
+    // the backend, so playlist/segment requests must carry credentials.
+    const useCredentials = isSelfHostedVideo(src);
+
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native HLS (iOS Safari): media requests send same-site cookies
+      // automatically; no crossorigin attribute needed.
       video.src = src;
       return;
     }
@@ -67,6 +73,11 @@ function HlsPlayer({
     const hls = new Hls({
       startLevel: -1,
       capLevelToPlayerSize: true,
+      ...(useCredentials && {
+        xhrSetup: (xhr: XMLHttpRequest) => {
+          xhr.withCredentials = true;
+        },
+      }),
     });
 
     hls.loadSource(src);

@@ -1,18 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { verifyEmail } from '@/app/lib/api-client';
 import PageShell from '@/app/ui/components/page-shell';
+import { loginHref, readStashedPostAuthRedirect } from '@/app/lib/auth-redirect';
+import LoadingComponent from '@/app/ui/components/loading';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-export default function VerifyEmailPage() {
+function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState<string>('');
+  const redirect = readStashedPostAuthRedirect();
+  const loginLink = loginHref(redirect ?? '/courses');
 
   useEffect(() => {
     if (!token) {
@@ -59,11 +63,19 @@ export default function VerifyEmailPage() {
           {status === 'idle' && 'Preparing verification…'}
         </p>
         <div className="mt-6">
-          <Link href="/login" className="text-[var(--brand-primary)] hover:underline">
-            Go to login
+          <Link href={loginLink} className="text-[var(--brand-primary)] hover:underline">
+            {redirect ? 'Sign in to continue' : 'Go to sign in'}
           </Link>
         </div>
       </div>
     </PageShell>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <VerifyEmailInner />
+    </Suspense>
   );
 }

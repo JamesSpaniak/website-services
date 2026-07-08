@@ -14,6 +14,7 @@ import {
     ExamAttemptResult,
     ClassExamSummary,
     ClassExamResults,
+    AssignedClassExam,
 } from "./types/question";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
@@ -236,6 +237,10 @@ async function verifyEmail(token: string): Promise<{ message: string }> {
     });
 }
 
+async function resendVerificationEmail(): Promise<{ message: string }> {
+    return apiClient('auth/resend-verification', { method: 'POST', body: JSON.stringify({}) });
+}
+
 async function purchaseCourse(courseId: number): Promise<void> {
     await apiClient('purchases/course', {
         method: 'POST',
@@ -247,6 +252,13 @@ async function createPaymentIntent(courseId: number): Promise<{ clientSecret: st
     return apiClient('purchases/create-payment-intent', {
         method: 'POST',
         body: JSON.stringify({ courseId }),
+    });
+}
+
+async function confirmCoursePurchase(paymentIntentId: string): Promise<{ granted: boolean; alreadyOwned: boolean }> {
+    return apiClient('purchases/confirm-payment', {
+        method: 'POST',
+        body: JSON.stringify({ paymentIntentId }),
     });
 }
 
@@ -612,6 +624,10 @@ async function getMyExamAttempt(examId: number): Promise<ExamAttemptResult | nul
     }
 }
 
+async function getAssignedClassExams(): Promise<AssignedClassExam[]> {
+    return apiClient('exams/class/assigned');
+}
+
 // ── Class exams (manager) ─────────────────────────────────────────────────────
 
 async function generateClassExam(dto: GenerateClassExamPayload): Promise<{ exam: ExamWithQuestions; class_exam_id: number }> {
@@ -647,7 +663,9 @@ export {
     sendConsultationRequest,
     resetPassword,
     verifyEmail,
+    resendVerificationEmail,
     purchaseCourse,
+    confirmCoursePurchase,
     logToServer,
     createPaymentIntent,
     uploadMedia,
@@ -703,6 +721,7 @@ export {
     getExamWithQuestions,
     submitExamAttempt,
     getMyExamAttempt,
+    getAssignedClassExams,
     // Class exams (manager)
     generateClassExam,
     getOrgClassExams,

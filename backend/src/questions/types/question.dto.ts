@@ -430,6 +430,43 @@ export class ExamWithQuestionsDto {
  * Summary of a single class exam assignment returned by GET /exams/class.
  * Joins ClassExam with its parent Exam to expose scope and question metadata.
  */
+export class AssignedClassExamAttemptDto {
+  @ApiProperty()
+  score: number;
+
+  @ApiProperty()
+  taken_at: Date;
+}
+
+export class AssignedClassExamDto {
+  @ApiProperty()
+  class_exam_id: number;
+
+  @ApiProperty()
+  exam_id: number;
+
+  @ApiProperty()
+  course_id: number;
+
+  @ApiPropertyOptional()
+  label: string | null;
+
+  @ApiPropertyOptional()
+  due_date: Date | null;
+
+  @ApiProperty()
+  assigned_at: Date;
+
+  @ApiProperty()
+  question_count: number;
+
+  @ApiProperty({ enum: ['sub_unit', 'unit', 'full_course'] })
+  scope: ExamScope;
+
+  @ApiPropertyOptional({ type: AssignedClassExamAttemptDto })
+  attempt: AssignedClassExamAttemptDto | null;
+}
+
 export class ClassExamSummaryDto {
   @ApiProperty()
   class_exam_id: number;

@@ -52,6 +52,44 @@ resource "aws_cloudfront_key_group" "video_signing" {
   items = [aws_cloudfront_public_key.video_signing.id]
 }
 
+# Managed policy: long TTLs, no query strings/cookies/headers in the cache key.
+# Signed cookies are validated by CloudFront at the edge and never need to be
+# forwarded to S3 or included in the cache key.
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
+# hls.js fetches playlists/segments via XHR with credentials (the signed
+# cookies), which requires exact-origin CORS + Allow-Credentials on responses.
+resource "aws_cloudfront_response_headers_policy" "video_cors" {
+  name = "${var.project_name}-video-cors"
+
+  cors_config {
+    access_control_allow_credentials = true
+
+    access_control_allow_origins {
+      items = [
+        "https://${var.domain_name}",
+        "https://www.${var.domain_name}",
+        "https://${var.frontend_subdomain}.${var.domain_name}",
+        "https://${var.frontend_subdomain}.${var.dev_subdomain}.${var.domain_name}",
+        "http://localhost:8080",
+      ]
+    }
+
+    # "*" is rejected when allow-credentials is true; list what hls.js sends.
+    access_control_allow_headers {
+      items = ["Range", "Origin", "Accept", "Accept-Encoding", "If-Range", "If-Match", "If-None-Match", "If-Modified-Since", "If-Unmodified-Since"]
+    }
+
+    access_control_allow_methods {
+      items = ["GET", "HEAD", "OPTIONS"]
+    }
+
+    origin_override = true
+  }
+}
+
 resource "aws_cloudfront_distribution" "media_distribution" {
   origin {
     domain_name              = aws_s3_bucket.media.bucket_regional_domain_name
@@ -64,21 +102,17 @@ resource "aws_cloudfront_distribution" "media_distribution" {
 
   aliases = ["${var.media_subdomain}.${var.domain_name}"]
 
-  # Paid course videos require a signed URL
+  # Paid course videos require a CloudFront signature: signed cookies for HLS
+  # (covers playlist + every segment), signed URLs for single-file mp4s.
   ordered_cache_behavior {
-    path_pattern           = "courses/videos/*"
-    target_origin_id       = "S3-${var.project_name}-media"
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    trusted_key_groups     = [aws_cloudfront_key_group.video_signing.id]
-
-    forwarded_values {
-      query_string = true
-      cookies {
-        forward = "none"
-      }
-    }
+    path_pattern               = "courses/videos/*"
+    target_origin_id           = "S3-${var.project_name}-media"
+    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    trusted_key_groups         = [aws_cloudfront_key_group.video_signing.id]
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.video_cors.id
   }
 
   # Everything else (articles, profile pics, course images) is public

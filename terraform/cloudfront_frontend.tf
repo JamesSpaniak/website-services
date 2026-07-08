@@ -161,8 +161,8 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
 
     min_ttl     = 0
-    default_ttl = 86400    # 1 day
-    max_ttl     = 2592000  # 30 days
+    default_ttl = 86400   # 1 day
+    max_ttl     = 2592000 # 30 days
   }
 
   # ── Public-folder static files (favicon, OG images, etc.) ─────────────────
@@ -183,8 +183,34 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
 
     min_ttl     = 0
-    default_ttl = 3600    # 1 hour
-    max_ttl     = 86400   # 1 day
+    default_ttl = 3600  # 1 hour
+    max_ttl     = 86400 # 1 day
+  }
+
+  # ── API proxy — authenticated, per-user responses; never cache ─────────────
+  # The backend does not send Cache-Control on API responses, so without an
+  # explicit TTL=0 behavior CloudFront caches /api GETs (default TTL 24h) and
+  # can serve one user's profile/course payload — or a stale 401 — to another
+  # request with the same cache key.
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    target_origin_id       = "ALB-${var.project_name}-frontend"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Authorization", "Content-Type", "Origin", "Referer"]
+      cookies {
+        forward = "all"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
   }
 
   default_cache_behavior {
@@ -196,7 +222,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     forwarded_values {
       query_string = true
       # Content-Type required so POST body (e.g. /api/analytics/event) is parsed as JSON at origin/backend
-      headers      = ["Authorization", "Content-Type", "Origin", "Referer"]
+      headers = ["Authorization", "Content-Type", "Origin", "Referer"]
 
       cookies {
         forward = "all"

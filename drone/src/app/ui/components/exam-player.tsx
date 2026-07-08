@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircleIcon, XCircleIcon, AcademicCapIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
-import { generateExam, submitExamAttempt } from '@/app/lib/api-client';
+import { generateExam, getExamWithQuestions, submitExamAttempt } from '@/app/lib/api-client';
 import { sendExamEvent } from '@/app/lib/analytics';
 import type { ExamPool, ExamScope, ExamWithQuestions, ExamAttemptResult, SectionBreakdown } from '@/app/lib/types/question';
 
 interface ExamPlayerProps {
     courseId: number;
     scope: ExamScope;
+    /** Pre-assigned exam id — skips generateExam and loads frozen questions. */
+    examId?: number;
     /** Unit / sub-unit ref (course_units.ref, e.g. "u101"). Omit for full_course. */
     scopeRef?: string;
     label?: string;
@@ -19,6 +21,8 @@ interface ExamPlayerProps {
     description?: string;
     showTopBorder?: boolean;
     variant?: 'inline' | 'page';
+    /** Hide retake on results (assigned class exams). */
+    hideRetake?: boolean;
     onSubmitted?: () => void;
 }
 
@@ -175,6 +179,7 @@ function ExamSubmitControls({
 export default function ExamPlayer({
     courseId,
     scope,
+    examId,
     scopeRef,
     label,
     examPool = 'scoped',
@@ -183,6 +188,7 @@ export default function ExamPlayer({
     description,
     showTopBorder = true,
     variant = 'inline',
+    hideRetake = false,
     onSubmitted,
 }: ExamPlayerProps) {
     const [phase, setPhase] = useState<Phase>('idle');
@@ -193,10 +199,12 @@ export default function ExamPlayer({
     const phaseRef = useRef<Phase>('idle');
 
     const scopeLabel = label ?? (scope === 'full_course' ? 'Full Course' : `Scope ${scopeRef}`);
-    const examKindLabel = examPool === 'final_only' ? 'Final Exam' : 'Practice Exam';
+    const examKindLabel = examId != null ? 'Assigned Exam' : examPool === 'final_only' ? 'Final Exam' : 'Practice Exam';
     const helperText =
         description ??
-        (scope === 'full_course'
+        (examId != null
+            ? 'Your teacher assigned this exam. Answer all questions, then submit for a score.'
+            : scope === 'full_course'
             ? examPool === 'final_only'
                 ? 'Randomized exam from chart and cross-section questions (FAA-CT-8080-2H supplement required).'
                 : 'Randomized practice exam across all course topics (excludes chart-only final items).'
@@ -239,14 +247,17 @@ export default function ExamPlayer({
         setAnswers({});
         setResult(null);
         try {
-            const generated = await generateExam({
-                course_id: courseId,
-                scope,
-                scope_refs: scopeRef != null ? [scopeRef] : [],
-                is_randomized: true,
-                exam_pool: examPool,
-                question_count: questionCount,
-            });
+            const generated =
+                examId != null
+                    ? await getExamWithQuestions(examId)
+                    : await generateExam({
+                          course_id: courseId,
+                          scope,
+                          scope_refs: scopeRef != null ? [scopeRef] : [],
+                          is_randomized: true,
+                          exam_pool: examPool,
+                          question_count: questionCount,
+                      });
             if (generated.questions.length === 0) {
                 setError('No questions are available for this exam yet. Check back after the question bank is populated.');
                 setPhase('idle');
@@ -261,7 +272,7 @@ export default function ExamPlayer({
             setPhase('taking');
             sendExamEvent('exam_start', courseId, examPool, scope);
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Failed to generate exam');
+            setError(e instanceof Error ? e.message : examId != null ? 'Failed to load exam' : 'Failed to generate exam');
             setPhase('idle');
         }
     };
@@ -328,9 +339,14 @@ export default function ExamPlayer({
                                 {examKindLabel}
                             </h2>
                             <p className="mt-1 text-sm text-[var(--brand-muted)]">{scopeLabel}</p>
-                            {questionCount != null && (
+                            {questionCount != null && examId == null && (
                                 <p className="mt-3 inline-block px-3 py-1 text-xs font-mono rounded-full bg-[var(--background)] border border-[var(--surface-border)] text-[var(--brand-muted)]">
                                     {questionCount} questions · randomized
+                                </p>
+                            )}
+                            {examId != null && questionCount != null && (
+                                <p className="mt-3 inline-block px-3 py-1 text-xs font-mono rounded-full bg-[var(--background)] border border-[var(--surface-border)] text-[var(--brand-muted)]">
+                                    {questionCount} questions
                                 </p>
                             )}
                             <p className="mt-4 text-sm text-[var(--brand-muted)] leading-relaxed">{helperText}</p>
@@ -345,7 +361,7 @@ export default function ExamPlayer({
                                 {phase === 'generating' ? (
                                     <><ArrowPathIcon className="h-5 w-5 animate-spin" /> Generating exam…</>
                                 ) : (
-                                    <><AcademicCapIcon className="h-5 w-5" /> {generateButtonLabel ?? 'Start exam'}</>
+                                    <><AcademicCapIcon className="h-5 w-5" /> {generateButtonLabel ?? (examId != null ? 'Start exam' : 'Start exam')}</>
                                 )}
                             </button>
                         </div>
@@ -377,7 +393,7 @@ export default function ExamPlayer({
                         {phase === 'generating' ? (
                             <><ArrowPathIcon className="h-4 w-4 animate-spin" /> Generating…</>
                         ) : (
-                            <><AcademicCapIcon className="h-4 w-4" /> {generateButtonLabel ?? 'Generate Exam'}</>
+                            <><AcademicCapIcon className="h-4 w-4" /> {generateButtonLabel ?? (examId != null ? 'Start exam' : 'Generate Exam')}</>
                         )}
                     </button>
                 </div>
@@ -563,9 +579,11 @@ export default function ExamPlayer({
                                     Back to exams
                                 </Link>
                             )}
-                            <button type="button" onClick={handleRetake} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] rounded-lg hover:border-[var(--brand-primary)] transition-colors">
-                                <ArrowPathIcon className="h-4 w-4" /> Retake exam
-                            </button>
+                            {!hideRetake && (
+                                <button type="button" onClick={handleRetake} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] rounded-lg hover:border-[var(--brand-primary)] transition-colors">
+                                    <ArrowPathIcon className="h-4 w-4" /> Retake exam
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

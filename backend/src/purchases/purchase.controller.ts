@@ -1,6 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, Headers, Post, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { PurchaseCourseDto, UpgradeToProDto } from './types/purchase.dto';
+import { ConfirmPurchaseDto, PurchaseCourseDto, UpgradeToProDto } from './types/purchase.dto';
 import { PurchaseService } from './purchase.service';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserFull } from 'src/users/types/user.dto';
@@ -45,7 +45,20 @@ export class PurchaseController {
   @ApiResponse({ status: 201, description: 'Payment Intent created successfully.' })
   @Post('create-payment-intent')
   async createPaymentIntent(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
+    await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
     return this.purchasesService.createPaymentIntent(req.user.userId, purchaseDto.courseId);
+  }
+
+  /**
+   * Reconcile access when Stripe succeeded but the client did not observe the webhook in time.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Confirm course access from a succeeded Payment Intent' })
+  @Post('confirm-payment')
+  async confirmPayment(@Request() req, @Body() dto: ConfirmPurchaseDto) {
+    await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
+    return this.purchasesService.confirmPaymentFromIntent(req.user.userId, dto.paymentIntentId);
   }
 
   /**

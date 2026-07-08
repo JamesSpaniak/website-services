@@ -220,6 +220,8 @@ UTM when tracking: `?utm_source=outreach&utm_medium=email&utm_campaign=[campaign
 
 Rep feedback from [`outreach.md`](../sales/outreach.md) weekly review reorders queue.
 
+**Open items:** [`docs/TODO.md`](../../docs/TODO.md)
+
 ---
 
 ## Related

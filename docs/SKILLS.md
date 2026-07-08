@@ -30,7 +30,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | Generate draft emails from CSV | [`docs/sales/contact-collection.md`](sales/contact-collection.md) | `scripts/draft_contact_emails.py` |
 | Pitch / procurement language | [`docs/sales/features.md`](sales/features.md) | — |
 | Competitor comparison | [`docs/sales/competitor-analysis.md`](sales/competitor-analysis.md) | Appendix A matrix |
-| Outreach data files | — | `data/outreach/contact-candidates.csv`, `contact-email-drafts.csv` |
+| Outreach data files | — | `outreach/contact-candidates.csv`, `contact-email-drafts.csv` |
 
 ## Marketing
 

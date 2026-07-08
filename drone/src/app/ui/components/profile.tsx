@@ -176,14 +176,12 @@ export default function ProfileComponent() {
                 ) : (
                     <div>
                         {loginStreak >= 2 && (
-                            <div className="mb-4 flex items-center gap-3 bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-xl px-5 py-4">
-                                <span className="text-3xl">&#128293;</span>
-                                <div>
-                                    <p className="text-lg font-bold text-[var(--brand-primary)]">{loginStreak}-day streak!</p>
-                                    <p className="text-sm text-[var(--brand-muted)]">
-                                        You&apos;ve logged in {loginStreak} days in a row. Keep it up!
-                                    </p>
-                                </div>
+                            <div className="mb-3 inline-flex items-center gap-2 bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)] rounded-lg px-3 py-1.5">
+                                <span className="text-base" aria-hidden>🔥</span>
+                                <p className="text-sm font-semibold text-[var(--brand-primary)]">
+                                    {loginStreak}-day streak
+                                    <span className="ml-1.5 font-normal text-[var(--brand-muted)]">— keep it up!</span>
+                                </p>
                             </div>
                         )}
 
@@ -192,14 +190,14 @@ export default function ProfileComponent() {
                                 <p className="text-[var(--brand-muted)]">No recent activity.</p>
                             </div>
                         ) : (
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 {activity.map((entry) => {
-                                    const cfg = PROFILE_ACTION_LABELS[entry.action] || { label: entry.action, icon: '&#9679;', color: 'text-[var(--brand-muted)]' };
+                                    const cfg = PROFILE_ACTION_LABELS[entry.action] || { label: entry.action, icon: '•', color: 'text-[var(--brand-muted)]' };
                                     const meta = formatProfileMeta(entry.metadata);
                                     return (
-                                        <div key={entry.id} className="flex items-center gap-3 p-3 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
-                                            <span className="text-lg" dangerouslySetInnerHTML={{ __html: cfg.icon }} />
-                                            <div className="flex-1 min-w-0">
+                                        <div key={entry.id} className="flex items-center gap-2.5 px-3 py-2 bg-[var(--comment-secondary-bg)] rounded-lg border border-[var(--surface-border)]">
+                                            <span className="text-sm shrink-0" aria-hidden>{cfg.icon}</span>
+                                            <div className="flex-1 min-w-0 flex items-baseline gap-2">
                                                 <p className={`text-sm font-medium ${cfg.color}`}>{cfg.label}</p>
                                                 {meta && <p className="text-xs text-[var(--brand-muted)] truncate">{meta}</p>}
                                             </div>
@@ -278,16 +276,16 @@ export default function ProfileComponent() {
 }
 
 const PROFILE_ACTION_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-    LOGIN: { label: 'Logged in', icon: '&#128275;', color: 'text-[var(--brand-foreground)]' },
-    REGISTER: { label: 'Joined the platform', icon: '&#127881;', color: 'text-[var(--brand-primary)]' },
-    VERIFY_EMAIL: { label: 'Verified email', icon: '&#9989;', color: 'text-[var(--brand-primary)]' },
-    COURSE_STARTED: { label: 'Started a new course', icon: '&#128218;', color: 'text-[var(--brand-primary)]' },
-    UNIT_COMPLETED: { label: 'Completed a unit', icon: '&#127942;', color: 'text-[var(--brand-foreground)]' },
-    EXAM_SUBMITTED: { label: 'Took an exam', icon: '&#128221;', color: 'text-[var(--brand-muted)]' },
-    COURSE_COMPLETED: { label: 'Completed a course', icon: '&#127941;', color: 'text-[var(--brand-primary)]' },
-    PROGRESS_RESET: { label: 'Reset course progress', icon: '&#128260;', color: 'text-red-500' },
-    COURSE_PURCHASED: { label: 'Purchased a course', icon: '&#128176;', color: 'text-[var(--brand-muted)]' },
-    PRO_UPGRADE: { label: 'Upgraded to Pro', icon: '&#11088;', color: 'text-[var(--brand-primary)]' },
+    LOGIN: { label: 'Logged in', icon: '🔓', color: 'text-[var(--brand-foreground)]' },
+    REGISTER: { label: 'Joined the platform', icon: '🎉', color: 'text-[var(--brand-primary)]' },
+    VERIFY_EMAIL: { label: 'Verified email', icon: '✅', color: 'text-[var(--brand-primary)]' },
+    COURSE_STARTED: { label: 'Started a new course', icon: '📚', color: 'text-[var(--brand-primary)]' },
+    UNIT_COMPLETED: { label: 'Completed a unit', icon: '🏆', color: 'text-[var(--brand-foreground)]' },
+    EXAM_SUBMITTED: { label: 'Took an exam', icon: '📝', color: 'text-[var(--brand-muted)]' },
+    COURSE_COMPLETED: { label: 'Completed a course', icon: '🏅', color: 'text-[var(--brand-primary)]' },
+    PROGRESS_RESET: { label: 'Reset course progress', icon: '🔄', color: 'text-red-500' },
+    COURSE_PURCHASED: { label: 'Purchased a course', icon: '💰', color: 'text-[var(--brand-muted)]' },
+    PRO_UPGRADE: { label: 'Upgraded to Pro', icon: '⭐', color: 'text-[var(--brand-primary)]' },
 };
 
 function formatProfileMeta(metadata: Record<string, unknown> | null): string {

@@ -27,7 +27,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '15m' }, // Access token expires in 15 minutes
+        // Must match ACCESS_TOKEN_MAX_AGE_MS in auth.controller.ts. A shorter
+        // JWT than the cookie means every request 401s once the JWT lapses,
+        // and concurrent 401s race the rotating refresh token into a forced
+        // sign-out ("Session expired") while the cookie still looks valid.
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '1h',
+        },
       }),
       inject: [ConfigService],
     }),

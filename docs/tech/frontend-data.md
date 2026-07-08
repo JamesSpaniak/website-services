@@ -99,9 +99,12 @@ Org roles (**manager** / **member**) are **not** in the JWT; `/manager` only req
 | Payment UI | `PurchaseFlow` — `CardElement`, `useStripe`, `useElements` |
 | Create intent | **`POST /api/purchases/create-payment-intent`** via `createPaymentIntent(courseId)` → `{ clientSecret }` |
 | Confirm | `stripe.confirmCardPayment(clientSecret, { payment_method: { card: elements.getElement(CardElement)! } })` |
-| Fulfillment | Server-side **`POST /purchases/webhook`** (Stripe signature); **not** called from the frontend |
+| Fulfillment | Server-side **`POST /purchases/webhook`** (Stripe signature); **not** called from the frontend. Client polls `getCourseById` for `has_access` (15 × 2s). |
+| Reconcile | **`POST /api/purchases/confirm-payment`** via `confirmCoursePurchase(paymentIntentId)` — idempotent recovery when Stripe succeeded but the webhook wasn't observed (poll timeout / page refresh). The pending PI id is stashed in `sessionStorage` (`pendingPurchasePi:{courseId}`) so the "Restore my access" button survives reloads. |
 
 Admin manual grant **`POST /purchases/course`** exists as `purchaseCourse` in `api-client` for tooling; the main user purchase path is PaymentIntent + webhook.
+
+**Logged-out purchase intent:** `PurchaseFlow` requires a session — logged-out users see "Create account & checkout" → `/register?redirect=/courses/{id}?purchase=1`. Redirect helpers live in `drone/src/app/lib/auth-redirect.ts` (`PURCHASE_QUERY`, `sanitizeRedirect`, `stashPostAuthRedirect` — sessionStorage carries the redirect through email verification).
 
 **Secrets:** only **`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`** on the client. **`STRIPE_SECRET_KEY`** / **`STRIPE_WEBHOOK_SECRET`** stay on the backend.
 
@@ -120,11 +123,11 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 | Courses / progress | `courses`, `courses/:id`, `progress/courses`, `progress/courses/:id`, `progress/courses/:id/reset`, `progress/courses/:courseId/units/:unitId`, `courses/:courseId/units/:unitId/media` |
 | Articles (public + admin) | `articles`, `articles/:id`, `articles/admin/all`, `articles` POST, `articles/:id` PATCH/DELETE |
 | Comments | `articles/:articleId/comments`, `comments/:id` PATCH/DELETE, `comments/:id/upvote` |
-| Purchases | `purchases/create-payment-intent`, `purchases/course` |
+| Purchases | `purchases/create-payment-intent`, `purchases/confirm-payment`, `purchases/course` |
 | Media | `media/presigned-url`, `media/profile-picture`, `media` GET/DELETE, `media?folder&subfolder` |
 | Organizations | `organizations/my`, `organizations/invite-info`, `organizations`, `organizations/:id`, members, invite-codes, courses, progress |
 | Audit / analytics | `audit/my`, `audit/users/:userId`, `audit/analytics/overview`, `audit/analytics/daily` |
-| Email | `email/contact` |
+| Email | `email/contact`, `email/consultation` |
 | Analytics | `analytics/event` (see below) |
 | Logging | `logs` (see below) |
 
@@ -152,7 +155,7 @@ The **Exam** UI (`exam.tsx`) submits answers via **`submitUnitExam`** → **`POS
 
 ## 6. Pages — route map
 
-**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, and `HeaderComponent` (nav + auth menu).
+**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav + auth menu + Book a Call CTA), and `FooterComponent` (nav columns + socials).
 
 Below: **page file** → **permissions** → **HTTP/API** (backend names match [`backend-data.md`](./backend-data.md) §4) → **UI components** (primary children; nested components may call additional APIs).
 
@@ -160,9 +163,9 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | Public. `HomeAuthCta` uses session from `AuthProvider` (no API by itself). |
-| **API** | None. |
-| **Components** | `JsonLd` (organization + website), `BrandLogo`, `HomeAuthCta`, links. |
+| **Permissions** | Public (RSC). `HomeAuthCta` uses session from `AuthProvider` (no API by itself). |
+| **API** | Server-side **`GET /articles`** (direct fetch, `revalidate: 3600`) for the "Recent Articles" section; static teaser cards as fallback when unreachable. |
+| **Components** | Full-viewport hero (`BrandLogo`, `HomeAuthCta`, `HeroScrollNext`), course-track cards (FAA 107 / Video / AI — Video & AI tracks are coming-soon stubs), For Schools callout, `ArticlePreviewComponent` grid, `JsonLd` (organization + website). |
 
 ### `/about` — `app/about/page.tsx`
 
@@ -184,17 +187,17 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | Public; redirects to `/profile` if already logged in (`useAuth`). |
+| **Permissions** | Public; redirects to `?redirect=` target (or `/profile`) if already logged in (`useAuth`). `?redirect=` is sanitized (`sanitizeRedirect`) and stashed to sessionStorage (`stashPostAuthRedirect`). |
 | **API** | **`LoginComponent`:** `POST /auth/login` (via `useAuth().login` → `login` in `api-client`). In **signup** mode: **`POST /auth/register`** → `createUser`. |
-| **Components** | `PageShell`, `LoginComponent`, `LoadingComponent`. |
+| **Components** | Two-column layout: `LoginComponent` + **`LoginConversionPanel`** (Part 107 pitch; try-free / purchase CTAs; purchase-intent copy when redirect contains `purchase=1`). `LoadingComponent`, Suspense wrapper. |
 
 ### `/register` — `app/register/page.tsx`
 
 | | |
 |--|--|
-| **Permissions** | Public; redirects to `/profile` if logged in. Optional `?code=` invite. |
+| **Permissions** | Public; redirects to `/profile` if logged in. Optional `?code=` invite. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
 | **API** | **`GET /organizations/invite-info?code=`** when `code` present → `getInviteCodeInfo`. **`POST /auth/register`** → `createUser` (includes `invite_code` when valid). |
-| **Components** | `PageShell`, `ErrorComponent`, inline form (Heroicon). |
+| **Components** | `PageShell`, `ErrorComponent`, inline form (Heroicon), Suspense wrapper. |
 
 ### `/forgot-password` — `app/forgot-password/page.tsx`
 
@@ -226,7 +229,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | Public; uses `?token=`. |
 | **API** | **`POST /auth/verify-email`** → `verifyEmail`. |
-| **Components** | `PageShell`, status messaging + link to `/login`. |
+| **Components** | `PageShell`, status messaging. The sign-in link reads the stashed redirect (`readStashedPostAuthRedirect`) so purchase/course intent survives verification. |
 
 ### `/settings` — `app/settings/page.tsx`
 
@@ -266,15 +269,31 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | Public page; **`GET /courses`** is optional-JWT on backend — when logged in, responses include `has_access` per course. Waits for `AuthProvider` before fetching. |
 | **API** | **`GET /courses`** → `getCourses`. |
-| **Components** | `PageShell`, `CoursePreviewComponent`, `LoadingComponent`, `ErrorComponent`. |
+| **Components** | `PageShell`, `CoursePreviewComponent` (preview-first card: links to `/courses/:id/preview`, plus "Try Unit 1 free" / "Purchase $X" register-redirect CTAs), `LoadingComponent`, `ErrorComponent`. |
 
 ### `/courses/[courseId]` — `app/courses/[courseId]/page.tsx`
 
 | | |
 |--|--|
-| **Permissions** | **`AuthGuard`** + **`Elements` (Stripe)**. Backend **`GET /courses/:id`** requires JWT and enforces access. |
-| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-payment-intent`**, then Stripe `confirmCardPayment`; may re-fetch course via `getCourseById` after success. |
-| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, `Elements` + **`CourseComponent`** (`PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `ImageComponent`, `JsonLd`). |
+| **Permissions** | **`AuthGuard`** + **`Elements` (Stripe)**. Backend **`GET /courses/:id`** requires JWT and enforces access. **`?purchase=1`** auto-opens `PurchaseFlow` (`initialShowPurchase`) when the course is paid and not yet owned. |
+| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-payment-intent`**, then Stripe `confirmCardPayment`, poll `getCourseById`; reconcile via **`POST /purchases/confirm-payment`** (see §3). Logged-out state renders account-required CTAs instead of the card form. |
+| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, `Elements` + **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). |
+
+### `/courses/[courseId]/preview` — `app/courses/[courseId]/preview/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (RSC — shareable / SEO landing per course). |
+| **API** | Server-side **`GET /courses/:id/public`** (direct fetch, `revalidate: 3600`) for metadata + page; 404 via `notFound()` when missing. |
+| **Components** | Hero image, price / unit-count badges, **`CoursePreviewActions`** (auth-aware: continue-learning + unlock for logged-in; create-account / purchase / sign-in register-redirects for logged-out), course outline with `free_preview` markers, FAQ section, `JsonLd` (course + FAQ). |
+
+### `/courses/tracks/video`, `/courses/tracks/ai` — `app/courses/tracks/*/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public; static "coming soon" stubs linked from the home track cards. Both tracks must ship before initial launch (see `docs/TODO.md` P0). |
+| **API** | None. |
+| **Components** | `PageShell`, copy + link back to `/courses`. |
 
 ### `/courses/[courseId]/units/[unitId]` — `app/courses/[courseId]/units/[unitId]/page.tsx`
 
@@ -300,6 +319,38 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | **API** | **`getOrganizationDetails`**, **`getOrgMembers`**, **`addOrgMember`**, **`removeOrgMember`**, **`updateMemberRole`**, **`generateInviteCode`**, **`getInviteCodes`**, **`getOrgProgress`**, **`getOrgCourseProgress`**, **`getStudentActivity`**, **`resetMemberPicture`** — all under `/organizations/...` and **`GET /audit/users/:userId`** per [`backend-data.md`](./backend-data.md). |
 | **Components** | `ManagerGuard`, `PageShell`, tabbed dashboard (members / invites / progress), Heroicons. |
 
+### `/schools`, `/schools/funding` — `app/schools/**/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (RSC, light `data-edu-theme` palette). |
+| **API** | None. |
+| **Components** | Static marketing sections (value props, dashboards, funding sources), links to `/consultation` and `/schools/curriculum`. |
+
+### `/schools/curriculum` — `app/schools/curriculum/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (RSC, `data-edu-theme`). |
+| **API** | Server-side **`GET /courses`** (direct fetch) for live course catalog data on the curriculum overview. |
+| **Components** | Static curriculum/track sections + fetched course info. |
+
+### `/consultation` — `app/consultation/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (`data-edu-theme`). |
+| **API** | **`POST /email/consultation`** → `sendConsultationRequest` (`ConsultationForm`, zod-validated). |
+| **Components** | Hero strip, `ConsultationForm`, what-we-discuss checklist. |
+
+### `/legal`, `/privacy` — `app/legal/page.tsx`, `app/privacy/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public. |
+| **API** | None. |
+| **Components** | Static terms (`terms-of-service-body.tsx`) / privacy notice content. |
+
 ### Other app routes (metadata / SEO)
 
 | File | Role |
@@ -318,6 +369,8 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | Proxy to backend | `drone/src/app/api/[...path]/route.ts` |
 | Edge JWT gating | `drone/src/middleware.ts` |
 | Session / profile | `drone/src/app/lib/auth-context.tsx` |
+| Redirect / purchase-intent helpers | `drone/src/app/lib/auth-redirect.ts` (sanitize, login/register hrefs, sessionStorage stash, `PURCHASE_QUERY`) |
+| Conversion CTAs | `drone/src/app/ui/components/login-conversion-panel.tsx`, `course-preview-actions.tsx`, `course-purchase-banner.tsx` |
 | Guards | `drone/src/app/lib/auth-guard.tsx`, `drone/src/app/ui/components/admin-guard.tsx`, `drone/src/app/ui/components/manager-guard.tsx` |
 | Stripe Elements + purchase | `drone/src/app/courses/[courseId]/page.tsx`, `drone/src/app/ui/components/purchase-flow.tsx` |
 | Analytics beacon | `drone/src/app/lib/analytics.ts`, `drone/src/app/lib/use-page-analytics.ts` |

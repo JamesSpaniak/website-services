@@ -106,3 +106,16 @@ variable "enable_vpc_flow_logs" {
   type        = bool
   default     = true
 }
+
+variable "seed_test_data" {
+  description = "Seed dev-only test fixtures (test admin, test student, test organization) on backend boot. Keep false for prod."
+  type        = bool
+  default     = false
+}
+
+variable "test_user_password" {
+  description = "Password for dev-only test fixtures. When set (and seed_test_data is true) terraform manages the secret value so no out-of-band seeding is needed. Leave empty in prod."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

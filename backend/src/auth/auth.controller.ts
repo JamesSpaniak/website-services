@@ -105,6 +105,17 @@ export class AuthController {
     return this.authService.verifyEmail(verifyEmailDto.token);
   }
 
+  @ApiOperation({ summary: 'Resend email verification link' })
+  @ApiResponse({ status: 200, description: 'Verification email sent.' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Request() req) {
+    return this.authService.resendVerificationEmail(req.user.userId);
+  }
+
   @ApiOperation({ summary: 'Refresh access token', description: 'Provides a new access and refresh token.' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token.' })

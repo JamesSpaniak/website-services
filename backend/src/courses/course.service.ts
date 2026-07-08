@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './types/course.entity';
 import { DataSource, Repository } from 'typeorm';
 import { User } from 'src/users/types/user.entity';
+import { Question } from 'src/questions/types/question.entity';
 import { Role } from 'src/users/types/role.enum';
 import { MediaService } from 'src/media/media.service';
 import { OrganizationService } from 'src/organizations/organization.service';
 import { CourseDetails, UnitData } from './types/course.dto';
 import { CourseUnitService } from './course-unit.service';
+import { FINAL_EXAM_STANDARD } from 'src/questions/exam-generator.service';
 import { normalizeAndFlattenUnits } from './course-unit.util';
 import {
   assertCourseExists,
@@ -23,6 +25,8 @@ export class CourseService {
         private courseRepository: Repository<Course>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        @InjectRepository(Question)
+        private questionRepository: Repository<Question>,
         private readonly mediaService: MediaService,
         private readonly organizationService: OrganizationService,
         private readonly courseUnitService: CourseUnitService,
@@ -67,8 +71,44 @@ export class CourseService {
     });
   }
 
-  async getCourses(): Promise<Course[]> {
-    return (await this.courseRepository.find()).filter(course => !course.hidden)
+  /**
+   * Active practice-pool question counts per unit ref and sub-unit ref, in two
+   * aggregate queries. Mirrors ExamGeneratorService.fetchPool for the default
+   * 'scoped' pool so the frontend can hide exam CTAs for empty scopes without
+   * a per-node API call.
+   */
+  async getQuestionCounts(
+    courseId: number,
+  ): Promise<{ unit: Record<string, number>; sub_unit: Record<string, number> }> {
+    const baseQuery = (refColumn: 'unit_ref' | 'sub_unit_ref') =>
+      this.questionRepository
+        .createQueryBuilder('q')
+        .select(`q.${refColumn}`, 'ref')
+        .addSelect('COUNT(*)', 'count')
+        .where('q.course_id = :courseId', { courseId })
+        .andWhere('q.status = :status', { status: 'active' })
+        .andWhere('(q.standard IS NULL OR q.standard != :finalStandard)', {
+          finalStandard: FINAL_EXAM_STANDARD,
+        })
+        .andWhere(`q.${refColumn} IS NOT NULL`)
+        .groupBy(`q.${refColumn}`)
+        .getRawMany<{ ref: string; count: string }>();
+
+    const [unitRows, subUnitRows] = await Promise.all([
+      baseQuery('unit_ref'),
+      baseQuery('sub_unit_ref'),
+    ]);
+
+    const toMap = (rows: { ref: string; count: string }[]) =>
+      Object.fromEntries(rows.map((r) => [r.ref, Number(r.count)]));
+
+    return { unit: toMap(unitRows), sub_unit: toMap(subUnitRows) };
+  }
+
+  /** Admins see every course (including hidden drafts they are editing). */
+  async getCourses(includeHidden = false): Promise<Course[]> {
+    const courses = await this.courseRepository.find();
+    return includeHidden ? courses : courses.filter(course => !course.hidden);
   }
 
   /** Unauthenticated marketing payload — outline and hero media only. */

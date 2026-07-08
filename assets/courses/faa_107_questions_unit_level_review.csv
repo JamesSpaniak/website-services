@@ -1,0 +1,577 @@
+row,disposition,unit_ref,category,sub_category,note,question
+2,imported,u5,weather,"Sources, Metar",,"(Refer to FAA-CT-8080-2H, Figure 12.) The wind direction and velocity at KJFK is from"
+3,imported,u5,Weather,"Sources, Metar",,"(Refer to FAA-CT-8080-2H, Figure 12.) What are the current conditions for Chicago Midway Airport (KMDW)?"
+4,imported,u5,weather,"Sources, Metar",,"(Refer to FAA-CT-8080-2H, Figure 12.) Which stations are reporting weather that would prohibit UAS operations?"
+5,imported,u5,weather,"Sources, TAF",,"(Refer to FAA-CT-8080-2H, Figure 15.) What is the valid period for the TAF for KMEM?"
+6,imported,u7,Loading & Performance,loading and performance,,"(Refer to FAA-CT-8080-2H, Figure 2.) If an unmanned airplane weighs 33 pounds, what approximate weight would the airplane structure be requi"
+7,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to FAA-CT-8080-2H, Figure 20 Area 1) The Fentress NALF Airport (NFE) is in what type of airspace?"
+8,imported,u2,Airports & Airspace,Aeronautical Charts,,"(Refer to FAA-CT-8080-2H, Figure 20, area 2.) Why would the small flag at Lake Drummond of the sectional chart be important to a remote pilo"
+9,imported,u2,Airports & Airspace,Aeronautical Charts,,"(Refer to FAA-CT-8080-2H, Figure 20, area 3.) With ATC authorization, you are operating your small unmanned aircraft approximately 4 SM sout"
+10,imported,u2,Airports & Airspace,Aeronautical Charts,,"(Refer to FAA-CT-8080-2H, Figure 20, area 4.) A small UA is being launched 2 NM northeast of the town of Hertford. What is the height of the"
+11,imported,u9,Operations,"ADM, Notams, Hazards",,"(Refer to FAA-CT-8080-2H, Figure 20, area 5.) How would a remote PIC ""CHECK NOTAMS"" as noted in the CAUTION box regarding the unmarked ballo"
+12,imported,u10,Operations,Communications,,"(Refer to FAA-CT-8080-2H, Figure 21, area 1.) After receiving authorization from ATC to operate a small UA near Minot International airport "
+13,imported,u2,Airports & Airspace,"Overview, L & L",,"(Refer to FAA-CT-8080-2H, Figure 21, area 2.) Which airport is located at approximately 47 degrees 41 minutes 00 seconds N latitude and 101 "
+14,imported,u2,Airports & Airspace,"Overview, L & L",,"(Refer to FAA-CT-8080-2H, Figure 21.) What airport is located approximately 47 (degrees) 40 (minutes) N latitude and 101 (degrees) 26 (minut"
+15,imported,u3,Airports & Airspace,"Airport Operations, MOA",,"(Refer to FAA-CT-8080-2H, Figure 21.) You have been hired by a farmer to use your small UA to inspect his crops. The area that you are to su"
+16,imported,u10,Operations,Radio Communications,,"(Refer to FAA-CT-8080-2H, Figure 22, area 2.) At Coeur D'Alene which frequency should be used as a Common Traffic Advisory Frequency (CTAF) "
+17,imported,u10,Operations,Radio Communications,,"(Refer to FAA-CT-8080-2H, Figure 22, area 2.) Weather information is available at the Coeur d'Alene (COE) Airport"
+18,imported,u3,Airports & Airspace,Airspace Classification and Operating Requirements,,"(Refer to FAA-CT-8080-2H, Figure 23, area 3.) What is the floor of the Savannah Class C airspace at the shelf area (outer circle)?"
+19,imported,u5,Weather,,,"(Refer to FAA-CT-8080-2H, Figure 23, area 4.) What is the required flight visibility for a remote pilot operating an unmanned aircraft near "
+20,imported,u2,Airports & Airspace,Aeronautical Charts,,"(Refer to FAA-CT-8080-2H, Figure 24, area 3, and Legend 1.) For information about the parachute operations at Tri-County Airport, refer to"
+21,imported,u2,Airports & Airspace,,,"(Refer to FAA-CT-8080-2H, Figure 24, area 6.) What type of airport is Card Airport?"
+22,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 25, area 2.) What is the base of Class B airspace at Lakeview (30F) Airport?"
+23,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 25, area 3.) The floor of Class B airspace at Dallas Executive (RBD) is"
+24,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 26, area 2.) While monitoring the Cooperstown CTAF you hear an aircraft announce that they are midfield lef"
+25,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 26, area 4.) You have been hired to inspect the tower under construction at 46.9N and 98.6W, near Jamestown"
+26,imported,u3,Airports & Airspace,"Airspace Classifications, MOA",,"(Refer to FAA-CT-8080-2H, Figure 26.) The Devils Lake East MOA (area 1) is a"
+27,imported,u2,Airports & Airspace,"Overview, L & L",,"(Refer to FAA-CT-8080-2H, Figure 26.) What does the line of latitude at area 4 measure?"
+28,imported,u3,Airports & Airspace,"Airspace Classifications, MTR",,"(Refer to FAA-CT-8080-2H, Figure 59, area 2.) The chart shows a gray line with VR1667, VR1617, VR1638, and VR1668. Could this area present a"
+29,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 75, area 6.) The airspace surrounding the Gila Bend AF AUX Airport (GBN) is classified as"
+30,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 78. Near the center of the figure.) What class of airspace is associated with SIOUX GATEWAY/COL DAY (SUX) A"
+31,imported,u3,Airports & Airspace,Airspace Classifications & operating requirements,,"(Refer to FAA-CT-8080-2H, Figure 78.) You have been contracted to inspect towers located approximately 4NM southwest of the Sioux Gateway (S"
+32,imported,u3,Airports & Airspace,"Airspace Classifications,",,"(Refer to FAA-CT-8080-2H, Figure 78.) You have been hired to use your small UAS to inspect the railroad tracks from Blencoe (SE of Sioux Cit"
+33,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to Figure 25, Area 3) The floor of Class B airspace at Dallas Executive (RBD) is"
+34,imported,u9,Operations,ADM,,A local TV station has hired a remote pilot to operate their small UA to cover news stories. The remote pilot has had multiple near misses w
+35,imported,u1,Regulations,Remote ID,,A person may not use a Remote ID broadcast module that:
+36,imported,u8,Operations,"Crew management, emergency procedures",,A person whose sole task is watching the sUAS to report hazards to the rest of the crew is called:
+37,imported,u1,Regulations,"Overview, Operating Rules",,A person without a part 107 remote pilot certificate may operate an sUAS for non-recreational operations:
+38,imported,u1,Regulations,Remote ID,,A small unmanned aircraft without Remote ID that is equipped after production with a Remote ID broadcast module:
+39,imported,u7,Loading & Performance,loading and performance,,A stall occurs when the smooth airflow over the unmanned airplane's wing is disrupted and the lift degenerates rapidly. This is caused when 
+40,imported,u6,weather,"effects on performance, wind",,A sudden change in wind speed and direction is called what?
+41,imported,u5,Weather,"sources, TAF",,A TAF is for how many hours or what period of time?
+42,imported,u1,Regulations,,,A travel blogger follows her truck with an sUAS while a passenger serves as RPIC for a monetized video. Does this comply with Part 107?
+43,imported,u3,Airports & Airspace,"Airspace Classifications,",,According to 14 CFR part 107 the remote pilot in command (PIC) of a small unmanned aircraft planning to operate within Class C airspace
+44,imported,u1,Regulations,Operating Rules,,"According to 14 CFR part 107, an sUAS is a unmanned aircraft system weighing:"
+45,imported,u3,Airports & Airspace,"Airspace Classifications, Operating Rules",,"According to 14 CFR part 107, how may a Remote Pilot in Command (Remote PIC) operate an unmanned aircraft in controlled airspace (Class B, C"
+46,imported,u9,Operations,"Crew Resource Management, Preflight Inspection",,"According to 14 CFR part 107, the responsibility to inspect the small UAS to ensure it is in a safe operating condition rests with the"
+47,imported,u1,Regulations,Flying at Night,,"According to 14 CFR Part 107, what is required to operate a small UA within 30 minutes after official sunset?"
+48,imported,u1,Regulations,Flying over people and moving objects,,"According to 14 CFR part 107, what is required to operate a small unmanned aircraft in civil twilight or at night?"
+49,imported,u1,Regulations,Operating Rules,,"According to 14 CFR part 107, what is the maximum groundspeed for a small UA?"
+50,imported,u7,Loading & Performance,loading and performance,,"According to 14 CFR part 107, who is responsible for determining the performance of a small unmanned aircraft?"
+51,imported,u9,Operations,Preflight Inspection,,"According to 14 CFR part 107, who is responsible for ensuring that all control links between the ground control station and the small unmann"
+52,imported,u1,Regulations,Applicability,,"According to 14 CFR part 48, when must a person register a small UA with the Federal Aviation Administration?"
+53,imported,u1,Regulations,Regulations,,"According to 14 CFR part 48, when would a small UA owner not be permitted to register it?"
+54,imported,u3,Airports & Airspace,"Airspace Classifications,",,"According to 14 CFR part 107, how may a remote pilot operate an unmanned aircraft in Class C airspace?"
+55,imported,u1,Regulations,"Operating Rules, Alcohol",,"After having dinner and wine, your client asks you to go outside to demonstrate the small UA's capabilities. You must"
+56,imported,u1,Regulations,Operating rules,,"After receiving a part 107 remote pilot certificate with an sUAS rating, how often must you satisfy recurrent training requirements?"
+57,imported,u9,Operations,"night operations, ADM",,"As landing an sUAS at night is particularly challenging, select a landing area:"
+58,imported,u9,Operations,"Operational Rules, Preflight",,"As part of an overall safety risk assessment for flight, when should the Remote Pilot in Command check and consider weather conditions in th"
+59,imported,u7,Loading & Performance,loading and performance,,"Before each flight, the Remote Pilot in Command must ensure that:"
+60,imported,u1,Regulations,Flying over people and moving objects,,Category 4 operations are limited to unmanned aircraft:
+61,imported,u9,Operations,Maintenance & Inspection Procedures,,Damaged lithium batteries can cause
+62,imported,u1,Regulations,Operating Rules,,"During a flight of your small UA, you observe a hot air balloon entering the area. You should"
+63,imported,u9,Operations,Physiological factors,,"During an inspection flight, you notice that objects that are closer to the drone appear to be moving across your visual field faster than d"
+64,imported,u9,Operations,"Physiological, ADM",,"During night operations, compensate for the night blind spot by:"
+65,imported,u9,Operations,Operations and Procedures,,"During your preflight inspection, you discover a small nick in the casing of your small UAS battery. What action should you take?"
+66,imported,u1,Regulations,Flying over people and moving objects,,"For Category 1, 2, and 4 operations over people, sustained flight over open air assemblies are restricted to small unmanned aircraft that:"
+67,imported,u1,Regulations,Flying over people and moving objects,,"For Category 2 operations over people, the small unmanned aircraft:"
+68,imported,u1,Regulations,Flying over people and moving objects,,"For Category 3 operations over people, the small unmanned aircraft must not cause injury equivalent to or greater than the impact of:"
+69,imported,u6,Weather,"effects on performance, humidity",,How does high humidity affect drone performance?
+70,imported,u7,Loading & Performance,loading and performance,,How does increasing the bank angle in a turn affect stall speed?
+71,imported,u9,Operations,ADM,,Identify the hazardous attitude or characteristic a remote pilot displays while taking risks in order to impress others?
+72,imported,u6,Weather,"effects on performance, air density",,"If the outside air temperature (OAT) at a given altitude is warmer than standard, the density altitude is"
+73,imported,u8,Operations,"ADM, Emergency procedures",,"If the Remote PIC cannot determine the location of the sUAS in relation to other aircraft during night operations, when should he or she lan"
+74,imported,u1,Regulations,Operating Rules,,"In accordance with 14 CFR part 107, you may operate an sUAS from a moving vehicle when no property is carried for compensation or hire:"
+75,imported,u10,Operations,Radio Communications,,Is it mandatory for sUAS operators to monitor CTAF at non-towered airports?
+76,imported,u1,Regulations,Operating Rules,,Part 107 applies to which operations?
+77,imported,u1,Regulations,Remote ID,,Part 89 Remote Identification (Remote ID) requirements:
+78,imported,u10,Operations,Communications,,"Refer to FAA-CT-8080-2H, Figure 21, area 1.) After receiving authorization from ATC to operate a small UA near Minot International airport ("
+79,needs_review,,Airports & Airspace,"airspace classifications, Restricted areas","answer=B, choices=1","Refer to FAA-CT-8080-2H, Figure 75 area 6. During preflight planning you plan to operate in R-2305, where would you find additional info reg"
+80,imported,u3,Airports & Airspace,"Airspace Classifications, Operating Rules",,"Refer to FAA-CT-8080-2H, figure 21 Area 1. At what altitude above the radio tower south of Minot Intl Airport may you fly?"
+81,imported,u3,Airports & Airspace,"Airspace Classifications, sectional charts",,"Refer to FAA-CT-8080-2H,  figure 22. While inspecting the obstacle located 3 miles northwest of Coeur D'Alene-Boyington Airport, what is the"
+82,imported,u9,Operations,ADM,,"Safety is an important element for a remote pilot to consider prior to operating an unmanned aircraft system. To prevent the final ""link"" in"
+83,imported,u9,Operations,Maintenance & Inspection Procedures,,Scheduled maintenance should be performed in accordance with the:
+84,imported,u1,Regulations,Waivers,,The FAA may approve your application for a waiver of provisions in part 107 only when it has been determined that the proposed operation:
+85,imported,u2,Airports & Airspace,Airports data sources,,The most comprehensive source of airport information is
+86,imported,u1,Regulations,"Operating Rules, Alcohol",,The refusal of a remote PIC to submit to a blood alcohol test when requested by a law enforcement officer
+87,imported,u1,Regulations,Operational Rules,,The U.S. Air Force is operating an atmospheric research sUAS over Texas oil fields. Must it comply with Part 107?
+88,imported,u1,Regulations,Flying over people and moving objects,,"To conduct Category 1 operations over people, the small unmanned aircraft:"
+89,imported,u7,Loading & Performance,loading and performance,,"To ensure that the unmanned aircraft center of gravity (CG) limits are not exceeded, follow the aircraft loading instructions specified in t"
+90,imported,u9,Operations,"Night Flying, ADM",,"To keep the small unmanned aircraft in the intended area and within visual line-of-sight (VLOS) during night operations, the Remote Pilot in"
+91,imported,u9,Operations,"Operations, Maintenance & Inspection Procedures",,Under what condition should the Remote Pilot in Command of a small unmanned aircraft develop his or her own scheduled maintenance protocol?
+92,imported,u1,Regulations,Operations,,Under what condition would a small UA not have to be registered before it is operated in the United States?
+93,imported,u1,Regulations,"Regulations, Operational Rules, Autonomous",,Unmanned aircraft means an aircraft operated:
+94,imported,u1,Regulations,"Regulations, Operational Rules",,"Upon request by the FAA, the remote pilot-in-command must provide"
+95,imported,u9,Operations,Maintenance & Inspection Procedures,,What actions should the operator of an sUAS do if the manufacturer does not provide information about scheduled maintenance?
+96,imported,u9,Operations,ADM,,What antidotal phrase can help reverse the hazardous attitude of impulsivity?
+97,imported,u6,Weather,"effects on performance, atmosheric stability",,"What are characteristics of a moist, unstable air mass?"
+98,imported,u6,Weather,"effects on performance, atmosheric stability",,What are the characteristics of stable air?
+99,imported,u6,weather,"effects on performance, thunderstorms",,What cloud type signals thunderstorms and severe turbulence?
+100,imported,u6,Weather,"effects on performance, thunderstorms",,What conditions are necessary for the formation of thunderstorms?
+101,imported,u9,Operations,,,What distinguishes a towered airport from a non-towered airport?
+102,imported,u6,weather,"effects on performance, atmosheric stability",,What effect does high density altitude have on the efficiency of a UA propeller?
+103,imported,u10,Operations,Radio Communications,,What frequency is used at non-towered airports for pilots to announce their intentions?
+104,imported,u9,Operations,Physiological factors,,What happens when using off-center viewing at night?
+105,imported,u6,Weather,"effects on performance, temp inversion",,What is a temperature inversion?
+106,imported,u6,Weather,"effects on performance, air density",,What is the effect of humidity on air density?
+107,imported,u7,Loading & Performance,loading and performance,,"What is the relationship of lift, drag, thrust, and weight when the airplane is in straight-and-level flight?"
+108,imported,u1,Regulations,Remote ID,,"What must a person, who is manipulating the controls of a small unmanned aircraft, do if the standard remote identification fails during a f"
+109,imported,u9,Operations,"Operations, Maintenance and Procedures",,What precautions should a remote PIC do to prevent possible inflight emergencies when using lithium-based batteries?
+110,imported,u6,Weather,"effects on performance, humidity",,What type of front often brings thunderstorms and gusty winds?
+111,imported,u5,weather,"Sources, Metar",,What type of report provides real-time weather observations?
+112,imported,u6,Weather,"effects on performance, atmosheric stability",,What would decrease the stability of an air mass?
+113,imported,u4,Airports & Airspace,Airport Classificatons,,"When a control tower located on an airport within Class D airspace ceases operation for the day, what happens to the airspace designation?"
+114,imported,u9,Operations,CRM,,When a remote pilot-in-command and a visual observer define their roles and responsibilities prior to and during the operation of a small UA
+115,imported,u9,Operations,"ADM, CRM",,"When adapting crew resource management (CRM) concepts to the operation of a small UA, CRM must be integrated into"
+116,imported,u1,Regulations,"Operating Rules, Twilight",,"When conducting operations during civil twilight or at night, the small unmanned aircraft must be equipped with anti-collision lights that a"
+117,imported,u1,Regulations,Flying at Night,,When does a Remote Pilot in Command operating at night have the discretion to reduce the intensity of the anti-collision lighting?
+118,imported,u7,Loading & Performance,loading and performance,,"When loading cameras or other equipment on a small UAS, mount the items in a manner that"
+119,imported,u7,Loading & Performance,loading and performance,,"When operating an unmanned airplane, the remote pilot should consider that the load factor on the wings may be increased any time"
+120,imported,u9,Operations,"Night operations, ADM",,"When preparing for a night flight, what should an sUAS pilot be aware of after assembling and conducting a preflight of an aircraft while us"
+121,imported,u1,Regulations,Waivers,,"When requesting a waiver, the required documents should be presented to the FAA at least how many calendar days prior to the planned operati"
+122,imported,u8,Operations,"Crew management, emergency procedures",,"When using a small unmanned aircraft in a non-recreational operation, who is responsible for informing the participants about emergency proc"
+123,imported,u1,Regulations,,,Where must a small unmanned aircraft's serial number be listed when using either standard remote identification or a broadcast module?
+124,imported,u4,Airports & Airspace,Airport Classificatons,,Which airspace types require authorization before flying under Part 107?
+125,imported,u1,Regulations,"Waivers, DOC",,Which best describes a declaration of compliance?
+126,imported,u6,weather,"effects on performance, atmosheric stability",,Which combination of atmospheric conditions will reduce aircraft takeoff and climb performance?
+127,imported,u1,Regulations,"Operational Rules,Medication",,Which is NOT prohibited when operating under Part 107?
+128,imported,u1,Regulations,"Operational Rules, Alcohol",,Which is true regarding the presence of alcohol within the human body?
+129,imported,u1,Regulations,Applicability,,Which of the following operations require adherence to 14 CFR 107?
+130,imported,u1,Regulations,Overview,,Which of the following statements is TRUE about small unmanned aircraft registration with the FAA before operation in the National Airspace 
+131,skipped_duplicate,,Regulations,Overview,first seen at row 130,Which of the following statements is TRUE about small unmanned aircraft registration with the FAA before operation in the National Airspace 
+132,skipped_duplicate,,Regulations,Overview,first seen at row 130,Which of the following statements is TRUE about small unmanned aircraft registration with the FAA before operation in the National Airspace 
+133,imported,u1,Regulations,Applicability,,Which of the following types of operations are excluded from the requirements in part 107?
+134,imported,u9,Operations,Crew Resource Management,,Which statement about visual observers under Part 107 is true?
+135,imported,u9,Operations,ADM,,Which technique should a remote pilot use to scan for traffic? A remote pilot should
+136,imported,u5,weather,"Sources, TAF",,Which tool provides an aviation-specific forecast?
+137,imported,u6,weather,"effects on performance, thunderstorms",,Which weather condition is most hazardous for drones?
+138,imported,u5,Weather,"Sources, Metar",,Which weather reports provide real-time observations?
+139,imported,u3,Airports & Airspace,"Airspace Classifications, Operating Rules",,"While conducting an aerial survey of a Class D airport, ATC instructs you to remain clear of all runways. How do you identify when you are c"
+140,imported,u1,Regulations,Operating Rules,,"While operating a small unmanned aircraft system (sUAS), you experience a flyaway and several people suffer injuries. Which of the following"
+141,imported,u6,Weather,"effects on performance, wind",,"While operating around buildings, the Remote Pilot in Command should be aware of the creation of wind gusts that"
+142,imported,u1,Regulations,"Operational Rules, Accident",,"While operating your small UA, it accidentally strikes your crewmember in the head causing him to lose consciousness. When should this accid"
+143,imported,u6,weather,Frost,,Why is frost considered hazardous to flight?
+144,imported,u1,Regulations,,,Within how many calendar days must a small UAS accident be reported to the FAA?
+145,imported,u9,Operations,ADM,,You are a remote pilot for a co-op energy service provider. You are to use your UA to inspect power lines in a remote area 15 hours away fro
+146,imported,u9,Operations,ADM,,You have been hired as a Remote Pilot in Command by a local TV news station to film breaking news with a small unmanned aircraft. You expres
+147,imported,u6,weather,Temperature Inversion,,You have received an outlook briefing from flight service through 1800wxbrief.com. The briefing indicates you can expect a low-level tempera
+148,imported,u1,Regulations,Operational Rules,,You plan to release golf balls from your small UA at an altitude of 100 feet AGL. You must ensure the objects being dropped will
+149,imported,u6,Weather,"effects on performance, obstructions, clouds",,You’re flying near mountains and there are lenticular clouds. What kind of weather should you expect?
+150,imported,u9,Operations,Crew Resource Management,,You're flying a mission and you need to hand over the controls to another certified remote pilot. What must occur?
+151,imported,u9,Operations,,,You're flying near an aircraft broadcasting ADS-B Out signals. What is required of your drone?
+152,imported,u6,Weather,"effects on performance, mountain",,You're planning to fly a fixed-wing unmanned aircraft from a high mountain plateau on a hot summer day. What should you consider?
+154,imported,u6,Weather,"effects on performance, clouds",,The two types of clouds that unmanned aircraft operators should be concerned about are:
+155,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to FAA-CT-8080-2H, Figure 22, South of Area 1) You have been hired to inspect the railroad near Cocolalla. Do you need ATC approval?"
+156,imported,u3,Airports & Airspace,Class D,,"(Refer to FAA-CT-8080-2H, figure 24, Northeast of area 1) What is the ceiling of Class D Airspace surrounding Majors (GVT) airport?"
+157,imported,u7,Loading & Performance,loading and performance,,What happens to the stalling speed of an aircraft as the load factor increases?
+158,imported,u7,Loading & Performance,loading and performance,,What is the primary concern for an RPIC when loading a payload onto an aircraft?
+159,imported,u7,Loading & Performance,loading and performance,,What is the primary factor that determines the load factor experienced by an aircraft during a turn?
+160,imported,u7,Loading & Performance,loading and performance,,What is the relationship between the load factor and the stalling speed of an aircraft?
+161,imported,u6,Weather,"effects on performance, humidity",,"With a low-level temperature inversion with high relative humidity, what weather conditions would you expect?"
+162,imported,u3,Airports & Airspace,"airspace classifications, MOA",,"Before flying in a military operations area, an sUAS operator should do what to find out if it is active?"
+163,imported,u2,Airports & Airspace,Aeronautical Charts,,How often are sectional charts covering the continental U.S. updated?
+164,needs_review,,Airports & Airspace,"airspace classifications, Restricted areas","answer=B, choices=1","Refer to FAA-CT-8080-2H, Figure 75 area 6. During preflight planning you plan to operate in R-2305, where would you find additional info reg"
+165,imported,u2,Airports & Airspace,Airports data sources,,Which of the following is not a source of airport data?
+166,imported,u10,Operations,Radio Communications Procedures,,"When near a non-towered airport, an sUAS operator should monitor what frequency?"
+167,imported,u2,Airports & Airspace,general,,An aircraft announces they are on the short final of a RWY 36. Where is the aircraft in relation to the airport?
+168,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to FAA-CT-8080-2G, Figure 23) What’s the lower altitude limit of Class E airspace at Statesboro Bulloch County Airport (TBR)?"
+169,imported,u6,Weather,"effects on performance, atmosheric stability",,A stable air mass is most likely to have which characteristic
+170,imported,u1,Regulations,Waivers,,How far in advance should waiver applications be submitted?
+171,imported,u1,Regulations,"Operational Rules, Transportation of property",,"Under Part 107, which of the following is permitted when transporting property for compensation or hire?"
+172,imported,u1,Regulations,Operational Rules,,What is the maximum allowable groundspeed for sUAS?
+173,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H) According to the TAF, what type of weather is expected from 1220Z to 1222Z?"
+174,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H)  What does ""BECMG 0522/0524 20013G20KT"" indicate?"
+175,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H)  What does ""P6SM SCT040"" mean in the forecast starting at 0608Z?"
+176,imported,u1,Regulations,Operational rules,,"During a survey flight, you realize that your drone is flying over a crowd of people or bystanders for a few seconds. What is your immediate"
+177,imported,u6,weather,effects on Performance,,"While conducting a drone inspection near an industrial facility, you observe a smoke stack flume that is rapidly rising, breaking apart, and"
+178,imported,u3,Airports & Airspace,"Airspace Classifications, Operating Rules",,"While flying your aerial survey, you notice a TFR over a stadium due to a major sporting event and your flight path intersects it. What must"
+179,imported,u1,Regulations,Operational Rules,,You are conducting an inspection of a communication tower that rises 550 ft AGL. You fly directly next to it and climb to 750 ft AGL within 
+180,imported,u1,Regulations,Operational Rules,,You are currently at 350 ft AGL. The clouds appear to be at 500 ft AGL. Visibility is good. What must you do to comply with Part 107 rules?
+181,imported,u1,Regulations,Operational Rules,,You are monitoring your drone exclusively through the onboard camera feed. Is this compliant with Part 107?
+182,imported,u1,Regulations,Remote ID,,You are using a drone that does not have built-in Remote ID capabilities. What must you do to comply with regulations?
+183,imported,u9,Operations,Physiological factors,,"You have been under persistent work-related stress for several months, which is starting to affect your focus during drone operations. What "
+184,imported,u3,Airports & Airspace,Airspace Classifications,,You want to fly a drone near a regional airport where the sectional chart shows Class E airspace starting at the surface at 300 ft AGL. What
+185,imported,u1,Regulations,Flying at Night,,You're conducting a night flight with a visual observer (VO). Which of the following is required for a safe operation?
+186,imported,u1,Regulations,Operational Rules,,You're flying your drone near an airport and you notice a manned aircraft approaching your area at a lower altitude than expected. What shou
+187,imported,u3,Airports & Airspace,Airspace Classifications,,You're planning a flight in a rural area. The sectional chart shows Class G airspace at the surface. What must you do before flying?
+188,imported,u6,weather,"effects on performance, air density alt, pressure",,"A remote pilot plans to operate a small UAS from a high-elevation airport on a hot, humid afternoon. What should the pilot expect?"
+189,imported,u6,weather,"effects on performance, air density alt, pressure",,An increase in atmospheric pressure will result in:
+190,imported,u6,weather,"effects on performance, air density alt, pressure",,"An increase in humidity, with all other factors constant, will cause density altitude to:"
+191,imported,u6,weather,"effects on performance, Density Altititude",,"As density altitude increases, what happens to UAS performance?"
+192,imported,u6,Weather,"effects on performance, humidity",,"As humidity increases, air density decreases."
+193,imported,u6,weather,"effets on performance, air density alt, pressure",,"If the actual temperature is higher than standard at a given airport, what is the effect on density altitude?"
+194,imported,u6,weather,"effects on performance, density altitude",,What happens to air pressure and air density as altitude increases?
+195,imported,u6,weather,effects on performance,,What is the standard sea-level atmospheric pressure according to the ISA?
+196,imported,u6,Weather,"effects on performance, standard temp",,What is the standard temperature at sea level?
+197,needs_review,,weather,effects on performance,"answer=D, choices=3",Which condition generally results in the best aircraft performance?
+198,imported,u6,Weather,"effects on performance, mountain",,The leeward side of a mountain or obstacle is:
+199,imported,u6,Weather,"effects on performance, obstructions",,"When flying near natural or man-made obstructions, an unmanned aircraft operator can expect:"
+200,imported,u6,Weather,"effects on performance, front",,What environment is most conductive to front formulation?
+201,imported,u6,Weather,"effects on performance, high density altititude",,What is the effect of a high-density altitude on aircraft performance?
+203,imported,u7,Loading & Performance,loading and performance,,Why is it unsafe to fly an unmanned aircraft at or near its maximum takeoff weight?
+204,imported,u7,Loading & Performance,loading and performance,,"For commercial off‑the‑shelf aircraft with fixed, manufacturer‑approved payloads, which loading action is typically not required prior to fl"
+205,imported,u7,Loading & Performance,loading and performance,,Which of the following reduces air density and therefore reduces maximum takeoff weight?
+206,imported,u7,Loading & Performance,loading and performance,,Which two components are the primary considerations for aircraft balance?
+208,imported,u1,Regulations,Registration,,Where must a small unmanned aircraft’s serial number be listed when using either standard remote identification or a broadcast module?
+209,imported,u9,Operations,IMSAFE,,What does the IMSAFE checklist help an RPIC to assess before a flight?
+210,imported,u9,Operations,Crew Resource Mangement,,What is the purpose of Crew Resource Management (CRM) in aeronautical decision-making?
+211,imported,u9,Operations,ADM,,What is the first step in dealing with hazardous attitudes?
+212,imported,u9,Operations,ADM,,What does ADM provide to pilots as they handle different situations?
+213,imported,u9,Operations,Pave,,"What does the acronym 'PAVE' stand for, and how does it relate to risk management?"
+214,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 206,Which two components are the primary considerations for aircraft balance?
+215,imported,u10,Operations,Radio Communications,,What is the primary function of a UNICOM station at a non-towered airport?
+216,imported,u10,Operations,Radio Communications,,What is the primary purpose of the Common Traffic Advisory Frequency (CTAF) in aviation?
+217,imported,u10,Operations,Radio Communications,,What is the primary function of a MULTICOM frequency in aviation?
+218,imported,u10,Operations,Radio Communications,,What is the recommended action for an unmanned aircraft operator flying near a non-towered airport that does not have a UNICOM frequency?
+219,imported,u10,Operations,Radio Communications,,What is the primary reason why unmanned aircraft operators should be familiar with airport traffic patterns when monitoring radio traffic?
+221,imported,u6,Weather,Effects on Performance clouds,,What are the two types of clouds that pose hazards to unmanned aircraft operators?
+222,imported,u6,Weather,Temp inversions,,What is the main difference between a surface-based temperature inversion and a frontal inversion?
+223,imported,u6,Weather,icing,,How does icing affect an unmanned aircraft's ability to fly?
+224,imported,u6,Weather,clouds,,What is the recommended action for an unmanned aircraft operator if they see stratified clouds during a preflight visual assessment?
+225,imported,u5,Weather,visiabilty,,What is the minimum visibility requirement for unmanned flight operations from the ground control station?
+226,imported,u6,Weather,thunderstorm stages,,What is the main difference between a cumulus stage and a mature stage of a thunderstorm?
+227,imported,u6,Weather,clouds,,What is the main difference between a cumulus cloud and a cumulonimbus cloud?
+229,skipped_duplicate,,Weather,wind,first seen at row 141,"While operating around buildings, the Remote Pilot in Command should be aware of the creation of wind gusts that"
+231,imported,u3,Airports & Airspace,Class E,,"Refer to FAA-CT-8080-2H, Figure 80, Montrose Regional starts at what altitude?"
+232,imported,u3,Airports & Airspace,Class E,,"Refer to FAA-CT-8080-2H, figure 80, Outside dashed magenta lines near Roubideau (Pvt) airport what airspace is from surface up to 700 ft AGL"
+233,imported,u3,Airports & Airspace,Class C,,"(Refer to FAA-CT-8080-2H, Figure 69 ,South of Area 5 & North East of Areaa 3) Do you need authorization in the area within the dashed magent"
+234,imported,u3,Airports & Airspace,Class E,,"(Refer to FAA-CT-8080-2H, Figure 69, South of Area 1) Do you need authorization inside dashed magenta lines that are intersecting the blue d"
+235,imported,u3,Airports & Airspace,Class D,,"(Refer to FAA-CT-8080-2H, Figure 69, South of Area 1) Do you need authorization inside blue dashed lines at Corpus Christi?"
+236,imported,u3,Airports & Airspace,Class E,,"(Refer to FAA-CT-8080-2H, Figure 23 South of Area 4) What is the lower altitude limit of Class E at Statesboro Bulloch County Airport?"
+237,imported,u9,Operations,Risk Management,,What methodology prevents final link in accident chain?
+239,imported,u1,Regulations,Applicability,,Which operation is NOT subject to Part 107?
+240,imported,u1,Regulations,Aircraft Registration,,Nonrecreational drones must be registered under which regulation?
+241,imported,u1,Regulations,Night Operations,,Anticollision lights used for night operations must be visible for at least:
+243,skipped_marker,,,,,REGULATIONS END OF EACH SECTION Questions
+244,imported,u1,Regulations,Applicability,,Part 107 primarily governs which type of sUAS operations?
+245,imported,u1,Regulations,Remote ID,,Which operation originally required a waiver under early Part 107 rules?
+246,imported,u1,Regulations,Applicability,,What credential is required to fly under Part 107 without special exemptions?
+247,skipped_duplicate,,Regulations,Applicability,first seen at row 239,Which operation is NOT subject to Part 107?
+248,imported,u1,Regulations,RPIC,,Which role has final authority and responsibility for a Part 107 operation?
+249,imported,u1,Regulations,RPIC,,"Under Part 107, who is ultimately responsible for the safety of the flight?"
+250,imported,u1,Regulations,RPIC,,Which action is required before each flight under Part 107?
+251,imported,u1,Regulations,Person Manipulating Controls,,The person manipulating the flight controls must be:
+252,imported,u1,Regulations,Visual Observer,,Which statement about Visual Observers is correct?
+253,imported,u1,Regulations,PreFlight Familiarization & Airport Operations,,Which factor must the RPIC assess before flight?
+254,imported,u1,Regulations,Flight Crew Management & Communication,,"If a sUAS goes out of VLOS for more than 15 seconds, the RPIC should:"
+255,skipped_duplicate,,Regulations,Applicability,first seen at row 240,Nonrecreational drones must be registered under which regulation?
+256,imported,u1,Regulations,Registration Inspection & Falsification,,"Upon request, the RPIC must present which document?"
+257,imported,u1,Regulations,Accident Reporting & Hazardous,,When must a sUAS accident be reported to the FAA?
+258,imported,u1,Regulations,Accident Reporting & Hazardous,,"During an inflight emergency, the RPIC may:"
+259,imported,u1,Regulations,Accident Reporting & Hazardous,,Which action is considered reckless under Part 107?
+260,imported,u1,Regulations,Medical Condition,,A medical certificate is required to fly under Part 107:
+261,imported,u1,Regulations,Operation drom Moving Vehicles & Transportation of Property,,You may operate a sUAS from a moving land vehicle when:
+262,imported,u1,Regulations,Medical Conditions Drugs and Alcohol,,What blood alcohol concentration (BAC) level disqualifies participation in a sUAS operation?
+263,skipped_duplicate,,Regulations,Night Eligibility Civil Twilight & Lighting,first seen at row 241,Anticollision lights used for night operations must be visible for at least:
+264,imported,u1,Regulations,Night Flight Hazards & Mitigation,,Visual Line of Sight requires the UA to be seen:
+265,imported,u1,Regulations,VLOS & Multiple Aircraft,,How many sUAS may a person operate at one time under Part 107?
+266,imported,u1,Regulations,Operations Over People General,,You may fly over a person who is:
+267,imported,u1,Regulations,Autonomous Flight,,"During autonomous flight, who is responsible for the operation?"
+268,imported,u1,Regulations,PreFlight Familiarization & Airport Operations,,"Operations in Class B, C, D, or surface Class E airspace require:"
+269,imported,u1,Regulations,Operating Limitations,,What is the maximum allowable altitude under Part 107?
+270,imported,u1,Regulations,Operating Limitations,,Minimum flight visibility required is:
+271,imported,u1,Regulations,Waivers,,A Part 107 waiver allows an operator to:
+272,imported,u1,Regulations,Slide 83 – Waiver Timing,,Waiver applications should be submitted at least how many days in advance?
+273,imported,u1,Regulations,Remote ID,,The purpose of Remote ID is to:
+274,imported,u1,Regulations,FRIA & Alternatives,,Which is NOT a Remote ID compliance method?
+275,imported,u1,Regulations,FRIA & Alternatives,,FAA-Recognized Identification Areas (FRIAs) allow operations:
+276,imported,u1,Regulations,Category 1 & 2,,Category 1 operations over people require the UA to:
+277,imported,u1,Regulations,Category 3 & 4,,Which category requires an Airworthiness Certificate under Part 21?
+278,imported,u1,Regulations,Night Eligibility Civil Twilight & Lighting,,Night operations without a waiver require:
+280,skipped_marker,,,,,Regulations END OF UNIT QUIZ/TEST
+281,skipped_duplicate,,Regulations,Waivers,first seen at row 170,How far in advance should waiver applications be submitted?
+282,skipped_duplicate,,Regulations,"Operational Rules, Transportation of property",first seen at row 171,"Under Part 107, which of the following is permitted when transporting property for compensation or hire?"
+283,imported,u1,Regulations,Roles,,"Under Part 107, who holds final authority over the operation of the sUAS?"
+284,imported,u1,Regulations,Operational Rules,,What is the maximum allowable altitude for sUAS flight under Part 107?
+285,skipped_duplicate,,Regulations,Operational Rules,first seen at row 172,What is the maximum allowable groundspeed for sUAS?
+286,imported,u1,Regulations,Operational Rules,,What is the minimum distance a drone must maintain from clouds?
+287,imported,u5,Weather,Operating Rules,,What is the minimum visibility required from the control station?
+288,imported,u1,Regulations,Remote ID,,What is the purpose of Remote ID?
+289,imported,u1,Regulations,Remote ID,,What must a Remote ID UA do before takeoff?
+290,imported,u9,Operations,Preflight Inspection,,What must be done before each flight?
+291,imported,u1,Regulations,Operations,,What must be made available upon request by law enforcement during an sUAS operation?
+292,imported,u1,Regulations,"Operational Rules, Accident",,What must be reported to the FAA within 10 calendar days?
+293,imported,u1,Regulations,Flying over people and moving objects,,Which category of UA may operate over people without a waiver if it weighs less than 0.55 lbs and has no exposed rotating parts?
+294,needs_review,,Regulations,Flying over people and moving objects,"answer=D, choices=3",Which category requires an airworthiness certificate under Part 21?
+295,imported,u9,Operations,Physiology,,Which of the following is a recommended mitigation strategy for night illusions during sUAS operations?
+296,imported,u1,Regulations,Operational Rules,,Which of the following is a required action for the RPIC before flight?
+297,imported,u1,Regulations,Flying over people and moving objects,,Which of the following is a requirement for Category 2 UA operations over people?
+298,imported,u1,Regulations,"Operational Rules, Transportation of property",,Which of the following is prohibited during sUAS operations under Part 107?
+299,imported,u1,Regulations,Operational Rules,,Which of the following is prohibited without prior authorization?
+300,imported,u1,Regulations,Remote ID,,Which of the following is true about FAA-Recognized Identification Areas (FRIAs)?
+301,imported,u1,Regulations,Flying over people and moving objects,,Which of the following is true for Category 3 UA operations over people?
+302,imported,u1,Regulations,Waivers,,Which of the following operations can be waived?
+303,imported,u1,Regulations,Applicability,,Which of the following operations is explicitly excluded from Part 107 applicability?
+304,imported,u1,Regulations,Roles,,Which of the following statements about Visual Observers (VOs) is correct?
+305,imported,u1,Regulations,"Operational Rules, impaired",,Which of the following substances or conditions would disqualify a person from participating in sUAS operations under Part 107?
+306,imported,u1,Regulations,Operational Rules,,Which of the following would be considered a careless or reckless operation under Part 107?
+307,imported,u1,Regulations,Operations,,Which regulation governs the registration of small unmanned aircraft?
+309,skipped_marker,,,,,2 Aiports end of section questions
+310,imported,u4,Airports & airspace,Intro To Airports,,What is the primary purpose of the National Airspace System (NAS)?
+311,imported,u4,Airports & airspace,Intro To Airports,,What are the two main purposes of the Air Traffic Control (ATC) system?
+312,imported,u4,Airports & airspace,Intro To Airports,,What makes integrating sUAS into the NAS complex?
+313,imported,u2,Airports & airspace,L& L,,Which method is universally used in aviation to locate points on Earth?
+314,imported,u2,Airports & airspace,L& L,,Lines of latitude run
+315,imported,u2,Airports & airspace,L& L,,Lines of longitude start at
+316,imported,u2,Airports & airspace,L& L,,The continental U.S. lies between which degrees of latitude?
+317,imported,u2,Airports & airspace,L& L,,How many minutes are in each degree of latitude or longitude?
+318,imported,u4,Airports & airspace,Intro To Airports,,Which of the following is NOT an airport ownership classification?
+320,imported,u2,Airports & airspace,Airport Data,,What should sUAS operators be aware of when operating within 5 miles of an airport?
+321,imported,u2,Airports & airspace,Airport Data,,Which source contains the most comprehensive airport information?
+322,imported,u2,Airports & airspace,Airport Data,,Which of the following is included in the Chart Supplement U.S.?
+323,imported,u2,Airports & airspace,Notam,,What is the purpose of NOTAMs?
+324,imported,u2,Airports & airspace,Notam,,Where can NOTAMs be found?
+325,imported,u2,Airports & airspace,ATIS,,What does ATIS provide?
+326,imported,u2,Airports & airspace,ATIS,,How often is ATIS information updated?
+327,imported,u2,Airports & airspace,Sectional Charts,,What are the two types of aeronautical charts relevant to sUAS operators?
+328,imported,u2,Airports & airspace,L& L,,Convert 46.75° to degrees and minutes.
+329,imported,u2,Airports & airspace,L& L,,Convert 98.2° to degrees and minutes.
+330,imported,u2,Airports & airspace,Aeronautical Charts,,What is the primary purpose of aeronautical charts?
+331,imported,u2,Airports & airspace,Sectional & Terminal Charts,,Which chart type covers the entire U.S. and is revised semi-annually?
+332,imported,u2,Airports & airspace,Sectional & Terminal Charts,,What is the scale of a sectional chart?
+333,imported,u2,Airports & airspace,Terminal Charts,,Terminal Area Charts are designed to show more detail around which type of airports?
+334,imported,u2,Airports & airspace,Terminal Charts,,What is the scale of a Terminal Area Chart?
+335,imported,u2,Airports & airspace,Aeronautical Charts,,What should sUAS operators use to interpret chart symbols during planning?
+336,imported,u2,Airports & airspace,Aeronautical Charts,,Which tab in the Chart User’s Guide includes airspace and airport information?
+337,imported,u2,Airports & airspace,Aeronautical Charts,,What is the benefit of being familiar with chart symbols before the Part 107 test?
+338,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What symbol on a sectional chart represents a VFR checkpoint?
+339,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What is the purpose of the CTAF frequency listed on a chart?
+340,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,Why is runway elevation important for sUAS operators?
+341,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What does the magenta color of an airport symbol indicate?
+342,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What does the blue color of an airport symbol indicate?
+343,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What does a communication box on a sectional chart provide?
+344,imported,u2,Airports & airspace,Chart Ledgend supplement & airport data,,What does the number in parentheses below an obstacle height indicate?
+345,imported,u2,Airports & airspace,MEF,,What is the typical size of a quadrant used for MEF calculations?
+346,imported,u2,Airports & airspace,MEF,,What does an MEF value of 35 indicate?
+348,skipped_marker,,,,,No Unit Test Until Done all Airport Sections
+349,skipped_marker,,,,,SEE BELOW FOR TEST
+352,imported,u4,Airports & airspace,towed Airports,,Towered airports have
+354,skipped_marker,,,,,Latitude and Longitude End of section Questions
+355,imported,u2,Airports & airspace,L& L,,"Refer to figure Longitude and Latitude Points A - D, What are the coordinates of Point A?"
+356,imported,u2,Airports & airspace,L& L,,"Refer to figure Longitude and Latitude Points A - D, What are the coordinates of Point B?"
+357,imported,u2,Airports & airspace,L& L,,"Refer to figure Longitude and Latitude Points A - D, What are the coordinates of Point C?"
+358,imported,u2,Airports & airspace,L& L,,"Refer to figure Longitude and Latitude Points A - D, What are the coordinates of Point D?"
+359,imported,u2,Airports & airspace,L& L,,Convert N 49.4517 to degrees and minutes.
+360,imported,u2,Airports & airspace,L& L,,Convert W 73.3398 to degrees and minutes.
+361,imported,u2,Airports & airspace,L& L,,Convert N 44.5923 to degrees and minutes.
+362,imported,u2,Airports & airspace,L& L,,Convert W 82.5976 to degrees and minutes.
+364,skipped_marker,,,,,Latitude and Longitude End of section Quiz
+365,imported,u2,Airports & airspace,L& L,,(Refer to Figure 1 L & L pic quiz) What is the Latitude and Longitude of Key West Airport
+366,imported,u2,Airports & airspace,L& L,,(Refer to Figure 2 L & L pic quiz) Which airport is located at 36° 45’ N and 85° 57’ W
+368,skipped_marker,,,,,3 airspace classes 3
+369,imported,u3,Airports Classification,Classes,,Class A airspace begins at what altitude?
+370,imported,u3,Airports Classification,Classes,,Which operation is required for all aircraft operating in Class A airspace?
+371,imported,u3,Airports Classification,Classes,,"Before operating a small UAS in Class B airspace, a remote pilot must:"
+372,imported,u3,Airports Classification,Classes,,Class C airspace normally extends from the surface to:
+373,imported,u3,Airports Classification,Classes,,Which airspace generally surrounds airports with an operational control tower but lower traffic volume than Class C?
+374,imported,u3,Airports Classification,Classes,,A remote pilot operating in Class D airspace must:
+375,imported,u3,Airports Classification,Classes,,"On a sectional chart, Class D airspace is depicted by:"
+376,imported,u3,Airports Classification,Classes,,A faded magenta vignette around an airport normally indicates Class E airspace beginning at:
+377,imported,u3,Airports Classification,Classes,,Federal Airways shown on sectional charts are usually found within:
+378,imported,u3,Airports Classification,Classes,,Which Class E airspace requires ATC authorization for drone operations?
+379,imported,u3,Airports Classification,Classes,,Dashed magenta lines that do not intersect another airspace area generally indicate:
+380,imported,u3,Airports Classification,Classes,,Class G airspace is considered:
+381,imported,u3,Airports Classification,Classes,,Prior authorization is generally required before operating in Class G airspace.
+382,imported,u3,Airports & Airspace,"Airspace Classifications,",,Which of the following is NOT a consideration of airspace classification?
+383,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,You have been hired to inspect a railroad near Cocolalla. (Refer to figure 22 south of area 1) Do you need approval from ATC?
+384,skipped_duplicate,,Airports & Airspace,Controlled vs Non controlled Airspace,first seen at row 168,"(Refer to FAA-CT-8080-2G, Figure 23) What’s the lower altitude limit of Class E airspace at Statesboro Bulloch County Airport (TBR)?"
+385,skipped_duplicate,,Airports & Airspace,Airspace Classifications,first seen at row 184,You want to fly a drone near a regional airport where the sectional chart shows Class E airspace starting at the surface at 300 ft AGL. What
+386,skipped_duplicate,,Airports & Airspace,Airspace Classifications,first seen at row 187,You're planning a flight in a rural area. The sectional chart shows Class G airspace at the surface. What must you do before flying?
+387,imported,u3,Airports & Airspace,Airspace Classifications,,Which classes use MSL and AGL?
+388,imported,u3,Airports & Airspace,Airspace Classifications,,Which classes use MSL only?
+389,imported,u3,Airports & Airspace,Class D,,What class has only one layer and looks like a cylinder?
+390,skipped_duplicate,,Airports & Airspace,Class E,first seen at row 231,"Refer to FAA-CT-8080-2H, Figure 80, Montrose Regional starts at what altitude?"
+391,skipped_duplicate,,Airports & Airspace,Class E,first seen at row 232,"Refer to FAA-CT-8080-2H, figure 80, Outside dashed magenta lines near Roubideau (Pvt) airport what airspace is from surface up to 700 ft AGL"
+392,imported,u3,Airports & Airspace,Class C,,"(Refer to FAA-CT-8080-2H, Figure 69, Area 5) Do you need authorization in the area within the dashed magenta lines that are intersecting Cla"
+393,imported,u3,Airports & Airspace,Class E,,"(Refer to FAA-CT-8080-2H, Figure 69, South of Area 1) Do you need authorization inside dashed magenta lines near Corpus Christi?"
+394,skipped_duplicate,,Airports & Airspace,Class D,first seen at row 235,"(Refer to FAA-CT-8080-2H, Figure 69, South of Area 1) Do you need authorization inside blue dashed lines at Corpus Christi?"
+395,skipped_duplicate,,Airports & Airspace,Class E,first seen at row 236,"(Refer to FAA-CT-8080-2H, Figure 23 South of Area 4) What is the lower altitude limit of Class E at Statesboro Bulloch County Airport?"
+396,imported,u3,Airports & Airspace,"Airspace Classifications, Operating Rules",,Refer to figure 21 Area 1. At what altitude above the radio tower south of Minot Intl Airport may you fly?
+397,imported,u3,Airports & Airspace,"Airspace Classifications, sectional charts",,"Refer to figure 22. While inspecting the obstacle located 3 miles northwest of Coeur D'Alene-Boyington Airport, what is the highest altitude"
+398,skipped_duplicate,,Airports & Airspace,Airport Classificatons,first seen at row 113,"When a control tower located on an airport within Class D airspace ceases operation for the day, what happens to the airspace designation?"
+399,skipped_duplicate,,Airports & Airspace,Airport Classificatons,first seen at row 124,Which airspace types require authorization before flying under Part 107?
+400,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to Figure 22, Area 1) The floor of the controlled airspace overlying the Sandpoint Airport is:"
+401,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to Figure 25, Area 5) What is the elevation range of the Class B airspace?"
+402,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,"(Refer to Figure 26, area 4) You have been hired to inspect the tower under construction at 46.90N and 98.55W, near Jamestown Regional (JMS)"
+403,imported,u3,Airports & Airspace,Controlled vs Non controlled Airspace,,(Refer to figure 78) You have been hired to use your sUAS to inspected the railroad tracks from Blencoe (SE of Sioux City) to Onawa. Will AT
+404,imported,u3,Airports & Airspace,Class D,,"(Refer to figure 24, Northeast of area 1) What is the ceiling of Class D Airspace surrounding Majors (GVT) airport?"
+405,imported,u3,Airports & Airspace,"airspace classifications, Prohibited areas",,An sUAS can fly in a prohibited area because there is no one inside it.
+406,imported,u2,Airports & Airspace,Aeronautical Charts,,An sUAS operator will not be able to determine what type of airspace they are operating in by using a sectional chart.
+407,skipped_duplicate,,Airports & Airspace,"airspace classifications, MOA",first seen at row 162,"Before flying in a military operations area, an sUAS operator should do what to find out if it is active?"
+409,skipped_marker,,,,,Special Use end of section Questions
+410,imported,u3,Airports Classification,Special Use,,"Which special use airspace contains hazards such as artillery firing, aerial gunnery, or guided missiles?"
+411,imported,u3,Airports Classification,Special Use,,Warning Areas differ from Restricted Areas because they are located:
+412,imported,u3,Airports Classification,Special Use,,Warning Areas begin how far from the U.S. coastline?
+413,imported,u3,Airports Classification,Special Use,,The primary purpose of a Military Operations Area (MOA) is to:
+414,imported,u3,Airports Classification,Special Use,,Alert Areas are established because they may contain:
+415,imported,u3,Airports Classification,Special Use,,Controlled Firing Areas (CFAs) are typically not shown on sectional charts because:
+417,skipped_marker,,,,,Other Airspace end of section questions
+418,imported,u3,Airports Classification,Other Airspace,,Military Training Routes (MTRs) allow military aircraft to:
+419,imported,u3,Airports Classification,Other Airspace,,An MTR identified as VR-1007 is:
+420,imported,u3,Airports Classification,Other Airspace,,Temporary Flight Restrictions (TFRs) are issued through:
+421,imported,u3,Airports Classification,Other Airspace,,Which activity may result in the establishment of a TFR?
+422,imported,u3,Airports Classification,Other Airspace,,A Terminal Radar Service Area (TRSA) is established to:
+423,imported,u3,Airports Classification,Other Airspace,,National Security Areas (NSAs) are established where:
+424,imported,u3,Airports Classification,Other Airspace,,Air Defense Identification Zone (ADIZ) boundaries are shown on sectional charts as:
+426,skipped_marker,,,,,Airport Operations end of Section Questions
+427,imported,u4,Airports & Airspace,"Airport Operations, Runways",,Why is it important for sUAS operators to understand airport runway layouts?
+428,imported,u4,Airports & Airspace,"Airport Operations, wildlife",,Why should sUAS operators avoid flying near birds?
+429,imported,u4,Airports & Airspace,"Airport Operations, wildlife",,Are sUAS operators required to report bird strikes?
+430,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,What is the minimum altitude a pilot should reach before turning crosswind?
+431,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,What is the standard direction for traffic patterns in the U.S.?
+432,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,At what angle should a pilot enter the traffic pattern?
+433,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,What does the “L” in Runway 04L indicate?
+434,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,When should a pilot begin the turn to final approach?
+435,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,Why are aircraft most vulnerable during arrival and departure?
+436,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,What is the typical traffic pattern altitude for propeller-driven aircraft?
+437,imported,u4,Airports & Airspace,"Airport Operations, Runways",,How are runway numbers determined?
+438,imported,u4,Airports & Airspace,Airport Operations,,What regulation governs access to SIDA areas?
+439,imported,u4,Airports & Airspace,Airport Operations,,What is a SIDA area at an airport?
+440,imported,u4,Airports & Airspace,Airport Operations,,What is the primary purpose of a Reliever Airport?
+441,skipped_duplicate,,Airports & airspace,towed Airports,first seen at row 352,Towered airports have
+442,imported,u4,Airports & Airspace,Airport Operations,,What type of airport is NOT open to the general public?
+444,skipped_marker,,,,,Runways End of Section Questions
+445,skipped_duplicate,,Airports & Airspace,general,first seen at row 167,An aircraft announces they are on the short final of a RWY 36. Where is the aircraft in relation to the airport?
+446,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring the Barnes CTAF you hear an aircraft announce that they are midfield left downwind to RWY 11. Where would the aircraft be r
+447,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring the Coventon CTAF you hear an aircraft announce that they are midfield left downwind to RWY 27. Where would the aircraft be
+448,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring the CTAF you hear an aircraft announce that they are midfield left downwind to RWY 14. What is the heading of the aircraft?
+449,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring the CTAF you hear an aircraft announce that they are midfield left downwind to RWY 24. What is the heading of the aircraft?
+450,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring the Pittsburg CTAF you hear an aircraft announce that they are midfield left downwind to RWY 4. Where would the aircraft be
+451,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,"The standard airport traffic pattern is to the what, unless otherwise noted."
+452,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,Runway numbers are based on the
+453,imported,u4,Operations,Airport Operations,,Why should unmanned operators be familiar with airport traffic patterns?
+455,skipped_marker,,,,,End of Unit Test Airports and Airspace Classifications
+456,imported,u2,Airports & Airspace,"Overview, L &L",,"(Refer to FAA-CT-800-2H, Figure 21). What is the airport located approximately 47 degrees 40 minutes N latitude and 101 degrees 26 minutes w"
+457,skipped_duplicate,,Airports & Airspace,Controlled vs Non controlled Airspace,first seen at row 7,"(Refer to FAA-CT-8080-2H, Figure 20 Area 1) The Fentress NALF Airport (NFE) is in what type of airspace?"
+458,skipped_duplicate,,Airports & Airspace,"airspace classifications, Prohibited areas",first seen at row 405,An sUAS can fly in a prohibited area because there is no one inside it.
+459,imported,u2,Airports & Airspace,Aeronautical Charts,,An sUAS operator can find out if they are operating near an airport and basic information about that airport by using a sectional chart.
+460,imported,u3,Airports & Airspace,"Airspace Classifications,",,An sUAS operator does not need prior authorization to fly in which airspace?
+461,skipped_duplicate,,Airports & Airspace,Aeronautical Charts,first seen at row 406,An sUAS operator will not be able to determine what type of airspace they are operating in by using a sectional chart.
+462,skipped_duplicate,,Airports & Airspace,"airspace classifications, MOA",first seen at row 162,"Before flying in a military operations area, an sUAS operator should do what to find out if it is active?"
+463,skipped_duplicate,,Airports & Airspace,Aeronautical Charts,first seen at row 163,How often are sectional charts covering the continental U.S. updated?
+464,imported,u2,Airports & Airspace,"Overview, L &L",,Lines of latitude
+465,imported,u2,Airports & Airspace,"Overview, L &L",,Lines of longitude run from the North Pole to the South Pole.
+466,needs_review,,Airports & Airspace,"airspace classifications, Restricted areas","answer=B, choices=1","Refer to FAA-CT-8080-2H, Figure 75 area 6. During preflight planning you plan to operate in R-2305, where would you find additional info reg"
+467,skipped_duplicate,,Airports & Airspace,"Airport Operations, Traffic Patterns",first seen at row 452,Runway numbers are based on the
+468,imported,u2,Airports & Airspace,"Overview, L &L",,The Prime Meridian runs through
+469,skipped_duplicate,,Airports & Airspace,"Airport Operations, Traffic Patterns",first seen at row 451,"The standard airport traffic pattern is to the what, unless otherwise noted."
+470,imported,u2,Airports & Airspace,Aeronautical Charts,,What is the scale on the terminal area chart?
+471,imported,u3,Airports & Airspace,"airspace classifications, Other Airspace Areas",,"When a temporary flight restriction is issued over a disaster area, it is still ok to fly your sUAS if you are trying to help."
+472,imported,u4,Airports & Airspace,Airport Operations,,Which airport type is the largest group in the United States?
+473,skipped_duplicate,,Airports & Airspace,"Airspace Classifications,",first seen at row 382,Which of the following is NOT a consideration of airspace classification?
+474,skipped_duplicate,,Airports & Airspace,Airports data sources,first seen at row 165,Which of the following is not a source of airport data?
+475,imported,u4,Airports & Airspace,"Airport Operations, Traffic Patterns",,While monitoring CTAF you hear an aircraft announce they where midfield left downwind to RWY 13. Where is the aircraft relative to the runwa
+476,skipped_duplicate,,Airports & Airspace,Controlled vs Non controlled Airspace,first seen at row 383,You have been hired to inspect a railroad near Cocolalla. (Refer to figure 22 south of area 1) Do you need approval from ATC?
+477,imported,u2,Airports & Airspace,,,"A hobbyist sUAS operator does not need to notify a non-towered, general aviation, private airport that they are flying nearby within 5 miles"
+479,skipped_marker,,,,,5 -WEATHER End of Section Questions
+480,imported,u5,Weather,"Sources, Metar",,A METAR is a surface weather observation report.
+481,skipped_duplicate,,weather,"Sources, Metar",first seen at row 2,"(Refer to FAA-CT-8080-2H, Figure 12.) The wind direction and velocity at KJFK is from"
+482,skipped_duplicate,,Weather,"Sources, Metar",first seen at row 3,"(Refer to FAA-CT-8080-2H, Figure 12.) What are the current conditions for Chicago Midway Airport (KMDW)?"
+483,skipped_duplicate,,weather,"Sources, Metar",first seen at row 4,"(Refer to FAA-CT-8080-2H, Figure 12.) Which stations are reporting weather that would prohibit UAS operations?"
+484,imported,u5,Weather,"Sources, Metar",,A METAR is usually updated
+485,skipped_duplicate,,weather,"Sources, Metar",first seen at row 111,What type of report provides real-time weather observations?
+486,imported,u5,Weather,METAR,,A METAR does not contain information related to which of the following:
+487,skipped_duplicate,,Weather,"Sources, Metar",first seen at row 3,"(Refer to FAA-CT-8080-2H, Figure 12.) What are the current conditions for Chicago Midway Airport (KMDW)?"
+488,imported,u5,Weather,"Sources, TAF",,A TAF report has winds at 16010KT. What does this mean?
+489,skipped_marker,,,,,TAF Weather End of Section Questions
+490,imported,u5,Weather,"sources, TAF",,A TEMPO is:
+491,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H)  The forecast ceiling at KMEM from 1200Z to 1220Z is:"
+492,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H)  What is the expected wind direction and speed at KMEM from 1222Z onward?"
+493,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H)  What is the forecast ceiling for KMEM from 1220Z to 1222Z?"
+494,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H)  What is the forecast wind direction and speed at KMEM from 1202Z to 1205Z?"
+495,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H)  When is fog expected to occur according to the TAF?"
+496,skipped_duplicate,,Weather,"sources, TAF",first seen at row 173,"(Refer to Figure 15,  FAA-CT-8080-2H) According to the TAF, what type of weather is expected from 1220Z to 1222Z?"
+497,imported,u5,Weather,"sources, TAF",,"(Refer to Figure 15,  FAA-CT-8080-2H) What is the forecast visibility for KMEM at the beginning of the TAF period (1218Z)?"
+498,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H)  During the period 0600Z to 0606Z, what is the probability of thunderstorms?"
+499,skipped_duplicate,,Weather,"sources, TAF",first seen at row 174,"(Refer to figure 15,  FAA-CT-8080-2H)  What does ""BECMG 0522/0524 20013G20KT"" indicate?"
+500,skipped_duplicate,,Weather,"sources, TAF",first seen at row 175,"(Refer to figure 15,  FAA-CT-8080-2H)  What does ""P6SM SCT040"" mean in the forecast starting at 0608Z?"
+501,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H)  What visibility is expected during the ""TEMPO 0513/0516"" period?"
+502,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H) What is the forecasted ceiling at 051200Z?"
+503,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15,  FAA-CT-8080-2H) What weather phenomenon is associated with ""OVC008CB""?"
+504,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15, FAA-CT-8080-2H)  At what time does the visibility improve to greater than 6 statute miles?"
+505,imported,u5,Weather,"sources, TAF",,"(Refer to figure 15, FAA-CT-8080-2H) What is the wind forecast for 0608Z?"
+506,skipped_duplicate,,weather,"Sources, TAF",first seen at row 5,"(Refer to FAA-CT-8080-2H, Figure 15.) What is the valid period for the TAF for KMEM?"
+507,skipped_duplicate,,Weather,"sources, TAF",first seen at row 41,A TAF is for how many hours or what period of time?
+508,imported,u5,Weather,"sources, TAF",,A TAF is updated
+510,skipped_marker,,,,,Loading and Performance End of Section Questions
+511,imported_inferred,u7,Additional Topics,,,An aircraft can stall at any airspeed.
+512,needs_review,,Loading & Performance,loading and performance,"answer=D, choices=3",An aircraft that weighs 100 lbs and is subjected to 3 Gs will feel as if it weighs:
+513,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 204,"For commercial off‑the‑shelf aircraft with fixed, manufacturer‑approved payloads, which loading action is typically not required prior to fl"
+514,imported,u7,Loading & Performance,loading and performance,,"If the center of gravity (CG) is forward of the center of pressure (CP), the aircraft will:"
+515,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 157,What happens to the stalling speed of an aircraft as the load factor increases?
+516,imported,u7,Loading & Performance,loading and performance,,What is the primary advantage that manned aircraft pilots have over unmanned pilots when it comes to handling load factors?
+517,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 158,What is the primary concern for an RPIC when loading a payload onto an aircraft?
+518,imported,u7,Loading & Performance,loading and performance,,What is the primary concern for an RPIC when operating an aircraft near its maximum takeoff weight?
+519,imported,u7,Loading & Performance,loading and performance,,Which of the following is not one of the four forces acting on an aircraft in straight and level flight?
+520,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 205,Which of the following reduces air density and therefore reduces maximum takeoff weight?
+521,skipped_marker,,,,,Load Factors and Performance End of Section Questions
+522,imported,u7,Loading & Performance,loading and performance,,Load factor is measured in:
+523,imported,u7,Loading & Performance,loading and performance,,What is the primary concern regarding operating an aircraft near its maximum takeoff weight?
+524,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 159,What is the primary factor that determines the load factor experienced by an aircraft during a turn?
+525,imported,u7,Loading & Performance,loading and performance,,What is the primary factor that determines the maximum load factor an aircraft can withstand?
+526,imported,u7,Loading & Performance,loading and performance,,What is the relationship between an aircraft's weight and its ability to generate lift?
+527,imported,u7,Loading & Performance,loading and performance,,What is the relationship between the center of gravity (CG) and the center of pressure (CP) in a traditionally designed multirotor aircraft?
+528,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 160,What is the relationship between the load factor and the stalling speed of an aircraft?
+529,imported,u7,Loading & Performance,loading and performance,,What is the relationship between the location of the center of gravity (CG) and the center of pressure (CP) on a fixed-wing aircraft?
+530,imported,u7,Loading & Performance,loading and performance,,"When an aircraft enters a turn, the load factor results from a combination of gravity and what?"
+531,skipped_duplicate,,Additional Topics,,first seen at row 206,Which two components are the primary considerations for aircraft balance?
+532,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 203,Why is it unsafe to fly an unmanned aircraft at or near its maximum takeoff weight?
+533,skipped_marker,,,,,No Loading and Performance Test its with ADM
+535,skipped_marker,,,,,Emergency End of Section Questions
+536,skipped_duplicate,,Operations,Emergency Procedures,first seen at row 62,"During a flight of your small UA, you observe a hot air balloon entering the area. You should"
+537,imported,u8,Operations,Emergency Procedures,,"To avoid a possible collision with a manned airplane, you estimate that your small UA climbed to an altitude greater than 600 feet AGL. To w"
+538,imported_inferred,u9,,,,What is the primary reason most aviation accidents occur?
+539,imported_inferred,u8,,,,What is the primary responsibility of the Remote Pilot in Command (RPIC) during an in-flight emergency?
+540,imported_inferred,u8,,,,What is the primary reason why the RPIC should document any emergency deviation from Part 107 regulations?
+541,imported_inferred,u8,,,,What is the primary reason why you should remain calm during an emergency?
+543,skipped_marker,,,,,No Emergency Test its with ADM
+546,skipped_marker,,,,,Communications End of Section Questions
+547,imported,u10,Operations,communications,,What is the primary function of a Flight Service Station (FSS) at an airport?
+548,imported,u10,Operations,communications,,What is the recommended action for an unmanned aircraft operator flying within 5 miles of a non-towered airport?
+549,imported,u10,Operations,communications,,What is the primary function of a MULTICOM frequency?
+550,skipped_duplicate,,Operations,communications,first seen at row 215,What is the primary function of a UNICOM station at a non-towered airport?
+551,imported,u10,Operations,communications,,What is the primary purpose of the CTAF?
+552,imported,u10,Operations,communications,,What is the purpose of using the phonetic alphabet in aviation radio communication?
+553,imported,u10,Operations,communications,,What is the recommended action when flying near a non-towered airport without UNICOM?
+554,skipped_duplicate,,Operations,Radio Communications,first seen at row 75,Is it mandatory for sUAS operators to monitor CTAF at non-towered airports?
+555,skipped_duplicate,,Operations,Radio Communications,first seen at row 552,What is the purpose of using the phonetic alphabet in aviation radio communication?
+556,skipped_duplicate,,Operations,Radio Communications,first seen at row 215,What is the primary function of a UNICOM station at a non-towered airport?
+557,skipped_duplicate,,Operations,Radio Communications,first seen at row 216,What is the primary purpose of the Common Traffic Advisory Frequency (CTAF) in aviation?
+558,skipped_duplicate,,Operations,Radio Communications,first seen at row 218,What is the recommended action for an unmanned aircraft operator flying near a non-towered airport that does not have a UNICOM frequency?
+559,skipped_duplicate,,Operations,Radio Communications,first seen at row 219,What is the primary reason why unmanned aircraft operators should be familiar with airport traffic patterns when monitoring radio traffic?
+561,skipped_marker,,,,,No Communications Test its with ADM
+563,skipped_marker,,,,,ADM End of section Questions
+564,imported_inferred,u9,Additional Topics,,,You have been hired as a remote pilot by a local TV news station to film breaking news with a small UA. You expressed a safety concern and t
+565,skipped_duplicate,,Additional Topics,,first seen at row 209,What does the IMSAFE checklist help an RPIC to assess before a flight?
+566,skipped_duplicate,,Additional Topics,,first seen at row 210,What is the purpose of Crew Resource Management (CRM) in aeronautical decision-making?
+567,skipped_duplicate,,Additional Topics,,first seen at row 211,What is the first step in dealing with hazardous attitudes?
+568,imported_inferred,u9,Additional Topics,,,What is the purpose of the 'six-sigma' process mentioned in relation to risk management?
+569,skipped_duplicate,,Additional Topics,,first seen at row 212,What does ADM provide to pilots as they handle different situations?
+570,imported_inferred,u9,Additional Topics,,,What is 'Situational Awareness' and why is it important for a pilot?
+571,skipped_duplicate,,Additional Topics,,first seen at row 213,"What does the acronym 'PAVE' stand for, and how does it relate to risk management?"
+572,imported_inferred,u9,Additional Topics,,,What is the role of Standard Operating Procedures (SOP) in Crew Resource Management (CRM)?
+573,imported_inferred,u9,Additional Topics,,,"What is the purpose of a risk management chart, and how should it be used by RPICs?"
+574,skipped_duplicate,,Operations,Physiological factors,first seen at row 183,"You have been under persistent work-related stress for several months, which is starting to affect your focus during drone operations. What "
+576,skipped_marker,,,,,"ADM, Emergency, Communications and Loading Test"
+577,imported_inferred,u7,,,,Select the force that is not acting on an aircraft during straight and level flight.
+578,imported_inferred,u7,,,,Air density has no effect on an aircraft’s ability to take off.
+579,skipped_duplicate,,,,first seen at row 511,An aircraft can stall at any airspeed.
+580,imported_inferred,u7,,,,"If an unmanned aircraft weighs 20 lbs, what approximate weight would the airplane structure be required to support during a 30-degree banked"
+581,imported_inferred,u10,,,,Unmanned aircraft operators are expected to communicate with manned aircraft over the CTAF when they are operating near a non-towered airpor
+582,imported_inferred,u10,,,,Which of the following is not part of the phonetic alphabet:
+583,imported_inferred,u8,,,,An unmanned aircraft operator can deviate from any portion of Part 107 to respond to an emergency.
+584,needs_review,,,,"answer=D, choices=3",An unmanned aircraft operator should do which of the following after they experience an inflight emergency?
+585,imported_inferred,u9,,,,Which of the following is not used in the Aeronautical Decision-Making (ADM) process?
+586,imported_inferred,u9,,,,You do not have to worry about dehydration when operating in a cold environment.
+587,needs_review,,,,"answer=D, choices=3",Unmanned aircraft operators should base their maintenance and inspection procedures on:
+588,imported_inferred,u9,,,,The antidote for the attitude macho is
+589,imported_inferred,u9,,,,The antidote for the attitude resignation is
+590,imported_inferred,u9,,,,The antidote for the attitude anti-authority is
+591,imported_inferred,u9,,,,The antidote for the attitude invulnerability is
+592,imported_inferred,u9,,,,The antidote for the attitude impulsivity is
+593,skipped_duplicate,,Additional Topics,,first seen at row 209,What does the IMSAFE checklist help an RPIC to assess before a flight?
+594,skipped_duplicate,,Additional Topics,,first seen at row 210,What is the purpose of Crew Resource Management (CRM) in aeronautical decision-making?
+595,skipped_duplicate,,Operations,Physiological factors,first seen at row 183,"You have been under persistent work-related stress for several months, which is starting to affect your focus during drone operations. What "
+596,skipped_duplicate,,,,first seen at row 540,What is the primary reason why the RPIC should document any emergency deviation from Part 107 regulations?
+597,skipped_duplicate,,Operations,communications,first seen at row 548,What is the recommended action for an unmanned aircraft operator flying within 5 miles of a non-towered airport?
+598,skipped_duplicate,,Operations,communications,first seen at row 549,What is the primary function of a MULTICOM frequency?
+599,skipped_duplicate,,Operations,communications,first seen at row 215,What is the primary function of a UNICOM station at a non-towered airport?
+600,skipped_duplicate,,Operations,communications,first seen at row 551,What is the primary purpose of the CTAF?
+601,skipped_duplicate,,Operations,communications,first seen at row 553,What is the recommended action when flying near a non-towered airport without UNICOM?
+602,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 157,What happens to the stalling speed of an aircraft as the load factor increases?
+603,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 158,What is the primary concern for an RPIC when loading a payload onto an aircraft?
+604,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 518,What is the primary concern for an RPIC when operating an aircraft near its maximum takeoff weight?
+605,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 519,Which of the following is not one of the four forces acting on an aircraft in straight and level flight?
+606,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 205,Which of the following reduces air density and therefore reduces maximum takeoff weight?
+607,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 159,What is the primary factor that determines the load factor experienced by an aircraft during a turn?
+608,skipped_duplicate,,Loading & Performance,loading and performance,first seen at row 160,What is the relationship between the load factor and the stalling speed of an aircraft?

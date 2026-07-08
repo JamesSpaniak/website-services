@@ -8,6 +8,7 @@ import { OrgRole } from './types/org-role.enum';
 import { User } from '../users/types/user.entity';
 import { Progress } from '../progress/types/progress.entity';
 import { Course } from '../courses/types/course.entity';
+import { CourseUnit } from '../courses/types/course-unit.entity';
 import { CourseDetails, ProgressStatus, UnitData } from '../courses/types/course.dto';
 import { EmailService } from '../email/email.service';
 import { ConfigService } from '@nestjs/config';
@@ -41,6 +42,8 @@ export class OrganizationService {
         private progressRepository: Repository<Progress>,
         @InjectRepository(Course)
         private courseRepository: Repository<Course>,
+        @InjectRepository(CourseUnit)
+        private courseUnitRepository: Repository<CourseUnit>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
         private dataSource: DataSource,
@@ -414,7 +417,10 @@ export class OrganizationService {
         const memberUserIds = members.map((m) => m.userId);
         if (memberUserIds.length === 0) return [];
 
-        const courses = await this.courseRepository.find();
+        // Summary needs course id/title/hidden only — never load the JSON payload.
+        const courses = await this.courseRepository.find({
+            select: ['id', 'title', 'hidden'],
+        });
 
         // Only select summary columns -- never load the JSONB payload.
         // p.id is required for getMany() to properly hydrate distinct entities.
@@ -429,21 +435,18 @@ export class OrganizationService {
             progressMap.set(`${p.userId}-${p.courseId}`, p);
         }
 
-        // Pre-compute units_total per course for members who have no progress row yet
-        const courseUnitCounts = new Map<number, number>();
-        for (const course of courses) {
-            if (course.hidden) continue;
-            try {
-                const parsed: CourseDetails = JSON.parse(course.payload);
-                let total = 0;
-                if (parsed.units) {
-                    this.countUnits(parsed.units, () => { total++; });
-                }
-                courseUnitCounts.set(course.id, total);
-            } catch {
-                courseUnitCounts.set(course.id, 0);
-            }
-        }
+        // Pre-compute units_total per course (for members with no progress row
+        // yet) from the course_units index table instead of parsing payloads.
+        const unitCountRows: { course_id: string | number; total: string }[] =
+            await this.courseUnitRepository
+                .createQueryBuilder('cu')
+                .select('cu.course_id', 'course_id')
+                .addSelect('COUNT(*)', 'total')
+                .groupBy('cu.course_id')
+                .getRawMany();
+        const courseUnitCounts = new Map<number, number>(
+            unitCountRows.map((row) => [Number(row.course_id), Number(row.total)]),
+        );
 
         const results: MemberCourseProgressSummary[] = [];
 
@@ -483,6 +486,21 @@ export class OrganizationService {
 
         const coursePayload: CourseDetails = JSON.parse(course.payload);
 
+        // Strip heavy content once and serialize the small skeleton; each
+        // member re-parses the skeleton (a few KB) instead of deep-copying the
+        // full course payload (~180 KB) per member.
+        coursePayload.id = courseId;
+        const stripContent = (units?: CourseDetails['units']): void => {
+            if (!units?.length) return;
+            for (const unit of units) {
+                unit.text_content = undefined;
+                unit.video_url = undefined;
+                stripContent(unit.sub_units);
+            }
+        };
+        stripContent(coursePayload.units);
+        const skeletonJson = JSON.stringify(coursePayload);
+
         const allProgress = await this.progressRepository
             .createQueryBuilder('p')
             .where('p.userId IN (:...userIds)', { userIds: memberUserIds })
@@ -500,17 +518,14 @@ export class OrganizationService {
 
             if (progress) {
                 // Overlay the member's unit_statuses map onto a fresh copy of
-                // the course tree (content stripped — this is a progress view).
-                mergedPayload = JSON.parse(JSON.stringify(coursePayload)) as CourseDetails;
-                mergedPayload.id = courseId;
+                // the content-stripped course skeleton.
+                mergedPayload = JSON.parse(skeletonJson) as CourseDetails;
                 mergedPayload.status = (progress.status as ProgressStatus) ?? ProgressStatus.NOT_STARTED;
                 const statuses = progress.unit_statuses ?? {};
                 const overlay = (units?: CourseDetails['units']): void => {
                     if (!units?.length) return;
                     for (const unit of units) {
                         unit.status = (statuses[String(unit.id)] as ProgressStatus) ?? ProgressStatus.NOT_STARTED;
-                        unit.text_content = undefined;
-                        unit.video_url = undefined;
                         overlay(unit.sub_units);
                     }
                 };
@@ -706,12 +721,4 @@ export class OrganizationService {
         await this.userRepository.update(userId, { picture_url: null });
     }
 
-    private countUnits(units: UnitData[], callback: (unit: UnitData, depth: number) => void, depth = 0): void {
-        for (const unit of units) {
-            callback(unit, depth);
-            if (unit.sub_units) {
-                this.countUnits(unit.sub_units, callback, depth + 1);
-            }
-        }
-    }
 }

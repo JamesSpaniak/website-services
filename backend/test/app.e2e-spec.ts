@@ -898,4 +898,208 @@ describe('API (e2e)', () => {
       expect(response.body.username).toBe('beareruser');
     });
   });
+
+  describe('frontend logging (W1.3)', () => {
+    it('accepts valid log payloads with 204', async () => {
+      await request(app.getHttpServer())
+        .post('/logs')
+        .send({ level: 'info', message: 'Test log', context: { page: '/home' } })
+        .expect(204);
+    });
+
+    it('rejects invalid log level with 400', async () => {
+      await request(app.getHttpServer())
+        .post('/logs')
+        .send({ level: 'debug', message: 'Bad level' })
+        .expect(400);
+    });
+
+    it('rejects oversized messages with 400', async () => {
+      await request(app.getHttpServer())
+        .post('/logs')
+        .send({ level: 'info', message: 'x'.repeat(2001) })
+        .expect(400);
+    });
+  });
+
+  describe('assigned class exams (W1.2)', () => {
+    const seedAssignedExam = async () => {
+      const course = await createCourse('Assigned Course');
+      const org = await organizationRepository.save({ name: 'Class Org', max_students: 30 });
+
+      const manager = await createUser(Role.User, 'classmgr', 'classmgr@example.com');
+      await memberRepository.save({
+        organizationId: org.id,
+        userId: manager.id,
+        role: OrgRole.Manager,
+      });
+
+      const student = await createUser(Role.User, 'classstudent', 'classstudent@example.com');
+      await memberRepository.save({
+        organizationId: org.id,
+        userId: student.id,
+        role: OrgRole.Member,
+      });
+
+      const outsider = await createUser(Role.User, 'classoutsider', 'classoutsider@example.com');
+
+      const question = await questionRepository.save({
+        course_id: course.id,
+        unit_ref: 'u1',
+        sub_unit_ref: null,
+        unit_id: null,
+        sub_unit_id: null,
+        question_text: 'Assigned exam question?',
+        choices: [
+          { id: 1, text: 'No', is_correct: false },
+          { id: 2, text: 'Yes', is_correct: true },
+        ],
+        explanation: null,
+        standard: null,
+        figure_ref: null,
+        priority: 1,
+        difficulty: 'medium' as const,
+        status: 'active' as const,
+      });
+
+      const exam = await examRepository.save({
+        course_id: course.id,
+        scope: 'unit' as const,
+        exam_pool: 'scoped' as const,
+        scope_refs: ['u1'],
+        scope_ids: [],
+        question_ids: [question.id],
+        is_randomized: false,
+        version: 'v1',
+        generated_by: 'teacher' as const,
+        created_by_user_id: manager.id,
+        dedup_key: null,
+      });
+
+      const classExam = await classExamRepository.save({
+        exam_id: exam.id,
+        assigned_by_user_id: manager.id,
+        organization_id: org.id,
+        label: 'Unit 1 Quiz',
+        due_date: null,
+      });
+
+      return { course, org, student, outsider, exam, question, classExam };
+    };
+
+    it('lists assigned exams for org members only', async () => {
+      const { course, exam, classExam } = await seedAssignedExam();
+      const studentToken = await loginAndGetToken('classstudent');
+      const outsiderToken = await loginAndGetToken('classoutsider');
+
+      const assigned = await request(app.getHttpServer())
+        .get('/exams/class/assigned')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .expect(200);
+
+      expect(assigned.body).toHaveLength(1);
+      expect(assigned.body[0].exam_id).toBe(exam.id);
+      expect(assigned.body[0].class_exam_id).toBe(classExam.id);
+      expect(assigned.body[0].course_id).toBe(course.id);
+      expect(assigned.body[0].label).toBe('Unit 1 Quiz');
+      expect(assigned.body[0].attempt).toBeNull();
+
+      await request(app.getHttpServer())
+        .get('/exams/class/assigned')
+        .set('Authorization', `Bearer ${outsiderToken}`)
+        .expect(200)
+        .then((res) => expect(res.body).toHaveLength(0));
+    });
+
+    it('allows org member without course purchase to open and submit assigned exam', async () => {
+      const { exam, question } = await seedAssignedExam();
+      const studentToken = await loginAndGetToken('classstudent');
+
+      const examResponse = await request(app.getHttpServer())
+        .get(`/exams/${exam.id}`)
+        .set('Authorization', `Bearer ${studentToken}`)
+        .expect(200);
+
+      expect(examResponse.body.questions).toHaveLength(1);
+      expect(examResponse.body.questions[0]).not.toHaveProperty('is_correct');
+
+      const submitResponse = await request(app.getHttpServer())
+        .post(`/exams/${exam.id}/submit`)
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ answers: [{ question_id: question.id, selected_choice_id: 2 }] })
+        .expect(201);
+
+      expect(submitResponse.body.score).toBe(100);
+
+      const assigned = await request(app.getHttpServer())
+        .get('/exams/class/assigned')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .expect(200);
+
+      expect(assigned.body[0].attempt?.score).toBe(100);
+    });
+
+    it('blocks non-members from opening assigned exams', async () => {
+      const { exam } = await seedAssignedExam();
+      const outsiderToken = await loginAndGetToken('classoutsider');
+
+      await request(app.getHttpServer())
+        .get(`/exams/${exam.id}`)
+        .set('Authorization', `Bearer ${outsiderToken}`)
+        .expect(403);
+    });
+  });
+
+  describe('deferred email verification (W2.2)', () => {
+    const createUnverifiedUser = async (username: string, email: string) => {
+      const hashedPassword = await UsersService.hashPassword(password);
+      return userRepository.save({
+        username,
+        email,
+        password: hashedPassword,
+        role: Role.User,
+        is_email_verified: false,
+        email_verification_token: 'pending-token',
+        email_verification_expires_at: new Date(Date.now() + 86400000),
+        token_version: 0,
+        pro_membership_expires_at: null,
+        purchased_courses: [],
+      });
+    };
+
+    it('allows unverified users to log in', async () => {
+      await createUnverifiedUser('unverified1', 'unverified1@example.com');
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username: 'unverified1', password })
+        .expect(200);
+
+      expect(response.body.user.email_verified).toBe(false);
+    });
+
+    it('blocks unverified users from create-payment-intent', async () => {
+      await createUnverifiedUser('unverified2', 'unverified2@example.com');
+      const course = await createCourse('Paid Course');
+      const token = await loginAndGetToken('unverified2');
+
+      await request(app.getHttpServer())
+        .post('/purchases/create-payment-intent')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ courseId: course.id })
+        .expect(403)
+        .then((res) => expect(res.body.message).toBe('EMAIL_NOT_VERIFIED'));
+    });
+
+    it('resends verification email for unverified users', async () => {
+      await createUnverifiedUser('unverified3', 'unverified3@example.com');
+      const token = await loginAndGetToken('unverified3');
+
+      await request(app.getHttpServer())
+        .post('/auth/resend-verification')
+        .set('Authorization', `Bearer ${token}`)
+        .send({})
+        .expect(200);
+    });
+  });
 });

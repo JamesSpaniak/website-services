@@ -2,18 +2,20 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getCourseById } from '@/app/lib/api-client';
+import { getCourseById, getAssignedClassExams } from '@/app/lib/api-client';
 import type { CourseData } from '@/app/lib/types/course';
 import AuthGuard from '@/app/lib/auth-guard';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import CourseExamBreadcrumb from '@/app/ui/components/course-exam-breadcrumb';
 import CourseExamsSection from '@/app/ui/components/course-exams-section';
+import AssignedClassExamsSection from '@/app/ui/components/assigned-class-exams-section';
 
 function ExamsHubPage() {
     const { courseId } = useParams();
     const router = useRouter();
     const [course, setCourse] = useState<CourseData | null>(null);
+    const [hasAssignedExams, setHasAssignedExams] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const didInitialLoad = useRef(false);
@@ -29,9 +31,13 @@ function ExamsHubPage() {
         if (showSpinner) setLoading(true);
         setError(null);
         try {
-            const data = await getCourseById(id);
+            const [data, assigned] = await Promise.all([
+                getCourseById(id),
+                getAssignedClassExams().catch(() => [] as Awaited<ReturnType<typeof getAssignedClassExams>>),
+            ]);
             data.id = id;
             setCourse(data);
+            setHasAssignedExams(assigned.some((a) => a.course_id === id));
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Failed to load course');
         } finally {
@@ -56,7 +62,7 @@ function ExamsHubPage() {
     if (error) return <ErrorComponent message={error} />;
     if (!course) return <ErrorComponent message="Course not found." />;
 
-    if (course.has_access === false && course.price && course.price > 0) {
+    if (course.has_access === false && course.price && course.price > 0 && !hasAssignedExams) {
         router.replace(`/courses/${id}`);
         return <LoadingComponent />;
     }
@@ -77,6 +83,7 @@ function ExamsHubPage() {
                 <p className="mt-2 text-sm text-[var(--brand-muted)]">{course.title}</p>
             </header>
             <CourseExamsSection courseId={id} examSummary={course.exam_summary} compact />
+            <AssignedClassExamsSection courseId={id} />
         </div>
     );
 }

@@ -27,6 +27,16 @@ interface CourseData {
         practice?: { score: number; taken_at: string } | null;
         final?: { score: number; taken_at: string } | null;
     };
+    /**
+     * Active question-bank counts keyed by unit ref / sub-unit ref (refs with
+     * zero questions are omitted). Used to hide exam CTAs for empty scopes.
+     */
+    question_counts?: QuestionCounts;
+}
+
+interface QuestionCounts {
+    unit: Record<string, number>;
+    sub_unit: Record<string, number>;
 }
 
 interface UnitData {
@@ -50,4 +60,5 @@ interface UnitData {
 export type {
     CourseData,
     UnitData,
+    QuestionCounts,
 }

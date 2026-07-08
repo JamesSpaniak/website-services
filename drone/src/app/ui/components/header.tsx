@@ -115,13 +115,21 @@ export default function HeaderComponent() {
               )}
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
-              style={{ borderRadius: 'var(--radius-sm)' }}
-            >
-              Login
-            </Link>
+            <>
+              <Link
+                href="/register"
+                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
+                style={{ borderRadius: 'var(--radius-sm)' }}
+              >
+                Get started
+              </Link>
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium tracking-wide text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors touch-manipulation"
+              >
+                Sign in
+              </Link>
+            </>
           )}
 
           <button
@@ -157,6 +165,24 @@ export default function HeaderComponent() {
             >
               Book a Free Call
             </Link>
+            {!user && (
+              <>
+                <Link
+                  href="/register"
+                  className="block min-h-[44px] flex items-center px-3 mt-2 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] touch-manipulation"
+                  style={{ borderRadius: 'var(--radius-sm)' }}
+                >
+                  Get started
+                </Link>
+                <Link
+                  href="/login"
+                  className="block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide text-[var(--brand-foreground)] touch-manipulation"
+                  style={{ borderRadius: 'var(--radius-sm)' }}
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
             {user && (
               <>
                 <hr className="my-2 border-[var(--surface-border)]" />

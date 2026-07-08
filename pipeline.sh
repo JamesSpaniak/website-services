@@ -55,6 +55,7 @@ Flags:
 
 Env overrides:
   AWS_REGION, PROJECT_NAME, TF_DIR, IMAGE_TAG, ENVIRONMENT, TFVARS_FILE, DOCKER_PROGRESS
+  NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_FEATURED_COURSE_ID (default: 35 — home/login CTA course id)
   REQUIRE_TFVARS (default: true)       — fail if tfvars missing
   AUTO_RECONCILE_STATE (default: true)  — auto-restore/import drifted secrets + CloudFront keys
   AUTO_SEED_CLOUDFRONT_PRIVATE_KEY_SECRET (default: true)
@@ -160,10 +161,41 @@ fi
 
 if [[ "${BUILD_FRONTEND}" == "true" ]]; then
   FRONTEND_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://thedroneedge.com}"
-  FRONTEND_IMAGE_URI="$(build_and_push "frontend" "${FRONTEND_ECR_REPO}" drone/Dockerfile drone "--build-arg NEXT_PUBLIC_DEBUG_LOGGING=1 --build-arg NEXT_PUBLIC_SITE_URL=${FRONTEND_SITE_URL}")"
+  # Featured course id for home/login CTAs — must match the deployed DB (35 in prod).
+  FRONTEND_FEATURED_COURSE_ID="${NEXT_PUBLIC_FEATURED_COURSE_ID:-35}"
+  FRONTEND_IMAGE_URI="$(build_and_push "frontend" "${FRONTEND_ECR_REPO}" drone/Dockerfile drone "--build-arg NEXT_PUBLIC_DEBUG_LOGGING=1 --build-arg NEXT_PUBLIC_SITE_URL=${FRONTEND_SITE_URL} --build-arg NEXT_PUBLIC_FEATURED_COURSE_ID=${FRONTEND_FEATURED_COURSE_ID}")"
 else
   FRONTEND_IMAGE_URI="$(get_current_task_image "${FRONTEND_TASK_FAMILY}" "${FRONTEND_CONTAINER_NAME}")"
 fi
+
+# ─── Service state helpers (deploy verification) ───────────────────────────────
+
+get_service_task_def() {
+  aws ecs describe-services --cluster "$1" --services "$2" --region "${AWS_REGION}" \
+    --query 'services[0].taskDefinition' --output text 2>/dev/null || echo "unknown"
+}
+
+get_task_def_image() {
+  aws ecs describe-task-definition --task-definition "$1" --region "${AWS_REGION}" \
+    --query "taskDefinition.containerDefinitions[?name=='$2'].image | [0]" \
+    --output text 2>/dev/null || echo "unknown"
+}
+
+log_service_state() {
+  local label="$1" cluster="$2" service="$3" container="$4"
+  local td image
+  td="$(get_service_task_def "${cluster}" "${service}")"
+  image="$(get_task_def_image "${td}" "${container}")"
+  echo "[${label}] ${service}: ${td##*/} -> ${image}"
+}
+
+# Snapshot what each service is running BEFORE terraform apply so we can
+# detect terraform reverting a service to a stale task definition revision
+# (this silently rolled the backend to an old image in the past).
+BACKEND_TD_BEFORE="$(get_service_task_def "${BACKEND_ECS_CLUSTER}" "${BACKEND_ECS_SERVICE}")"
+FRONTEND_TD_BEFORE="$(get_service_task_def "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}")"
+log_service_state "pre-terraform" "${BACKEND_ECS_CLUSTER}" "${BACKEND_ECS_SERVICE}" "${BACKEND_CONTAINER_NAME}"
+log_service_state "pre-terraform" "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_CONTAINER_NAME}"
 
 # ─── Terraform apply ────────────────────────────────────────────────────────────
 
@@ -206,6 +238,30 @@ fi
     terraform plan -input=false "${COMMON_VARS[@]}"
   fi
 )
+
+# Detect terraform moving a service to a different task definition. With the
+# lifecycle ignore_changes=[task_definition] rules in place this should never
+# fire; if it does, the deploy below may be fighting terraform — investigate.
+if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
+  BACKEND_TD_AFTER="$(get_service_task_def "${BACKEND_ECS_CLUSTER}" "${BACKEND_ECS_SERVICE}")"
+  FRONTEND_TD_AFTER="$(get_service_task_def "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}")"
+  if [[ "${BACKEND_TD_AFTER}" != "${BACKEND_TD_BEFORE}" ]]; then
+    echo "############################################################################" >&2
+    echo "## WARNING: terraform apply changed ${BACKEND_ECS_SERVICE} task definition" >&2
+    echo "##   before: ${BACKEND_TD_BEFORE##*/}" >&2
+    echo "##   after:  ${BACKEND_TD_AFTER##*/}" >&2
+    echo "## Terraform is reverting deploys — check lifecycle ignore_changes rules." >&2
+    echo "############################################################################" >&2
+  fi
+  if [[ "${FRONTEND_TD_AFTER}" != "${FRONTEND_TD_BEFORE}" ]]; then
+    echo "############################################################################" >&2
+    echo "## WARNING: terraform apply changed ${FRONTEND_ECS_SERVICE} task definition" >&2
+    echo "##   before: ${FRONTEND_TD_BEFORE##*/}" >&2
+    echo "##   after:  ${FRONTEND_TD_AFTER##*/}" >&2
+    echo "## Terraform is reverting deploys — check lifecycle ignore_changes rules." >&2
+    echo "############################################################################" >&2
+  fi
+fi
 
 # ─── Seed CloudFront private key secret ─────────────────────────────────────────
 
@@ -308,11 +364,64 @@ wait_for_service_stable() {
   done
 }
 
+# Hard check: after the service stabilizes, confirm it is actually running the
+# image we deployed. Catches ECS rolling back a failed deployment, terraform
+# reverting the service, or anything else overwriting the rollout — previously
+# these failed silently and prod kept running an old image.
+verify_deployed_image() {
+  local cluster="$1" service="$2" expected_image="$3" container="$4"
+  local td image
+  td="$(get_service_task_def "${cluster}" "${service}")"
+  image="$(get_task_def_image "${td}" "${container}")"
+  if [[ "${image}" != "${expected_image}" ]]; then
+    echo "" >&2
+    echo "############################################################################" >&2
+    echo "## DEPLOY VERIFICATION FAILED: ${service}" >&2
+    echo "##   running:  ${image} (${td##*/})" >&2
+    echo "##   expected: ${expected_image}" >&2
+    echo "## The service was rolled back or overwritten after the deploy was" >&2
+    echo "## triggered. Check ECS service events and stopped-task reasons:" >&2
+    echo "##   aws ecs describe-services --cluster ${cluster} --services ${service} \\" >&2
+    echo "##     --region ${AWS_REGION} --query 'services[0].events[0:10]'" >&2
+    echo "############################################################################" >&2
+    exit 1
+  fi
+  echo "Verified ${service} is running ${image} (${td##*/})"
+}
+
+# Softer check for the side that was NOT rebuilt this run: warn if the live
+# service image differs from the latest registered task definition image.
+warn_if_service_stale() {
+  local cluster="$1" service="$2" latest_image="$3" container="$4"
+  local td image
+  td="$(get_service_task_def "${cluster}" "${service}")"
+  image="$(get_task_def_image "${td}" "${container}")"
+  if [[ "${image}" != "${latest_image}" ]]; then
+    echo "############################################################################" >&2
+    echo "## WARNING: ${service} was not deployed this run and is running a STALE image:" >&2
+    echo "##   running:           ${image} (${td##*/})" >&2
+    echo "##   latest registered: ${latest_image}" >&2
+    echo "## Run ./pipeline.sh for that side to bring it up to date." >&2
+    echo "############################################################################" >&2
+  fi
+}
+
 if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
   [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"  "${BACKEND_CONTAINER_NAME}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}"
   [[ "${BUILD_BACKEND}" == "true" ]]  && wait_for_service_stable "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && wait_for_service_stable "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}"
+
+  if [[ "${BUILD_BACKEND}" == "true" ]]; then
+    verify_deployed_image "${BACKEND_ECS_CLUSTER}" "${BACKEND_ECS_SERVICE}" "${BACKEND_IMAGE_URI}" "${BACKEND_CONTAINER_NAME}"
+  else
+    warn_if_service_stale "${BACKEND_ECS_CLUSTER}" "${BACKEND_ECS_SERVICE}" "${BACKEND_IMAGE_URI}" "${BACKEND_CONTAINER_NAME}"
+  fi
+  if [[ "${BUILD_FRONTEND}" == "true" ]]; then
+    verify_deployed_image "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}"
+  else
+    warn_if_service_stale "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}"
+  fi
 
   # Invalidate frontend CloudFront cache after a frontend deploy so clients get fresh HTML/chunks
   if [[ "${BUILD_FRONTEND}" == "true" ]]; then

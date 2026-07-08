@@ -9,12 +9,13 @@ import { OrganizationService } from './organization.service';
 import { OrgManagerGuard } from './org-manager.guard';
 import { Progress } from '../progress/types/progress.entity';
 import { Course } from '../courses/types/course.entity';
+import { CourseUnit } from '../courses/types/course-unit.entity';
 import { User } from '../users/types/user.entity';
 import { EmailModule } from '../email/email.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Organization, OrganizationMember, InviteCode, Progress, Course, User]),
+        TypeOrmModule.forFeature([Organization, OrganizationMember, InviteCode, Progress, Course, CourseUnit, User]),
         EmailModule,
         ConfigModule,
     ],

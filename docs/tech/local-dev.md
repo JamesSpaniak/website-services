@@ -5,7 +5,7 @@ Run Postgres in Docker and the API + frontend with npm. Migrations run automatic
 ## Prerequisites
 
 - Docker Desktop (or Docker Engine + Compose)
-- Node.js 20+
+- Node.js 20+ — run `nvm use` in the repo root (`.nvmrc` pins 20)
 - `npm install` in both `backend/` and `drone/`
 
 ## 1. Start Postgres
@@ -133,6 +133,11 @@ Caveats:
 
 For day-to-day development, **Postgres-only Docker + native npm** is simpler.
 
+## Running tests
+
+- Unit tests: `cd backend && npm test` (no DB needed).
+- E2E tests: `cd backend && npm run test:e2e` — runs against the **`blog_test`** database (set via `DB_NAME` in the script), so your dev `blog` data is safe. The suite truncates all tables in its target DB before each test; never point it at `blog`.
+
 ## Manual migrations (debugging only)
 
 Boot normally handles migrations. If needed:
@@ -152,6 +157,8 @@ npm run typeorm:revert   # undo last
 | No migrations run | Run `npm run build` in `backend/` first |
 | Frontend auth fails | Backend must be on `:3000`; check `API_INTERNAL_BASE_URL` |
 | Empty DB after reset | Restart backend — migrations and admin seed run on boot |
+| `ReferenceError: crypto is not defined` on boot | You're on Node < 19 (check `node --version`) — run `nvm use` for Node 20. `main.ts` also polyfills WebCrypto as a fallback |
+| `npm run build` fails in `drone/` with Node version error | Same fix — Next.js requires Node 18.18+ |
 
 ## Related docs
 
