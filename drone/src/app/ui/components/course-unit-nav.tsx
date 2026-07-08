@@ -4,11 +4,14 @@ import Link from 'next/link';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import CourseExamBreadcrumb from './course-exam-breadcrumb';
 import type { FlatUnitNode } from '@/app/lib/course-tree';
+import { unitPath } from '@/app/lib/auth-redirect';
 
 interface CourseUnitNavProps {
     courseId: number;
     courseTitle: string;
     unitTitle: string;
+    /** Ancestor units of the current one (top-level first), each linked in the breadcrumb. */
+    ancestors?: FlatUnitNode[];
     prev: FlatUnitNode | null;
     next: FlatUnitNode | null;
 }
@@ -17,11 +20,11 @@ export default function CourseUnitNav({
     courseId,
     courseTitle,
     unitTitle,
+    ancestors = [],
     prev,
     next,
 }: CourseUnitNavProps) {
-    const unitHref = (id: string) =>
-        `/courses/${courseId}/units/${encodeURIComponent(id)}`;
+    const unitHref = (id: string) => unitPath(courseId, id);
 
     return (
         <div className="mb-8">
@@ -29,6 +32,7 @@ export default function CourseUnitNav({
                 crumbs={[
                     { label: 'Courses', href: '/courses' },
                     { label: courseTitle, href: `/courses/${courseId}` },
+                    ...ancestors.map((a) => ({ label: a.title, href: unitHref(a.id) })),
                     { label: unitTitle },
                 ]}
             />

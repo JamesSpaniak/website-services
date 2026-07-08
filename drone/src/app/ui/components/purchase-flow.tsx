@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
-import { createPaymentIntent, getCourseById } from '@/app/lib/api-client';
+import { confirmCoursePurchase, createPaymentIntent, getCourseById, resendVerificationEmail } from '@/app/lib/api-client';
 import ImageComponent from './image';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { logger } from '@/app/lib/logger';
+import { coursePath, registerHref } from '@/app/lib/auth-redirect';
 
 // NOTE: The parent component rendering this flow must be wrapped in Stripe's <Elements> provider.
 // Example in a layout or page:
@@ -20,6 +21,23 @@ interface PurchaseFlowProps {
     course: CourseData;
     onPurchaseSuccess: () => void;
     redirectPath?: string;
+}
+
+const pendingPiKey = (courseId: number) => `pendingPurchasePi:${courseId}`;
+
+function stashPendingPaymentIntent(courseId: number, paymentIntentId: string): void {
+    if (typeof window === 'undefined') return;
+    sessionStorage.setItem(pendingPiKey(courseId), paymentIntentId);
+}
+
+function readPendingPaymentIntent(courseId: number): string | null {
+    if (typeof window === 'undefined') return null;
+    return sessionStorage.getItem(pendingPiKey(courseId));
+}
+
+function clearPendingPaymentIntent(courseId: number): void {
+    if (typeof window === 'undefined') return;
+    sessionStorage.removeItem(pendingPiKey(courseId));
 }
 
 function useStripeElementStyle() {
@@ -48,11 +66,23 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
     const elements = useElements();
     const cardStyle = useStripeElementStyle();
     const loginHref = useMemo(() => {
-        const base = redirectPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/courses');
+        const base = redirectPath ?? (typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/courses');
         return `/login?redirect=${encodeURIComponent(base)}`;
     }, [redirectPath]);
+    const registerHrefForCourse = useMemo(() => {
+        const base = redirectPath ?? coursePath(course.id, true);
+        return registerHref(base);
+    }, [redirectPath, course.id]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+    const [pendingPaymentIntentId, setPendingPaymentIntentId] = useState<string | null>(null);
+    const [reconciling, setReconciling] = useState(false);
+
+    useEffect(() => {
+        const stored = readPendingPaymentIntent(course.id);
+        if (stored) setPendingPaymentIntentId(stored);
+    }, [course.id]);
 
     const handlePurchase = async () => {
         if (!stripe || !elements) {
@@ -82,6 +112,12 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
             if (paymentResult.error) {
                 throw new Error(paymentResult.error.message);
             }
+
+            const paymentIntentId = paymentResult.paymentIntent?.id;
+            if (paymentIntentId) {
+                setPendingPaymentIntentId(paymentIntentId);
+                stashPendingPaymentIntent(course.id, paymentIntentId);
+            }
             
             // 3. Payment succeeded on the client. Now, poll the backend to wait for webhook processing.
             logger.info('Stripe payment confirmed on client. Awaiting server-side fulfillment via webhook.', { courseId: course.id, paymentIntentId: paymentResult.paymentIntent.id });
@@ -103,13 +139,40 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
             };
 
             await pollForPurchase();
+            setPendingPaymentIntentId(null);
+            clearPendingPaymentIntent(course.id);
             onPurchaseSuccess();
         } catch (err) {
             const message = err instanceof Error ? err.message : 'An unknown error occurred.';
-            logger.error(err as Error, { context: 'Stripe Purchase Flow' });
-            setError(`Purchase failed: ${message}`);
+            if (message.includes('EMAIL_NOT_VERIFIED')) {
+                setError('Verify your email before purchasing.');
+            } else {
+                logger.error(err as Error, { context: 'Stripe Purchase Flow' });
+                setError(`Purchase failed: ${message}`);
+            }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleReconcileAccess = async () => {
+        if (!pendingPaymentIntentId) return;
+        setReconciling(true);
+        setError(null);
+        try {
+            await confirmCoursePurchase(pendingPaymentIntentId);
+            const updatedCourse = await getCourseById(course.id);
+            if (updatedCourse.has_access) {
+                setPendingPaymentIntentId(null);
+                clearPendingPaymentIntent(course.id);
+                onPurchaseSuccess();
+                return;
+            }
+            setError('Payment found but access is not active yet. Try again in a moment or contact support with your receipt.');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Could not confirm purchase.');
+        } finally {
+            setReconciling(false);
         }
     };
 
@@ -117,14 +180,62 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
         return (
             <div className="text-center p-8 max-w-4xl mx-auto">
                 <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8">
-                    <h2 className="text-2xl font-bold text-[var(--brand-foreground)]">Please Log In</h2>
-                    <p className="mt-2 text-[var(--brand-muted)]">You need to be logged in to purchase this course.</p>
-                    <Link href={loginHref} className="mt-4 inline-block px-6 py-2 text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
-                        Login or Sign Up
-                    </Link>
+                    <h2 className="text-2xl font-bold text-[var(--brand-foreground)]">Account required</h2>
+                    <p className="mt-2 text-[var(--brand-muted)]">
+                        Checkout is tied to your account so access survives sign-out and device changes.
+                        Create an account first, verify your email, then return here to pay.
+                    </p>
+                    <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                        <Link href={registerHrefForCourse} className="inline-block px-6 py-2.5 font-semibold text-[var(--brand-black)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
+                            Create account &amp; checkout
+                        </Link>
+                        <Link href={loginHref} className="inline-block px-6 py-2.5 font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] rounded-lg hover:bg-[var(--background)]">
+                            Sign in
+                        </Link>
+                    </div>
+                    <p className="mt-4 text-xs text-[var(--brand-muted)]">
+                        Already paid? Sign in with the same account you used at checkout — access is granted automatically.
+                    </p>
                 </div>
             </div>
         )
+    }
+
+    const needsVerification = user.email_verified === false;
+
+    const handleResendVerification = async () => {
+        setResendStatus('sending');
+        setError(null);
+        try {
+            await resendVerificationEmail();
+            setResendStatus('sent');
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Could not send verification email.');
+            setResendStatus('idle');
+        }
+    };
+
+    if (needsVerification) {
+        return (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8 text-center">
+                    <h1 className="text-2xl font-bold text-[var(--brand-foreground)]">Verify your email to continue</h1>
+                    <p className="mt-3 text-[var(--brand-muted)]">
+                        We sent a verification link to <span className="font-medium text-[var(--brand-foreground)]">{user.email}</span>.
+                        Confirm your email before checkout — it keeps your purchase tied to the right account.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resendStatus === 'sending'}
+                        className="mt-6 inline-flex items-center justify-center px-6 py-2.5 font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                    >
+                        {resendStatus === 'sending' ? 'Sending…' : resendStatus === 'sent' ? 'Link sent — check your inbox' : 'Resend verification email'}
+                    </button>
+                    {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -160,6 +271,19 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
 
                 <div className="mt-8 text-center">
                     <p className="text-sm text-[var(--brand-muted)]">This is a one-time payment for lifetime access.</p>
+                    {pendingPaymentIntentId && (
+                        <p className="mt-3 text-sm text-[var(--brand-muted)]">
+                            Already charged?{' '}
+                            <button
+                                type="button"
+                                onClick={handleReconcileAccess}
+                                disabled={reconciling}
+                                className="font-semibold text-[var(--brand-primary)] underline disabled:opacity-50"
+                            >
+                                {reconciling ? 'Restoring access…' : 'Restore my access'}
+                            </button>
+                        </p>
+                    )}
                     <div className="mt-4 flex justify-center gap-4">
                         <button onClick={handlePurchase} disabled={isLoading || !stripe} className="px-8 py-3 font-semibold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--background)] focus:ring-[var(--brand-primary)] transition-colors disabled:opacity-40">
                             {isLoading ? 'Processing...' : 'Purchase with Stripe'}
@@ -167,7 +291,21 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
                     </div>
                 </div>
 
-                {error && <div className="mt-6 p-3 bg-red-100 text-red-700 rounded-lg text-center">{error}</div>}
+                {error && (
+                    <div className="mt-6 p-3 bg-red-100 text-red-700 rounded-lg text-center space-y-3">
+                        <p>{error}</p>
+                        {pendingPaymentIntentId && (
+                            <button
+                                type="button"
+                                onClick={handleReconcileAccess}
+                                disabled={reconciling}
+                                className="text-sm font-semibold underline disabled:opacity-50"
+                            >
+                                {reconciling ? 'Confirming…' : 'Payment went through? Restore my access'}
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

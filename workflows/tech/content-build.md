@@ -29,6 +29,18 @@ News pipeline: [`workflows/marketing/content-and-seo.md`](../marketing/content-a
 
 ## Video upload
 
+**Open:** Finish recordings for all Part 107 unit/section nodes — see [`docs/TODO.md`](../../docs/TODO.md) P0.
+
+| Step | Action |
+|------|--------|
+| Record | One video per unit/section (or agreed granularity) |
+| Upload | `./scripts/bulk-upload-videos.sh` — source: `assets/videos/` |
+| Wire course | Set `video_url` on each node in `assets/courses/faa_107_course.json` |
+| Publish | Admin course save or API; invalidate CDN if needed |
+| Captions | Plan transcripts/captions track — WCAG (see TODO) |
+
+Pipeline:
+
 ```bash
 ./scripts/bulk-upload-videos.sh
 ```

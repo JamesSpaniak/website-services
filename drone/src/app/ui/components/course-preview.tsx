@@ -5,6 +5,8 @@ import { useState } from 'react';
 import ImageComponent from './image';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { coursePath, coursePreviewPath, registerHref } from '@/app/lib/auth-redirect';
+import { useAuth } from '@/app/lib/auth-context';
 
 interface CoursePreviewProps {
     id: number;
@@ -13,6 +15,7 @@ interface CoursePreviewProps {
     images_url?: string[];
     unitCount: number;
     price?: number;
+    has_access?: boolean;
 }
 
 export default function CoursePreviewComponent({
@@ -22,7 +25,9 @@ export default function CoursePreviewComponent({
     images_url,
     unitCount,
     price,
+    has_access,
 }: CoursePreviewProps) {
+    const { user } = useAuth();
     const images = mergeCourseImages({ images_url });
     const [imgIdx, setImgIdx] = useState(0);
     const n = images.length;
@@ -32,9 +37,12 @@ export default function CoursePreviewComponent({
         setImgIdx((i) => (i + delta + n) % n);
     };
 
-    const courseHref = `/courses/${id}/preview`;
-    const learnHref = `/courses/${id}`;
+    const courseHref = coursePreviewPath(id);
+    // Logged-in users go straight to the course; guests go through register.
+    const tryFreeHref = user ? coursePath(id) : registerHref(coursePath(id));
+    const purchaseHref = user ? coursePath(id, true) : registerHref(coursePath(id, true));
     const displayPrice = Number(price) || 0;
+    const fullAccess = !!user && has_access === true;
 
     return (
         <article
@@ -110,12 +118,24 @@ export default function CoursePreviewComponent({
                 </div>
                 <span className="mt-3 text-xs font-medium text-[var(--brand-primary)]">View details →</span>
             </Link>
-            <Link
-                href={learnHref}
-                className="block px-5 pb-4 text-xs text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
-            >
-                Sign in to start learning
-            </Link>
+            <div className="px-5 pb-4 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                {fullAccess ? (
+                    <Link href={coursePath(id)} className="text-[var(--brand-primary)] hover:opacity-90 font-medium">
+                        Open course
+                    </Link>
+                ) : (
+                    <>
+                        <Link href={tryFreeHref} className="text-[var(--brand-primary)] hover:opacity-90 font-medium">
+                            {user ? 'Continue with Unit 1 free' : 'Try Unit 1 free'}
+                        </Link>
+                        {displayPrice > 0 && (
+                            <Link href={purchaseHref} className="text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors">
+                                Purchase ${displayPrice}
+                            </Link>
+                        )}
+                    </>
+                )}
+            </div>
         </article>
     );
 }

@@ -1,6 +1,8 @@
 # Agent guide — Drone Edge monorepo
 
-Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, **sales**, and **marketing** in this repository.
+Full rules for AI agents (Cursor, Claude Code, CI bots) working across **product**, **sales**, and **marketing** in this repository.
+
+**Navigation:** repo index + doc-system definitions live in [`../AGENTS.md`](../AGENTS.md); task → doc lookup in [`SKILLS.md`](SKILLS.md); backlog in [`TODO.md`](TODO.md). Read this file for the rules, then the folder-level `AGENTS.md` for the area you're editing.
 
 ## What this repo is
 
@@ -11,7 +13,7 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 - **`workflows/`** — Executable runbooks (sales outreach, deploy, content pipeline).
 - **`assets/`** — Course JSON, article outlines, brand files, news drafts.
 - **`scripts/`** — Python/shell helpers; not all are safe to run without review.
-- **`data/outreach/`** — Generated contact lists and email drafts (may contain PII).
+- **`outreach/`** — Generated contact lists and email drafts (may contain PII).
 
 ## Before you change code
 
@@ -35,8 +37,20 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 | Edit frontend/backend with tests locally | `./pipeline.sh` deploy to AWS |
 | Draft outreach email in chat | Sending email or importing contacts to a CRM |
 | Update course JSON in `assets/courses/` | Bulk DB migrations on production |
-| Run contact scripts locally | Committing `data/outreach/*.csv` |
+| Run contact scripts locally | Committing `outreach/*.csv` |
 | Terraform plan | Terraform apply (especially prod tfvars) |
+| Add a resource to Terraform | Creating AWS resources by hand (`aws … create-*`, console) |
+
+## Infrastructure — Terraform owns everything
+
+**All AWS resources are declared in `terraform/` and created by `terraform apply`.** Never create, delete, or rename AWS resources with the AWS CLI or console — hand-made resources drift from state and get clobbered or duplicated on the next apply.
+
+- New resource → add it to Terraform, don't `aws … create-*`.
+- Ordering trap (resource needs a value before a task starts) → solve it in Terraform with a dedicated value resource + `depends_on` (see how `test_user_password` is handled), not a manual `put-secret-value`.
+- Only exception: a resource type genuinely unsupported by the AWS provider (should never happen) — create it, then `terraform import` it and register it in `scripts/reconcile-state.sh`, documenting why.
+- Carve-out: sensitive **secret values** are seeded out-of-band into Terraform-owned secret containers so they never hit git; the container itself is still Terraform-owned.
+
+Full detail: [`docs/tech/architecture.md`](tech/architecture.md) § Resource ownership.
 
 ## Deploy reality (important)
 
@@ -52,7 +66,7 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 | Repeatable process steps | `workflows/<domain>/` |
 | Course/article source data | `assets/courses/`, `assets/articles/`, `assets/news/` |
 | Brand logos and mockups | `assets/visuals/Logo/`, `assets/visuals/Assets/` |
-| Outreach outputs | `data/outreach/` |
+| Outreach outputs | `outreach/` |
 
 ## Cross-links agents often need
 
@@ -64,3 +78,17 @@ Instructions for AI agents (Cursor, CI bots, etc.) working across **product**, *
 ## Commits
 
 Only commit when the user asks. Do not commit terraform state, `.env`, secrets, or outreach CSVs unless explicitly requested.
+
+## Keeping docs current
+
+**Required for agents:** when you change code, assets, or process in any folder, update the linked reference docs in the same session. Each major folder has README + AGENTS.md with a change → doc table:
+
+| Folder | Agent guide |
+|--------|-------------|
+| `backend/` | [`backend/AGENTS.md`](../backend/AGENTS.md) |
+| `drone/` | [`drone/AGENTS.md`](../drone/AGENTS.md) |
+| `docs/` | This file + domain READMEs under `tech/`, `sales/`, `marketing/` |
+| `workflows/` | [`workflows/AGENTS.md`](../workflows/AGENTS.md) |
+| `assets/` | [`assets/AGENTS.md`](../assets/AGENTS.md) |
+
+Backlog hygiene: ship an item → move row from [`TODO.md`](TODO.md) to [`TODO_COMPLETED.md`](TODO_COMPLETED.md) with the date.

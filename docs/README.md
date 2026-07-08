@@ -2,6 +2,8 @@
 
 This repo runs **TheDroneEdge.com** (product) and the **go-to-market** work around it (school sales, content, SEO). Documentation is split so you can operate the business without digging through app code.
 
+**Open items backlog:** [`TODO.md`](TODO.md) — cross-doc priorities (course video, sales, content, engineering). **Completed:** [`TODO_COMPLETED.md`](TODO_COMPLETED.md).
+
 ## Structure
 
 | Area | Purpose | Location |
@@ -10,7 +12,7 @@ This repo runs **TheDroneEdge.com** (product) and the **go-to-market** work arou
 | **Workflows** | Step-by-step runbooks you execute repeatedly | [`workflows/`](../workflows/) |
 | **Code** | Backend (`backend/`), frontend (`drone/`), infra (`terraform/`) | Repo root |
 | **Assets** | Brand, course content, news drafts, research | [`assets/`](../assets/) |
-| **Operational data** | Contact lists, email drafts (gitignored or review before commit) | [`data/outreach/`](../data/outreach/) |
+| **Operational data** | Contact lists, email drafts (gitignored or review before commit) | [`outreach/`](../outreach/) |
 | **Scripts** | Automation helpers | [`scripts/`](../scripts/) |
 
 ## Quick start by role
@@ -61,4 +63,19 @@ This repo runs **TheDroneEdge.com** (product) and the **go-to-market** work arou
 - **Docs** = reference material (what things are, why, constraints).
 - **Workflows** = ordered steps (do this, then that).
 - Prefer updating the workflow when a process changes; update the doc when facts or strategy change.
-- Contact CSVs under `data/outreach/` may contain PII — review before committing.
+- Contact CSVs under `outreach/` may contain PII — review before committing (CSVs are gitignored).
+
+## Keeping docs current
+
+This folder is the **canonical reference** for company facts. Each code/content folder also has README + AGENTS.md — agents should update the right doc when they ship changes.
+
+| You change… | Update… |
+|-------------|---------|
+| Product capability or live URLs | [`sales/features.md`](sales/features.md), affected `tech/*.md` |
+| Architecture, API, frontend flows | [`tech/backend-data.md`](tech/backend-data.md), [`tech/frontend-data.md`](tech/frontend-data.md), [`tech/architecture.md`](tech/architecture.md) |
+| Course / exam model | [`tech/exam-generator-and-course-linking.md`](tech/exam-generator-and-course-linking.md), [`tech/course-content-restructure-plan.md`](tech/course-content-restructure-plan.md) |
+| Sales or marketing strategy | [`sales/`](sales/), [`marketing/`](marketing/) as appropriate |
+| Repeatable process | Matching workflow under [`workflows/`](../workflows/) |
+| Shipped backlog item | [`TODO.md`](TODO.md) → [`TODO_COMPLETED.md`](TODO_COMPLETED.md) with date |
+
+Per-area agent guides: [`AGENTS.md`](AGENTS.md) (this tree) · [`../backend/AGENTS.md`](../backend/AGENTS.md) · [`../drone/AGENTS.md`](../drone/AGENTS.md) · [`../workflows/AGENTS.md`](../workflows/AGENTS.md) · [`../assets/AGENTS.md`](../assets/AGENTS.md)

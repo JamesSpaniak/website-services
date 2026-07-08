@@ -170,3 +170,22 @@ export interface ClassExamResults {
   total_completed: number;
   students: StudentExamResult[];
 }
+
+// ── Assigned class exams (student) ────────────────────────────────────────────
+
+export interface AssignedClassExamAttempt {
+  score: number;
+  taken_at: string;
+}
+
+export interface AssignedClassExam {
+  class_exam_id: number;
+  exam_id: number;
+  course_id: number;
+  label: string | null;
+  due_date: string | null;
+  assigned_at: string;
+  question_count: number;
+  scope: ExamScope;
+  attempt: AssignedClassExamAttempt | null;
+}

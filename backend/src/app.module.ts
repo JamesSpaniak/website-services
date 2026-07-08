@@ -31,10 +31,6 @@ import { QuestionModule } from './questions/question.module';
     OpenTelemetryModule.forRoot({
       metrics: {
         hostMetrics: true,
-        apiMetrics: {
-          enable: true,
-          defaultAttributes: { app: 'backend-service' },
-        },
       },
     }),
     CourseModule,

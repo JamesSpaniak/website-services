@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CourseData, ProgressStatus, UnitData } from "@/app/lib/types/course";
 import { updateCourseProgress, updateUnitProgress } from '@/app/lib/api-client';
 import PurchaseFlow from './purchase-flow';
@@ -18,7 +18,7 @@ import CourseExamsSection from './course-exams-section';
 import CourseOutlineSidebar from './course-outline-sidebar';
 import { isUnitPreviewAccessible } from '@/app/lib/course-tree';
 
-export default function CourseComponent(props: CourseData) {
+export default function CourseComponent(props: CourseData & { initialShowPurchase?: boolean }) {
     const [course, setCourse] = useState<CourseData>(props);
     const [showPurchase, setShowPurchase] = useState(false);
     const { id, title, sub_title, video_url, units, status, price, has_access, image_focal_point } = course;
@@ -26,6 +26,12 @@ export default function CourseComponent(props: CourseData) {
     const heroImages = mergeCourseImages(course);
     const paidCourse = Number(price) > 0;
     const fullAccess = has_access !== false;
+
+    useEffect(() => {
+        if (props.initialShowPurchase && paidCourse && !fullAccess) {
+            setShowPurchase(true);
+        }
+    }, [props.initialShowPurchase, paidCourse, fullAccess]);
 
     debugLog('CourseComponent', {
         courseId,
@@ -45,7 +51,6 @@ export default function CourseComponent(props: CourseData) {
             <PurchaseFlow
                 course={course}
                 onPurchaseSuccess={handlePurchaseSuccess}
-                redirectPath={`/courses/${courseId}`}
             />
         );
     }

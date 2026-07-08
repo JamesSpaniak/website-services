@@ -68,7 +68,7 @@ Write one CSV row per contact candidate. Include enough fields for review and de
 Recommended CSV path:
 
 ```text
-data/outreach/contact-candidates.csv
+outreach/contact-candidates.csv
 ```
 
 Keep generated output out of commits unless intentionally adding a seed dataset. Contact lists can age quickly and may include personally identifiable business contact details.
@@ -329,8 +329,8 @@ Build the smallest useful version:
 4. Implement the PDE OESE table extractor.
 5. Implement the Downingtown staff-profile extractor.
 6. Implement generic email/phone extraction with nearby heading/title context.
-7. Output `data/outreach/contact-candidates.csv`.
-8. Output `data/outreach/contact-collection-report.md`.
+7. Output `outreach/contact-candidates.csv`.
+8. Output `outreach/contact-collection-report.md`.
 9. Manually review results and tune keywords before adding pagination or Playwright.
 
 This milestone should prove the data model and review flow before dealing with dynamic district directories.

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import JsonLd, { courseJsonLd, faqPageJsonLd } from '@/app/ui/components/json-ld';
+import CoursePreviewActions from '@/app/ui/components/course-preview-actions';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import type { CourseData } from '@/app/lib/types/course';
 import ImageComponent from '@/app/ui/components/image';
@@ -74,7 +75,6 @@ export default async function CoursePreviewPage({
   const price = Number(course.price) || 0;
   const hero = mergeCourseImages(course)[0];
   const unitCount = course.units?.length ?? 0;
-  const loginHref = `/login?redirect=${encodeURIComponent(`/courses/${id}`)}`;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -108,23 +108,13 @@ export default async function CoursePreviewPage({
 
       <section id="purchase" className="mt-10 p-6 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
         <h2 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">Start learning</h2>
-        <p className="mt-2 text-sm text-[var(--brand-muted)]">
-          Create a free account to access Unit 1, or sign in to continue where you left off.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href={loginHref}
-            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
-            style={{ borderRadius: 'var(--radius-sm)' }}
-          >
-            {price > 0 ? 'Try Unit 1 free' : 'Start course'}
-          </Link>
+        <CoursePreviewActions courseId={id} price={price} />
+        <div className="mt-4">
           <Link
             href="/courses"
-            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--surface)] transition-colors"
-            style={{ borderRadius: 'var(--radius-sm)' }}
+            className="text-sm text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
           >
-            All courses
+            ← All courses
           </Link>
         </div>
       </section>

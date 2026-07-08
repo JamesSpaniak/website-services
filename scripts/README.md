@@ -6,7 +6,7 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 
 | Script | Purpose |
 |--------|---------|
-| `collect_school_contacts.py` | Scrape public district pages → `data/outreach/contact-candidates.csv` |
+| `collect_school_contacts.py` | Scrape public district pages → `outreach/contact-candidates.csv` |
 | `draft_contact_emails.py` | Generate draft emails from approved contacts |
 | `contact_sources.yaml` | Seed URLs for PA district collection |
 
@@ -22,7 +22,8 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 
 | Script | Purpose |
 |--------|---------|
-| `build_faa_107_questions.py` | Question bank generation → `assets/courses/` |
+| `build_faa_107_questions.py` | Question bank generation → `assets/courses/` (legacy sub-unit scoping) |
+| `build_unit_level_questions.py` | Author's sorted CSV → unit-level bulk import + review CSV |
 | `course_question_mapper.py` | Map questions to course units |
 | `export_general_operations_review.py` | Ops-category review export |
 | `refactor_course_goals.py` | One-off: merge unit descriptions into goals |

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UnitData, ProgressStatus } from '@/app/lib/types/course';
+import { UnitData, ProgressStatus, QuestionCounts } from '@/app/lib/types/course';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import { ChevronRightIcon, DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
@@ -12,12 +12,18 @@ import { mergeCourseImages } from '@/app/lib/course-images';
 import CourseImageStrip from './course-image-strip';
 import ExamPlayer from './exam-player';
 import { PROSE_COMPACT } from '@/app/lib/prose-classes';
+import { findUnitInTree } from '@/app/lib/course-tree';
+import { hasScopedQuestions } from './unit';
 
 interface SectionProps {
   section: UnitData;
   courseId: number;
   onStatusUpdate: (unitId: string, newStatus: ProgressStatus) => Promise<void>;
   level?: number;
+  /** Section id to auto-expand and scroll to. */
+  focusUnitId?: string | null;
+  /** Question-bank counts per ref — hides exam CTAs for empty scopes. */
+  questionCounts?: QuestionCounts;
 }
 
 function isCourseVideo(url?: string): boolean {
@@ -30,12 +36,25 @@ export default function SectionComponent({
   courseId,
   onStatusUpdate,
   level = 0,
+  focusUnitId,
+  questionCounts,
 }: SectionProps) {
   const { id, title, description, text_content, video_url, status, sub_units } = section;
   const sectionImages = mergeCourseImages(section);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isFocused = focusUnitId != null && String(id) === String(focusUnitId);
+  const containsFocus =
+    focusUnitId != null && !isFocused && findUnitInTree(sub_units, focusUnitId) != null;
+  const [isExpanded, setIsExpanded] = useState(isFocused || containsFocus);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
+
+  useEffect(() => {
+    if (isFocused || containsFocus) setIsExpanded(true);
+    if (isFocused) {
+      containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isFocused, containsFocus]);
 
   const needsSigning = isCourseVideo(video_url);
   const subUnitScopeRef = String(id);
@@ -63,8 +82,11 @@ export default function SectionComponent({
   const resolvedVideoUrl = needsSigning ? signedVideoUrl : video_url;
 
   return (
-    <div className={`mt-4 ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
-      <div className="border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
+    <div ref={containerRef} className={`mt-4 scroll-mt-24 ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
+      <div
+        className={`border bg-[var(--surface)] ${isFocused ? 'border-[var(--brand-primary)]' : 'border-[var(--surface-border)]'}`}
+        style={{ borderRadius: 'var(--radius-md)' }}
+      >
         <div className="w-full flex items-center justify-between p-5 text-left">
           <button
             type="button"
@@ -125,10 +147,12 @@ export default function SectionComponent({
                     courseId={courseId}
                     onStatusUpdate={onStatusUpdate}
                     level={level + 1}
+                    focusUnitId={focusUnitId}
+                    questionCounts={questionCounts}
                   />
                 ))}
 
-                {isLeaf && (
+                {isLeaf && hasScopedQuestions(questionCounts?.sub_unit, subUnitScopeRef) && (
                   <ExamPlayer
                     courseId={courseId}
                     scope="sub_unit"

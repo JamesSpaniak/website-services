@@ -84,7 +84,7 @@ The API is **not** exposed on a public `api.thedroneedge.com` record. Browsers o
 |------|------|
 | **Upload (admin)** | Browser → `POST /api/media/...` → API presigned URL → browser **PUT** direct to S3 `droneedge-dev-media` (CORS allows site origins) |
 | **Public images** | Browser → `https://media.thedroneedge.com/{key}` → media CloudFront → S3 |
-| **Paid course video** | Browser → signed URL from API (`SignedUrlService`) → media CloudFront path `courses/videos/*` (trusted key group) |
+| **Paid course video** | Browser → `GET /courses/:id/units/:unitId/media` → API returns URL. HLS (`.m3u8`): API sets CloudFront **signed cookies** (domain-scoped, path `/courses/videos`) so playlist *and* segment requests are authorized; player sends credentials. Single-file mp4: exact **signed URL** (`SignedUrlService`). CloudFront `courses/videos/*` behavior enforces the trusted key group and serves credentialed CORS via a response headers policy |
 | **Bulk transcode** | Operator → S3 `droneedge-dev-raw-video` → Lambda trigger → MediaConvert → HLS under `courses/videos/` in media bucket |
 
 ### Stripe (external)
@@ -195,10 +195,15 @@ DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
 | `droneedge-dev-stripe-secret-key` | API |
 | `droneedge-dev-stripe-webhook-secret` | API |
 | `droneedge-dev-admin-seed-password` | API |
+| `droneedge-dev-test-user-password` | API (dev-only, when `seed_test_data = true`) |
 | `droneedge-dev-grafana-otel-headers` | API OTLP auth |
 | `droneedge-dev-cloudfront-signing-private-key` | API video URL signing |
 
-Values for Stripe/JWT/admin are **not** in Terraform; seeded manually or via pipeline reconcile scripts.
+**Terraform owns the resources.** All AWS resources — including the secret *containers* above — are declared in Terraform, never created by hand. See [Resource ownership](#resource-ownership-terraform-first) below.
+
+Secret **values** are split by sensitivity:
+- Stripe / JWT / admin / DB / CloudFront private key: seeded out-of-band (manual or pipeline reconcile scripts), never in Terraform or git.
+- `test-user-password`: the value **is** Terraform-managed (`terraform/env/dev.tfvars` → `test_user_password`), because it is a throwaway dev credential and this removes the create-secret-before-deploy ordering trap.
 
 ### IAM (shared ECS roles)
 
@@ -509,6 +514,23 @@ git push → pipeline.sh
 ```
 
 Images: Node 20. Terraform: local state file (`terraform/terraform.tfstate`). See [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md).
+
+---
+
+## Resource ownership (Terraform-first)
+
+**Terraform is the single source of truth for AWS resources.** Every AWS object this project depends on — VPC, ECS, ALB, RDS, S3, CloudFront, IAM, Secrets Manager *containers*, log groups, etc. — must be declared in `terraform/` and created by `terraform apply` (via `pipeline.sh`).
+
+**Do not use the AWS CLI or console to create, delete, or rename resources.** Hand-created resources drift from state, get clobbered or duplicated on the next apply, and are invisible to code review. This applies even for "just one quick secret."
+
+Rules of thumb:
+
+- **Creating a resource?** Add it to Terraform and apply. Never `aws … create-*`.
+- **Ordering trap (a resource needs a value before a task can start)?** Solve it *in Terraform* — e.g. manage the value with a dedicated resource (`aws_secretsmanager_secret_version`) and use `depends_on` so the graph orders it correctly. This is exactly how `test_user_password` is handled. Do **not** paper over it with a manual `aws secretsmanager create-secret`.
+- **Only exception — a genuinely unsupported edge case:** if a resource type truly cannot be expressed in the AWS provider (this should essentially never happen), it may be created out-of-band, but it must then be `terraform import`-ed into state and registered in `scripts/reconcile-state.sh`. Document why in the same PR.
+- **Secret values** are the one deliberate carve-out from "state owns everything": sensitive values (Stripe/JWT/admin/DB keys) are seeded out-of-band into Terraform-owned secret containers so they never touch git — but the *container* is still Terraform-owned.
+
+If you catch yourself reaching for `aws … create-*` / `put-secret-value` to make a deploy work, stop and model it in Terraform instead.
 
 ---
 

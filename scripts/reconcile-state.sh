@@ -84,6 +84,7 @@ reconcile_secrets() {
     "stripe-secret-key:aws_secretsmanager_secret.stripe_secret_key"
     "jwt-secret:aws_secretsmanager_secret.jwt_secret"
     "admin-seed-password:aws_secretsmanager_secret.admin_seed_password"
+    "test-user-password:aws_secretsmanager_secret.test_user_password"
     "grafana-otel-headers:aws_secretsmanager_secret.grafana_otel_headers"
     "cloudfront-signing-private-key:aws_secretsmanager_secret.cloudfront_signing_private_key"
   )

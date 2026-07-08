@@ -3,6 +3,8 @@ scripts/__pycache__/
 */dist
 */node_modules
 data/*
+# Outreach contact data may contain PII — keep CSVs local (README stays tracked)
+outreach/*.csv
 */package-lock.json
 
 

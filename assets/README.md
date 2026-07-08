@@ -19,4 +19,10 @@ assets/
 | [`news/`](news/) | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
 | [`visuals/`](visuals/) | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 
+**Agent guide:** [`AGENTS.md`](AGENTS.md)
+
 Company doc hub: [`docs/README.md`](../docs/README.md)
+
+## Keeping docs current
+
+Course or question changes must update [`docs/tech/course-content-restructure-plan.md`](../docs/tech/course-content-restructure-plan.md) and [`docs/tech/exam-generator-and-course-linking.md`](../docs/tech/exam-generator-and-course-linking.md) — see the full table in [`AGENTS.md`](AGENTS.md).

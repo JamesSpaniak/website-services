@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from 'src/courses/types/course.entity';
 import { Role } from 'src/users/types/role.enum';
@@ -24,6 +24,16 @@ export class PurchaseService {
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
   ) {}
+
+  async assertEmailVerifiedForPurchase(userId: number): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+    if (!user.is_email_verified) {
+      throw new ForbiddenException('EMAIL_NOT_VERIFIED');
+    }
+  }
 
   async purchaseCourse(userId: number, courseId: number): Promise<User> {
     const user = await this.userRepository.findOne({
@@ -85,6 +95,40 @@ export class PurchaseService {
 
     return { clientSecret: paymentIntent.client_secret };
 }
+
+  /**
+   * Idempotent recovery when Stripe charged the user but the client lost the
+   * session before the webhook was observed (or polling timed out).
+   */
+  async confirmPaymentFromIntent(
+    userId: number,
+    paymentIntentId: string,
+  ): Promise<{ granted: boolean; alreadyOwned: boolean }> {
+    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new BadRequestException('Payment has not completed yet.');
+    }
+
+    const metaUserId = paymentIntent.metadata?.userId;
+    const courseId = paymentIntent.metadata?.courseId;
+    if (!metaUserId || !courseId) {
+      throw new BadRequestException('Payment is missing course metadata.');
+    }
+    if (String(metaUserId) !== String(userId)) {
+      throw new ForbiddenException('This payment belongs to a different account.');
+    }
+
+    try {
+      await this.purchaseCourse(userId, parseInt(courseId, 10));
+      return { granted: true, alreadyOwned: false };
+    } catch (e) {
+      if (this.isAlreadyPurchasedBadRequest(e)) {
+        return { granted: true, alreadyOwned: true };
+      }
+      throw e;
+    }
+  }
 
   async handleWebhookEvent(rawBody: Buffer, signature: string) {
     const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET');

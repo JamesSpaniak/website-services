@@ -1,7 +1,16 @@
+import { webcrypto } from 'crypto';
+
+// Node < 19 has no global WebCrypto; @nestjs/schedule calls crypto.randomUUID()
+// at boot. Same polyfill as test/jest-e2e.setup.ts. Target runtime is Node 20+.
+if (!globalThis.crypto) {
+  (globalThis as { crypto: Crypto }).crypto = webcrypto as Crypto;
+}
+
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DataSource } from 'typeorm';
+import { seedTestData } from './seed/test-data.seeder';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import { HttpExceptionFilter } from './common/http-exception.filter';
@@ -143,6 +152,13 @@ async function bootstrap() {
     logger.log('Migrations complete.');
   } else {
     logger.log('Database schema is up to date.');
+  }
+
+  // Dev-only test fixtures. Gated by an explicit env flag (not NODE_ENV) so the
+  // gate lives in per-environment config and survives the future dev/prod split.
+  if (process.env.SEED_TEST_DATA === 'true') {
+    logger.log('SEED_TEST_DATA=true — seeding dev test fixtures...');
+    await seedTestData(dataSource, logger);
   }
 
   await app.listen(3000, '0.0.0.0');

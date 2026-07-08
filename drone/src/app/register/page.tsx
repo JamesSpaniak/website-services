@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
@@ -11,6 +11,12 @@ import type { InviteCodeInfo } from '@/app/lib/types/organization';
 import { z } from 'zod';
 import { BuildingOfficeIcon } from '@heroicons/react/24/solid';
 import PageShell from '../ui/components/page-shell';
+import {
+    redirectIndicatesPurchase,
+    sanitizeRedirect,
+    stashPostAuthRedirect,
+    loginHref,
+} from '@/app/lib/auth-redirect';
 
 const signupSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -19,10 +25,20 @@ const signupSchema = z.object({
 });
 
 export default function RegisterPage() {
+    return (
+        <Suspense fallback={<LoadingComponent />}>
+            <RegisterPageInner />
+        </Suspense>
+    );
+}
+
+function RegisterPageInner() {
     const { user, isLoading: authLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const inviteCode = searchParams.get('code');
+    const redirect = sanitizeRedirect(searchParams.get('redirect'));
+    const purchaseIntent = redirectIndicatesPurchase(redirect);
 
     const [inviteInfo, setInviteInfo] = useState<InviteCodeInfo | null>(null);
     const [inviteLoading, setInviteLoading] = useState(!!inviteCode);
@@ -41,10 +57,14 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        if (redirect) stashPostAuthRedirect(redirect);
+    }, [redirect]);
+
+    useEffect(() => {
         if (!authLoading && user) {
-            router.replace('/profile');
+            router.replace(redirect ?? '/profile');
         }
-    }, [user, authLoading, router]);
+    }, [user, authLoading, router, redirect]);
 
     useEffect(() => {
         if (!inviteCode) return;
@@ -90,7 +110,11 @@ export default function RegisterPage() {
                 last_name: formData.lastName || undefined,
                 invite_code: inviteCode || undefined,
             });
-            setInfoMessage('Registration successful! Please verify your email before logging in.');
+            setInfoMessage(
+                purchaseIntent
+                    ? 'Account created! Verify your email before checkout, or sign in now to browse Unit 1 free.'
+                    : 'Registration successful! Check your email for a verification link, or sign in now to start Unit 1.',
+            );
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Registration failed.');
         } finally {
@@ -104,8 +128,12 @@ export default function RegisterPage() {
 
     return (
         <PageShell
-            title="Create account"
-            subtitle="Join to access courses and track your progress."
+            title={purchaseIntent ? 'Create account to purchase' : 'Create account'}
+            subtitle={
+                purchaseIntent
+                    ? 'Verify your email, sign in, then checkout — access stays on this account.'
+                    : 'Join to access courses and track your progress.'
+            }
             maxWidthClass="max-w-lg"
         >
             <form
@@ -151,9 +179,21 @@ export default function RegisterPage() {
                     <div className="mb-4 p-4 rounded-md border border-[var(--surface-border)] bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)] text-sm">
                         {infoMessage}
                         <p className="mt-2">
-                            <Link href="/login" className="font-medium text-[var(--brand-primary)] hover:underline">
-                                Go to Login
+                            <Link
+                                href={redirect ? loginHref(redirect) : '/login'}
+                                className="font-medium text-[var(--brand-primary)] hover:underline"
+                            >
+                                Sign in{purchaseIntent ? ' after verifying' : ''}
                             </Link>
+                            {!purchaseIntent && (
+                                <>
+                                    {' '}
+                                    or{' '}
+                                    <Link href="/login" className="font-medium text-[var(--brand-primary)] hover:underline">
+                                        skip for now — start Unit 1
+                                    </Link>
+                                </>
+                            )}
                         </p>
                     </div>
                 )}
@@ -250,8 +290,11 @@ export default function RegisterPage() {
                 </button>
 
                 <div className="text-center mt-4">
-                    <Link href="/login" className="text-sm text-[var(--brand-primary)] hover:underline">
-                        Already have an account? Login
+                    <Link
+                        href={redirect ? loginHref(redirect) : '/login'}
+                        className="text-sm text-[var(--brand-primary)] hover:underline"
+                    >
+                        Already have an account? Sign in
                     </Link>
                 </div>
             </form>

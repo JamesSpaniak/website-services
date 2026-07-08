@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { UnitData, ProgressStatus } from '@/app/lib/types/course';
+import { UnitData, ProgressStatus, QuestionCounts } from '@/app/lib/types/course';
 import { updateUnitProgress } from '@/app/lib/api-client';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
@@ -12,9 +12,21 @@ import { PROSE_BODY } from '@/app/lib/prose-classes';
 interface UnitComponentProps {
     unitData: UnitData;
     courseId: number;
+    /** Section id to auto-expand and scroll to (e.g. from a leaf-node redirect). */
+    focusUnitId?: string | null;
+    /** Question-bank counts per ref — hides exam CTAs for empty scopes. */
+    questionCounts?: QuestionCounts;
 }
 
-export default function UnitComponent({ unitData, courseId }: UnitComponentProps) {
+/** Show the exam CTA when counts are unknown (older API) or the ref has questions. */
+export function hasScopedQuestions(
+    counts: Record<string, number> | undefined,
+    ref: string,
+): boolean {
+    return counts == null || (counts[ref] ?? 0) > 0;
+}
+
+export default function UnitComponent({ unitData, courseId, focusUnitId, questionCounts }: UnitComponentProps) {
     const [unit, setUnit] = useState<UnitData>(unitData);
     const { id, title, sub_units, description, text_content, status } = unit;
 
@@ -54,8 +66,8 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
     const unitScopeRef = String(id);
 
     return (
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="p-8 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
+        <div className="relative z-10">
+            <div className="p-6 sm:p-8 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
                 <div className="flex items-center gap-3 mb-2">
                     <h1 className="text-2xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] sm:text-3xl">{title}</h1>
                     <StatusIcon status={status} />
@@ -76,18 +88,22 @@ export default function UnitComponent({ unitData, courseId }: UnitComponentProps
                                 section={sub_unit}
                                 courseId={courseId}
                                 onStatusUpdate={handleSubUnitStatusUpdate}
+                                focusUnitId={focusUnitId}
+                                questionCounts={questionCounts}
                             />
                         ))}
                     </div>
                 )}
 
-                <ExamPlayer
-                    courseId={courseId}
-                    scope="unit"
-                    scopeRef={unitScopeRef}
-                    label={`Unit: ${title}`}
-                    questionCount={25}
-                />
+                {hasScopedQuestions(questionCounts?.unit, unitScopeRef) && (
+                    <ExamPlayer
+                        courseId={courseId}
+                        scope="unit"
+                        scopeRef={unitScopeRef}
+                        label={`Unit: ${title}`}
+                        questionCount={25}
+                    />
+                )}
             </div>
         </div>
     );

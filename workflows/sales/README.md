@@ -9,4 +9,4 @@
 
 Reference docs: [`docs/sales/`](../docs/sales/)
 
-Data: `data/outreach/` · Scripts: `scripts/collect_school_contacts.py`, `scripts/draft_contact_emails.py`
+Data: `outreach/` · Scripts: `scripts/collect_school_contacts.py`, `scripts/draft_contact_emails.py`

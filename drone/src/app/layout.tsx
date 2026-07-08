@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./font-imports.css";
 import "./globals.css";
 import HeaderComponent from "./ui/components/header";
+import VerifyEmailBanner from "./ui/components/verify-email-banner";
 import FooterComponent from "./ui/components/footer";
 import PageAnalytics from "./ui/components/page-analytics";
 import { AuthProvider } from "./lib/auth-context";
@@ -107,6 +108,7 @@ export default function RootLayout({
             </a>
             <div className="relative z-10 flex min-h-screen flex-col">
               <HeaderComponent />
+              <VerifyEmailBanner />
               <main
                 id="main-content"
                 tabIndex={-1}

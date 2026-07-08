@@ -1,17 +1,22 @@
 'use client';
 
 import LoginComponent from '../ui/components/login';
+import LoginConversionPanel from '../ui/components/login-conversion-panel';
 import { useAuth } from '../lib/auth-context';
+import { stashPostAuthRedirect } from '../lib/auth-redirect';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import LoadingComponent from '../ui/components/loading';
-import PageShell from '../ui/components/page-shell';
 
 function LoginPageInner() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get('redirect');
+
+    useEffect(() => {
+        if (redirect) stashPostAuthRedirect(redirect);
+    }, [redirect]);
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -24,9 +29,12 @@ function LoginPageInner() {
     }
 
     return (
-        <PageShell maxWidthClass="max-w-lg">
-            <LoginComponent redirectPath={redirect ?? undefined} />
-        </PageShell>
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <LoginComponent redirectPath={redirect ?? undefined} />
+                <LoginConversionPanel redirect={redirect ?? undefined} />
+            </div>
+        </div>
     );
 }
 

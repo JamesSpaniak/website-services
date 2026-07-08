@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { getCourseById } from '@/app/lib/api-client';
 import { useAuth } from '@/app/lib/auth-context';
 import AuthGuard from '@/app/lib/auth-guard';
@@ -11,15 +13,61 @@ import CourseOutlineSidebar from '@/app/ui/components/course-outline-sidebar';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import { CourseData, UnitData } from '@/app/lib/types/course';
-import { findUnitInTree, unitNavNeighbors } from '@/app/lib/course-tree';
+import {
+    findUnitInTree,
+    isUnitPreviewAccessible,
+    unitAncestors,
+    unitNavNeighbors,
+    unitPageTarget,
+} from '@/app/lib/course-tree';
+import { coursePath, unitPath, FOCUS_QUERY } from '@/app/lib/auth-redirect';
+
+function LockedUnitNotice({ courseId, unitTitle, price }: { courseId: number; unitTitle: string; price: number }) {
+    return (
+        <div className="mt-6 p-8 border border-[var(--surface-border)] bg-[var(--surface)] text-center" style={{ borderRadius: 'var(--radius-md)' }}>
+            <div className="inline-flex p-3 bg-[var(--brand-primary)]/10 rounded-xl mb-4">
+                <LockClosedIcon className="h-7 w-7 text-[var(--brand-primary)]" />
+            </div>
+            <h2 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">{unitTitle}</h2>
+            <p className="mt-3 text-sm text-[var(--brand-muted)] leading-relaxed">
+                This unit is part of the full course. Unit 1 is free — unlock the rest with a one-time purchase
+                for lifetime access to all units, practice exams, and progress tracking.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                <Link
+                    href={coursePath(courseId, true)}
+                    className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
+                >
+                    {price > 0 ? `Unlock full course — $${price}` : 'Unlock full course'}
+                </Link>
+                <Link
+                    href={coursePath(courseId)}
+                    className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
+                >
+                    Back to course
+                </Link>
+            </div>
+        </div>
+    );
+}
 
 function UnitPageContent() {
     const { courseId, unitId } = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const focusUnitId = searchParams.get(FOCUS_QUERY);
     const { isLoading: isAuthLoading } = useAuth();
     const [course, setCourse] = useState<CourseData | null>(null);
-    const [unit, setUnit] = useState<UnitData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const parsedCourseId = parseInt(courseId as string);
+    const decodedUnitId = useMemo(() => {
+        const rawId = Array.isArray(unitId) ? unitId[0] : unitId;
+        return rawId != null ? decodeURIComponent(String(rawId)) : '';
+    }, [unitId]);
 
     useEffect(() => {
         if (isAuthLoading || !courseId || !unitId) {
@@ -27,29 +75,33 @@ function UnitPageContent() {
             return;
         }
 
-        const fetchUnit = async () => {
+        const fetchCourse = async () => {
             setLoading(true);
             setError(null);
             try {
                 const courseData: CourseData = await getCourseById(parseInt(courseId as string));
-                const rawId = Array.isArray(unitId) ? unitId[0] : unitId;
-                const decodedId = rawId != null ? decodeURIComponent(String(rawId)) : '';
-                const foundUnit = findUnitInTree(courseData.units, decodedId);
                 setCourse(courseData);
-                setUnit(foundUnit ?? null);
-                if (!foundUnit) {
-                    setError('Unit not found in this course.');
-                }
             } catch (e) {
                 setError(e instanceof Error ? e.message : 'An unknown error occurred while fetching unit.');
             }
             setLoading(false);
         };
 
-        fetchUnit();
+        fetchCourse();
     }, [courseId, unitId, isAuthLoading]);
 
-    if (loading || isAuthLoading) {
+    // Deep leaf nodes don't get their own page — send the user to the parent
+    // unit's page with the leaf focused, so its context (unit/section) is visible.
+    const pageTarget = course ? unitPageTarget(course.units, decodedUnitId) : null;
+    const needsRedirect = pageTarget != null && pageTarget.focusUnitId != null;
+
+    useEffect(() => {
+        if (needsRedirect && pageTarget) {
+            router.replace(unitPath(parsedCourseId, pageTarget.pageUnitId, pageTarget.focusUnitId));
+        }
+    }, [needsRedirect, pageTarget, parsedCourseId, router]);
+
+    if (loading || isAuthLoading || needsRedirect) {
         return <LoadingComponent />;
     }
 
@@ -57,34 +109,51 @@ function UnitPageContent() {
         return <ErrorComponent message={error} />;
     }
 
+    const unit = course ? findUnitInTree(course.units, decodedUnitId) : undefined;
     if (!unit || !course) {
-        return <ErrorComponent message="Unit not found." />;
+        return <ErrorComponent message="Unit not found in this course." />;
     }
 
-    const parsedCourseId = parseInt(courseId as string);
-    const decodedUnitId = decodeURIComponent(String(Array.isArray(unitId) ? unitId[0] : unitId));
+    const ancestors = unitAncestors(course.units, decodedUnitId);
     const { prev, next } = unitNavNeighbors(course.units, decodedUnitId);
+    const unitLocked = course.has_access === false && !isUnitPreviewAccessible(course.units, decodedUnitId);
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-                <div className="lg:col-span-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+                <div className="lg:col-span-8 xl:col-span-9 min-w-0">
                     <CourseUnitNav
                         courseId={parsedCourseId}
                         courseTitle={course.title}
                         unitTitle={unit.title}
+                        ancestors={ancestors}
                         prev={prev}
                         next={next}
                     />
-                    <UnitComponent unitData={unit} courseId={parsedCourseId} />
+                    {unitLocked ? (
+                        <LockedUnitNotice
+                            courseId={parsedCourseId}
+                            unitTitle={unit.title}
+                            price={Number(course.price) || 0}
+                        />
+                    ) : (
+                        <UnitComponent
+                            unitData={unit}
+                            courseId={parsedCourseId}
+                            focusUnitId={focusUnitId}
+                            questionCounts={course.question_counts}
+                        />
+                    )}
                 </div>
-                <aside className="mt-8 lg:mt-0 hidden lg:block">
-                    <CourseOutlineSidebar
-                        courseId={parsedCourseId}
-                        units={course.units}
-                        hasAccess={course.has_access !== false}
-                        activeUnitId={decodedUnitId}
-                    />
+                <aside className="mt-8 lg:mt-0 hidden lg:block lg:col-span-4 xl:col-span-3">
+                    <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
+                        <CourseOutlineSidebar
+                            courseId={parsedCourseId}
+                            units={course.units}
+                            hasAccess={course.has_access !== false}
+                            activeUnitId={focusUnitId ?? decodedUnitId}
+                        />
+                    </div>
                 </aside>
             </div>
         </div>
@@ -94,7 +163,9 @@ function UnitPageContent() {
 export default function SingleUnitPage() {
     return (
         <AuthGuard>
-            <UnitPageContent />
+            <Suspense fallback={<LoadingComponent />}>
+                <UnitPageContent />
+            </Suspense>
         </AuthGuard>
     );
 }

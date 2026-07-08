@@ -61,11 +61,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.project_name}-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
@@ -84,11 +84,11 @@ resource "aws_iam_policy" "secrets_manager_policy" {
   description = "Allow ECS tasks to read backend secrets"
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
@@ -98,6 +98,7 @@ resource "aws_iam_policy" "secrets_manager_policy" {
           aws_secretsmanager_secret.stripe_webhook_secret.arn,
           aws_secretsmanager_secret.jwt_secret.arn,
           aws_secretsmanager_secret.admin_seed_password.arn,
+          aws_secretsmanager_secret.test_user_password.arn,
           aws_secretsmanager_secret.grafana_otel_headers.arn,
           aws_secretsmanager_secret.cloudfront_signing_private_key.arn
         ]
@@ -115,11 +116,11 @@ resource "aws_iam_role" "ecs_task_role" {
   name = "${var.project_name}-ecs-task-role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
@@ -133,11 +134,11 @@ resource "aws_iam_policy" "cloudwatch_logs_policy" {
   description = "Allows ECS tasks to write logs to CloudWatch via Winston"
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:DescribeLogStreams"
@@ -158,7 +159,7 @@ resource "aws_iam_policy" "s3_media_policy" {
   description = "Allow ECS backend tasks to manage objects in the media S3 bucket and invalidate CloudFront"
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -215,7 +216,7 @@ resource "aws_ecs_task_definition" "api_server" {
         }
       }
       # Pass database credentials securely from Secrets Manager
-      secrets = [
+      secrets = concat([
         {
           name      = "DB_PASSWORD"
           valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:password::"
@@ -244,8 +245,13 @@ resource "aws_ecs_task_definition" "api_server" {
           name      = "CLOUDFRONT_SIGNING_PRIVATE_KEY"
           valueFrom = aws_secretsmanager_secret.cloudfront_signing_private_key.arn
         }
-      ]
-      environment = [
+        ], var.seed_test_data ? [
+        {
+          name      = "TEST_USER_PASSWORD"
+          valueFrom = aws_secretsmanager_secret.test_user_password.arn
+        }
+      ] : [])
+      environment = concat([
         { name = "DB_HOST", value = aws_rds_cluster.aurora_cluster.endpoint },
         { name = "DB_USER", value = jsondecode(aws_secretsmanager_secret_version.db_credentials.secret_string).username },
         { name = "DB_NAME", value = "blog" },
@@ -268,10 +274,15 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "https://otlp-gateway-prod-us-east-2.grafana.net/otlp" },
         { name = "OTEL_EXPORTER_OTLP_PROTOCOL", value = "http/protobuf" },
         { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id },
-        { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id }
-      ]
+        { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id },
+        { name = "SEED_TEST_DATA", value = tostring(var.seed_test_data) }
+      ])
     }
   ])
+
+  # Ensure the test-user secret has a value before the task (which references it
+  # when seeding) is registered/started.
+  depends_on = [aws_secretsmanager_secret_version.test_user_password]
 
   lifecycle {
     ignore_changes = [container_definitions]
@@ -294,6 +305,15 @@ resource "aws_ecs_service" "api_server" {
     target_group_arn = aws_lb_target_group.api_internal_tg.arn
     container_name   = "api-server"
     container_port   = 3000
+  }
+
+  # pipeline.sh owns image rollouts: it registers new task definition revisions
+  # via the AWS CLI and points the service at them. Terraform's copy of the
+  # task definition is frozen (ignore_changes on container_definitions above),
+  # so without this rule every `terraform apply` would silently revert the
+  # service to the stale revision in state — rolling back deploys.
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 
   depends_on = [aws_lb_listener.backend_internal_http]

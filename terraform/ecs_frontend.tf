@@ -168,6 +168,13 @@ resource "aws_ecs_service" "frontend" {
     container_port   = 8080
   }
 
+  # pipeline.sh owns image rollouts (registers task definition revisions via
+  # the AWS CLI). Without this rule, `terraform apply` reverts the service to
+  # the stale task definition revision held in state — rolling back deploys.
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
+
   depends_on = [aws_lb_listener.http, aws_lb_listener.https]
 }
 

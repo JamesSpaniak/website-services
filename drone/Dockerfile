@@ -10,6 +10,10 @@ ENV NEXT_PUBLIC_DEBUG_LOGGING=${NEXT_PUBLIC_DEBUG_LOGGING}
 ARG NEXT_PUBLIC_SITE_URL=https://thedroneedge.com
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 
+# Course id for home/login CTAs — differs per environment DB (35 in prod).
+ARG NEXT_PUBLIC_FEATURED_COURSE_ID=
+ENV NEXT_PUBLIC_FEATURED_COURSE_ID=${NEXT_PUBLIC_FEATURED_COURSE_ID}
+
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY src ./src

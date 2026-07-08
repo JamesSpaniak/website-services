@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import JsonLd, { organizationJsonLd, websiteJsonLd } from './ui/components/json-ld';
 import HomeAuthCta from './ui/components/home-auth-cta';
+import LoginConversionPanel from './ui/components/login-conversion-panel';
 import BrandLogo from './ui/components/brand-logo';
 import ImageComponent from './ui/components/image';
 import HeroScrollNext from './ui/components/hero-scroll-next';
 import { ArrowRightIcon, AcademicCapIcon, FilmIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 import { ArticleSlim } from './lib/types/article';
 import ArticlePreviewComponent from './ui/components/article-preview';
+import { FEATURED_COURSE_ID, registerHref } from './lib/auth-redirect';
 
 // ── Server-side data ──────────────────────────────────────────────────────────
 
@@ -39,27 +41,30 @@ const COURSE_TRACKS = [
     title: 'FAA Part 107',
     tagline: 'The certification prerequisite',
     desc: 'Federal airspace rules, weather, safety, and decision-making. Required knowledge before any drone program — recreational, commercial, or STEM.',
-    href: '/courses',
+    href: `/courses/${FEATURED_COURSE_ID}/preview`,
+    cta: 'View course',
   },
   {
     id: 'photo',
     Icon: FilmIcon,
-    badge: 'Creative Track',
+    badge: 'Coming soon',
     badgeCls: 'bg-violet-100/80 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
     title: 'Video & Photography',
     tagline: 'From flight to final cut',
     desc: 'Camera settings, cinematic composition, and professional editing in DaVinci Resolve. A complete production pipeline for aerial storytelling.',
     href: '/courses/tracks/video',
+    cta: 'Preview track',
   },
   {
     id: 'ai',
     Icon: CpuChipIcon,
-    badge: 'STEM Track',
+    badge: 'Coming soon',
     badgeCls: 'bg-sky-100/80 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
     title: 'AI & Drones',
     tagline: 'Machine learning meets autonomous flight',
     desc: 'Python, computer vision, and autonomous navigation using drones as the hands-on platform. Built for STEM programs and CS classes.',
     href: '/courses/tracks/ai',
+    cta: 'Preview track',
   },
 ] as const;
 
@@ -101,38 +106,44 @@ export default async function Home() {
         <JsonLd data={websiteJsonLd()} />
 
         {/* Hero content */}
-        <main className="relative z-[1] flex min-w-0 flex-col gap-12 max-w-2xl">
+        <section className="relative z-[1] flex min-w-0 flex-col gap-12 max-w-2xl">
           <div className="relative min-w-0">
-            <h1 className="sr-only">Drone Edge</h1>
             <div className="mb-8 max-w-full min-w-0 [filter:drop-shadow(0_2px_24px_var(--background))]">
               <BrandLogo variant="hero" />
             </div>
             <p className="font-mono text-sm tracking-widest text-[var(--brand-subtle)] uppercase mb-2 [text-shadow:0_1px_3px_var(--background),0_0_20px_var(--background)]">
               Learn · Practice · Certify
             </p>
-            <p className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] max-w-md [text-shadow:0_1px_4px_var(--background),0_0_32px_var(--background)]">
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] max-w-md [text-shadow:0_1px_4px_var(--background),0_0_32px_var(--background)]">
               FAA Part 107 and beyond. Technical education for the field.
-            </p>
+            </h1>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/courses"
+              href={registerHref(`/courses/${FEATURED_COURSE_ID}`)}
               className="inline-flex items-center justify-center min-h-[44px] bg-[var(--brand-primary)] text-[var(--brand-black)] font-medium text-sm tracking-wide px-5 hover:opacity-90 transition-opacity ring-focus touch-manipulation"
+              style={{ borderRadius: 'var(--radius-sm)' }}
+            >
+              Try Unit 1 free
+            </Link>
+            <Link
+              href={`/courses/${FEATURED_COURSE_ID}/preview`}
+              className="inline-flex items-center justify-center min-h-[44px] border border-[var(--surface-border)] text-[var(--brand-foreground)] font-medium text-sm tracking-wide px-5 hover:bg-[var(--surface)] transition-colors ring-focus touch-manipulation"
+              style={{ borderRadius: 'var(--radius-sm)' }}
+            >
+              Part 107 course — $29
+            </Link>
+            <Link
+              href="/courses"
+              className="inline-flex items-center justify-center min-h-[44px] border border-[var(--surface-border)] text-[var(--brand-foreground)] font-medium text-sm tracking-wide px-5 hover:bg-[var(--surface)] transition-colors ring-focus touch-manipulation"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
               Courses
             </Link>
-            <Link
-              href="/articles"
-              className="inline-flex items-center justify-center min-h-[44px] border border-[var(--surface-border)] text-[var(--brand-foreground)] font-medium text-sm tracking-wide px-5 hover:bg-[var(--surface)] transition-colors ring-focus touch-manipulation"
-              style={{ borderRadius: 'var(--radius-sm)' }}
-            >
-              Articles
-            </Link>
             <HomeAuthCta />
           </div>
-        </main>
+        </section>
 
         <HeroScrollNext />
       </div>
@@ -163,7 +174,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {COURSE_TRACKS.map(({ id, Icon, badge, badgeCls, title, tagline, desc, href }) => (
+            {COURSE_TRACKS.map(({ id, Icon, badge, badgeCls, title, tagline, desc, href, cta }) => (
               <Link
                 key={id}
                 href={href}
@@ -190,7 +201,7 @@ export default async function Home() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-xs font-medium text-[var(--brand-primary)] mt-auto">
-                  View course
+                  {cta}
                   <ArrowRightIcon className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </Link>
@@ -283,6 +294,15 @@ export default async function Home() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── Closing CTA ─────────────────────────────────────────────────── */}
+      <section className="bg-[var(--background)] border-t border-[var(--surface-border)]">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+          <div className="max-w-xl mx-auto">
+            <LoginConversionPanel featuredCourseId={FEATURED_COURSE_ID} />
+          </div>
         </div>
       </section>
 

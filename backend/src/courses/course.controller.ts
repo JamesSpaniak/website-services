@@ -1,4 +1,5 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Post, Put, Request, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Logger, NotFoundException, Param, ParseIntPipe, Post, Put, Request, Res, SerializeOptions, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import type { Response } from "express";
 import { CourseService } from "./course.service";
 import { CourseDetails, UnitData } from "./types/course.dto";
 import { Course } from "./types/course.entity";
@@ -35,7 +36,8 @@ export class CourseController {
     @UseGuards(OptionalJwtAuthGuard)
     @Get()
     async getCourses(@Request() req): Promise<CourseDetails[]> {
-      const courses: Course[] = await this.courseService.getCourses();
+      const isAdmin = req.user?.role === Role.Admin;
+      const courses: Course[] = await this.courseService.getCourses(isAdmin);
       
       const courseDetailsPromises = courses.map(async (course) => {
         const payload: CourseDetails = JSON.parse(course.payload);
@@ -95,7 +97,12 @@ export class CourseController {
       }
       this.logger.log(`User '${req.user.username}' requesting course ID ${id}`);
       const hasAccess = await this.courseService.hasAccess(id, req.user);
-      return this.progressService.getCourseWithProgress(req.user.userId, id, hasAccess);
+      const [details, questionCounts] = await Promise.all([
+        this.progressService.getCourseWithProgress(req.user.userId, id, hasAccess),
+        this.courseService.getQuestionCounts(id),
+      ]);
+      details.question_counts = questionCounts;
+      return details;
     }
   
     /**
@@ -152,11 +159,13 @@ export class CourseController {
     }
 
     /**
-     * Returns a signed video URL for a specific unit in a course.
-     * Generates the URL lazily — only for the unit the user is viewing.
+     * Returns a playable video URL for a specific unit in a course.
+     * Single-file videos (mp4) get an exact signed URL. HLS playlists are
+     * authorized with CloudFront signed cookies instead — a signed playlist
+     * URL alone would leave every segment request unsigned (403).
      */
     @ApiOperation({ summary: 'Get signed media URL for a course unit' })
-    @ApiResponse({ status: 200, description: 'Signed video URL for the unit.' })
+    @ApiResponse({ status: 200, description: 'Playable video URL for the unit (signed cookies set for HLS).' })
     @ApiResponse({ status: 403, description: 'User does not have access to this course.' })
     @Get(':courseId/units/:unitId/media')
     @ApiBearerAuth()
@@ -165,6 +174,7 @@ export class CourseController {
       @Request() req,
       @Param('courseId', ParseIntPipe) courseId: number,
       @Param('unitId') unitId: string,
+      @Res({ passthrough: true }) res: Response,
     ): Promise<{ video_url?: string }> {
       const course = await this.courseService.getCourseById(courseId);
       if (!course) {
@@ -180,6 +190,19 @@ export class CourseController {
       const unit = this.findUnit(payload.units, unitId);
       if (!unit) {
         throw new NotFoundException(`Unit with ID ${unitId} not found`);
+      }
+
+      if (this.signedUrlService.isProtectedHlsUrl(unit.video_url)) {
+        const cookies = this.signedUrlService.signedVideoCookies();
+        if (cookies) {
+          const options = this.signedUrlService.videoCookieOptions();
+          for (const [name, value] of Object.entries(cookies)) {
+            res.cookie(name, value, options);
+          }
+        }
+        return {
+          video_url: this.signedUrlService.toAbsoluteMediaUrl(unit.video_url),
+        };
       }
 
       return {
