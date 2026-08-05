@@ -27,6 +27,10 @@ Legacy batch payloads: `assets/articles/*.json` → admin article editor.
 
 News pipeline: [`workflows/marketing/content-and-seo.md`](../marketing/content-and-seo.md) (`assets/news/`).
 
+## Course images
+
+Bulk image insertion (map folder → review → upload → merge): [`course-images.md`](course-images.md), driven by `scripts/course_images.py`.
+
 ## Video upload
 
 **Open:** Finish recordings for all Part 107 unit/section nodes — see [`docs/TODO.md`](../../docs/TODO.md) P0.

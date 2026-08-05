@@ -27,7 +27,7 @@ SRC = REPO / "assets/courses/Compiled Question Bank Sorted.xlsx - questions sort
 OUT_BULK = REPO / "assets/courses/faa_107_questions_unit_level.bulk.json"
 OUT_REVIEW = REPO / "assets/courses/faa_107_questions_unit_level_review.csv"
 
-# Top-level unit refs in assets/courses/faa_107_course_refs.json:
+# Top-level unit refs in assets/courses/faa_107_course.json:
 #   u1  PART 107 REGULATIONS            u6  WEATHER EFFECTS ON AIRCRAFT PERFORMANCE
 #   u2  Airports, Airspace, Data Sources u7  LOADING AND PERFORMANCE
 #   u3  Airspace Classifications         u8  EMERGENCY PROCEDURES

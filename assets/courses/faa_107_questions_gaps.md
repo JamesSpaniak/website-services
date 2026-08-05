@@ -243,13 +243,11 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 | 5 | 55 | Terminal Aerodrome Forecast (TAF) Decoding |
 | 5 | 552 | Valid Period and Core Forecast Elements |
 | 5 | 553 | Forecast Change Groups (FM, TEMPO, PROB) |
-| 6 | 60 | What Is Weather? |
 | 6 | 61 | Air Pressure, Density, and Altitude Effects |
 | 6 | 62 | Pressure, Humidity, and Performance |
 | 6 | 63 | Wind, Turbulence, and Severe Wind Hazards |
 | 6 | 633 | Operational Wind Risk Decisions |
-| 6 | 64 | Atmospheric Stability and Temperature Inversions |
-| 6 | 641 | Atmospheric Stability and Convective Currents |
+| 6 | 64 | Atmospheric Stability |
 | 6 | 65 | Dew Point and Structural Icing Hazards |
 | 6 | 66 | Clouds and Thunderstorm Life Cycle |
 | 6 | 67 | Fronts, Mountain Flying, and Operational Minimums |
@@ -284,33 +282,20 @@ These sub-units have no questions assigned. Consider authoring a few core questi
 | 7 | 729 | SAFETY CONSIDERATIONS |
 | 7 | 730 | KEY TAKEAWAYS |
 | 7 | 731 | QUESTIONS AND COMMENTS |
-| 8 | 82 | Preflight Planning, Checklists, and Crew Briefing |
-| 8 | 83 | Regulatory Deviation and Documentation |
-| 8 | 84 | Example Emergency Scenario |
+| 8 | 81 | Emergency Preparedness and Response |
 | 9 | 91 | Aeronautical Decision Making (ADM) |
-| 9 | 912 | Steps to Good Decision Making (Part 2) |
 | 9 | 92 | Risk Management |
 | 9 | 921 | Hazards and Risk Assessment |
 | 9 | 922 | Hazardous Attitudes and Antidotes |
-| 9 | 923 | Mitigating Risks: IMSAFE Checklist |
-| 9 | 924 | Mitigating Risks: PAVE Checklist |
-| 9 | 93 | Crew and Single-Pilot Resource Management |
+| 9 | 923 | Mitigating Risks: IMSAFE and PAVE Checklists |
+| 9 | 93 | Workload and Crew Resource Management |
 | 9 | 931 | Workload Management |
 | 9 | 933 | Situational Awareness |
-| 9 | 94 | Physiology and Vision |
-| 9 | 942 | Collision Threat Detection |
-| 10 | 101 | Radio Communication in the NAS |
-| 10 | 102 | Understanding Proper Radio Procedures |
-| 10 | 103 | Phonetic Alphabet |
-| 10 | 104 | Common Traffic Advisory Frequency (CTAF) |
-| 10 | 105 | Communication Frequencies and Chart Supplements |
-| 10 | 106 | Recommended Traffic Advisory Practices for Remote Pilots |
-| 10 | 1062 | UNICOM |
-| 10 | 1063 | MULTICOM |
-| 10 | 1064 | Flight Service Station (FSS) |
-| 10 | 107 | Aircraft Call Signs and Identification |
-| 10 | 108 | Standard Radio Calls for Incoming Aircraft |
-| 10 | 1081 | Initial 10-Mile Call |
+| 9 | 94 | Physiology |
+| 9 | 940 | Physiology |
+| 10 | 101 | Radio Communication Fundamentals |
+| 10 | 104 | CTAF, Frequencies, and Advisory Services |
+| 10 | 107 | Aircraft Identification and Standard Radio Calls |
 
 ### 4. Unclassified rows
 

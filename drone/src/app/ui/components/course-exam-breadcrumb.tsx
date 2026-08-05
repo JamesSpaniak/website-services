@@ -18,7 +18,7 @@ export default function CourseExamBreadcrumb({ crumbs }: CourseExamBreadcrumbPro
             <ol className="flex flex-wrap items-center gap-1 text-[var(--brand-muted)]">
                 {crumbs.map((crumb, i) => (
                     <li key={`${crumb.label}-${i}`} className="flex items-center gap-1">
-                        {i > 0 && <ChevronRightIcon className="h-3.5 w-3.5 shrink-0" />}
+                        {i > 0 && <ChevronRightIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                         {crumb.href ? (
                             <Link
                                 href={crumb.href}
@@ -27,7 +27,7 @@ export default function CourseExamBreadcrumb({ crumbs }: CourseExamBreadcrumbPro
                                 {crumb.label}
                             </Link>
                         ) : (
-                            <span className="text-[var(--brand-foreground)] font-medium">{crumb.label}</span>
+                            <span aria-current="page" className="text-[var(--brand-foreground)] font-medium">{crumb.label}</span>
                         )}
                     </li>
                 ))}

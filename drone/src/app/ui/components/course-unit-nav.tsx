@@ -40,9 +40,10 @@ export default function CourseUnitNav({
                 {prev ? (
                     <Link
                         href={unitHref(prev.id)}
+                        aria-label={`Previous unit: ${prev.title}`}
                         className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors"
                     >
-                        <ChevronLeftIcon className="h-4 w-4 shrink-0" />
+                        <ChevronLeftIcon className="h-4 w-4 shrink-0" aria-hidden />
                         <span className="truncate max-w-[12rem] sm:max-w-xs">{prev.title}</span>
                     </Link>
                 ) : (
@@ -51,10 +52,11 @@ export default function CourseUnitNav({
                 {next ? (
                     <Link
                         href={unitHref(next.id)}
+                        aria-label={`Next unit: ${next.title}`}
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand-primary)] hover:opacity-80 transition-opacity ml-auto"
                     >
                         <span className="truncate max-w-[12rem] sm:max-w-xs">{next.title}</span>
-                        <ChevronRightIcon className="h-4 w-4 shrink-0" />
+                        <ChevronRightIcon className="h-4 w-4 shrink-0" aria-hidden />
                     </Link>
                 ) : null}
             </div>

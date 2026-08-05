@@ -13,6 +13,8 @@ interface CoursePreviewProps {
     title: string;
     sub_title?: string;
     images_url?: string[];
+    /** CSS object-position for the 16:9 cover crop (same as course hero). */
+    image_focal_point?: string;
     unitCount: number;
     price?: number;
     has_access?: boolean;
@@ -23,6 +25,7 @@ export default function CoursePreviewComponent({
     title,
     sub_title,
     images_url,
+    image_focal_point,
     unitCount,
     price,
     has_access,
@@ -31,6 +34,7 @@ export default function CoursePreviewComponent({
     const images = mergeCourseImages({ images_url });
     const [imgIdx, setImgIdx] = useState(0);
     const n = images.length;
+    const objectPosition = image_focal_point?.trim() || 'center';
 
     const goImg = (delta: number) => {
         if (n <= 1) return;
@@ -61,7 +65,8 @@ export default function CoursePreviewComponent({
                         src={images[imgIdx]}
                         alt={`${title} — preview ${imgIdx + 1} of ${n}`}
                         fill
-                        className="relative z-[1] object-cover object-center pointer-events-none"
+                        className="relative z-[1] object-cover pointer-events-none"
+                        style={{ objectPosition }}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     {n > 1 && (

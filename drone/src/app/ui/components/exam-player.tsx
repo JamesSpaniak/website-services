@@ -77,7 +77,8 @@ function ExamProgressBar({ answered, total }: { answered: number; total: number 
                 aria-valuenow={answered}
                 aria-valuemin={0}
                 aria-valuemax={total}
-                aria-label={`${answered} of ${total} questions answered`}
+                aria-valuetext={`${answered} of ${total} questions answered`}
+                aria-label="Exam progress"
             >
                 <div
                     className="h-full rounded-full bg-[var(--brand-primary)] transition-all duration-300"
@@ -197,6 +198,15 @@ export default function ExamPlayer({
     const [result, setResult] = useState<ExamAttemptResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const phaseRef = useRef<Phase>('idle');
+    const takingHeaderRef = useRef<HTMLDivElement>(null);
+    const resultsRef = useRef<HTMLDivElement>(null);
+
+    // Move keyboard/SR focus into the exam when it starts and to the score when results land,
+    // so the phase change is announced instead of leaving focus on a removed button.
+    useEffect(() => {
+        if (phase === 'taking') takingHeaderRef.current?.focus();
+        if (phase === 'results') resultsRef.current?.focus();
+    }, [phase]);
 
     const scopeLabel = label ?? (scope === 'full_course' ? 'Full Course' : `Scope ${scopeRef}`);
     const examKindLabel = examId != null ? 'Assigned Exam' : examPool === 'final_only' ? 'Final Exam' : 'Practice Exam';
@@ -318,7 +328,9 @@ export default function ExamPlayer({
     const jumpToQuestion = useCallback((index: number) => {
         const prefix = isPage ? 'exam-q-' : 'exam-q-inline-';
         const el = document.getElementById(`${prefix}${index + 1}`);
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!el) return;
+        el.focus({ preventScroll: true });
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, [isPage]);
 
     // ── Idle / Generating ─────────────────────────────────────────────────────
@@ -419,7 +431,8 @@ export default function ExamPlayer({
                     <div
                         key={q.id}
                         role="listitem"
-                        className={`p-5 border border-[var(--surface-border)] bg-[var(--background)] rounded-lg ${isPage ? 'scroll-mt-28' : ''}`}
+                        tabIndex={-1}
+                        className={`p-5 border border-[var(--surface-border)] bg-[var(--background)] rounded-lg outline-none ${isPage ? 'scroll-mt-28' : ''}`}
                         id={isPage ? `exam-q-${idx + 1}` : `exam-q-inline-${idx + 1}`}
                     >
                         <p className="text-xs font-mono text-[var(--brand-muted)] mb-2">
@@ -487,7 +500,7 @@ export default function ExamPlayer({
         if (isPage) {
             return (
                 <div className={sectionClass}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div ref={takingHeaderRef} tabIndex={-1} className="flex items-center justify-between mb-6 outline-none">
                         <div>
                             <p className="text-lg font-display font-semibold text-[var(--brand-foreground)]">
                                 {examKindLabel} — {scopeLabel}
@@ -499,6 +512,7 @@ export default function ExamPlayer({
                         <button
                             type="button"
                             onClick={handleRetake}
+                            aria-label="Cancel exam and discard answers"
                             className="text-sm text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors"
                         >
                             Cancel
@@ -517,7 +531,7 @@ export default function ExamPlayer({
                     )}
 
                     <div className="fixed bottom-0 inset-x-0 z-30 border-t border-[var(--surface-border)] bg-[var(--background)]/95 backdrop-blur-sm">
-                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6">
                             <ExamProgressBar answered={answeredCount} total={exam.questions.length} />
                             <ExamSubmitControls phase={phase} allAnswered={allAnswered} remaining={remainingCount} onSubmit={handleSubmit} compact />
                         </div>
@@ -528,7 +542,7 @@ export default function ExamPlayer({
 
         return (
             <div className={sectionClass}>
-                <div className="flex items-center justify-between mb-6">
+                <div ref={takingHeaderRef} tabIndex={-1} className="flex items-center justify-between mb-6 outline-none">
                     <div>
                         <p className="text-base font-display font-semibold text-[var(--brand-foreground)]">
                             {examKindLabel} — {scopeLabel}
@@ -537,7 +551,7 @@ export default function ExamPlayer({
                             {exam.questions.length} questions · {answeredCount} answered
                         </p>
                     </div>
-                    <button type="button" onClick={handleRetake} className="text-xs text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors">
+                    <button type="button" onClick={handleRetake} aria-label="Cancel exam and discard answers" className="text-xs text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors">
                         Cancel
                     </button>
                 </div>
@@ -559,7 +573,11 @@ export default function ExamPlayer({
 
         return (
             <div className={sectionClass}>
-                <div className={`p-6 rounded-xl mb-6 ${passed ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
+                <div
+                    ref={resultsRef}
+                    tabIndex={-1}
+                    className={`p-6 rounded-xl mb-6 outline-none ${passed ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
+                >
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div>
                             <p className="text-xs font-mono text-[var(--brand-muted)] uppercase tracking-wide mb-1">
@@ -622,11 +640,12 @@ export default function ExamPlayer({
                                 <div key={q.id} className={`p-4 border rounded-lg ${isCorrect ? 'border-green-500/20 bg-green-500/5' : 'border-red-500/20 bg-red-500/5'}`}>
                                     <div className="flex items-start gap-2 mb-3">
                                         {isCorrect ? (
-                                            <CheckCircleIcon className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="h-4 w-4 text-green-400 shrink-0 mt-0.5" aria-hidden />
                                         ) : (
-                                            <XCircleIcon className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+                                            <XCircleIcon className="h-4 w-4 text-red-400 shrink-0 mt-0.5" aria-hidden />
                                         )}
                                         <p className="text-sm font-medium text-[var(--brand-foreground)]">
+                                            <span className="sr-only">{isCorrect ? 'Correct. ' : 'Incorrect. '}</span>
                                             {idx + 1}. {q.question_text}
                                         </p>
                                     </div>
@@ -645,8 +664,8 @@ export default function ExamPlayer({
                                                               : 'text-[var(--brand-muted)]'
                                                     }`}
                                                 >
-                                                    {wasSelected && isCorrect && <CheckCircleIcon className="h-3.5 w-3.5 shrink-0" />}
-                                                    {wasSelected && !isCorrect && <XCircleIcon className="h-3.5 w-3.5 shrink-0" />}
+                                                    {wasSelected && isCorrect && <CheckCircleIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />}
+                                                    {wasSelected && !isCorrect && <XCircleIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                                                     <span>{choice.text}</span>
                                                     {wasSelected && (
                                                         <span className="ml-auto text-xs opacity-70">

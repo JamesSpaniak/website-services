@@ -71,6 +71,7 @@ Good first contacts:
 
 Suggested research sources:
 
+- **`outreach/DroneEdge School District Research.xlsx`** — Mid-Atlantic district superintendent + curriculum contacts (PA/NJ/DE). Import with `scripts/import_district_research.py`.
 - District staff directories.
 - School board agendas and CTE program pages.
 - State CTE directories.

@@ -66,45 +66,19 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
     };
 
     return (
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-12">
             <JsonLd data={courseJsonLd(course)} />
             {!fullAccess && paidCourse && (
                 <CoursePurchaseBanner course={course} onPurchaseClick={() => setShowPurchase(true)} />
             )}
-            <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-                <div className="lg:col-span-2">
-                    <div className="mb-8 space-y-4 overflow-hidden">
-                        {heroImages.length > 0 && (
-                            <CourseImageStrip images={heroImages} alt={title} objectPosition={image_focal_point} />
-                        )}
-                        {video_url && fullAccess && (
-                            <div className="overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
-                                <VideoComponent src={video_url} className="w-full" title={title} />
-                            </div>
-                        )}
-                    </div>
-                    <div className="space-y-4">
-                        {units?.map((unit) => (
-                            <UnitPreviewComponent
-                                key={unit.id}
-                                unit={unit}
-                                courseId={courseId}
-                                locked={!fullAccess && !isUnitPreviewAccessible(units, String(unit.id))}
-                                onStatusUpdate={handleUnitStatusUpdate}
-                            />
-                        ))}
-                    </div>
-                    {fullAccess && (
-                        <CourseExamsSection courseId={courseId} examSummary={course.exam_summary} />
-                    )}
-                </div>
-
-                <div className="mt-8 lg:mt-0 space-y-6">
+            {/* Sidebar (with the course h1) comes first in DOM for a sane heading/reading order; the grid places it visually on the right on lg+. */}
+            <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
+                <div className="lg:col-start-2 lg:row-start-1 space-y-6">
                     <div className="p-6 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
                         <h1 className="text-xl font-display font-semibold tracking-tight text-[var(--brand-foreground)]">{title}</h1>
                         {sub_title && <p className="mt-2 text-sm text-[var(--brand-muted)]">{sub_title}</p>}
 
-                        <h3 className="mt-6 pt-6 border-t border-[var(--surface-border)] text-sm font-display font-semibold text-[var(--brand-foreground)]">Info</h3>
+                        <h2 className="mt-6 pt-6 border-t border-[var(--surface-border)] text-sm font-display font-semibold text-[var(--brand-foreground)]">Info</h2>
                         <div className="mt-4 space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-[var(--brand-muted)]">Status</span>
@@ -153,6 +127,33 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
                         units={units}
                         hasAccess={fullAccess}
                     />
+                </div>
+
+                <div className="mt-8 lg:mt-0 lg:col-start-1 lg:row-start-1 min-w-0">
+                    <div className="mb-8 space-y-4 overflow-hidden">
+                        {heroImages.length > 0 && (
+                            <CourseImageStrip images={heroImages} alt={title} fit="cover" objectPosition={image_focal_point} />
+                        )}
+                        {video_url && fullAccess && (
+                            <div className="overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
+                                <VideoComponent src={video_url} className="w-full" title={title} />
+                            </div>
+                        )}
+                    </div>
+                    <div className="space-y-4">
+                        {units?.map((unit) => (
+                            <UnitPreviewComponent
+                                key={unit.id}
+                                unit={unit}
+                                courseId={courseId}
+                                locked={!fullAccess && !isUnitPreviewAccessible(units, String(unit.id))}
+                                onStatusUpdate={handleUnitStatusUpdate}
+                            />
+                        ))}
+                    </div>
+                    {fullAccess && (
+                        <CourseExamsSection courseId={courseId} examSummary={course.exam_summary} />
+                    )}
                 </div>
             </div>
         </div>

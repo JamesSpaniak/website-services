@@ -85,7 +85,7 @@ function AssignedExamPageInner() {
     ];
 
     return (
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <CourseExamBreadcrumb crumbs={crumbs} />
             <header className="mb-8">
                 <h1 className="text-2xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] sm:text-3xl">

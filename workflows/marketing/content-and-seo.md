@@ -1,6 +1,6 @@
 # Content & SEO workflow
 
-Recurring marketing work: articles, SEO/GEO, and promotion. Strategy detail: [`docs/marketing/seo-geo-strategy.md`](../../docs/marketing/seo-geo-strategy.md).
+Recurring marketing work: articles, SEO/GEO, and promotion. Strategy detail: [`docs/marketing/seo-geo-strategy.md`](../../docs/marketing/seo-geo-strategy.md). **Before drafting any content, read [`docs/marketing/content-vision.md`](../../docs/marketing/content-vision.md)** — the north star for AI-drafted and AI-cited content.
 
 ## Publish a news / article piece
 

@@ -75,6 +75,7 @@ export default async function CoursePreviewPage({
   const price = Number(course.price) || 0;
   const hero = mergeCourseImages(course)[0];
   const unitCount = course.units?.length ?? 0;
+  const heroPosition = course.image_focal_point?.trim() || 'center';
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -83,7 +84,14 @@ export default async function CoursePreviewPage({
 
       {hero && (
         <div className="relative aspect-video w-full overflow-hidden mb-8" style={{ borderRadius: 'var(--radius-md)' }}>
-          <ImageComponent src={hero} alt={course.title} fill className="object-cover" sizes="(max-width: 896px) 100vw, 896px" />
+          <ImageComponent
+            src={hero}
+            alt={course.title}
+            fill
+            className="object-cover"
+            style={{ objectPosition: heroPosition }}
+            sizes="(max-width: 896px) 100vw, 896px"
+          />
         </div>
       )}
 

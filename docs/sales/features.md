@@ -89,7 +89,7 @@ We want to **push this knowledge to a wider audience**: career switchers, CTE cl
 
 | Area | Capability |
 |------|------------|
-| **Admin dashboard** | Articles, courses, organizations, **analytics overview/daily** |
+| **Admin dashboard** | Articles, courses, **question bank**, organizations, **analytics overview/daily** — each area is its own route with a persistent tab bar |
 | **Course editor** | Visual + JSON modes; **hero + unit image lists**, **sub-units**; edit loads **`getCourseById`** for full tree |
 | **Media** | Presigned uploads, list, delete, **orphan scan/delete** (admin) |
 

@@ -4,12 +4,19 @@ import { useCallback, useState } from 'react';
 import ImageComponent from './image';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
+type ImageFit = 'cover' | 'contain';
+
 interface CourseImageStripProps {
     images: string[];
     alt: string;
     /**
-     * CSS `object-position` value controlling which part of the image stays in
-     * frame when the 16:9 crop is applied. Defaults to `"center"`.
+     * How the image fills its frame.
+     * - `contain` (default): show the whole image; letterbox tall/wide sources (unit figures).
+     * - `cover`: crop to 16:9 (course hero / marketing surfaces).
+     */
+    fit?: ImageFit;
+    /**
+     * CSS `object-position` when `fit="cover"`. Defaults to `"center"`.
      *
      * Common values:
      *   "center"        – default, centred crop
@@ -22,7 +29,12 @@ interface CourseImageStripProps {
 }
 
 /** Course or unit figures: ordered gallery with prev/next (same order as stored in `images_url`). */
-export default function CourseImageStrip({ images, alt, objectPosition = 'center' }: CourseImageStripProps) {
+export default function CourseImageStrip({
+    images,
+    alt,
+    fit = 'contain',
+    objectPosition = 'center',
+}: CourseImageStripProps) {
     const [index, setIndex] = useState(0);
     const n = images?.length ?? 0;
 
@@ -35,34 +47,37 @@ export default function CourseImageStrip({ images, alt, objectPosition = 'center
 
     if (!n) return null;
 
-    if (n === 1) {
-        return (
-            <div className="overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
-                <ImageComponent
-                    src={images[0]}
-                    alt={`${alt} — 1`}
-                    width={1200}
-                    height={675}
-                    className="aspect-video w-full object-cover"
-                    style={{ objectPosition }}
-                />
-            </div>
-        );
-    }
+    const frameClass =
+        fit === 'cover'
+            ? 'overflow-hidden'
+            : 'flex items-center justify-center overflow-hidden bg-[var(--surface)]';
+    const imageClass =
+        fit === 'cover'
+            ? 'aspect-video w-full object-cover'
+            : 'w-full h-auto max-h-[70vh] object-contain';
+
+    const current = images[n === 1 ? 0 : index];
+    const imageAlt = n === 1 ? `${alt} — 1` : `${alt} — ${index + 1} of ${n}`;
+
+    const frame = (
+        <div className={frameClass} style={{ borderRadius: 'var(--radius-md)' }}>
+            <ImageComponent
+                key={current}
+                src={current}
+                alt={imageAlt}
+                width={1200}
+                height={675}
+                className={imageClass}
+                style={fit === 'cover' ? { objectPosition } : undefined}
+            />
+        </div>
+    );
+
+    if (n === 1) return frame;
 
     return (
         <div className="relative" role="region" aria-label={`${alt} images`}>
-            <div className="overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
-                <ImageComponent
-                    key={images[index]}
-                    src={images[index]}
-                    alt={`${alt} — ${index + 1} of ${n}`}
-                    width={1200}
-                    height={675}
-                    className="aspect-video w-full object-cover"
-                    style={{ objectPosition }}
-                />
-            </div>
+            {frame}
 
             <button
                 type="button"

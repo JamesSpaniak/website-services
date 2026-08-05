@@ -20,17 +20,19 @@ export default function UnitPreviewComponent({ unit, courseId, locked, onStatusU
   const unitHref = `/courses/${courseId}/units/${encodeURIComponent(String(unit.id))}`;
 
   return (
-    <div className="border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
-      <div className="flex items-stretch justify-between gap-3 p-5">
-        <Link
-          href={unitHref}
-          className="flex flex-1 min-w-0 items-center gap-3 text-left rounded-md outline-none ring-offset-2 ring-offset-[var(--background)] focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] hover:opacity-95"
-        >
+    <div className="relative border border-[var(--surface-border)] bg-[var(--surface)] hover:border-[var(--brand-primary)]/40 transition-colors" style={{ borderRadius: 'var(--radius-md)' }}>
+      <Link
+        href={unitHref}
+        className="absolute inset-0 z-0 rounded-[inherit] outline-none ring-offset-2 ring-offset-[var(--background)] focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+        aria-label={`Open unit: ${unit.title}`}
+      />
+      <div className="relative z-10 flex items-stretch justify-between gap-3 p-5 pointer-events-none">
+        <div className="flex flex-1 min-w-0 items-center gap-3 text-left">
           <StatusIcon status={unit.status} />
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
+            <h2 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
               {unit.title}
-            </h3>
+            </h2>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-[var(--brand-muted)]">
               {locked && (
                 <span className="inline-flex items-center gap-1 text-xs text-[var(--brand-muted)]">
@@ -39,16 +41,27 @@ export default function UnitPreviewComponent({ unit, courseId, locked, onStatusU
                 </span>
               )}
               {unit.text_content && (
-                <DocumentTextIcon className="h-4 w-4 shrink-0" title="Text" />
+                <>
+                  <DocumentTextIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  <span className="sr-only">Includes reading</span>
+                </>
               )}
               {mergeCourseImages(unit).length > 0 && (
-                <PhotoIcon className="h-4 w-4 shrink-0" title="Images" />
+                <>
+                  <PhotoIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  <span className="sr-only">Includes images</span>
+                </>
               )}
-              {unit.video_url && <VideoCameraIcon className="h-4 w-4 shrink-0" title="Video" />}
+              {unit.video_url && (
+                <>
+                  <VideoCameraIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  <span className="sr-only">Includes video</span>
+                </>
+              )}
             </div>
           </div>
-        </Link>
-        <div className="shrink-0 flex items-center self-center">
+        </div>
+        <div className="shrink-0 flex items-center self-center pointer-events-auto">
           <StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(unit.id, newStatus)} />
         </div>
       </div>

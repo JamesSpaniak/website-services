@@ -156,9 +156,15 @@ async function bootstrap() {
 
   // Dev-only test fixtures. Gated by an explicit env flag (not NODE_ENV) so the
   // gate lives in per-environment config and survives the future dev/prod split.
+  // Seeding is best-effort: a failure here must never block the API from
+  // starting (these are convenience fixtures, not required for the app to run).
   if (process.env.SEED_TEST_DATA === 'true') {
     logger.log('SEED_TEST_DATA=true — seeding dev test fixtures...');
-    await seedTestData(dataSource, logger);
+    try {
+      await seedTestData(dataSource, logger);
+    } catch (err) {
+      logger.error('Test data seeding failed; continuing startup.', err instanceof Error ? err.stack : String(err));
+    }
   }
 
   await app.listen(3000, '0.0.0.0');
