@@ -2,13 +2,14 @@
 
 ## Current admin dashboard (courses)
 
-**Entry:** `drone/src/app/admin/page.tsx` — Courses tab lists courses from `getCourses()`, with New / Edit / Delete. Edit opens **`CourseEditor`** full-page inside `PageShell`.
+**Entry:** `drone/src/app/admin/courses/page.tsx` — course list from `getCourses()`, with New / Edit / Delete plus a per-course link to the Question Bank (`/admin/questions?course=<id>`). Editing is a **route**: `/admin/courses/new` and `/admin/courses/[courseId]` render **`CourseEditor`** under the persistent admin tab bar, so other tabs (e.g. Question Bank) stay reachable while editing and the browser back button works. Save/Cancel navigate back to `/admin/courses`.
 
 **`CourseEditor`** (`drone/src/app/ui/components/course-editor.tsx`):
 
 - **Visual mode:** Title, subtitle, description, HTML body, **hero images** (list + uploads), video URL, price, **tree of units** with **Add sub-unit** / **Sub-unit** controls to build nested sections (same fields per node: title, description, text, **images list**, video; max depth 8).
 - **JSON mode:** Raw `CourseDetails` JSON for power users; uploads copy URL to clipboard.
-- **Gaps addressed recently:** Multi-image **`images_url`**, visual **sub-unit** creation, horizontal scroll gallery in learner UI, admin list shows “Image” when any gallery URL exists (`mergeCourseImages`).
+- **Gaps addressed recently:** Multi-image **`images_url`**, visual **sub-unit** creation, horizontal scroll gallery in learner UI, admin list shows “Image” when any gallery URL exists (`mergeCourseImages`). Unit `CourseImageStrip` uses **`fit="contain"`** (full figure, letterboxed); course hero keeps **`fit="cover"`** + focal point.
+- **Lesson body lists:** Learner UI renders `text_content` with `\n` → `<br />` only (no markdown). HTML `<ul>/<li>` works via Tailwind `prose`. Tracked in `docs/TODO.md` — course lesson list/markdown rendering.
 
 **Remaining UX gaps (enhancement plan)**
 
@@ -61,4 +62,4 @@
 ## References
 
 - Learner views: `course.tsx`, `unit.tsx`, `section.tsx`, `unit-preview.tsx`.
-- Image gallery: `course-image-strip.tsx`, `mergeCourseImages` in `drone/src/app/lib/course-images.ts`.
+- Image gallery: `course-image-strip.tsx` (`fit` contain vs cover), `mergeCourseImages` in `drone/src/app/lib/course-images.ts`.

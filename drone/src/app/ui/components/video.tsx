@@ -94,6 +94,7 @@ function HlsPlayer({
         ref={videoRef}
         controls
         preload="metadata"
+        aria-label={title?.trim() || 'Course video'}
         className="w-full h-full rounded-xl bg-black"
       >
         {captionsSrc && (
@@ -138,7 +139,7 @@ export default function VideoComponent({ src, className = '', title, captionsSrc
           controls
           preload="metadata"
           className="w-full h-full rounded-xl bg-black"
-          title={title}
+          aria-label={title?.trim() || 'Course video'}
         >
           {captionsSrc && (
             <track kind="captions" src={captionsSrc} srcLang="en" label="English" default />

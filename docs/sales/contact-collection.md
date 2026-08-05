@@ -73,6 +73,31 @@ outreach/contact-candidates.csv
 
 Keep generated output out of commits unless intentionally adding a seed dataset. Contact lists can age quickly and may include personally identifiable business contact details.
 
+## Manual research workbook
+
+District leadership research for the Mid-Atlantic campaign lives in:
+
+```text
+outreach/DroneEdge School District Research.xlsx
+```
+
+Sheets (one per county): Delco, Montco, Bucks, Chester, Philadelphia (PA); Glocester/Camden/Burlington (NJ); New Castle (DE). Each row is a district with superintendent + curriculum/instruction contacts in a wide layout.
+
+Normalize into the contact schema with:
+
+```bash
+python scripts/import_district_research.py --merge-candidates
+```
+
+Outputs:
+
+| File | Role |
+|------|------|
+| `outreach/school-district-research-contacts.csv` | Full normalized export (includes `county`) |
+| `outreach/contact-candidates.csv` | Appends new rows (deduped); shared pool for drafts |
+
+All research imports default to `review_status=needs_review` and `source_type=research_workbook`. Re-run after editing the Excel.
+
 ## Script shape
 
 Create a small script first, not a service.
@@ -81,6 +106,7 @@ Suggested path:
 
 ```text
 scripts/collect_school_contacts.py
+scripts/import_district_research.py
 ```
 
 Suggested inputs:

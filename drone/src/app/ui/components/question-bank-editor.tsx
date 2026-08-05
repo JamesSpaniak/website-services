@@ -8,6 +8,8 @@ import { getQuestions, createQuestion, updateQuestion, archiveQuestion, bulkImpo
 
 interface Props {
     courses: CourseData[];
+    /** Preselect a course (e.g. from a `?course=` deep link); falls back to the first course. */
+    initialCourseId?: number;
 }
 
 const EMPTY_CHOICES: QuestionChoice[] = [
@@ -36,9 +38,11 @@ function blankForm(courseId: number): CreateQuestionPayload {
     };
 }
 
-export default function QuestionBankEditor({ courses }: Props) {
+export default function QuestionBankEditor({ courses, initialCourseId }: Props) {
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(
-        courses[0]?.id ?? null,
+        initialCourseId != null && courses.some((c) => c.id === initialCourseId)
+            ? initialCourseId
+            : courses[0]?.id ?? null,
     );
     const [questions, setQuestions] = useState<Question[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('active');

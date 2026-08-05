@@ -74,8 +74,8 @@ Org roles (**manager** / **member**) are **not** in the JWT; `/manager` only req
 | Component | Rule |
 |-----------|------|
 | **`AuthGuard`** | `getProfile()` succeeded → render; else redirect to `/login`. Used e.g. for course detail (`/courses/[courseId]`). |
-| **`AdminGuard`** | `user.role === 'admin'` or redirect `/`. Wraps `/admin` page (defense in depth with middleware). |
-| **`ManagerGuard`** | `user.organization?.role === 'manager'` **or** `user.role === 'admin'`; else redirect `/`. Wraps `/manager`. |
+| **`AdminGuard`** | `user.role === 'admin'` or redirect `/`. Applied in `app/admin/layout.tsx`, covering all `/admin/*` routes (defense in depth with middleware). |
+| **`ManagerGuard`** | `user.organization?.role === 'manager'` **or** `user.role === 'admin'`; else redirect `/`. Applied in the `/manager` layout shell, covering all `/manager/*` routes. |
 
 ### Profile shape (`UserDto`)
 
@@ -155,7 +155,7 @@ The **Exam** UI (`exam.tsx`) submits answers via **`submitUnitExam`** → **`POS
 
 ## 6. Pages — route map
 
-**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav + auth menu + Book a Call CTA), and `FooterComponent` (nav columns + socials).
+**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav + auth menu + Book a Call CTA; logged-out Sign in / Get started preserve the current path via `loginHref` / `registerHref`), and `FooterComponent` (nav columns + socials).
 
 Below: **page file** → **permissions** → **HTTP/API** (backend names match [`backend-data.md`](./backend-data.md) §4) → **UI components** (primary children; nested components may call additional APIs).
 
@@ -187,15 +187,15 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | Public; redirects to `?redirect=` target (or `/profile`) if already logged in (`useAuth`). `?redirect=` is sanitized (`sanitizeRedirect`) and stashed to sessionStorage (`stashPostAuthRedirect`). |
+| **Permissions** | Public; redirects to sanitized `?redirect=` (else stashed `postAuthRedirect`, else `/profile`) when already logged in (`useAuth`). `?redirect=` is sanitized (`sanitizeRedirect`) and stashed to sessionStorage (`stashPostAuthRedirect`). |
 | **API** | **`LoginComponent`:** `POST /auth/login` (via `useAuth().login` → `login` in `api-client`). In **signup** mode: **`POST /auth/register`** → `createUser`. |
-| **Components** | Two-column layout: `LoginComponent` + **`LoginConversionPanel`** (Part 107 pitch; try-free / purchase CTAs; purchase-intent copy when redirect contains `purchase=1`). `LoadingComponent`, Suspense wrapper. |
+| **Components** | Two-column layout: `LoginComponent` + **`LoginConversionPanel`** (Part 107 pitch; try-free / purchase CTAs; purchase-intent copy when redirect contains `purchase=1`). `LoadingComponent`, Suspense wrapper. **Header** Sign in / Get started append `?redirect=` for the current path (except auth pages) so signing in from a course/preview returns there. |
 
 ### `/register` — `app/register/page.tsx`
 
 | | |
 |--|--|
-| **Permissions** | Public; redirects to `/profile` if logged in. Optional `?code=` invite. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
+| **Permissions** | Public; redirects to sanitized `?redirect=` (else stashed redirect, else `/profile`) if logged in. Optional `?code=` invite. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
 | **API** | **`GET /organizations/invite-info?code=`** when `code` present → `getInviteCodeInfo`. **`POST /auth/register`** → `createUser` (includes `invite_code` when valid). |
 | **Components** | `PageShell`, `ErrorComponent`, inline form (Heroicon), Suspense wrapper. |
 
@@ -245,7 +245,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | **`AuthGuard`** — JWT session required (`GET /auth/profile` on app load). |
 | **API** | **`ProfileComponent`:** `PATCH /users/me` → `updateUser` (email); **`GET /progress/courses`** → `getCoursesWithProgress`; **`GET /audit/my`** → `getMyActivity`; **`media/profile-picture` + S3 PUT + `PATCH /users/me`** → `uploadProfilePicture`. **`CourseProgressPreview`:** `POST /progress/courses/:id/reset` → `resetCourseProgress`. |
-| **Components** | `AuthGuard`, `PageShell`, `ProfileComponent`, `CourseProgressPreview`. |
+| **Components** | `AuthGuard`, `PageShell`, `ProfileComponent`, `CourseProgressPreview` (whole card is the course link; overflow menu stays separately clickable). |
 
 ### `/articles` — `app/articles/page.tsx`
 
@@ -277,7 +277,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | **`AuthGuard`** + **`Elements` (Stripe)**. Backend **`GET /courses/:id`** requires JWT and enforces access. **`?purchase=1`** auto-opens `PurchaseFlow` (`initialShowPurchase`) when the course is paid and not yet owned. |
 | **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-payment-intent`**, then Stripe `confirmCardPayment`, poll `getCourseById`; reconcile via **`POST /purchases/confirm-payment`** (see §3). Logged-out state renders account-required CTAs instead of the card form. |
-| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, `Elements` + **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). |
+| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, `Elements` + **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). **Hit targets:** unit preview cards are full-card links (status menu excluded); outline rows use a larger min-height link area (chevron alone expands). **`CourseImageStrip`:** unit galleries default to `fit="contain"` (`object-contain`, `max-h-[70vh]`, letterbox on `--surface`) so instructional charts are not cropped; course hero passes `fit="cover"` (16:9 `object-cover` + optional `image_focal_point`). Catalog cards and `/preview` also use cover and honor `image_focal_point`. Authoring sizes: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md). **Layout:** full-width (no `max-w` cap) with a fixed-width info/outline column on `lg+`; the info card (course `h1`) comes **first in DOM** (sane heading order, title-first on mobile) and is placed visually right via grid `col-start`. |
 
 ### `/courses/[courseId]/preview` — `app/courses/[courseId]/preview/page.tsx`
 
@@ -285,7 +285,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | Public (RSC — shareable / SEO landing per course). |
 | **API** | Server-side **`GET /courses/:id/public`** (direct fetch, `revalidate: 3600`) for metadata + page; 404 via `notFound()` when missing. |
-| **Components** | Hero image, price / unit-count badges, **`CoursePreviewActions`** (auth-aware: continue-learning + unlock for logged-in; create-account / purchase / sign-in register-redirects for logged-out), course outline with `free_preview` markers, FAQ section, `JsonLd` (course + FAQ). |
+| **Components** | Hero image (`aspect-video` + `object-cover`, honors `image_focal_point`), price / unit-count badges, **`CoursePreviewActions`** (auth-aware: continue-learning + unlock for logged-in; create-account / purchase / sign-in register-redirects for logged-out), course outline with `free_preview` markers, FAQ section, `JsonLd` (course + FAQ). Image size/format guidelines: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md) § Display modes / Authoring. |
 
 ### `/courses/tracks/video`, `/courses/tracks/ai` — `app/courses/tracks/*/page.tsx`
 
@@ -301,23 +301,36 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | **No `AuthGuard`** in code, but **`GET /courses/:id`** requires JWT — unauthenticated users typically see an error from the fetch. Intended for logged-in learners. |
 | **API** | **`GET /courses/:id`** → `getCourseById` (client extracts unit). **`UnitComponent`:** `PATCH /progress/.../units/:unitId` → `updateUnitProgress`. **`SectionComponent`:** **`GET /courses/:courseId/units/:unitId/media`** → `getUnitMedia` for signed video URLs. |
-| **Components** | `UnitComponent` → `SectionComponent`, `ExamComponent` (local scoring), `StatusUpdater`, `StatusIcon`. |
+| **Components** | `CourseUnitNav` (breadcrumb + prev/next unit links), `UnitComponent` → `SectionComponent` (level-aware headings h3–h6; **full header row** toggles expand/collapse — status menu excluded), `ExamPlayer` (scoped practice exams), `CourseOutlineSidebar` (auto-expands ancestors of the active/focused unit so deep `?focus=` targets stay visible), `StatusUpdater`, `StatusIcon`. **Deep links:** leaf lessons do not get their own URL — outline links them as `/units/{parent}?focus={leaf}` which expands + scrolls that section. Mid-level nodes with children get their own page. **Layout:** full-width (no `max-w` cap) with a fixed-width outline column on `lg+` (sticky); on mobile the outline renders below the unit content instead of being hidden. |
 
-### `/admin` — `app/admin/page.tsx`
+### `/admin/*` — `app/admin/**` (routed dashboard)
 
-| | |
-|--|--|
-| **Permissions** | **Middleware:** cookie + JWT `role === 'admin'`. **`AdminGuard`:** same. Backend: Admin-only on mutating routes. |
-| **API** | **Load:** `GET /articles/admin/all`, `GET /courses`, `GET /organizations`. **Articles:** `POST/PATCH/DELETE /articles`, **Courses:** `POST/PUT/DELETE /courses`. **Orgs:** `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. **Analytics tab:** `GET /audit/analytics/overview`, `GET /audit/analytics/daily`. |
-| **Components** | `AdminGuard`, `PageShell`, `AdminDashboard` (tabs), **`ArticleEditor`** / **`CourseEditor`** (`createArticle` / `updateArticle`, `createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) for hero/unit galleries — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). **Edit course** loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present; **`GET /courses`** (list) strips nested content for the catalog. `LoadingComponent`, `ErrorComponent`. |
+Each tab is a **real route** (shared tab bar renders on every admin page, including editors — so e.g. the Question Bank stays one click away while editing a course). `app/admin/layout.tsx` wraps everything in `AdminGuard` + `PageShell` + `AdminTabs` (`app/admin/tabs.tsx` → shared **`DashboardTabs`**). `/admin` redirects to `/admin/courses`. Tabs survive refresh, deep links, and the browser back button.
 
-### `/manager` — `app/manager/page.tsx`
+| Route | Content / API |
+|-------|----------------|
+| `/admin/articles` | Article table — `GET /articles/admin/all`, `DELETE /articles/:id`. |
+| `/admin/articles/new`, `/admin/articles/[articleId]` | **`ArticleEditor`** (`createArticle` / `updateArticle`); edit route loads `GET /articles/:id`. Save/Cancel navigate back to `/admin/articles`. |
+| `/admin/courses` | Course table — `GET /courses`, `DELETE /courses/:id`. Per-row shortcut to `/admin/questions?course=<id>`. |
+| `/admin/courses/new`, `/admin/courses/[courseId]` | **`CourseEditor`** (`createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). Edit route loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present (`GET /courses` list strips nested content). Header link to the course's question bank. |
+| `/admin/questions` | **`QuestionBankEditor`** — question CRUD, bulk import/export. Accepts `?course=<id>` to preselect a course. |
+| `/admin/organizations` | Org CRUD, invites (single + bulk), course assignment — `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. |
+| `/admin/analytics` | `GET /audit/analytics/overview`, `GET /audit/analytics/daily`. |
 
-| | |
-|--|--|
-| **Permissions** | **Middleware:** any logged-in user with cookie. **`ManagerGuard`:** org **`role === 'manager'`** or global **admin**. |
-| **API** | **`getOrganizationDetails`**, **`getOrgMembers`**, **`addOrgMember`**, **`removeOrgMember`**, **`updateMemberRole`**, **`generateInviteCode`**, **`getInviteCodes`**, **`getOrgProgress`**, **`getOrgCourseProgress`**, **`getStudentActivity`**, **`resetMemberPicture`** — all under `/organizations/...` and **`GET /audit/users/:userId`** per [`backend-data.md`](./backend-data.md). |
-| **Components** | `ManagerGuard`, `PageShell`, tabbed dashboard (members / invites / progress), Heroicons. |
+**Permissions:** middleware cookie + JWT `role === 'admin'` (prefix match covers all nested routes); `AdminGuard` in the layout; backend admin-only on mutating routes.
+
+### `/manager/*` — `app/manager/**` (routed dashboard)
+
+Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShell`** (`app/manager/shell.tsx`) wraps `ManagerGuard` + org fetch (`getOrganizationDetails`) + `PageShell` + `DashboardTabs`, and provides the org to tab pages via the **`useManagerOrg()`** context (`refreshOrg` re-fetches header seat counts after membership changes). `/manager` redirects to `/manager/members`.
+
+| Route | Content / API |
+|-------|----------------|
+| `/manager/members` | `getOrgMembers`, `addOrgMember`, `removeOrgMember`, `updateMemberRole`. |
+| `/manager/invites` | `getInviteCodes`, `generateInviteCode`. |
+| `/manager/progress` | `getOrgProgress`, `getOrgCourseProgress`, per-student `getStudentActivity` (`GET /audit/users/:userId`), `resetMemberPicture`. |
+| `/manager/exams` | Class exams: `getOrgCourses`, `getOrgClassExams`, `generateClassExam`, `getClassExamResults`, CSV export. |
+
+**Permissions:** middleware any logged-in cookie (org role not in JWT); `ManagerGuard` requires org **`role === 'manager'`** or global **admin**.
 
 ### `/schools`, `/schools/funding` — `app/schools/**/page.tsx`
 

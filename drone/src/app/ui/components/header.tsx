@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/lib/auth-context';
 import BrandLogo from '@/app/ui/components/brand-logo';
 import { UserIcon, ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
+import { loginHref, registerHref, sanitizeRedirect } from '@/app/lib/auth-redirect';
 
 const navLinks = [
   { href: '/articles', label: 'Articles' },
@@ -15,11 +16,28 @@ const navLinks = [
   { href: '/about', label: 'About' },
 ];
 
-export default function HeaderComponent() {
+/** Paths that should not be used as post-auth return targets. */
+const AUTH_PATH_PREFIXES = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'];
+
+function useAuthReturnHref(): { signInHref: string; registerHrefResolved: string } {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const query = searchParams.toString();
+  const candidate = `${pathname}${query ? `?${query}` : ''}`;
+  const isAuthPage = AUTH_PATH_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const safe = !isAuthPage ? sanitizeRedirect(candidate) : null;
+  return {
+    signInHref: safe ? loginHref(safe) : '/login',
+    registerHrefResolved: safe ? registerHref(safe) : '/register',
+  };
+}
+
+function HeaderInner() {
   const { user, logout, isLoading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { signInHref, registerHrefResolved } = useAuthReturnHref();
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -117,14 +135,14 @@ export default function HeaderComponent() {
           ) : (
             <>
               <Link
-                href="/register"
+                href={registerHrefResolved}
                 className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 Get started
               </Link>
               <Link
-                href="/login"
+                href={signInHref}
                 className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium tracking-wide text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors touch-manipulation"
               >
                 Sign in
@@ -168,14 +186,14 @@ export default function HeaderComponent() {
             {!user && (
               <>
                 <Link
-                  href="/register"
+                  href={registerHrefResolved}
                   className="block min-h-[44px] flex items-center px-3 mt-2 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] touch-manipulation"
                   style={{ borderRadius: 'var(--radius-sm)' }}
                 >
                   Get started
                 </Link>
                 <Link
-                  href="/login"
+                  href={signInHref}
                   className="block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide text-[var(--brand-foreground)] touch-manipulation"
                   style={{ borderRadius: 'var(--radius-sm)' }}
                 >
@@ -203,7 +221,7 @@ export default function HeaderComponent() {
                 {user.organization?.role === 'manager' && (
                   <Link
                     href="/manager"
-                    className={`block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide touch-manipulation ${pathname === '/manager' ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]' : 'text-[var(--brand-foreground)] active:bg-[var(--surface)]'}`}
+                    className={`block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide touch-manipulation ${pathname.startsWith('/manager') ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]' : 'text-[var(--brand-foreground)] active:bg-[var(--surface)]'}`}
                     style={{ borderRadius: 'var(--radius-sm)' }}
                   >
                     Manager
@@ -212,7 +230,7 @@ export default function HeaderComponent() {
                 {user.role === 'admin' && (
                   <Link
                     href="/admin"
-                    className={`block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide touch-manipulation ${pathname === '/admin' ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]' : 'text-[var(--brand-foreground)] active:bg-[var(--surface)]'}`}
+                    className={`block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide touch-manipulation ${pathname.startsWith('/admin') ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]' : 'text-[var(--brand-foreground)] active:bg-[var(--surface)]'}`}
                     style={{ borderRadius: 'var(--radius-sm)' }}
                   >
                     Admin
@@ -232,5 +250,22 @@ export default function HeaderComponent() {
         </div>
       )}
     </header>
+  );
+}
+
+export default function HeaderComponent() {
+  return (
+    <Suspense fallback={
+      <header className="sticky top-0 z-50 border-b border-[var(--surface-border)] bg-[var(--background)]/95 backdrop-blur-sm">
+        <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+          <Link href="/" className="flex items-center justify-start shrink-0 min-h-[44px]" aria-label="The Drone Edge – Home">
+            <BrandLogo variant="header" />
+          </Link>
+          <div className="h-8 w-24 bg-[var(--surface)] animate-pulse" style={{ borderRadius: 'var(--radius-sm)' }} />
+        </nav>
+      </header>
+    }>
+      <HeaderInner />
+    </Suspense>
   );
 }

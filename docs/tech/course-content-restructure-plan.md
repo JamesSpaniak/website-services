@@ -2,7 +2,9 @@
 
 Plan for rebalancing the Part 107 course tree (`assets/courses/faa_107_course.json`), merging split example sections, standardizing video placement, simplifying the question model to unit-level / final-exam-only scoping, applying the author's content-review notes, and cleaning markdown artifacts course-wide.
 
-Status: **deployed to prod** (Jul 8 2026) — restructured payload live; unit-level question bank imported. Repo artifacts: `faa_107_course_restructured.json` (171 nodes, was 197), `faa_107_questions_unit_level.bulk.json` (463 unit-scoped items). Remaining: images, videos, unit 5 author notes, leaf `ExamPlayer` removal, final-exam pool carry-over (see below).
+Status: **deployed to prod** (Jul 8 2026) — restructured payload live; unit-level question bank imported. Repo canonical: `faa_107_course.json` (**149 nodes** / **114 leaves**, string refs `u{n}`, Ch.1–5 + Ch.8 done; Ch.6–7 + Ch.9–10 partial through Aug 5 2026; **do not combine** `u5`/`u6`; numeric twin / refs twin removed), `faa_107_questions_unit_level.bulk.json` (463 unit-scoped items). Remaining: admin re-publish of reviewed Ch.1–10 edits (ship **Ch.3+4 together**), `u422` runway figures, Ch.6/7/9/10 images, remaining Ch.7/9/10 author notes, leaf `ExamPlayer` removal, final-exam pool carry-over (see below).
+
+Post-deploy edit (Jul 8 2026, **not yet re-uploaded**): course retitled in the repo payload to **"FAA Part 107 Remote Pilot Certification Prep"** (with matching sub_title/description/text_content) so it no longer duplicates unit 1's "PART 107 REGULATIONS" title. Prod still shows the old title until the payload is re-uploaded via admin.
 
 ## Findings
 
@@ -90,6 +92,8 @@ Verified against the repo JSON: **17 nodes have artifacts, all in unit 9 (Aerona
 
 ## Author content-review intake (Jul 2026)
 
+Ongoing quality backlog: see [`assets/courses/faa_107_course_quality_review.md`](../../assets/courses/faa_107_course_quality_review.md). **Ch.1–5 + Ch.8 done**; **Ch.6–7 + Ch.9–10 partial (through Aug 5 2026)**. Ch.9 now has study-format CRM/SRM, separate Physiology/Vision leaves, shorter overviews, HTML risk lists/headings, and merged decision/IMSAFE-PAVE leaves. Ch.10 is consolidated from 11 leaves to 3. **Do not combine** weather units 5/6. Repo payload: **149 nodes / 114 leaves**. **Open:** figures/images and remaining detailed review for Ch.7/9/10.
+
 Raw notes from the course author, organized per unit. Slide numbers refer to the source decks in `assets/courses/outlines/`. Items marked **(structure)** change the tree; **(content)** edit text in place; **(images)** need a picture inserted; **(questions)** affect the question bank.
 
 ### Course-wide
@@ -147,9 +151,15 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 - **(content)** Traffic Patterns for Manned Aircraft: exam asks material not yet taught — add content from slides 29–35 to the leaf.
 - **(images)** Many pics needed throughout the unit.
 
-### Unit 5 — Weather
+### Unit 5 — Weather — **done Jul 26–27 2026**
 
-- Author notes cut off after the heading — **pending**; follow up for unit 5 (and 6, 9, 10) review notes.
+- Structure/content review closed (sources fold, METAR/TAF flatten, description polish). Keep separate from unit 6.
+
+### Unit 6 — Weather Effects (Jul 26–Aug 5 2026)
+
+- **(structure)** Folded What Is Weather? (`u60`) into unit `u6` intro body — same pattern as Ch.5 sources overview.
+- **(content)** Outline pass: humidity density numbers; thunderstorm mature-stage 2,500 ft/min + plow wind; ceiling/visibility wording; stems shortened to intros.
+- **(structure, Aug 5 2026)** Combined pressure/density + humidity under `u61` (`u611` / `u612` / `u62`). `u64` flat **Atmospheric Stability** (retired nested `u641`). Temperature Inversions (`u642`) moved under `u65` with dew point/icing. **Do not combine** with unit 5. Images still open.
 
 ### Unit 7 — Loading and Performance (deck: `7- Loading & Performance 2026.pptx.txt`)
 
@@ -160,32 +170,41 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 - **(structure)** Delete "QUESTIONS AND COMMENTS" leaves (already in plan).
 - **(images)** Needed: slide 18 (load factor in steep turns), slide 20 (load factor vs bank angle chart — the testing-supplement chart), slide 21 (calculation example).
 - **(questions)** Section quizzes exist where no questions do, and end-of-unit questions don't correlate to the leaves — resolved by unit-level scoping + removing the leaf `ExamPlayer`.
+- **(content, Aug 5 2026)** In `u715`, internal headings are **Load** and **Load Factors** (removed text after each hyphen). In `u718`, the bank-angle chart callout now says **"See how…"**; the chart image remains to be added. In `u723`, the stall-speed relationship spells out **square root** instead of using `√`.
 
 ### Unit 8 — Emergency Procedures (deck: `8 Emergency Procedures Outline.docx`)
 
-- **(structure)** **Combine all four leaves into one section** (text is good). With one leaf the unit becomes a single-node unit — fold the leaves into the unit's own `text_content`, or one leaf under the unit.
-- **(content)** Remove stars.
-- **(questions)** No questions per leaf and the end-of-unit ones don't match — unit-level scoping covers this.
+- **Done (confirmed Aug 5 2026):** four source leaves consolidated into one `u81` section; text retained and artifacts removed. Unit-level scoping covers the prior question mismatch.
 
 ### Unit 9 — Aeronautical Decision Making
 
 - **(content)** All 17 markdown-artifact nodes live here (literal `\n`, `*`, `#`) — covered by the course-wide cleanup.
+- **(content/structure, Aug 5 2026)** Shortened repeated overviews. Risk Management uses HTML `<strong>` headings and `<ul>` lists because `text_content` does not parse Markdown. Foundation examples and principles were rewritten; `u921` likelihood levels are a headed list.
+- **(structure, Aug 5 2026)** Combined Steps to Good Decision Making into `u911` (retired `u912`). Combined IMSAFE and PAVE into `u923` (retired `u924`).
+- **(content/structure, Aug 5 2026)** Renamed `u93` **Workload and Crew Resource Management** and rewrote CRM/SRM + child lessons as short narrative plus study bullets. `u94` is **Physiology** with new `u940` Physiology and consolidated `u941` Vision; retired `u942`.
+- **(images)** `u95` maintenance figures require exact figure/title/source mapping, matching body callouts, `images_url` attachments, and external source links where applicable. Do not publish placeholders.
+- **(review candidate)** `u922` Hazardous Attitudes is the strongest remaining narrative/list candidate: convert the attitude/antidote pairs to semantic HTML.
+
+### Unit 10 — Radio Communication Procedures
+
+- **(structure, Aug 5 2026)** Consolidated 11 short leaves into 3 top-level lessons: `u101` **Radio Communication Fundamentals**, `u104` **CTAF, Frequencies, and Advisory Services**, and `u107` **Aircraft Identification and Standard Radio Calls**.
+- **(content)** Removed repeated introductions/warnings and used narrative + HTML study lists. Retired `u102`, `u103`, `u105`, `u106`, `u1061`–`u1064`, `u108`, and `u1081`.
 
 ## Implementation steps
 
 1. **Reconcile live vs repo payload** — **open**: before uploading, export the deployed course and diff against the restructured file (author's notes referenced starred text not present in the repo JSON; the restructured file is built from the repo JSON).
-2. ~~Course-wide text cleanup~~ — **done** in `faa_107_course_restructured.json` (literal `\n` → newlines, `*` bullets → dashes, `**`/`#` stripped; verified zero artifacts remain).
+2. ~~Course-wide text cleanup~~ — **done** in `faa_107_course.json` (literal `\n` → newlines, `*` bullets → dashes, `**`/`#` stripped; verified zero artifacts remain).
 3. ~~Rebuild unit 7~~ — **done**: 2 stems / 9 leaves; "LOAD" overview leaf deleted, "LOAD - Turn Stress" folded into Load Factor Fundamentals, bank-angle leaves merged, both slide-artifact leaves dropped.
 4. ~~Unit-3 merges~~ — **done**: chart examples merged into Class B/C/D/E leaves; "Introduction and Airspace Classifications" leaf combines the intro, symbols, and controlled-overview text; stem renamed "Controlled Airspace Classes".
 5. ~~Units 1, 2, 4, 8 structure~~ — **done**: "Operating Rules" rename; Flying Over People split into overview + "Category Operations" stems (mirrors deck title slide 121); unit 2 stems "Airports, Charts, and Data Sources" + "Aeronautical Charts" (charts moved up a level, max depth now 3); unit 4 "Airport Classification and Control" stem; unit 8 consolidated to one leaf. **Night operations (slides 44–49) NOT added** — blocked on author confirmation (see caveats).
 6. ~~Content edits with exact text~~ — **done**: waiver lead time 60 → 90 days; VO duties added to the VLOS leaf; night no-waiver sentence; coordinate format example; chart-supplement PDF link + purchase advice; "Example Airport Data" retitle; MEF own-supplement sentence removed; duplicate chart-info block deduplicated into the Aeronautical Charts stem. Items already present in the repo text (Part 89 sentence, ATC role, additional roles, required documentation, NOTAM note, red-lines sentence, sectional ATC-frequency sentence) needed no change.
-7. **Insert images** — **open**: get the author's image folder, upload to the media bucket, set `images_url` on the leaves flagged **(images)** (tracked in `docs/TODO.md` P0).
-8. Regenerate refs/leaf-paths artifacts — **open**: `faa_107_course_refs.json` and `faa_107_course_leaf_paths.csv` still describe the old tree; regenerate from the restructured payload once it is confirmed as the upload candidate (numeric ids normalize to the same `u{n}` refs on upload either way).
+7. **Insert images** — **partially done (Jul 8 2026)**: `assets/courses/Pictures for Airports` processed via `scripts/course_images.py` ([`workflows/tech/course-images.md`](../../workflows/tech/course-images.md)) — 61 images uploaded to `s3://droneedge-dev-media/courses/35/{unitId}/` and merged into `images_url` in `faa_107_course.json` (units 2 and 3 subtrees). Remaining: other author image folders (unit 7 load-factor charts, airport ops, etc.) and the manual admin publish of the JSON (tracked in `docs/TODO.md` P0).
+8. ~~Canonical string-ref payload + leaf-paths~~ — **done (Jul 26 2026; refreshed Aug 5 2026 through Ch.10 consolidation)**: single file `faa_107_course.json` with `u{n}` refs (**149 nodes**; stems include `u21`, Class E `u325`, signs `u440`, weather `u61`/`u65`); twin numeric/refs files removed; `faa_107_course_leaf_paths.csv` has **114 leaves**. Prefer not to rerun legacy `scripts/build_faa_107_questions.py` just to refresh leaf paths.
 9. ~~Question file for unit-level scoping~~ — **done**: `faa_107_questions_unit_level.bulk.json` (463 items from the author's sorted/deduped CSV, all `sub_unit_ref: null`, unit_refs u1–u10 all present in the restructured tree). **Gap: it contains no `FINAL_EXAM` items**, so the final-exam pool (`exam_pool: final_only`) would be empty — carry over or re-tag the 77 FINAL_EXAM items from `faa_107_questions.bulk.json` before retiring the old file.
 10. **Remove the leaf-level `ExamPlayer` from `section.tsx`** — **open** (leaf quizzes will error once questions are unit-level only).
-11. **Upload**: admin JSON upload of `faa_107_course_restructured.json` → `updateCourseFromPayload`, then `/questions/import` with the unit-level file.
+11. **Upload**: admin JSON upload of `faa_107_course.json` → `updateCourseFromPayload`, then `/questions/import` with the unit-level file (only if questions changed).
 12. **Record videos per stem** (~35–45 total) and attach via `video_url` on stem nodes; stems match the deck title slides the author is inserting.
-13. **Follow up with the author** for the missing unit 5 (and 6, 9, 10) review notes.
+13. **Follow up with the author** for remaining detailed notes on units 6, 7, 9, and 10.
 
 ## Caveats
 

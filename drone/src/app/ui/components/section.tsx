@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UnitData, ProgressStatus, QuestionCounts } from '@/app/lib/types/course';
 import StatusIcon from './status-icon';
@@ -48,10 +48,14 @@ export default function SectionComponent({
   const containerRef = useRef<HTMLDivElement>(null);
   const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
+  const bodyId = useId();
+  // Keep heading levels meaningful for screen readers: unit h1 → "Sections" h2 → h3, nested deeper → h4…h6.
+  const HeadingTag = `h${Math.min(level + 3, 6)}` as 'h3' | 'h4' | 'h5' | 'h6';
 
   useEffect(() => {
     if (isFocused || containsFocus) setIsExpanded(true);
     if (isFocused) {
+      containerRef.current?.focus({ preventScroll: true });
       containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [isFocused, containsFocus]);
@@ -82,37 +86,51 @@ export default function SectionComponent({
   const resolvedVideoUrl = needsSigning ? signedVideoUrl : video_url;
 
   return (
-    <div ref={containerRef} className={`mt-4 scroll-mt-24 ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
+    <div ref={containerRef} tabIndex={-1} className={`mt-4 scroll-mt-24 outline-none ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
       <div
         className={`border bg-[var(--surface)] ${isFocused ? 'border-[var(--brand-primary)]' : 'border-[var(--surface-border)]'}`}
         style={{ borderRadius: 'var(--radius-md)' }}
       >
-        <div className="w-full flex items-center justify-between p-5 text-left">
-          <button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            aria-expanded={isExpanded}
-            className="flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer"
-          >
-            <h3 className="text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">{title}</h3>
-            <StatusIcon status={status} />
-            <div className="flex items-center gap-2 text-[var(--brand-muted)]">
-                {text_content && <DocumentTextIcon className="h-4 w-4" aria-hidden />}
-                {sectionImages.length > 0 && <PhotoIcon className="h-4 w-4" aria-hidden />}
-                {video_url && <VideoCameraIcon className="h-4 w-4" aria-hidden />}
-            </div>
-          </button>
-          <div className="flex items-center gap-2 shrink-0">
-            <StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(id, newStatus)} />
+        <div className="flex items-stretch">
+          <HeadingTag className="flex-1 min-w-0 m-0 text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
               aria-expanded={isExpanded}
-              aria-label={isExpanded ? 'Collapse section' : 'Expand section'}
-              className="p-1 text-[var(--brand-muted)] hover:text-[var(--brand-foreground)]"
+              aria-controls={bodyId}
+              className="flex w-full min-w-0 items-center gap-3 p-5 text-left cursor-pointer hover:bg-[var(--background)]/40 transition-colors"
+              style={{ borderRadius: 'var(--radius-md) 0 0 var(--radius-md)' }}
             >
-              <ChevronRightIcon className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+              <span className="min-w-0 truncate">{title}</span>
+              <StatusIcon status={status} />
+              <span className="flex items-center gap-2 text-[var(--brand-muted)] font-normal">
+                  {text_content && (
+                    <>
+                      <DocumentTextIcon className="h-4 w-4" aria-hidden />
+                      <span className="sr-only">Includes reading</span>
+                    </>
+                  )}
+                  {sectionImages.length > 0 && (
+                    <>
+                      <PhotoIcon className="h-4 w-4" aria-hidden />
+                      <span className="sr-only">Includes images</span>
+                    </>
+                  )}
+                  {video_url && (
+                    <>
+                      <VideoCameraIcon className="h-4 w-4" aria-hidden />
+                      <span className="sr-only">Includes video</span>
+                    </>
+                  )}
+              </span>
+              <ChevronRightIcon
+                className={`ml-auto h-5 w-5 shrink-0 text-[var(--brand-muted)] font-normal transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                aria-hidden
+              />
             </button>
+          </HeadingTag>
+          <div className="flex items-center shrink-0 pr-4 pl-1">
+            <StatusUpdater onStatusSelect={(newStatus) => onStatusUpdate(id, newStatus)} />
           </div>
         </div>
 
@@ -125,15 +143,16 @@ export default function SectionComponent({
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="overflow-hidden"
             >
-              <div className="px-5 pb-5 border-t border-[var(--surface-border)]">
+              <div id={bodyId} className="px-5 pb-5 border-t border-[var(--surface-border)]">
                 {description && <div className={`mt-4 ${PROSE_COMPACT}`} dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }} />}
                 <div className="my-6 space-y-6">
                     {sectionImages.length > 0 && (
                         <CourseImageStrip images={sectionImages} alt={title} />
                     )}
                     {videoLoading && (
-                      <div className="flex items-center justify-center h-64 bg-[var(--brand-black)]" style={{ borderRadius: 'var(--radius-sm)' }}>
-                        <div className="animate-spin h-8 w-8 border-2 border-[var(--brand-primary)] border-t-transparent" style={{ borderRadius: '50%' }} />
+                      <div role="status" className="flex items-center justify-center h-64 bg-[var(--brand-black)]" style={{ borderRadius: 'var(--radius-sm)' }}>
+                        <div className="animate-spin h-8 w-8 border-2 border-[var(--brand-primary)] border-t-transparent" style={{ borderRadius: '50%' }} aria-hidden />
+                        <span className="sr-only">Loading video…</span>
                       </div>
                     )}
                     {!videoLoading && resolvedVideoUrl && <VideoComponent src={resolvedVideoUrl} title={title} />}

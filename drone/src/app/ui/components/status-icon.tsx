@@ -6,11 +6,11 @@ import { CheckCircleIcon, ClockIcon, PlayCircleIcon } from '@heroicons/react/24/
 export default function StatusIcon({ status }: { status?: ProgressStatus }) {
   switch (status) {
     case ProgressStatus.COMPLETED:
-      return <CheckCircleIcon className="h-6 w-6 text-green-500 flex-shrink-0" title="Completed" />;
+      return <CheckCircleIcon className="h-6 w-6 text-green-500 flex-shrink-0" role="img" aria-label="Completed" />;
     case ProgressStatus.IN_PROGRESS:
-      return <PlayCircleIcon className="h-6 w-6 text-[var(--brand-primary)] flex-shrink-0" title="In Progress" />;
+      return <PlayCircleIcon className="h-6 w-6 text-[var(--brand-primary)] flex-shrink-0" role="img" aria-label="In progress" />;
     case ProgressStatus.NOT_STARTED:
     default:
-      return <ClockIcon className="h-6 w-6 text-[var(--brand-muted)] flex-shrink-0" title="Not Started" />;
+      return <ClockIcon className="h-6 w-6 text-[var(--brand-muted)] flex-shrink-0" role="img" aria-label="Not started" />;
   }
 };

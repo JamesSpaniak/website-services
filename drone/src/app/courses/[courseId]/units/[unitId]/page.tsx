@@ -28,7 +28,7 @@ function LockedUnitNotice({ courseId, unitTitle, price }: { courseId: number; un
             <div className="inline-flex p-3 bg-[var(--brand-primary)]/10 rounded-xl mb-4">
                 <LockClosedIcon className="h-7 w-7 text-[var(--brand-primary)]" />
             </div>
-            <h2 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">{unitTitle}</h2>
+            <h1 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">{unitTitle}</h1>
             <p className="mt-3 text-sm text-[var(--brand-muted)] leading-relaxed">
                 This unit is part of the full course. Unit 1 is free — unlock the rest with a one-time purchase
                 for lifetime access to all units, practice exams, and progress tracking.
@@ -119,9 +119,9 @@ function UnitPageContent() {
     const unitLocked = course.has_access === false && !isUnitPreviewAccessible(course.units, decodedUnitId);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-                <div className="lg:col-span-8 xl:col-span-9 min-w-0">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
+            <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] xl:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8">
+                <div className="min-w-0">
                     <CourseUnitNav
                         courseId={parsedCourseId}
                         courseTitle={course.title}
@@ -145,7 +145,7 @@ function UnitPageContent() {
                         />
                     )}
                 </div>
-                <aside className="mt-8 lg:mt-0 hidden lg:block lg:col-span-4 xl:col-span-3">
+                <aside className="mt-8 lg:mt-0">
                     <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
                         <CourseOutlineSidebar
                             courseId={parsedCourseId}

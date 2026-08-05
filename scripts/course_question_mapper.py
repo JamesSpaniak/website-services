@@ -31,12 +31,23 @@ def _tokens(s: str) -> set[str]:
     return {t for t in _norm(s).split() if len(t) > 2 and t not in stop}
 
 
+def legacy_id(node_id: int | str) -> int:
+    """Numeric payload id from a course node id (`111`, `"111"`, or `"u111"`)."""
+    if isinstance(node_id, int):
+        if node_id < 0:
+            raise ValueError(f"Invalid numeric unit id: {node_id}")
+        return node_id
+    text = str(node_id).strip()
+    if text.isdigit():
+        return int(text)
+    if text.startswith("u") and text[1:].isdigit():
+        return int(text[1:])
+    raise ValueError(f"Unsupported unit id (expected u{{n}} or digits): {node_id!r}")
+
+
 def unit_ref(node_id: int | str) -> str:
-    """Canonical string ref for a payload id: numeric ids become "u{n}" (matches
-    the backend's toUnitRef normalization); string ids pass through trimmed."""
-    if isinstance(node_id, int) or (isinstance(node_id, str) and node_id.strip().isdigit()):
-        return f"u{int(node_id)}"
-    return str(node_id).strip()
+    """Canonical string ref for a payload id (matches backend toUnitRef)."""
+    return f"u{legacy_id(node_id)}"
 
 
 @dataclass
@@ -77,7 +88,7 @@ def load_course_index(path: Path = COURSE_JSON) -> dict[int, CourseNode]:
             title = (item.get("title") or "").strip()
             path = prefix + (title,)
             subs = item.get("sub_units") or []
-            node_id = int(item["id"])
+            node_id = legacy_id(item["id"])
             top_id = root_id if root_id is not None else node_id
             node = CourseNode(
                 id=node_id,

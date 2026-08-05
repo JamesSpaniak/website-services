@@ -3,7 +3,12 @@
 import LoginComponent from '../ui/components/login';
 import LoginConversionPanel from '../ui/components/login-conversion-panel';
 import { useAuth } from '../lib/auth-context';
-import { stashPostAuthRedirect } from '../lib/auth-redirect';
+import {
+    stashPostAuthRedirect,
+    sanitizeRedirect,
+    readStashedPostAuthRedirect,
+    clearStashedPostAuthRedirect,
+} from '../lib/auth-redirect';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import LoadingComponent from '../ui/components/loading';
@@ -12,7 +17,7 @@ function LoginPageInner() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirect = searchParams.get('redirect');
+    const redirect = sanitizeRedirect(searchParams.get('redirect'));
 
     useEffect(() => {
         if (redirect) stashPostAuthRedirect(redirect);
@@ -20,7 +25,9 @@ function LoginPageInner() {
 
     useEffect(() => {
         if (!isLoading && user) {
-            router.replace(redirect && redirect.startsWith('/') ? redirect : '/profile');
+            const target = redirect ?? readStashedPostAuthRedirect() ?? '/profile';
+            clearStashedPostAuthRedirect();
+            router.replace(target);
         }
     }, [user, isLoading, router, redirect]);
 

@@ -996,13 +996,16 @@ def main() -> None:
     ]
 
     # Enumerate sub-units from the course JSON that received zero questions.
+    from course_question_mapper import legacy_id
+
     course = json.loads(COURSE_JSON.read_text())
     all_sub_ids: list[tuple[int, int, str]] = []
     for u in course["units"]:
+        uid = legacy_id(u["id"])
         for su in u.get("sub_units", []):
-            all_sub_ids.append((u["id"], su["id"], su["title"]))
+            all_sub_ids.append((uid, legacy_id(su["id"]), su["title"]))
             for ssu in su.get("sub_units", []):
-                all_sub_ids.append((u["id"], ssu["id"], ssu["title"]))
+                all_sub_ids.append((uid, legacy_id(ssu["id"]), ssu["title"]))
     have = {(u, s) for (u, s), n in by_unit_subunit.items() if n > 0 and s is not None}
     zero = [(u, s, t) for (u, s, t) in all_sub_ids if (u, s) not in have]
     if not zero:

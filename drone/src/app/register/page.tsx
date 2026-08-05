@@ -15,6 +15,8 @@ import {
     redirectIndicatesPurchase,
     sanitizeRedirect,
     stashPostAuthRedirect,
+    readStashedPostAuthRedirect,
+    clearStashedPostAuthRedirect,
     loginHref,
 } from '@/app/lib/auth-redirect';
 
@@ -62,7 +64,9 @@ function RegisterPageInner() {
 
     useEffect(() => {
         if (!authLoading && user) {
-            router.replace(redirect ?? '/profile');
+            const target = redirect ?? readStashedPostAuthRedirect() ?? '/profile';
+            clearStashedPostAuthRedirect();
+            router.replace(target);
         }
     }, [user, authLoading, router, redirect]);
 
