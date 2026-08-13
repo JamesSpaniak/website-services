@@ -1,6 +1,6 @@
 unit_id,sub_unit_id,unit_ref,sub_unit_ref,course_path
 1,11,u1,u11,PART 107 REGULATIONS > Applicability of Part 107
-1,124,u1,u124,PART 107 REGULATIONS > Flight Crew Management and Communication
+1,124,u1,u124,PART 107 REGULATIONS > Crew Roles and Responsibilities > Flight Crew Management and Communication
 1,171,u1,u171,"PART 107 REGULATIONS > Flying At Night Under Certain Conditions > Night Eligibility, Civil Twilight, and Lighting"
 1,172,u1,u172,PART 107 REGULATIONS > Flying At Night Under Certain Conditions > Night Flight Hazards and Mitigation
 1,161,u1,u161,PART 107 REGULATIONS > Flying Over People and Moving Objects > Means of Compliance and Declaration of Compliance
@@ -18,12 +18,12 @@ unit_id,sub_unit_id,unit_ref,sub_unit_ref,course_path
 1,136,u1,u136,PART 107 REGULATIONS > Operating Rules > Right-of-Way Rules and Operation Near Aircraft
 1,141,u1,u141,PART 107 REGULATIONS > Operating Rules > Transportation of Property
 1,135,u1,u135,PART 107 REGULATIONS > Operating Rules > Visual Line of Sight (VLOS) and Multi-Aircraft Rules
-1,122,u1,u122,PART 107 REGULATIONS > Person Manipulating the Flight Controls
+1,122,u1,u122,PART 107 REGULATIONS > Crew Roles and Responsibilities > Person Manipulating the Flight Controls
 1,153,u1,u153,PART 107 REGULATIONS > Remote ID Requirements > FRIA and Alternative Remote Identification
 1,152,u1,u152,PART 107 REGULATIONS > Remote ID Requirements > Remote ID Broadcast Module
 1,151,u1,u151,PART 107 REGULATIONS > Remote ID Requirements > Standard Remote ID
-1,121,u1,u121,PART 107 REGULATIONS > Remote Pilot In Command (RPIC)
-1,123,u1,u123,PART 107 REGULATIONS > Visual Observer (VO)
+1,121,u1,u121,PART 107 REGULATIONS > Crew Roles and Responsibilities > Remote Pilot In Command (RPIC)
+1,123,u1,u123,PART 107 REGULATIONS > Crew Roles and Responsibilities > Visual Observer (VO)
 1,14,u1,u14,PART 107 REGULATIONS > Waivers and Airspace Authorization
 2,243,u2,u243,"Airports, Airspace, and Data Sources > Aeronautical Charts > Chart Legend, Supplement, and Airport Data"
 2,244,u2,u244,"Airports, Airspace, and Data Sources > Aeronautical Charts > Man-Made Obstacles on Sectional Charts"

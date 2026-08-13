@@ -1,34 +1,42 @@
-import { User } from "../../users/types/user.entity";
-import { Organization } from "../../organizations/types/organization.entity";
-import { Column, CreateDateColumn, Entity, Index, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from '../../users/types/user.entity';
+import { Organization } from '../../organizations/types/organization.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('courses')
 export class Course {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Index()
-    @Column({ type: 'varchar', unique: true })
-    title: string;
+  @Index()
+  @Column({ type: 'varchar', unique: true })
+  title: string;
 
-    @Column({ type: 'varchar' })
-    payload: string;
+  @Column({ type: 'varchar' })
+  payload: string;
 
-    @Column({ type: 'decimal', nullable: true })
-    price: number;
+  @Column({ type: 'decimal', nullable: true })
+  price: number;
 
-    @CreateDateColumn({ type: 'timestamptz' })
-    submitted_at?: Date;
+  @CreateDateColumn({ type: 'timestamptz' })
+  submitted_at?: Date;
 
-    @UpdateDateColumn({ type: 'timestamptz' })
-    updated_at?: Date;
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updated_at?: Date;
 
-    @Column({ type: 'boolean' })
-    hidden: boolean;
+  @Column({ type: 'boolean' })
+  hidden: boolean;
 
-    @ManyToMany(() => User, (user) => user.purchased_courses)
-    purchased_by_users: User[];
+  @ManyToMany(() => User, (user) => user.purchased_courses)
+  purchased_by_users: User[];
 
-    @ManyToMany(() => Organization, (org) => org.courses)
-    organizations?: Organization[];
+  @ManyToMany(() => Organization, (org) => org.courses)
+  organizations?: Organization[];
 }

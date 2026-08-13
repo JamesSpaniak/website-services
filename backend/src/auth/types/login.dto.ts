@@ -1,7 +1,5 @@
 class AccessToken {
-    access_token: string;
+  access_token: string;
 }
 
-export {
-    AccessToken
-}
+export { AccessToken };

@@ -1,8 +1,27 @@
-import { Body, ClassSerializerInterceptor, Controller, Headers, Post, Request, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Headers,
+  Post,
+  Request,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ConfirmPurchaseDto, PurchaseCourseDto, UpgradeToProDto } from './types/purchase.dto';
+import {
+  ConfirmPurchaseDto,
+  PurchaseCourseDto,
+  UpgradeToProDto,
+} from './types/purchase.dto';
 import { PurchaseService } from './purchase.service';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserFull } from 'src/users/types/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { RolesGuard } from 'src/users/role.guard';
@@ -23,12 +42,22 @@ export class PurchaseController {
   @Roles(Role.Admin)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Grant the current user a course (Admin only)' })
-  @ApiResponse({ status: 201, description: 'Course granted successfully.', type: UserFull })
-  @ApiResponse({ status: 400, description: 'Bad request (e.g., course already owned).' })
+  @ApiResponse({
+    status: 201,
+    description: 'Course granted successfully.',
+    type: UserFull,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request (e.g., course already owned).',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden — not an admin.' })
   @Post('course')
   async purchaseCourse(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
-    const updatedUser = await this.purchasesService.purchaseCourse(req.user.userId, purchaseDto.courseId);
+    const updatedUser = await this.purchasesService.purchaseCourse(
+      req.user.userId,
+      purchaseDto.courseId,
+    );
     return plainToInstance(UserFull, updatedUser);
   }
 
@@ -41,12 +70,23 @@ export class PurchaseController {
    */
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a Stripe Payment Intent for a course purchase' })
-  @ApiResponse({ status: 201, description: 'Payment Intent created successfully.' })
+  @ApiOperation({
+    summary: 'Create a Stripe Payment Intent for a course purchase',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment Intent created successfully.',
+  })
   @Post('create-payment-intent')
-  async createPaymentIntent(@Request() req, @Body() purchaseDto: PurchaseCourseDto) {
+  async createPaymentIntent(
+    @Request() req,
+    @Body() purchaseDto: PurchaseCourseDto,
+  ) {
     await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
-    return this.purchasesService.createPaymentIntent(req.user.userId, purchaseDto.courseId);
+    return this.purchasesService.createPaymentIntent(
+      req.user.userId,
+      purchaseDto.courseId,
+    );
   }
 
   /**
@@ -54,11 +94,16 @@ export class PurchaseController {
    */
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Confirm course access from a succeeded Payment Intent' })
+  @ApiOperation({
+    summary: 'Confirm course access from a succeeded Payment Intent',
+  })
   @Post('confirm-payment')
   async confirmPayment(@Request() req, @Body() dto: ConfirmPurchaseDto) {
     await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
-    return this.purchasesService.confirmPaymentFromIntent(req.user.userId, dto.paymentIntentId);
+    return this.purchasesService.confirmPaymentFromIntent(
+      req.user.userId,
+      dto.paymentIntentId,
+    );
   }
 
   /**
@@ -69,7 +114,10 @@ export class PurchaseController {
    */
   @ApiExcludeEndpoint() // Exclude from Swagger UI as it's not for public consumption
   @Post('webhook')
-  async handleStripeWebhook(@Headers('stripe-signature') signature: string, @Request() req) {
+  async handleStripeWebhook(
+    @Headers('stripe-signature') signature: string,
+    @Request() req,
+  ) {
     // The raw body is needed for signature verification
     return this.purchasesService.handleWebhookEvent(req.body, signature);
   }
@@ -81,13 +129,25 @@ export class PurchaseController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Upgrade the current user to Pro (Admin only, no payment)' })
-  @ApiResponse({ status: 201, description: 'User upgraded to Pro successfully.', type: UserFull })
-  @ApiResponse({ status: 400, description: 'Bad request (e.g., user is already an admin).' })
+  @ApiOperation({
+    summary: 'Upgrade the current user to Pro (Admin only, no payment)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User upgraded to Pro successfully.',
+    type: UserFull,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request (e.g., user is already an admin).',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden — not an admin.' })
   @Post('pro-membership')
   async upgradeToPro(@Request() req, @Body() upgradeDto: UpgradeToProDto) {
-    const updatedUser = await this.purchasesService.upgradeToPro(req.user.userId, upgradeDto.duration);
+    const updatedUser = await this.purchasesService.upgradeToPro(
+      req.user.userId,
+      upgradeDto.duration,
+    );
     return plainToInstance(UserFull, updatedUser);
   }
 }

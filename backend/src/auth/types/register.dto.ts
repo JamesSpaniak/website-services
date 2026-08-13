@@ -31,8 +31,19 @@ export class RegisterDto {
   @IsString()
   picture_url?: string;
 
-  @ApiPropertyOptional({ description: 'One-time invite code to join an organization on registration.' })
+  @ApiPropertyOptional({
+    description:
+      'One-time invite code to join an organization on registration.',
+  })
   @IsOptional()
   @IsString()
   invite_code?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Admin-generated signup link code (promo) granting course access on registration.',
+  })
+  @IsOptional()
+  @IsString()
+  signup_code?: string;
 }

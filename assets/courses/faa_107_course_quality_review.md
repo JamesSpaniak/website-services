@@ -115,6 +115,16 @@ Night content stays under stem `17` (not duplicated inside Operating Rules).
 
 ---
 
+### Chapter 1 — first video batch Aug 12 2026
+
+| | |
+|--|--|
+| **Structure** | Restored `u12` **Crew Roles and Responsibilities** as a stem above `u121`–`u124`; leaf ids remain unchanged. |
+| **Video mappings** | Added reviewed HLS references to `u11` (applicability), `u12` (roles), `u131` (registration/inspection), and `u133` (medical/alcohol/drugs). |
+| **Open recording** | Do not map the combined falsification/accident-reporting recording. Because each node supports one `video_url`, merge its falsification segment into the existing `u131` registration/inspection recording, then use the accident-reporting segment as the `u132` video. |
+
+---
+
 ## Chapter 2 — Airports, Airspace, and Data Sources (unit `u2`)
 
 ### Current direct children in JSON — **confirmed Jul 26 2026**
@@ -434,7 +444,7 @@ All **35** unit-3 `images_url` entries preserved on the same node ids.
 | | |
 |--|--|
 | **Shipped** | Reduced Chapter 10 from 11 leaves to 3 top-level leaves, removed repeated warnings/introductions, and used short narrative plus HTML study lists. Retained `u101`, `u104`, and `u107`; retired `u102`, `u103`, `u105`, `u106`, `u1061`–`u1064`, `u108`, and `u1081`. |
-| **Counts** | Course total: **149 nodes / 114 leaves**. |
+| **Counts** | Course total: **150 nodes / 114 leaves**. |
 | **Open** | Detailed author content review and any radio/Chart Supplement figures. |
 
 ---
@@ -453,7 +463,7 @@ All **35** unit-3 `images_url` entries preserved on the same node ids.
 | **`u325` / `u440` stems** | Progress/UI that treated former leaves as flat may need re-save after publish |
 | **`u422` runway figures** | Text callouts present; images not in JSON yet |
 | Retired refs | Earlier: `u4100`, `u412`, `u421`, Ch.5 `u52` / `u531`–`u534` / `u551`–`u553`, Ch.6 `u60` / `u641`; Ch.9: `u912` / `u924` / `u942`; Ch.10: `u102` / `u103` / `u105` / `u106` / `u1061`–`u1064` / `u108` / `u1081` |
-| Publish JSON | `faa_107_course.json` (**149 nodes / 114 leaves**); admin publish of **Ch.3+4 together** still pending; include reviewed Ch.5–10 edits — **do not combine** `u5`/`u6` (`docs/TODO.md`) |
+| Publish JSON | `faa_107_course.json` (**150 nodes / 114 leaves**, 4 Ch.1 video references); admin publish of **Ch.3+4 together** still pending; include reviewed Ch.5–10 edits — **do not combine** `u5`/`u6` (`docs/TODO.md`) |
 
 ---
 

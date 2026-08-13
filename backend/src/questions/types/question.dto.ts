@@ -38,13 +38,18 @@ export class CreateQuestionDto {
   @IsInt()
   course_id: number;
 
-  @ApiPropertyOptional({ description: 'Top-level unit ref from course_units (e.g. "u10"). Null = full-course question.' })
+  @ApiPropertyOptional({
+    description:
+      'Top-level unit ref from course_units (e.g. "u10"). Null = full-course question.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
   unit_ref?: string | null;
 
-  @ApiPropertyOptional({ description: 'Lesson/sub-unit ref from course_units (e.g. "u101").' })
+  @ApiPropertyOptional({
+    description: 'Lesson/sub-unit ref from course_units (e.g. "u101").',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
@@ -83,13 +88,18 @@ export class CreateQuestionDto {
   @MaxLength(64)
   standard?: string | null;
 
-  @ApiPropertyOptional({ description: 'FAA-CT-8080-2H figure reference (e.g. "15")' })
+  @ApiPropertyOptional({
+    description: 'FAA-CT-8080-2H figure reference (e.g. "15")',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(32)
   figure_ref?: string | null;
 
-  @ApiPropertyOptional({ default: 2, description: '1=core, 2=standard, 3=supplemental' })
+  @ApiPropertyOptional({
+    default: 2,
+    description: '1=core, 2=standard, 3=supplemental',
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -101,7 +111,10 @@ export class CreateQuestionDto {
   @IsEnum(['easy', 'medium', 'hard'])
   difficulty?: QuestionDifficulty;
 
-  @ApiPropertyOptional({ enum: ['active', 'draft', 'archived'], default: 'active' })
+  @ApiPropertyOptional({
+    enum: ['active', 'draft', 'archived'],
+    default: 'active',
+  })
   @IsOptional()
   @IsEnum(['active', 'draft', 'archived'])
   status?: QuestionStatus;
@@ -131,7 +144,9 @@ export class UpdateQuestionDto {
   @MaxLength(64)
   standard?: string | null;
 
-  @ApiPropertyOptional({ description: 'FAA-CT-8080-2H figure reference (e.g. "15")' })
+  @ApiPropertyOptional({
+    description: 'FAA-CT-8080-2H figure reference (e.g. "15")',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(32)
@@ -154,13 +169,17 @@ export class UpdateQuestionDto {
   @IsEnum(['active', 'draft', 'archived'])
   status?: QuestionStatus;
 
-  @ApiPropertyOptional({ description: 'Top-level unit ref from course_units (e.g. "u10").' })
+  @ApiPropertyOptional({
+    description: 'Top-level unit ref from course_units (e.g. "u10").',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
   unit_ref?: string | null;
 
-  @ApiPropertyOptional({ description: 'Lesson/sub-unit ref from course_units (e.g. "u101").' })
+  @ApiPropertyOptional({
+    description: 'Lesson/sub-unit ref from course_units (e.g. "u101").',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
@@ -173,7 +192,9 @@ export class UpdateQuestionDto {
  * updated; otherwise a new question is created.
  */
 export class ImportQuestionDto extends CreateQuestionDto {
-  @ApiPropertyOptional({ description: 'Existing question ID — triggers an update if found' })
+  @ApiPropertyOptional({
+    description: 'Existing question ID — triggers an update if found',
+  })
   @IsOptional()
   @IsInt()
   id?: number;
@@ -211,7 +232,10 @@ export class BulkImportResultDto {
   @ApiProperty()
   skipped: number;
 
-  @ApiPropertyOptional({ description: 'Number of existing questions archived (only when replace_existing=true)' })
+  @ApiPropertyOptional({
+    description:
+      'Number of existing questions archived (only when replace_existing=true)',
+  })
   archived?: number;
 }
 
@@ -230,7 +254,8 @@ export class GenerateExamDto {
 
   @ApiPropertyOptional({
     type: [String],
-    description: 'Unit or sub-unit refs (course_units.ref) to include. Empty for full_course.',
+    description:
+      'Unit or sub-unit refs (course_units.ref) to include. Empty for full_course.',
   })
   @IsOptional()
   @IsArray()
@@ -245,18 +270,27 @@ export class GenerateExamDto {
   @IsInt({ each: true })
   scope_ids?: number[];
 
-  @ApiPropertyOptional({ default: true, description: 'Randomize question selection and order' })
+  @ApiPropertyOptional({
+    default: true,
+    description: 'Randomize question selection and order',
+  })
   @IsOptional()
   @IsBoolean()
   is_randomized?: boolean;
 
-  @ApiPropertyOptional({ default: 'v1', description: 'Version label (A/B/v1/v2) for multi-version class exams' })
+  @ApiPropertyOptional({
+    default: 'v1',
+    description: 'Version label (A/B/v1/v2) for multi-version class exams',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(8)
   version?: string;
 
-  @ApiPropertyOptional({ description: 'Target number of questions. Defaults to all available active questions.' })
+  @ApiPropertyOptional({
+    description:
+      'Target number of questions. Defaults to all available active questions.',
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -394,7 +428,9 @@ export class ExamQuestionDto {
   @ApiPropertyOptional()
   difficulty: string;
 
-  @ApiPropertyOptional({ description: 'FAA-CT-8080-2H figure reference (e.g. "15")' })
+  @ApiPropertyOptional({
+    description: 'FAA-CT-8080-2H figure reference (e.g. "15")',
+  })
   figure_ref: string | null;
 }
 

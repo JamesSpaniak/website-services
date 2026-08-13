@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ExamGeneratorService, FINAL_EXAM_STANDARD } from './exam-generator.service';
+import {
+  ExamGeneratorService,
+  FINAL_EXAM_STANDARD,
+} from './exam-generator.service';
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
 import { GenerateExamDto } from './types/question.dto';
 
-function q(partial: Partial<Question> & { id: number; priority: number }): Question {
+function q(
+  partial: Partial<Question> & { id: number; priority: number },
+): Question {
   return {
     id: partial.id,
     course_id: 35,
@@ -117,14 +122,15 @@ describe('ExamGeneratorService', () => {
     expect(exam.scope_refs).toEqual(['u1']);
 
     const qb = questionRepo.createQueryBuilder.mock.results[0].value;
-    expect(qb.andWhere).toHaveBeenCalledWith(
-      'q.unit_ref = ANY(:refs)',
-      { refs: ['u1'] },
-    );
+    expect(qb.andWhere).toHaveBeenCalledWith('q.unit_ref = ANY(:refs)', {
+      refs: ['u1'],
+    });
   });
 
   it('applies final_only pool filter', async () => {
-    questions = [q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_ref: null })];
+    questions = [
+      q({ id: 10, priority: 3, standard: FINAL_EXAM_STANDARD, unit_ref: null }),
+    ];
 
     const dto: GenerateExamDto = {
       course_id: 35,
@@ -137,10 +143,9 @@ describe('ExamGeneratorService', () => {
     expect(exam.question_ids).toEqual([10]);
 
     const qb = questionRepo.createQueryBuilder.mock.results[0].value;
-    expect(qb.andWhere).toHaveBeenCalledWith(
-      'q.standard = :finalStandard',
-      { finalStandard: FINAL_EXAM_STANDARD },
-    );
+    expect(qb.andWhere).toHaveBeenCalledWith('q.standard = :finalStandard', {
+      finalStandard: FINAL_EXAM_STANDARD,
+    });
   });
 
   it('constrains randomized exam reuse to identical scope_refs (H3)', async () => {

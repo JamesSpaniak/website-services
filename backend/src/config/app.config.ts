@@ -1,6 +1,7 @@
 import { DataSourceOptions } from 'typeorm';
 import { Article } from '../articles/types/article.entity';
 import { User } from '../users/types/user.entity';
+import { SignupLink } from '../users/types/signup-link.entity';
 import { Course } from '../courses/types/course.entity';
 import { CourseUnit } from '../courses/types/course-unit.entity';
 import { Progress } from '../progress/types/progress.entity';
@@ -16,41 +17,37 @@ import { Exam } from '../questions/types/exam.entity';
 import { ExamAttempt } from '../questions/types/exam-attempt.entity';
 import { ClassExam } from '../questions/types/class-exam.entity';
 
-
 const useSsl = process.env.DB_SSL === 'true' || process.env.DB_SSL === '1';
 
 const defaultConnection: DataSourceOptions = {
-    type: 'postgres',
-    database: process.env.DB_NAME || 'blog',
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT || '5432'),
-    ssl: useSsl ? { rejectUnauthorized: false } : undefined,
-    synchronize: false,
-    entities: [
-        Article,
-        Course,
-        CourseUnit,
-        User,
-        Progress,
-        Session,
-        Organization,
-        OrganizationMember,
-        InviteCode,
-        AuditLog,
-        Comment,
-        CommentVote,
-        Question,
-        Exam,
-        ExamAttempt,
-        ClassExam,
-    ],
-    migrations: [
-        'dist/**/migrations/**'
-    ]
+  type: 'postgres',
+  database: process.env.DB_NAME || 'blog',
+  username: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || '5432'),
+  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+  synchronize: false,
+  entities: [
+    Article,
+    Course,
+    CourseUnit,
+    User,
+    SignupLink,
+    Progress,
+    Session,
+    Organization,
+    OrganizationMember,
+    InviteCode,
+    AuditLog,
+    Comment,
+    CommentVote,
+    Question,
+    Exam,
+    ExamAttempt,
+    ClassExam,
+  ],
+  migrations: ['dist/**/migrations/**'],
 };
 
-export {
-    defaultConnection,
-}
+export { defaultConnection };

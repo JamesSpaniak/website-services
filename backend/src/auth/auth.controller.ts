@@ -1,13 +1,37 @@
-import { Controller, Post, UseGuards, Request, Res, Get, Body, UseInterceptors, ClassSerializerInterceptor, NotFoundException, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Res,
+  Get,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  NotFoundException,
+  UnauthorizedException,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/user.service';
 import { OrganizationService } from '../organizations/organization.service';
+import { RolesGuard } from '../users/role.guard';
+import { Roles } from '../users/role.decorator';
+import { Role } from '../users/types/role.enum';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Throttle } from '@nestjs/throttler';
 import { ResetPasswordDto } from './types/reset-password.dto';
 import { ForgotPasswordDto } from './types/forgot-password.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserFull } from 'src/users/types/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { LoginCredentialsDto } from './types/login-credentials.dto';
@@ -42,7 +66,10 @@ export class AuthController {
     private analyticsService: AnalyticsService,
   ) {}
 
-  private setAuthCookies(res: Response, tokens: { access_token: string; refresh_token: string }) {
+  private setAuthCookies(
+    res: Response,
+    tokens: { access_token: string; refresh_token: string },
+  ) {
     res.cookie(ACCESS_TOKEN_COOKIE, tokens.access_token, {
       ...baseCookieOptions(),
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
@@ -58,7 +85,10 @@ export class AuthController {
     res.clearCookie(REFRESH_TOKEN_COOKIE, baseCookieOptions());
   }
 
-  @ApiOperation({ summary: 'Log in a user', description: 'Authenticates a user and returns tokens and user profile.' })
+  @ApiOperation({
+    summary: 'Log in a user',
+    description: 'Authenticates a user and returns tokens and user profile.',
+  })
   @ApiResponse({ status: 200, description: 'Login successful.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   @Post('login')
@@ -67,7 +97,10 @@ export class AuthController {
     @Body() loginCredentialsDto: LoginCredentialsDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateUser(loginCredentialsDto.username, loginCredentialsDto.password);
+    const user = await this.authService.validateUser(
+      loginCredentialsDto.username,
+      loginCredentialsDto.password,
+    );
     if (!user) {
       this.analyticsService.recordLoginFailed(loginCredentialsDto.username);
       throw new UnauthorizedException('Invalid credentials');
@@ -75,8 +108,12 @@ export class AuthController {
     const tokens = await this.authService.login(user);
     this.setAuthCookies(res, tokens);
     this.analyticsService.recordLogin(user.id, user.username);
-    const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
-    const orgMembership = await this.organizationService.getMyOrganization(user.id);
+    const userFull = plainToInstance(UserFull, user, {
+      excludeExtraneousValues: true,
+    });
+    const orgMembership = await this.organizationService.getMyOrganization(
+      user.id,
+    );
     if (orgMembership) {
       userFull.organization = orgMembership;
     }
@@ -88,8 +125,14 @@ export class AuthController {
     };
   }
 
-  @ApiOperation({ summary: 'Register a new user', description: 'Creates a new account and sends a verification email.' })
-  @ApiResponse({ status: 201, description: 'Registration successful. Verification email sent.' })
+  @ApiOperation({
+    summary: 'Register a new user',
+    description: 'Creates a new account and sends a verification email.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Registration successful. Verification email sent.',
+  })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     const result = await this.authService.registerUser(registerDto);
@@ -97,7 +140,10 @@ export class AuthController {
     return result;
   }
 
-  @ApiOperation({ summary: 'Verify email address', description: 'Validates email verification token.' })
+  @ApiOperation({
+    summary: 'Verify email address',
+    description: 'Validates email verification token.',
+  })
   @ApiResponse({ status: 200, description: 'Email verified successfully.' })
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
@@ -116,7 +162,10 @@ export class AuthController {
     return this.authService.resendVerificationEmail(req.user.userId);
   }
 
-  @ApiOperation({ summary: 'Refresh access token', description: 'Provides a new access and refresh token.' })
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description: 'Provides a new access and refresh token.',
+  })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token.' })
   @Post('refresh')
@@ -138,7 +187,11 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'The profile of the currently authenticated user.', type: UserFull })
+  @ApiResponse({
+    status: 200,
+    description: 'The profile of the currently authenticated user.',
+    type: UserFull,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('profile')
@@ -148,15 +201,22 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException('User from token not found.');
     }
-    const userFull = plainToInstance(UserFull, user, { excludeExtraneousValues: true });
-    const orgMembership = await this.organizationService.getMyOrganization(user.id);
+    const userFull = plainToInstance(UserFull, user, {
+      excludeExtraneousValues: true,
+    });
+    const orgMembership = await this.organizationService.getMyOrganization(
+      user.id,
+    );
     if (orgMembership) {
       userFull.organization = orgMembership;
     }
     return userFull;
   }
 
-  @ApiOperation({ summary: 'Log out the current user', description: 'Invalidates the provided refresh token.' })
+  @ApiOperation({
+    summary: 'Log out the current user',
+    description: 'Invalidates the provided refresh token.',
+  })
   @ApiResponse({ status: 200, description: 'Logout successful.' })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
@@ -175,15 +235,46 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Request a password reset' })
-  @ApiResponse({ status: 201, description: 'A message indicating that if the user exists, an email has been sent.' })
+  @ApiResponse({
+    status: 201,
+    description:
+      'A message indicating that if the user exists, an email has been sent.',
+  })
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.sendPasswordResetLink(forgotPasswordDto.email);
   }
 
+  @ApiOperation({
+    summary: 'Send a password reset link to a specific user (Admin only)',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Post('admin/users/:id/send-password-reset')
+  @HttpCode(HttpStatus.OK)
+  async adminSendPasswordReset(@Param('id', ParseIntPipe) id: number) {
+    return this.authService.adminSendPasswordReset(id);
+  }
+
+  @ApiOperation({
+    summary: "Resend a specific user's verification email (Admin only)",
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Post('admin/users/:id/resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async adminResendVerification(@Param('id', ParseIntPipe) id: number) {
+    return this.authService.adminResendVerification(id);
+  }
+
   @ApiOperation({ summary: 'Reset password with a token' })
-  @ApiResponse({ status: 201, description: 'Password has been successfully reset.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Password has been successfully reset.',
+  })
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {

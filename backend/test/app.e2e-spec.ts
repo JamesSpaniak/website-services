@@ -62,8 +62,8 @@ describe('API (e2e)', () => {
   const truncateAll = async () => {
     await dataSource.query(
       'TRUNCATE TABLE "sessions", "progress", "user_courses_purchased", "courses", "course_units", "users", "articles", ' +
-      '"organizations", "organization_members", "exams", "exam_attempts", "class_exams", "questions" ' +
-      'RESTART IDENTITY CASCADE;',
+        '"organizations", "organization_members", "exams", "exam_attempts", "class_exams", "questions" ' +
+        'RESTART IDENTITY CASCADE;',
     );
   };
 
@@ -106,9 +106,11 @@ describe('API (e2e)', () => {
     if (!globalThis.crypto) {
       globalThis.crypto = webcrypto as Crypto;
     }
-    process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_123';
+    process.env.STRIPE_SECRET_KEY =
+      process.env.STRIPE_SECRET_KEY || 'sk_test_123';
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_jwt_secret';
-    process.env.JWT_RESET_SECRET = process.env.JWT_RESET_SECRET || 'test_jwt_reset_secret';
+    process.env.JWT_RESET_SECRET =
+      process.env.JWT_RESET_SECRET || 'test_jwt_reset_secret';
     process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
     process.env.JWT_RESET_EXPIRES_IN = process.env.JWT_RESET_EXPIRES_IN || '1h';
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -130,13 +132,25 @@ describe('API (e2e)', () => {
     dataSource = app.get(DataSource);
     userRepository = app.get<Repository<User>>(getRepositoryToken(User));
     courseRepository = app.get<Repository<Course>>(getRepositoryToken(Course));
-    courseUnitRepository = app.get<Repository<CourseUnit>>(getRepositoryToken(CourseUnit));
-    progressRepository = app.get<Repository<Progress>>(getRepositoryToken(Progress));
-    organizationRepository = app.get<Repository<Organization>>(getRepositoryToken(Organization));
-    memberRepository = app.get<Repository<OrganizationMember>>(getRepositoryToken(OrganizationMember));
+    courseUnitRepository = app.get<Repository<CourseUnit>>(
+      getRepositoryToken(CourseUnit),
+    );
+    progressRepository = app.get<Repository<Progress>>(
+      getRepositoryToken(Progress),
+    );
+    organizationRepository = app.get<Repository<Organization>>(
+      getRepositoryToken(Organization),
+    );
+    memberRepository = app.get<Repository<OrganizationMember>>(
+      getRepositoryToken(OrganizationMember),
+    );
     examRepository = app.get<Repository<Exam>>(getRepositoryToken(Exam));
-    classExamRepository = app.get<Repository<ClassExam>>(getRepositoryToken(ClassExam));
-    questionRepository = app.get<Repository<Question>>(getRepositoryToken(Question));
+    classExamRepository = app.get<Repository<ClassExam>>(
+      getRepositoryToken(ClassExam),
+    );
+    questionRepository = app.get<Repository<Question>>(
+      getRepositoryToken(Question),
+    );
   });
 
   beforeEach(async () => {
@@ -215,7 +229,9 @@ describe('API (e2e)', () => {
 
     it('requires auth for course detail', async () => {
       const course = await createCourse('Restricted Course');
-      await request(app.getHttpServer()).get(`/courses/${course.id}`).expect(401);
+      await request(app.getHttpServer())
+        .get(`/courses/${course.id}`)
+        .expect(401);
     });
 
     it('returns redacted course content for normal users', async () => {
@@ -250,15 +266,21 @@ describe('API (e2e)', () => {
   describe('progress access control', () => {
     it('requires auth for progress endpoints', async () => {
       await request(app.getHttpServer()).get('/progress/courses').expect(401);
-      await request(app.getHttpServer()).post('/progress/courses/1/reset').expect(401);
+      await request(app.getHttpServer())
+        .post('/progress/courses/1/reset')
+        .expect(401);
     });
   });
 
   describe('purchases access control', () => {
     it('requires auth for purchase endpoints', async () => {
       await request(app.getHttpServer()).post('/purchases/course').expect(401);
-      await request(app.getHttpServer()).post('/purchases/create-payment-intent').expect(401);
-      await request(app.getHttpServer()).post('/purchases/pro-membership').expect(401);
+      await request(app.getHttpServer())
+        .post('/purchases/create-payment-intent')
+        .expect(401);
+      await request(app.getHttpServer())
+        .post('/purchases/pro-membership')
+        .expect(401);
     });
 
     it('rejects non-admin for direct course grant and pro upgrade', async () => {
@@ -294,7 +316,11 @@ describe('API (e2e)', () => {
 
   describe('mass assignment protection (C1)', () => {
     it('ignores role/password escalation attempts on PATCH /users/me', async () => {
-      const user = await createUser(Role.User, 'escalate', 'escalate@example.com');
+      const user = await createUser(
+        Role.User,
+        'escalate',
+        'escalate@example.com',
+      );
       const token = await loginAndGetToken('escalate');
 
       const response = await request(app.getHttpServer())
@@ -374,10 +400,20 @@ describe('API (e2e)', () => {
     const seedOrgExam = async () => {
       const course = await createCourse('Org Course');
 
-      const orgA = await organizationRepository.save({ name: 'Org A', max_students: 30 });
-      const orgB = await organizationRepository.save({ name: 'Org B', max_students: 30 });
+      const orgA = await organizationRepository.save({
+        name: 'Org A',
+        max_students: 30,
+      });
+      const orgB = await organizationRepository.save({
+        name: 'Org B',
+        max_students: 30,
+      });
 
-      const managerA = await createUser(Role.User, 'managera', 'managera@example.com');
+      const managerA = await createUser(
+        Role.User,
+        'managera',
+        'managera@example.com',
+      );
       await memberRepository.save({
         organizationId: orgA.id,
         userId: managerA.id,
@@ -532,7 +568,9 @@ describe('API (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post(`/exams/${exam.id}/submit`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ answers: [{ question_id: question.id, selected_choice_id: 1 }] })
+        .send({
+          answers: [{ question_id: question.id, selected_choice_id: 1 }],
+        })
         .expect(201);
 
       expect(response.body.score).toBe(0);
@@ -548,7 +586,9 @@ describe('API (e2e)', () => {
       await request(app.getHttpServer())
         .post(`/exams/${exam.id}/submit`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ answers: [{ question_id: question.id, selected_choice_id: 2 }] })
+        .send({
+          answers: [{ question_id: question.id, selected_choice_id: 2 }],
+        })
         .expect(201);
 
       const response = await request(app.getHttpServer())
@@ -573,8 +613,18 @@ describe('API (e2e)', () => {
             title: 'Regulations',
             text_content: 'unit content',
             sub_units: [
-              { id: 11, title: 'Applicability', text_content: 'lesson content', sub_units: [] },
-              { id: 13, title: 'Operational Rules', text_content: 'lesson content', sub_units: [] },
+              {
+                id: 11,
+                title: 'Applicability',
+                text_content: 'lesson content',
+                sub_units: [],
+              },
+              {
+                id: 13,
+                title: 'Operational Rules',
+                text_content: 'lesson content',
+                sub_units: [],
+              },
             ],
           },
           {
@@ -582,7 +632,12 @@ describe('API (e2e)', () => {
             title: 'Radio Communications',
             text_content: 'unit content',
             sub_units: [
-              { id: 101, title: 'Radio in the NAS', text_content: 'lesson content', sub_units: [] },
+              {
+                id: 101,
+                title: 'Radio in the NAS',
+                text_content: 'lesson content',
+                sub_units: [],
+              },
             ],
           },
         ],
@@ -595,7 +650,12 @@ describe('API (e2e)', () => {
       return response.body as Course;
     };
 
-    const seedQuestion = (courseId: number, unitRef: string, subUnitRef: string | null, text: string) =>
+    const seedQuestion = (
+      courseId: number,
+      unitRef: string,
+      subUnitRef: string | null,
+      text: string,
+    ) =>
       questionRepository.save({
         course_id: courseId,
         unit_ref: unitRef,
@@ -624,7 +684,13 @@ describe('API (e2e)', () => {
         where: { course_id: course.id },
         order: { depth: 'ASC', position: 'ASC' },
       });
-      expect(rows.map((r) => r.ref).sort()).toEqual(['u1', 'u10', 'u101', 'u11', 'u13']);
+      expect(rows.map((r) => r.ref).sort()).toEqual([
+        'u1',
+        'u10',
+        'u101',
+        'u11',
+        'u13',
+      ]);
 
       const u101 = rows.find((r) => r.ref === 'u101');
       expect(u101.parent_ref).toBe('u10'); // owned by unit 10, not prefix-math unit 1
@@ -634,7 +700,10 @@ describe('API (e2e)', () => {
       // Payload ids were rewritten to refs
       const saved = await courseRepository.findOneBy({ id: course.id });
       const payload = JSON.parse(saved.payload);
-      expect(payload.units.map((u: { id: string }) => u.id)).toEqual(['u1', 'u10']);
+      expect(payload.units.map((u: { id: string }) => u.id)).toEqual([
+        'u1',
+        'u10',
+      ]);
 
       // Re-uploading the same payload is idempotent (same refs, no dupes)
       await request(app.getHttpServer())
@@ -642,8 +711,16 @@ describe('API (e2e)', () => {
         .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(200);
-      const rowsAfter = await courseUnitRepository.find({ where: { course_id: course.id } });
-      expect(rowsAfter.map((r) => r.ref).sort()).toEqual(['u1', 'u10', 'u101', 'u11', 'u13']);
+      const rowsAfter = await courseUnitRepository.find({
+        where: { course_id: course.id },
+      });
+      expect(rowsAfter.map((r) => r.ref).sort()).toEqual([
+        'u1',
+        'u10',
+        'u101',
+        'u11',
+        'u13',
+      ]);
     });
 
     it('generates ref-scoped exams without unit 1 / unit 10 collisions', async () => {
@@ -652,7 +729,12 @@ describe('API (e2e)', () => {
       const course = await createCourseViaApi(token, 'Refs Exam Course');
 
       const q1 = await seedQuestion(course.id, 'u1', 'u11', 'Unit 1 question');
-      const q10 = await seedQuestion(course.id, 'u10', 'u101', 'Unit 10 question');
+      const q10 = await seedQuestion(
+        course.id,
+        'u10',
+        'u101',
+        'Unit 10 question',
+      );
 
       const unit1 = await request(app.getHttpServer())
         .post('/exams/generate')
@@ -660,14 +742,18 @@ describe('API (e2e)', () => {
         .send({ course_id: course.id, scope: 'unit', scope_refs: ['u1'] })
         .expect(201);
       expect(unit1.body.scope_refs).toEqual(['u1']);
-      expect(unit1.body.questions.map((q: { id: number }) => q.id)).toEqual([q1.id]);
+      expect(unit1.body.questions.map((q: { id: number }) => q.id)).toEqual([
+        q1.id,
+      ]);
 
       const unit10 = await request(app.getHttpServer())
         .post('/exams/generate')
         .set('Authorization', `Bearer ${token}`)
         .send({ course_id: course.id, scope: 'unit', scope_refs: ['u10'] })
         .expect(201);
-      expect(unit10.body.questions.map((q: { id: number }) => q.id)).toEqual([q10.id]);
+      expect(unit10.body.questions.map((q: { id: number }) => q.id)).toEqual([
+        q10.id,
+      ]);
     });
 
     it('maps legacy scope_ids to refs on generate', async () => {
@@ -690,7 +776,12 @@ describe('API (e2e)', () => {
       await createUser(Role.Admin, 'breakdown', 'breakdown@example.com');
       const token = await loginAndGetToken('breakdown');
       const course = await createCourseViaApi(token, 'Breakdown Course');
-      const question = await seedQuestion(course.id, 'u1', 'u11', 'Breakdown question');
+      const question = await seedQuestion(
+        course.id,
+        'u1',
+        'u11',
+        'Breakdown question',
+      );
 
       const generated = await request(app.getHttpServer())
         .post('/exams/generate')
@@ -701,7 +792,9 @@ describe('API (e2e)', () => {
       const submit = await request(app.getHttpServer())
         .post(`/exams/${generated.body.id}/submit`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ answers: [{ question_id: question.id, selected_choice_id: 1 }] })
+        .send({
+          answers: [{ question_id: question.id, selected_choice_id: 1 }],
+        })
         .expect(201);
 
       const breakdown = submit.body.section_breakdown;
@@ -776,7 +869,10 @@ describe('API (e2e)', () => {
     const getCookies = (response: request.Response): string[] =>
       ([] as string[]).concat(response.headers['set-cookie'] ?? []);
 
-    const cookieValue = (cookies: string[], name: string): string | undefined => {
+    const cookieValue = (
+      cookies: string[],
+      name: string,
+    ): string | undefined => {
       const cookie = cookies.find((c) => c.startsWith(`${name}=`));
       return cookie?.split(';')[0].split('=').slice(1).join('=');
     };
@@ -852,7 +948,10 @@ describe('API (e2e)', () => {
     });
 
     it('rejects refresh without cookie or body token', async () => {
-      await request(app.getHttpServer()).post('/auth/refresh').send({}).expect(401);
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({})
+        .expect(401);
     });
 
     it('clears cookies and invalidates the session on logout', async () => {
@@ -873,10 +972,16 @@ describe('API (e2e)', () => {
         .expect(200);
 
       const clearedCookies = getCookies(logoutResponse);
-      const clearedAccess = clearedCookies.find((c) => c.startsWith('access_token='));
-      const clearedRefresh = clearedCookies.find((c) => c.startsWith('refresh_token='));
+      const clearedAccess = clearedCookies.find((c) =>
+        c.startsWith('access_token='),
+      );
+      const clearedRefresh = clearedCookies.find((c) =>
+        c.startsWith('refresh_token='),
+      );
       expect(clearedAccess).toMatch(/access_token=;|Expires=Thu, 01 Jan 1970/i);
-      expect(clearedRefresh).toMatch(/refresh_token=;|Expires=Thu, 01 Jan 1970/i);
+      expect(clearedRefresh).toMatch(
+        /refresh_token=;|Expires=Thu, 01 Jan 1970/i,
+      );
 
       // The invalidated session can no longer refresh
       await request(app.getHttpServer())
@@ -903,7 +1008,11 @@ describe('API (e2e)', () => {
     it('accepts valid log payloads with 204', async () => {
       await request(app.getHttpServer())
         .post('/logs')
-        .send({ level: 'info', message: 'Test log', context: { page: '/home' } })
+        .send({
+          level: 'info',
+          message: 'Test log',
+          context: { page: '/home' },
+        })
         .expect(204);
     });
 
@@ -925,23 +1034,38 @@ describe('API (e2e)', () => {
   describe('assigned class exams (W1.2)', () => {
     const seedAssignedExam = async () => {
       const course = await createCourse('Assigned Course');
-      const org = await organizationRepository.save({ name: 'Class Org', max_students: 30 });
+      const org = await organizationRepository.save({
+        name: 'Class Org',
+        max_students: 30,
+      });
 
-      const manager = await createUser(Role.User, 'classmgr', 'classmgr@example.com');
+      const manager = await createUser(
+        Role.User,
+        'classmgr',
+        'classmgr@example.com',
+      );
       await memberRepository.save({
         organizationId: org.id,
         userId: manager.id,
         role: OrgRole.Manager,
       });
 
-      const student = await createUser(Role.User, 'classstudent', 'classstudent@example.com');
+      const student = await createUser(
+        Role.User,
+        'classstudent',
+        'classstudent@example.com',
+      );
       await memberRepository.save({
         organizationId: org.id,
         userId: student.id,
         role: OrgRole.Member,
       });
 
-      const outsider = await createUser(Role.User, 'classoutsider', 'classoutsider@example.com');
+      const outsider = await createUser(
+        Role.User,
+        'classoutsider',
+        'classoutsider@example.com',
+      );
 
       const question = await questionRepository.save({
         course_id: course.id,
@@ -1026,7 +1150,9 @@ describe('API (e2e)', () => {
       const submitResponse = await request(app.getHttpServer())
         .post(`/exams/${exam.id}/submit`)
         .set('Authorization', `Bearer ${studentToken}`)
-        .send({ answers: [{ question_id: question.id, selected_choice_id: 2 }] })
+        .send({
+          answers: [{ question_id: question.id, selected_choice_id: 2 }],
+        })
         .expect(201);
 
       expect(submitResponse.body.score).toBe(100);

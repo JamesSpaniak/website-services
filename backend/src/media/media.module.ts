@@ -9,9 +9,9 @@ import { Course } from '../courses/types/course.entity';
 import { User } from '../users/types/user.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Article, Course, User])],
-    controllers: [MediaController],
-    providers: [MediaService, SignedUrlService, OrphanMediaService],
-    exports: [MediaService, SignedUrlService],
+  imports: [TypeOrmModule.forFeature([Article, Course, User])],
+  controllers: [MediaController],
+  providers: [MediaService, SignedUrlService, OrphanMediaService],
+  exports: [MediaService, SignedUrlService],
 })
 export class MediaModule {}

@@ -22,6 +22,15 @@ Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to a
 | [`drone/public/`](../../drone/public/) | Static files served by Next.js |
 | CloudFront `media.thedroneedge.com` | Uploaded course/article video and images |
 
+## Marketing flight media (local, mostly gitignored)
+
+| Path | Contents |
+|------|----------|
+| [`assets/media/`](../../assets/media/) | Business drone masters (`raw/`), snips/previews (`edits/`), tracked cut lists (`manifests/`) |
+| [`assets/media/README.md`](../../assets/media/README.md) | Hybrid archive rules: external SSD primary, this folder working set, B2/Glacier later; never iCloud for 4K masters |
+
+Personal/family footage does **not** live in this repo. Course lesson source for MediaConvert stays under [`assets/videos/`](../../assets/videos/). Finished site uploads go to S3/CloudFront only.
+
 ## Editorial content
 
 | Path | Contents |

@@ -11,63 +11,69 @@ import { CourseDetails, UnitData } from './types/course.dto';
 import { CourseUnitService } from './course-unit.service';
 import { FINAL_EXAM_STANDARD } from 'src/questions/exam-generator.service';
 import { normalizeAndFlattenUnits } from './course-unit.util';
-import {
-  assertCourseExists,
-  stripCourseForPublic,
-} from './course-access.util';
+import { assertCourseExists, stripCourseForPublic } from './course-access.util';
 
 @Injectable()
 export class CourseService {
-    private readonly logger = new Logger(CourseService.name);
+  private readonly logger = new Logger(CourseService.name);
 
-    constructor(
-        @InjectRepository(Course)
-        private courseRepository: Repository<Course>,
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
-        @InjectRepository(Question)
-        private questionRepository: Repository<Question>,
-        private readonly mediaService: MediaService,
-        private readonly organizationService: OrganizationService,
-        private readonly courseUnitService: CourseUnitService,
-        private readonly dataSource: DataSource,
+  constructor(
+    @InjectRepository(Course)
+    private courseRepository: Repository<Course>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Question)
+    private questionRepository: Repository<Question>,
+    private readonly mediaService: MediaService,
+    private readonly organizationService: OrganizationService,
+    private readonly courseUnitService: CourseUnitService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getCourseByTitle(title: string): Promise<Course | undefined> {
     const res = this.courseRepository.findOne({
-        where: { title: title }
+      where: { title: title },
     });
     return res;
   }
 
-  async hasAccess(courseId: number, userFromJwt: { userId: number, role: Role }): Promise<boolean> {
+  async hasAccess(
+    courseId: number,
+    userFromJwt: { userId: number; role: Role },
+  ): Promise<boolean> {
     if (userFromJwt.role === Role.Admin) {
-        return true;
+      return true;
     }
 
     const user = await this.userRepository.findOne({
-        where: { id: userFromJwt.userId },
-        relations: ['purchased_courses'],
+      where: { id: userFromJwt.userId },
+      relations: ['purchased_courses'],
     });
 
     if (!user) return false;
 
-    if(user.role === Role.Admin)
-        return true;
-    if (user.role === Role.Pro && user.pro_membership_expires_at && user.pro_membership_expires_at > new Date()) {
-        return true;
+    if (user.role === Role.Admin) return true;
+    if (
+      user.role === Role.Pro &&
+      user.pro_membership_expires_at &&
+      user.pro_membership_expires_at > new Date()
+    ) {
+      return true;
     }
 
-    if (user.purchased_courses.some(course => course.id === courseId)) {
-        return true;
+    if (user.purchased_courses.some((course) => course.id === courseId)) {
+      return true;
     }
 
-    return this.organizationService.hasOrgCourseAccess(userFromJwt.userId, courseId);
+    return this.organizationService.hasOrgCourseAccess(
+      userFromJwt.userId,
+      courseId,
+    );
   }
 
   async getCourseById(id: number): Promise<Course | undefined> {
     return this.courseRepository.findOne({
-        where: { id: id }
+      where: { id: id },
     });
   }
 
@@ -77,9 +83,10 @@ export class CourseService {
    * 'scoped' pool so the frontend can hide exam CTAs for empty scopes without
    * a per-node API call.
    */
-  async getQuestionCounts(
-    courseId: number,
-  ): Promise<{ unit: Record<string, number>; sub_unit: Record<string, number> }> {
+  async getQuestionCounts(courseId: number): Promise<{
+    unit: Record<string, number>;
+    sub_unit: Record<string, number>;
+  }> {
     const baseQuery = (refColumn: 'unit_ref' | 'sub_unit_ref') =>
       this.questionRepository
         .createQueryBuilder('q')
@@ -108,7 +115,7 @@ export class CourseService {
   /** Admins see every course (including hidden drafts they are editing). */
   async getCourses(includeHidden = false): Promise<Course[]> {
     const courses = await this.courseRepository.find();
-    return includeHidden ? courses : courses.filter(course => !course.hidden);
+    return includeHidden ? courses : courses.filter((course) => !course.hidden);
   }
 
   /** Unauthenticated marketing payload — outline and hero media only. */
@@ -177,7 +184,9 @@ export class CourseService {
     if (!course) return;
     await this.courseRepository.delete(id);
     void this.deleteCourseMedia(course).catch((err) =>
-      this.logger.error(`Post-delete media cleanup failed for course ${id}: ${(err as Error).message}`),
+      this.logger.error(
+        `Post-delete media cleanup failed for course ${id}: ${(err as Error).message}`,
+      ),
     );
   }
 
@@ -189,7 +198,9 @@ export class CourseService {
     if (keys.length === 0) return;
 
     await this.mediaService.deleteMultipleMedia(keys);
-    this.logger.log(`Deleted ${keys.length} media files for course ${course.id}`);
+    this.logger.log(
+      `Deleted ${keys.length} media files for course ${course.id}`,
+    );
   }
 
   private collectCourseMediaUrls(course: Course): string[] {

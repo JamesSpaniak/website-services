@@ -57,9 +57,12 @@ export class ExamController {
     private readonly courseService: CourseService,
     private readonly progressService: ProgressService,
     @InjectRepository(Exam) private examRepository: Repository<Exam>,
-    @InjectRepository(ClassExam) private classExamRepository: Repository<ClassExam>,
-    @InjectRepository(ExamAttempt) private examAttemptRepository: Repository<ExamAttempt>,
-    @InjectRepository(Question) private questionRepository: Repository<Question>,
+    @InjectRepository(ClassExam)
+    private classExamRepository: Repository<ClassExam>,
+    @InjectRepository(ExamAttempt)
+    private examAttemptRepository: Repository<ExamAttempt>,
+    @InjectRepository(Question)
+    private questionRepository: Repository<Question>,
     @InjectRepository(OrganizationMember)
     private memberRepository: Repository<OrganizationMember>,
   ) {}
@@ -102,10 +105,8 @@ export class ExamController {
   ): Promise<{ exam: ExamWithQuestionsDto; class_exam_id: number }> {
     await this.assertManagesOrg(req.user, dto.organization_id);
     await this.assertCourseAccess(req.user, dto.course_id);
-    const { exam, classExam } = await this.examGeneratorService.generateClassExam(
-      dto,
-      req.user.userId,
-    );
+    const { exam, classExam } =
+      await this.examGeneratorService.generateClassExam(dto, req.user.userId);
     return {
       exam: await this.buildExamWithQuestions(exam),
       class_exam_id: classExam.id,
@@ -165,7 +166,9 @@ export class ExamController {
   })
   @ApiResponse({ status: 200, type: [AssignedClassExamDto] })
   @Get('class/assigned')
-  async listAssignedClassExams(@Request() req): Promise<AssignedClassExamDto[]> {
+  async listAssignedClassExams(
+    @Request() req,
+  ): Promise<AssignedClassExamDto[]> {
     const memberships = await this.memberRepository.find({
       where: { userId: req.user.userId },
     });
@@ -225,7 +228,8 @@ export class ExamController {
     const classExam = await this.classExamRepository.findOne({
       where: { id: classExamId },
     });
-    if (!classExam) throw new NotFoundException(`ClassExam ${classExamId} not found`);
+    if (!classExam)
+      throw new NotFoundException(`ClassExam ${classExamId} not found`);
     await this.assertManagesOrg(req.user, classExam.organization_id);
     return this.examAttemptService.getClassResults(classExamId);
   }
@@ -234,7 +238,8 @@ export class ExamController {
 
   @ApiOperation({
     summary: 'Get an exam with its questions',
-    description: 'Returns question text and choices without revealing correct answers.',
+    description:
+      'Returns question text and choices without revealing correct answers.',
   })
   @ApiResponse({ status: 200, type: ExamWithQuestionsDto })
   @ApiResponse({ status: 404, description: 'Exam not found.' })
@@ -338,7 +343,9 @@ export class ExamController {
     }
   }
 
-  private async buildExamWithQuestions(exam: Exam): Promise<ExamWithQuestionsDto> {
+  private async buildExamWithQuestions(
+    exam: Exam,
+  ): Promise<ExamWithQuestionsDto> {
     const questions = await this.questionRepository.findBy({
       id: In(exam.question_ids),
     });

@@ -67,7 +67,9 @@ export class StringUnitRefsAndCourseUnits1745100006000
       try {
         payload = JSON.parse(course.payload);
       } catch {
-        console.warn(`[migration] course ${course.id}: unparseable payload, skipped`);
+        console.warn(
+          `[migration] course ${course.id}: unparseable payload, skipped`,
+        );
         continue;
       }
 
@@ -95,8 +97,11 @@ export class StringUnitRefsAndCourseUnits1745100006000
       const cleanNode = (node: any): void => {
         // L1: image_url was merged into images_url long ago; drop the leftovers
         if (typeof node.image_url === 'string' && node.image_url.trim()) {
-          const urls: string[] = Array.isArray(node.images_url) ? node.images_url : [];
-          if (!urls.includes(node.image_url.trim())) urls.push(node.image_url.trim());
+          const urls: string[] = Array.isArray(node.images_url)
+            ? node.images_url
+            : [];
+          if (!urls.includes(node.image_url.trim()))
+            urls.push(node.image_url.trim());
           node.images_url = urls;
         }
         delete node.image_url;
@@ -323,11 +328,19 @@ export class StringUnitRefsAndCourseUnits1745100006000
     await queryRunner.query(
       `ALTER TABLE "progress" ADD COLUMN "payload" jsonb NOT NULL DEFAULT '{}'`,
     );
-    await queryRunner.query(`ALTER TABLE "progress" DROP COLUMN "unit_statuses"`);
+    await queryRunner.query(
+      `ALTER TABLE "progress" DROP COLUMN "unit_statuses"`,
+    );
     await queryRunner.query(`ALTER TABLE "exams" DROP COLUMN "scope_refs"`);
-    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_questions_course_sub_unit_ref"`);
-    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_questions_course_unit_ref"`);
-    await queryRunner.query(`ALTER TABLE "questions" DROP COLUMN "sub_unit_ref"`);
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS "IDX_questions_course_sub_unit_ref"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS "IDX_questions_course_unit_ref"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "questions" DROP COLUMN "sub_unit_ref"`,
+    );
     await queryRunner.query(`ALTER TABLE "questions" DROP COLUMN "unit_ref"`);
     await queryRunner.query(`DROP TABLE IF EXISTS "course_units"`);
   }

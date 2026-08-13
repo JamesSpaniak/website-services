@@ -31,7 +31,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    this.logger.debug(`JWT validate: sub=${payload.sub}, username=${payload.username}, token_version=${payload.token_version}`);
+    this.logger.debug(
+      `JWT validate: sub=${payload.sub}, username=${payload.username}, token_version=${payload.token_version}`,
+    );
 
     const user = await this.usersService.getUserById(payload.sub);
     if (!user) {
@@ -40,7 +42,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (user.token_version !== payload.token_version) {
-      this.logger.warn(`JWT rejected: token_version mismatch for user="${user.username}" (db=${user.token_version}, jwt=${payload.token_version})`);
+      this.logger.warn(
+        `JWT rejected: token_version mismatch for user="${user.username}" (db=${user.token_version}, jwt=${payload.token_version})`,
+      );
       throw new UnauthorizedException('Token has been invalidated.');
     }
 

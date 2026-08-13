@@ -5,7 +5,9 @@ import { FrontendLogDto } from './types/frontend-log.dto';
 
 const MAX_CONTEXT_BYTES = 8000;
 
-function truncateContext(ctx: Record<string, unknown>): Record<string, unknown> {
+function truncateContext(
+  ctx: Record<string, unknown>,
+): Record<string, unknown> {
   const serialized = JSON.stringify(ctx);
   if (serialized.length <= MAX_CONTEXT_BYTES) return ctx;
   return {
@@ -24,7 +26,11 @@ export class LoggingController {
    * Receives log messages from the frontend client and writes them to the backend logger.
    * This is a "fire-and-forget" endpoint that returns 204 No Content.
    */
-  @ApiOperation({ summary: 'Endpoint for frontend to send logs to the backend.', description: 'This is an internal endpoint and not intended for public use.' })
+  @ApiOperation({
+    summary: 'Endpoint for frontend to send logs to the backend.',
+    description:
+      'This is an internal endpoint and not intended for public use.',
+  })
   @Post()
   @HttpCode(204) // No Content
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
@@ -37,7 +43,9 @@ export class LoggingController {
       const rest = { ...ctx };
       delete rest.stack;
       const detail =
-        Object.keys(rest).length > 0 ? `${message} ${JSON.stringify(rest)}` : message;
+        Object.keys(rest).length > 0
+          ? `${message} ${JSON.stringify(rest)}`
+          : message;
       this.logger.error(detail, stack);
       return;
     }

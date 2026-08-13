@@ -9,4 +9,3 @@ export class BroadcastDto {
   @MinLength(20)
   message: string; // Can be HTML
 }
-

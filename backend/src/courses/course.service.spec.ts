@@ -48,8 +48,17 @@ describe('CourseService', () => {
         CourseService,
         { provide: getRepositoryToken(Course), useValue: courseRepo },
         { provide: getRepositoryToken(User), useValue: userRepo },
-        { provide: MediaService, useValue: { extractKeysFromUrls: jest.fn(() => []), deleteMultipleMedia: jest.fn() } },
-        { provide: OrganizationService, useValue: { hasOrgCourseAccess: jest.fn(async () => false) } },
+        {
+          provide: MediaService,
+          useValue: {
+            extractKeysFromUrls: jest.fn(() => []),
+            deleteMultipleMedia: jest.fn(),
+          },
+        },
+        {
+          provide: OrganizationService,
+          useValue: { hasOrgCourseAccess: jest.fn(async () => false) },
+        },
         { provide: CourseUnitService, useValue: courseUnitService },
         { provide: DataSource, useValue: dataSource },
       ],
@@ -113,13 +122,17 @@ describe('CourseService', () => {
 
       // "11" as a section of unit 1 collides with a top-level unit 11
       const details = payload([
-        { id: 1, title: 'Unit 1', sub_units: [{ id: 11, title: 'Section 1.1' }] },
+        {
+          id: 1,
+          title: 'Unit 1',
+          sub_units: [{ id: 11, title: 'Section 1.1' }],
+        },
         { id: 11, title: 'Unit 11' },
       ]);
 
-      await expect(
-        service.updateCourseFromPayload(1, details),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.updateCourseFromPayload(1, details)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(courseUnitService.rebuild).not.toHaveBeenCalled();
     });
   });

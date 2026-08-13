@@ -44,7 +44,11 @@ export class QuestionController {
 
   @ApiOperation({ summary: 'List questions for a course (Admin)' })
   @ApiQuery({ name: 'courseId', required: true, type: Number })
-  @ApiQuery({ name: 'status', required: false, enum: ['active', 'draft', 'archived'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['active', 'draft', 'archived'],
+  })
   @Get()
   async findByCourse(
     @Query('courseId', ParseIntPipe) courseId: number,
@@ -58,7 +62,8 @@ export class QuestionController {
 
   @ApiOperation({
     summary: 'Export all questions for a course as JSON (Admin)',
-    description: 'Returns the full question bank for a course in the same format accepted by /import.',
+    description:
+      'Returns the full question bank for a course in the same format accepted by /import.',
   })
   @ApiQuery({ name: 'courseId', required: true, type: Number })
   @Get('export')
@@ -112,7 +117,9 @@ export class QuestionController {
   })
   @ApiResponse({ status: 200, description: 'Question archived.' })
   @Delete(':id')
-  async archive(@Param('id', ParseIntPipe) id: number): Promise<{ ok: boolean }> {
+  async archive(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ ok: boolean }> {
     await this.questionService.archive(id);
     return { ok: true };
   }

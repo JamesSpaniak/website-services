@@ -48,7 +48,12 @@ export class QuestionService {
   ): Promise<Question[]> {
     return this.questionRepository.find({
       where: { course_id: courseId, status },
-      order: { unit_ref: 'ASC', sub_unit_ref: 'ASC', priority: 'ASC', id: 'ASC' },
+      order: {
+        unit_ref: 'ASC',
+        sub_unit_ref: 'ASC',
+        priority: 'ASC',
+        id: 'ASC',
+      },
     });
   }
 
@@ -183,7 +188,10 @@ export class QuestionService {
           });
           if (existing) {
             this.validateChoices(item.choices);
-            Object.assign(existing, this.importDtoToFields(item, dto.course_id, index));
+            Object.assign(
+              existing,
+              this.importDtoToFields(item, dto.course_id, index),
+            );
             await this.questionRepository.save(existing);
             updated++;
             continue;
@@ -197,7 +205,9 @@ export class QuestionService {
         await this.questionRepository.save(question);
         created++;
       } catch (err) {
-        this.logger.warn(`Skipped question (id=${item.id}): ${(err as Error).message}`);
+        this.logger.warn(
+          `Skipped question (id=${item.id}): ${(err as Error).message}`,
+        );
         skipped++;
       }
     }
@@ -205,7 +215,12 @@ export class QuestionService {
     this.logger.log(
       `Bulk import for course ${dto.course_id}: created=${created}, updated=${updated}, skipped=${skipped}, archived=${archived}`,
     );
-    return { created, updated, skipped, ...(dto.replace_existing ? { archived } : {}) };
+    return {
+      created,
+      updated,
+      skipped,
+      ...(dto.replace_existing ? { archived } : {}),
+    };
   }
 
   /**
@@ -328,7 +343,9 @@ export class QuestionService {
     }
     const correctCount = choices.filter((c) => c.is_correct).length;
     if (correctCount !== 1) {
-      throw new BadRequestException('Exactly one choice must be marked is_correct.');
+      throw new BadRequestException(
+        'Exactly one choice must be marked is_correct.',
+      );
     }
   }
 }

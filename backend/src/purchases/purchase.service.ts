@@ -1,4 +1,11 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from 'src/courses/types/course.entity';
 import { Role } from 'src/users/types/role.enum';
@@ -54,47 +61,61 @@ export class PurchaseService {
     user.purchased_courses.push(course);
     user.token_version = (user.token_version || 0) + 1;
     const saved = await this.userRepository.save(user);
-    this.auditService.log(userId, AuditAction.COURSE_PURCHASED, { courseId, courseTitle: course.title });
+    this.auditService.log(userId, AuditAction.COURSE_PURCHASED, {
+      courseId,
+      courseTitle: course.title,
+    });
     return saved;
   }
 
-  async upgradeToPro(userId: number, duration: ProMembershipDuration): Promise<User> {
+  async upgradeToPro(
+    userId: number,
+    duration: ProMembershipDuration,
+  ): Promise<User> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) throw new NotFoundException('User not found.');
-    if (user.role === Role.Admin) throw new BadRequestException('Admins cannot be downgraded to Pro.');
+    if (user.role === Role.Admin)
+      throw new BadRequestException('Admins cannot be downgraded to Pro.');
 
     const now = new Date();
-    const expiryDate = duration === ProMembershipDuration.Monthly
-      ? new Date(now.setMonth(now.getMonth() + 1))
-      : new Date(now.setFullYear(now.getFullYear() + 1));
+    const expiryDate =
+      duration === ProMembershipDuration.Monthly
+        ? new Date(now.setMonth(now.getMonth() + 1))
+        : new Date(now.setFullYear(now.getFullYear() + 1));
 
     user.role = Role.Pro;
     user.pro_membership_expires_at = expiryDate;
     user.token_version = (user.token_version || 0) + 1;
     const saved = await this.userRepository.save(user);
-    this.auditService.log(userId, AuditAction.PRO_UPGRADE, { duration, expiryDate: expiryDate.toISOString() });
+    this.auditService.log(userId, AuditAction.PRO_UPGRADE, {
+      duration,
+      expiryDate: expiryDate.toISOString(),
+    });
     return saved;
   }
 
-  async createPaymentIntent(userId: number, courseId: number): Promise<{ clientSecret: string }> {
+  async createPaymentIntent(
+    userId: number,
+    courseId: number,
+  ): Promise<{ clientSecret: string }> {
     // Fetch course price from your database
     const course = await this.courseRepository.findOneBy({ id: courseId });
     if (!course || !course.price) {
-        throw new NotFoundException('Course not found or has no price.');
+      throw new NotFoundException('Course not found or has no price.');
     }
 
     // Amount should be in the smallest currency unit (e.g., cents for USD)
     const amount = Math.round(course.price * 100);
 
     const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: amount,
-        currency: 'usd',
-        metadata: { userId: String(userId), courseId: String(courseId) },
+      amount: amount,
+      currency: 'usd',
+      metadata: { userId: String(userId), courseId: String(courseId) },
     });
     // TODO save paymentIntent?
 
     return { clientSecret: paymentIntent.client_secret };
-}
+  }
 
   /**
    * Idempotent recovery when Stripe charged the user but the client lost the
@@ -104,7 +125,8 @@ export class PurchaseService {
     userId: number,
     paymentIntentId: string,
   ): Promise<{ granted: boolean; alreadyOwned: boolean }> {
-    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent =
+      await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== 'succeeded') {
       throw new BadRequestException('Payment has not completed yet.');
@@ -116,7 +138,9 @@ export class PurchaseService {
       throw new BadRequestException('Payment is missing course metadata.');
     }
     if (String(metaUserId) !== String(userId)) {
-      throw new ForbiddenException('This payment belongs to a different account.');
+      throw new ForbiddenException(
+        'This payment belongs to a different account.',
+      );
     }
 
     try {
@@ -135,9 +159,15 @@ export class PurchaseService {
     let event: Stripe.Event;
 
     try {
-      event = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+      event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        webhookSecret,
+      );
     } catch (err) {
-      this.logger.error(`Webhook signature verification failed: ${err.message}`);
+      this.logger.error(
+        `Webhook signature verification failed: ${err.message}`,
+      );
       throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
 
@@ -156,9 +186,14 @@ export class PurchaseService {
           break;
         }
 
-        this.logger.log(`PaymentIntent succeeded for userId: ${userId}, courseId: ${courseId}`);
+        this.logger.log(
+          `PaymentIntent succeeded for userId: ${userId}, courseId: ${courseId}`,
+        );
         try {
-          await this.purchaseCourse(parseInt(userId, 10), parseInt(courseId, 10));
+          await this.purchaseCourse(
+            parseInt(userId, 10),
+            parseInt(courseId, 10),
+          );
         } catch (e) {
           // Duplicate webhook delivery: user already owns the course — acknowledge so Stripe stops retrying.
           if (this.isAlreadyPurchasedBadRequest(e)) {
@@ -183,7 +218,10 @@ export class PurchaseService {
   private isAlreadyPurchasedBadRequest(e: unknown): boolean {
     if (!(e instanceof BadRequestException)) return false;
     const r = e.getResponse();
-    const msg = typeof r === 'string' ? r : (r as { message?: string | string[] }).message;
+    const msg =
+      typeof r === 'string'
+        ? r
+        : (r as { message?: string | string[] }).message;
     const s = Array.isArray(msg) ? msg.join(' ') : String(msg ?? '');
     return s.includes('already purchased');
   }

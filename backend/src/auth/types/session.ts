@@ -1,13 +1,11 @@
 class SessionPayload {
-    user_id: number;
+  user_id: number;
 
-    user_username: string;
+  user_username: string;
 
-    access_token: string;
+  access_token: string;
 
-    submitted_at: Date;
+  submitted_at: Date;
 }
 
-export {
-    SessionPayload
-}
+export { SessionPayload };

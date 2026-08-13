@@ -15,7 +15,9 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   UQ_organizations_name: 'An organization with this name already exists.',
 };
 
-function parseConstraintMessage(error: QueryFailedError & { constraint?: string; detail?: string }): string | null {
+function parseConstraintMessage(
+  error: QueryFailedError & { constraint?: string; detail?: string },
+): string | null {
   if (error.constraint) {
     const friendly = CONSTRAINT_MESSAGES[error.constraint];
     if (friendly) return friendly;
@@ -56,7 +58,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
           exception.stack,
         );
       } else {
-        this.logger.warn(`[${request.method} ${request.url}] ${status} - ${JSON.stringify(message)}`);
+        this.logger.warn(
+          `[${request.method} ${request.url}] ${status} - ${JSON.stringify(message)}`,
+        );
       }
 
       response.status(status).json(exceptionResponse);
@@ -64,12 +68,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof QueryFailedError) {
-      const pgCode = (exception as any).driverError?.code || (exception as any).code;
+      const pgCode =
+        (exception as any).driverError?.code || (exception as any).code;
 
       // 23505 = unique_violation
       if (pgCode === '23505') {
-        const friendly = parseConstraintMessage(exception as any) || 'A record with this value already exists.';
-        this.logger.warn(`[${request.method} ${request.url}] 409 - Unique constraint: ${(exception as any).detail || exception.message}`);
+        const friendly =
+          parseConstraintMessage(exception as any) ||
+          'A record with this value already exists.';
+        this.logger.warn(
+          `[${request.method} ${request.url}] 409 - Unique constraint: ${(exception as any).detail || exception.message}`,
+        );
         response.status(HttpStatus.CONFLICT).json({
           statusCode: HttpStatus.CONFLICT,
           message: friendly,
@@ -80,7 +89,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       // 23503 = foreign_key_violation
       if (pgCode === '23503') {
-        this.logger.warn(`[${request.method} ${request.url}] 400 - FK violation: ${(exception as any).detail || exception.message}`);
+        this.logger.warn(
+          `[${request.method} ${request.url}] 400 - FK violation: ${(exception as any).detail || exception.message}`,
+        );
         response.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Referenced record does not exist.',
@@ -92,7 +103,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       // 23502 = not_null_violation
       if (pgCode === '23502') {
         const column = (exception as any).column || 'unknown';
-        this.logger.warn(`[${request.method} ${request.url}] 400 - Not null: ${column}`);
+        this.logger.warn(
+          `[${request.method} ${request.url}] 400 - Not null: ${column}`,
+        );
         response.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,
           message: `Required field "${column}" is missing.`,
@@ -102,7 +115,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     }
 
-    const error = exception instanceof Error ? exception : new Error(String(exception));
+    const error =
+      exception instanceof Error ? exception : new Error(String(exception));
     this.logger.error(
       `[${request.method} ${request.url}] Unhandled exception: ${error.message}`,
       error.stack,

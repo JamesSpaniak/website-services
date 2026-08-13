@@ -42,25 +42,22 @@ export function flattenCourseUnits(units: UnitData[] | undefined): FlatUnitNode[
     return out;
 }
 
-/**
- * Leaf nodes below the top level don't get their own page — they render as
- * expandable sections inside their parent unit's page.
- */
+/** Top-level units own pages; every descendant is focused within its root page. */
 export function hasOwnPage(node: FlatUnitNode): boolean {
-    return !node.isLeaf || node.depth === 0;
+    return node.depth === 0;
 }
 
 /**
- * Resolve the page a unit id should be viewed on. Deep leaf nodes resolve to
- * their parent's page with the leaf as the focused section.
+ * Resolve the canonical page for a node. Descendants stay inside their
+ * top-level unit so the complete lesson context remains visible.
  */
 export function unitPageTarget(
     units: UnitData[] | undefined,
     unitId: string,
 ): { pageUnitId: string; focusUnitId: string | null } {
     const node = flattenCourseUnits(units).find((n) => n.id === String(unitId));
-    if (node && !hasOwnPage(node) && node.parentId) {
-        return { pageUnitId: node.parentId, focusUnitId: node.id };
+    if (node && !hasOwnPage(node)) {
+        return { pageUnitId: node.rootUnitId, focusUnitId: node.id };
     }
     return { pageUnitId: String(unitId), focusUnitId: null };
 }
@@ -95,12 +92,12 @@ export function unitNavNeighbors(
     units: UnitData[] | undefined,
     currentId: string,
 ): { prev: FlatUnitNode | null; next: FlatUnitNode | null } {
-    const pages = flattenCourseUnits(units).filter(hasOwnPage);
-    const idx = pages.findIndex((n) => n.id === String(currentId));
+    const sequence = flattenCourseUnits(units);
+    const idx = sequence.findIndex((n) => n.id === String(currentId));
     if (idx < 0) return { prev: null, next: null };
     return {
-        prev: idx > 0 ? pages[idx - 1] : null,
-        next: idx < pages.length - 1 ? pages[idx + 1] : null,
+        prev: idx > 0 ? sequence[idx - 1] : null,
+        next: idx < sequence.length - 1 ? sequence[idx + 1] : null,
     };
 }
 

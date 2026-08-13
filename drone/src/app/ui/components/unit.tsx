@@ -6,8 +6,10 @@ import { updateUnitProgress } from '@/app/lib/api-client';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import SectionComponent from './section';
+import CourseUnitVideo from './course-unit-video';
 import ExamPlayer from './exam-player';
 import { PROSE_BODY } from '@/app/lib/prose-classes';
+import { findUnitInTree } from '@/app/lib/course-tree';
 
 interface UnitComponentProps {
     unitData: UnitData;
@@ -28,21 +30,27 @@ export function hasScopedQuestions(
 
 export default function UnitComponent({ unitData, courseId, focusUnitId, questionCounts }: UnitComponentProps) {
     const [unit, setUnit] = useState<UnitData>(unitData);
-    const { id, title, sub_units, description, text_content, status } = unit;
+    const { id, title, sub_units, description, text_content, video_url, status } = unit;
+    const progressTarget =
+        (focusUnitId ? findUnitInTree([unit], focusUnitId) : undefined) ?? unit;
 
     useEffect(() => {
         let cancelled = false;
-        const s = unitData.status;
+        const s = progressTarget.status;
         if (s != null && s !== ProgressStatus.NOT_STARTED) return;
         (async () => {
             try {
                 const updated = await updateUnitProgress(
                     courseId,
-                    String(unitData.id),
+                    String(progressTarget.id),
                     ProgressStatus.IN_PROGRESS,
                 );
                 if (!cancelled) {
-                    setUnit((prev) => ({ ...prev, status: updated.status }));
+                    setUnit((prev) =>
+                        String(prev.id) === String(updated.id)
+                            ? { ...prev, ...updated }
+                            : updateUnitInState(prev, updated),
+                    );
                 }
             } catch {
                 /* guest or offline */
@@ -51,7 +59,7 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
         return () => {
             cancelled = true;
         };
-    }, [courseId, unitData.id, unitData.status]);
+    }, [courseId, progressTarget.id, progressTarget.status]);
 
     const handleStatusUpdate = async (newStatus: ProgressStatus) => {
         const updatedUnitFromApi = await updateUnitProgress(courseId, id, newStatus);
@@ -76,7 +84,18 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
 
                 
                     <div className={`mt-8 ${PROSE_BODY}`} dangerouslySetInnerHTML={{ __html: description?.replace(/\n/g, '<br />') || ''}} />
-                
+
+                {video_url && (
+                    <div className="mt-6">
+                        <CourseUnitVideo
+                            courseId={courseId}
+                            unitId={String(id)}
+                            videoUrl={video_url}
+                            title={title}
+                        />
+                    </div>
+                )}
+
                 {text_content && <div className={`mt-4 ${PROSE_BODY}`} dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
 
                 {sub_units && sub_units.length > 0 && (
@@ -87,6 +106,7 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
                                 key={sub_unit.id}
                                 section={sub_unit}
                                 courseId={courseId}
+                                rootUnitId={String(id)}
                                 onStatusUpdate={handleSubUnitStatusUpdate}
                                 focusUnitId={focusUnitId}
                                 questionCounts={questionCounts}

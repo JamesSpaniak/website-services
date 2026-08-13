@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ArticleCreateDto, ArticleFull, ContentBlock } from '@/app/lib/types/article';
 import { createArticle, updateArticle } from '@/app/lib/api-client';
+import { useUnsavedChangesGuard, UNSAVED_CHANGES_MESSAGE } from '@/app/lib/use-unsaved-changes';
 import { prepareArticleBodyHtml } from '@/app/lib/article-html';
 import { tryParseArticleImportJson, type ArticleImportResult } from '@/app/lib/article-import-json';
 import ContentBlockEditor from './content-block-editor';
@@ -28,6 +29,18 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
     const [useBlocks, setUseBlocks] = useState(
         (article?.content_blocks && article.content_blocks.length > 0) || false
     );
+
+    // Dirty = current form serialization differs from the snapshot taken on mount.
+    const currentSnapshot = JSON.stringify({ title, subHeading, imageUrl, body, contentBlocks, hidden, useBlocks });
+    const initialSnapshotRef = useRef<string | null>(null);
+    if (initialSnapshotRef.current === null) initialSnapshotRef.current = currentSnapshot;
+    const dirty = currentSnapshot !== initialSnapshotRef.current;
+    useUnsavedChangesGuard(dirty);
+
+    const handleCancel = () => {
+        if (dirty && !confirm(UNSAVED_CHANGES_MESSAGE)) return;
+        onCancel();
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -190,7 +203,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
                     className="px-6 py-2.5 text-sm font-semibold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 disabled:opacity-50">
                     {saving ? 'Saving...' : (article?.id ? 'Update Article' : 'Create Article')}
                 </button>
-                <button type="button" onClick={onCancel}
+                <button type="button" onClick={handleCancel}
                     className="px-6 py-2.5 text-sm font-semibold text-[var(--brand-foreground)] bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg hover:bg-[var(--comment-secondary-bg)]">
                     Cancel
                 </button>

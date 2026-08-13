@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ContentBlock } from '@/app/lib/types/article';
 import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
 import MediaUpload from './media-upload';
+import VideoPreview from './video-preview';
 import { v4 as uuidv4 } from 'uuid';
 
 interface ContentBlockEditorProps {
@@ -224,6 +225,7 @@ function BlockEditor({
                     placeholder="Caption (optional)"
                     className={`w-full ${field} text-sm`}
                 />
+                <VideoPreview src={block.content} />
             </div>
         );
     }
