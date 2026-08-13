@@ -12,7 +12,9 @@ const ns = createNamespace('app-namespace');
 export class RequestIdMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     ns.run(() => {
-      const requestId = (req.headers[REQUEST_ID_HEADER.toLowerCase()] as string) || randomUUID();
+      const requestId =
+        (req.headers[REQUEST_ID_HEADER.toLowerCase()] as string) ||
+        randomUUID();
       ns.set('requestId', requestId);
       res.setHeader(REQUEST_ID_HEADER, requestId);
       next();

@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { CourseData, UnitData } from '@/app/lib/types/course';
 import { createCourse, updateCourse } from '@/app/lib/api-client';
+import { useUnsavedChangesGuard, UNSAVED_CHANGES_MESSAGE } from '@/app/lib/use-unsaved-changes';
 import MediaUpload from './media-upload';
+import VideoPreview from './video-preview';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { v4 as uuidv4 } from 'uuid';
 import { mergeCourseImages } from '@/app/lib/course-images';
@@ -101,6 +103,23 @@ export default function CourseEditor({ course, onSave, onCancel }: CourseEditorP
         units: units.map(sanitizeUnitForSave),
     });
 
+    // Dirty = current form serialization differs from the snapshot taken on mount.
+    // JSON mode additionally compares the textarea against its content at switch time,
+    // since formatting differences make it incomparable to the visual snapshot.
+    const currentSnapshot = JSON.stringify(buildCourseData());
+    const initialSnapshotRef = useRef<string | null>(null);
+    if (initialSnapshotRef.current === null) initialSnapshotRef.current = currentSnapshot;
+    const jsonBaselineRef = useRef('');
+    const dirty =
+        currentSnapshot !== initialSnapshotRef.current ||
+        (editMode === 'json' && jsonPayload !== jsonBaselineRef.current);
+    useUnsavedChangesGuard(dirty);
+
+    const handleCancel = () => {
+        if (dirty && !confirm(UNSAVED_CHANGES_MESSAGE)) return;
+        onCancel();
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -136,7 +155,9 @@ export default function CourseEditor({ course, onSave, onCancel }: CourseEditorP
             units: built.units,
         };
         jsonMergeBaseRef.current = merged;
-        setJsonPayload(JSON.stringify(merged, null, 2));
+        const payload = JSON.stringify(merged, null, 2);
+        jsonBaselineRef.current = payload;
+        setJsonPayload(payload);
         setEditMode('json');
     };
 
@@ -261,6 +282,7 @@ export default function CourseEditor({ course, onSave, onCancel }: CourseEditorP
                                 <MediaUpload folder="courses" subfolder={course?.id ? String(course.id) : undefined}
                                     accept="video/*" label="Upload" onUploadComplete={(url) => setVideoUrl(url)} />
                             </div>
+                            <VideoPreview src={videoUrl} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-[var(--brand-foreground)]">
@@ -330,7 +352,7 @@ export default function CourseEditor({ course, onSave, onCancel }: CourseEditorP
                     className="px-6 py-2.5 text-sm font-semibold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 disabled:opacity-50">
                     {saving ? 'Saving...' : (course?.id ? 'Update Course' : 'Create Course')}
                 </button>
-                <button type="button" onClick={onCancel}
+                <button type="button" onClick={handleCancel}
                     className="px-6 py-2.5 text-sm font-semibold text-[var(--brand-foreground)] bg-[var(--surface)] border border-[var(--surface-border)] rounded-lg hover:bg-[var(--comment-secondary-bg)]">
                     Cancel
                 </button>
@@ -362,36 +384,42 @@ function ImagesListField({
     return (
         <div className="mt-2 space-y-2">
             {rows.map((url, i) => (
-                <div key={i} className="flex gap-2 items-start">
-                    <input type="text" value={url} placeholder="Image URL"
-                        onChange={(e) => {
-                            const next = [...rows];
-                            next[i] = e.target.value;
-                            onChange(next);
-                        }}
-                        className="flex-1 rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] shadow-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)] text-sm" />
-                    <MediaUpload
-                        folder="courses"
-                        subfolder={subfolder}
-                        accept="image/*"
-                        label="Upload"
-                        multiple
-                        onUploadComplete={(u) => {
-                            const next = [...rows];
-                            next[i] = u;
-                            onChange(next);
-                        }}
-                        onUploadBatchComplete={(items) => {
-                            const urls = items.map((r) => r.publicUrl);
-                            const next = [...rows];
-                            if (urls.length > 0) next[i] = urls[0];
-                            for (let j = 1; j < urls.length; j++) next.push(urls[j]);
-                            onChange(next);
-                        }}
-                    />
-                    <button type="button" onClick={() => removeAt(i)} className="p-1.5 text-red-400 hover:text-red-600 shrink-0" aria-label="Remove image URL">
-                        <TrashIcon className="h-4 w-4" />
-                    </button>
+                <div key={i}>
+                    <div className="flex gap-2 items-start">
+                        <input type="text" value={url} placeholder="Image URL"
+                            onChange={(e) => {
+                                const next = [...rows];
+                                next[i] = e.target.value;
+                                onChange(next);
+                            }}
+                            className="flex-1 rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] shadow-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)] text-sm" />
+                        <MediaUpload
+                            folder="courses"
+                            subfolder={subfolder}
+                            accept="image/*"
+                            label="Upload"
+                            multiple
+                            onUploadComplete={(u) => {
+                                const next = [...rows];
+                                next[i] = u;
+                                onChange(next);
+                            }}
+                            onUploadBatchComplete={(items) => {
+                                const urls = items.map((r) => r.publicUrl);
+                                const next = [...rows];
+                                if (urls.length > 0) next[i] = urls[0];
+                                for (let j = 1; j < urls.length; j++) next.push(urls[j]);
+                                onChange(next);
+                            }}
+                        />
+                        <button type="button" onClick={() => removeAt(i)} className="p-1.5 text-red-400 hover:text-red-600 shrink-0" aria-label="Remove image URL">
+                            <TrashIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                    {url.trim() && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={url.trim()} alt="" className="mt-1.5 max-h-28 rounded-md object-contain border border-[var(--surface-border)]" />
+                    )}
                 </div>
             ))}
             <button type="button" onClick={() => onChange([...rows, ''])}
@@ -495,6 +523,7 @@ function UnitEditor({
                                 <MediaUpload folder="courses" subfolder={courseId ? `${courseId}/${unit.id}` : undefined}
                                     accept="video/*" label="Upload" onUploadComplete={(url) => onUpdateById(unit.id, { video_url: url })} />
                             </div>
+                            <VideoPreview src={unit.video_url} />
                         </div>
                     </div>
 

@@ -17,7 +17,7 @@ export class ArticleService {
 
   static articleDtoToEntity(article: ArticleDto): Article {
     return {
-        ...article
+      ...article,
     };
   }
 
@@ -36,18 +36,18 @@ export class ArticleService {
 
   async getArticle(id: string): Promise<Article> {
     const article = await this.articleRepository.findOne({
-        where: { id: +id }
+      where: { id: +id },
     });
 
     if (!article) {
-        throw new NotFoundException(`Article ID ${id} does not exist.`)
+      throw new NotFoundException(`Article ID ${id} does not exist.`);
     }
     return article;
   }
 
   async saveArticle(article: ArticleDto): Promise<Article> {
     const newArticle = this.articleRepository.create(
-        ArticleService.articleDtoToEntity(article)
+      ArticleService.articleDtoToEntity(article),
     );
     await this.articleRepository.save(newArticle);
     return newArticle;
@@ -56,11 +56,11 @@ export class ArticleService {
   async updateArticle(id: string, article: Article): Promise<Article> {
     const existingArticle = await this.getArticle(id);
     const updatedArticle = this.articleRepository.create(
-        ArticleService.articleDtoToEntity(article)
+      ArticleService.articleDtoToEntity(article),
     );
     await this.articleRepository.update(id, {
-        ...updatedArticle,
-        submitted_at: existingArticle.submitted_at
+      ...updatedArticle,
+      submitted_at: existingArticle.submitted_at,
     });
     return updatedArticle;
   }
@@ -69,7 +69,9 @@ export class ArticleService {
     const article = await this.getArticle(id);
     await this.articleRepository.delete(+id);
     void this.deleteArticleMedia(article).catch((err) =>
-      this.logger.error(`Post-delete media cleanup failed for article ${id}: ${(err as Error).message}`),
+      this.logger.error(
+        `Post-delete media cleanup failed for article ${id}: ${(err as Error).message}`,
+      ),
     );
   }
 
@@ -81,7 +83,9 @@ export class ArticleService {
     if (keys.length === 0) return;
 
     await this.mediaService.deleteMultipleMedia(keys);
-    this.logger.log(`Deleted ${keys.length} media files for article ${article.id}`);
+    this.logger.log(
+      `Deleted ${keys.length} media files for article ${article.id}`,
+    );
   }
 
   private collectArticleMediaUrls(article: Article): string[] {
@@ -93,7 +97,10 @@ export class ArticleService {
 
     if (article.content_blocks) {
       for (const block of article.content_blocks) {
-        if ((block.type === 'image' || block.type === 'video') && block.content) {
+        if (
+          (block.type === 'image' || block.type === 'video') &&
+          block.content
+        ) {
           urls.push(block.content);
         }
       }

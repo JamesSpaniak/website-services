@@ -4,12 +4,13 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
-import { createUser, getInviteCodeInfo } from '@/app/lib/api-client';
+import { createUser, getInviteCodeInfo, getSignupLinkInfo } from '@/app/lib/api-client';
 import ErrorComponent from '@/app/ui/components/error';
 import LoadingComponent from '@/app/ui/components/loading';
 import type { InviteCodeInfo } from '@/app/lib/types/organization';
+import type { SignupLinkInfo } from '@/app/lib/types/admin-users';
 import { z } from 'zod';
-import { BuildingOfficeIcon } from '@heroicons/react/24/solid';
+import { BuildingOfficeIcon, GiftIcon } from '@heroicons/react/24/solid';
 import PageShell from '../ui/components/page-shell';
 import {
     redirectIndicatesPurchase,
@@ -39,12 +40,17 @@ function RegisterPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const inviteCode = searchParams.get('code');
+    const signupCode = searchParams.get('signup');
     const redirect = sanitizeRedirect(searchParams.get('redirect'));
     const purchaseIntent = redirectIndicatesPurchase(redirect);
 
     const [inviteInfo, setInviteInfo] = useState<InviteCodeInfo | null>(null);
     const [inviteLoading, setInviteLoading] = useState(!!inviteCode);
     const [inviteError, setInviteError] = useState<string | null>(null);
+
+    const [signupInfo, setSignupInfo] = useState<SignupLinkInfo | null>(null);
+    const [signupLoading, setSignupLoading] = useState(!!signupCode);
+    const [signupError, setSignupError] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -87,6 +93,29 @@ function RegisterPageInner() {
             .finally(() => setInviteLoading(false));
     }, [inviteCode]);
 
+    useEffect(() => {
+        if (!signupCode) return;
+        setSignupLoading(true);
+        getSignupLinkInfo(signupCode)
+            .then((info) => {
+                if (info.valid) {
+                    setSignupInfo(info);
+                } else {
+                    setSignupError(
+                        info.reason === 'expired'
+                            ? 'This signup link has expired.'
+                            : info.reason === 'used'
+                              ? 'This signup link has already been used.'
+                              : 'This signup link is invalid.',
+                    );
+                }
+            })
+            .catch(() => {
+                setSignupError('Failed to verify signup link.');
+            })
+            .finally(() => setSignupLoading(false));
+    }, [signupCode]);
+
     if (authLoading || user) return <LoadingComponent />;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +142,9 @@ function RegisterPageInner() {
                 first_name: formData.firstName || undefined,
                 last_name: formData.lastName || undefined,
                 invite_code: inviteCode || undefined,
+                // Only send the promo code when it verified as valid — an invalid
+                // link shows a warning but doesn't block a normal registration.
+                signup_code: signupCode && signupInfo?.valid ? signupCode : undefined,
             });
             setInfoMessage(
                 purchaseIntent
@@ -144,8 +176,40 @@ function RegisterPageInner() {
                 onSubmit={handleSubmit}
                 className="p-6 sm:p-8 rounded-lg border border-[var(--surface-border)] bg-[var(--surface)] shadow-xl w-full"
             >
-                {inviteLoading && (
-                    <div className="mb-4 text-center text-sm text-[var(--brand-muted)]">Verifying invite code...</div>
+                {(inviteLoading || signupLoading) && (
+                    <div className="mb-4 text-center text-sm text-[var(--brand-muted)]">
+                        {inviteLoading ? 'Verifying invite code...' : 'Verifying signup link...'}
+                    </div>
+                )}
+
+                {signupInfo?.valid && (
+                    <div className="mb-6 p-4 rounded-lg bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)]">
+                        <div className="flex items-center gap-2 text-[var(--brand-foreground)]">
+                            <GiftIcon className="h-5 w-5 text-[var(--brand-primary)]" />
+                            <span className="font-semibold">This link includes course access</span>
+                        </div>
+                        {signupInfo.courses && signupInfo.courses.length > 0 && (
+                            <ul className="text-sm text-[var(--brand-muted)] mt-1 list-disc list-inside">
+                                {signupInfo.courses.map((c) => (
+                                    <li key={c.id}>{c.title}</li>
+                                ))}
+                            </ul>
+                        )}
+                        <p className="text-xs text-[var(--brand-muted)] mt-2">
+                            {signupInfo.email_locked
+                                ? 'This link is reserved for a specific email address — register with the email it was sent to.'
+                                : 'Access is applied automatically when you create your account.'}
+                        </p>
+                    </div>
+                )}
+
+                {signupError && (
+                    <div className="mb-4">
+                        <ErrorComponent message={signupError} />
+                        <p className="text-sm text-[var(--brand-muted)] mt-2 text-center">
+                            You can still create a regular account below.
+                        </p>
+                    </div>
                 )}
 
                 {inviteInfo && (

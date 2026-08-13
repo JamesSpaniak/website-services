@@ -7,7 +7,7 @@
   "images_url": [
     "https://media.thedroneedge.com/courses/35/9c2099d5-a2a4-4af6-8d5e-e518ae0502b1.png"
   ],
-  "price": "29",
+  "price": "129",
   "has_access": true,
   "units": [
     {
@@ -27,45 +27,55 @@
           "title": "Applicability of Part 107",
           "description": "Identify which small unmanned aircraft operations are governed by Part 107 and which operations are explicitly excluded.",
           "text_content": "The FAA published remote pilot certification and operating rules for civil small unmanned aircraft in August 2016. Part 107 oversees non-recreational and commercial operations of small unmanned aircraft systems (sUAS) in the National Airspace System (NAS).\n\nPart 107 applies to any operation that directly or indirectly supports a business, nonprofit, government, or compensated purpose (monetary or non-monetary).\n\nDrone operators no longer need special exemptions or permits from the FAA to fly—only a Remote Pilot certificate. Operators can fly without needing special exemptions, airworthiness requirements, pilot certification provisions, operating limitations, or external payload provisions. Initially, the rule did not permit sUAS operations at night or over people without a waiver.\n\nPart 107 DOES NOT apply to: recreational/model aircraft operated in accordance with 49 U.S.C. 44809 (hobby and recreational use), public aircraft operations, amateur rockets, moored balloons, unmanned free balloons, kites, operations conducted outside the United States, air carrier operations, and operations conducted under Section 333 exemptions.",
-          "video_url": null,
+          "video_url": "courses/videos/faa-107-u11-applicability/faa-107-u11-applicability.m3u8",
           "status": "NOT_STARTED",
           "sub_units": []
         },
         {
-          "id": "u121",
-          "title": "Remote Pilot In Command (RPIC)",
-          "description": "Describe RPIC certification, authority, preflight duties, and emergency responsibilities under Part 107.",
-          "text_content": "The person flying the drone must hold a Remote Pilot Certificate with a sUAS rating, or be under the direct supervision of someone who holds that certificate.\n\nThe RPIC has final authority and ultimate responsibility for the operation and safety of the sUAS and flight. The certificate must be easily accessible when flying.\n\nThe RPIC must be designated before or during the flight. The RPIC must ensure the sUA will pose no undue hazard to other people, aircraft, or property in the event of a loss of control, and must ensure the operation complies with all applicable regulations.\n\nPreflight duties include conducting preflight checks of the aircraft and control system, verifying the aircraft is safe and airworthy, confirming registration requirements are met, ensuring Visual Line of Sight (VLOS) rules will be met, and briefing the crew (visual observer and person manipulating controls) on readiness and capability.\n\nThe RPIC has final authority to modify, delay, or cancel a flight. In a true in-flight emergency requiring immediate action, the RPIC may deviate from Part 107 rules to the extent necessary to meet that emergency.",
-          "video_url": null,
+          "id": "u12",
+          "title": "Crew Roles and Responsibilities",
+          "description": "Understand the responsibilities, authority, communication, and coordination of each person involved in a Part 107 operation.",
+          "text_content": "A safe Part 107 operation depends on clear roles and effective communication. This section covers the Remote Pilot in Command, the person manipulating the flight controls, the visual observer, and broader flight crew coordination.",
+          "video_url": "courses/videos/faa-107-u12-crew-roles/faa-107-u12-crew-roles.m3u8",
           "status": "NOT_STARTED",
-          "sub_units": []
-        },
-        {
-          "id": "u122",
-          "title": "Person Manipulating the Flight Controls",
-          "description": "Explain when a non-certificated person may manipulate flight controls and the supervision requirements for the RPIC.",
-          "text_content": "Under Part 107, the person manipulating the flight controls is physically operating the drone's controls but is not necessarily the Remote Pilot in Command (RPIC).\n\nIf the person manipulating the flight controls is not a certificated remote pilot, they may operate the controls only if:\n- The RPIC is supervising them directly.\n- The RPIC has the ability to immediately take control, either by standing next to them or through a radio or override system.\n- They understand the mission, safety procedures, and emergency actions.",
-          "video_url": null,
-          "status": "NOT_STARTED",
-          "sub_units": []
-        },
-        {
-          "id": "u123",
-          "title": "Visual Observer (VO)",
-          "description": "Explain the visual observer's role and when a VO is recommended to support situational awareness and VLOS.",
-          "text_content": "A Visual Observer (VO) assists the crew in avoiding hazards and obstacles and in maintaining situational awareness and VLOS. A VO is not always required but is recommended when mission complexity warrants extra eyes on the operation.",
-          "video_url": null,
-          "status": "NOT_STARTED",
-          "sub_units": []
-        },
-        {
-          "id": "u124",
-          "title": "Flight Crew Management and Communication",
-          "description": "Apply crew briefing, workload management, and communication methods including hands-free options and clock-position reporting.",
-          "text_content": "Depending on operation complexity, additional crew may be needed beyond the RPIC, VO, and person manipulating the controls—for example payload operators, camera operators, or other specialists.\n\nThe RPIC is responsible for task distribution and workload management.\n\nPre-flight considerations include assessing weather, airspace, terrain, and obstacles; aircraft condition and airworthiness; and crew readiness (mental and physical).\n\nPre-flight communications must include a crew briefing on emergency procedures, contingency plans, and potential hazards. Preflight familiarization and inspection include reviewing manufacturer instructions, inspecting components (propellers, battery, control link), and ensuring required documentation is available.\n\nEffective communication between crew members may use a two-way radio, cell phone, or other technology. The RPIC may choose any communication method as long as it is safe. If the person manipulating the flight controls cannot use a handheld device safely, use hands-free options such as an earpiece, headset, or speaker mode on a cell phone.\n\nWhen flying, it is important for everyone to maintain situational awareness. Communicating the UA's location using clock coordinates is recommended: 12:00 straight ahead of the RPIC, 3:00 to the right, 6:00 behind, and 9:00 to the left.\n\nIf the UA goes out of VLOS for more than 15 seconds, initiate a failsafe return to home.",
-          "video_url": null,
-          "status": "NOT_STARTED",
-          "sub_units": []
+          "sub_units": [
+            {
+              "id": "u121",
+              "title": "Remote Pilot In Command (RPIC)",
+              "description": "Describe RPIC certification, authority, preflight duties, and emergency responsibilities under Part 107.",
+              "text_content": "The person flying the drone must hold a Remote Pilot Certificate with a sUAS rating, or be under the direct supervision of someone who holds that certificate.\n\nThe RPIC has final authority and ultimate responsibility for the operation and safety of the sUAS and flight. The certificate must be easily accessible when flying.\n\nThe RPIC must be designated before or during the flight. The RPIC must ensure the sUA will pose no undue hazard to other people, aircraft, or property in the event of a loss of control, and must ensure the operation complies with all applicable regulations.\n\nPreflight duties include conducting preflight checks of the aircraft and control system, verifying the aircraft is safe and airworthy, confirming registration requirements are met, ensuring Visual Line of Sight (VLOS) rules will be met, and briefing the crew (visual observer and person manipulating controls) on readiness and capability.\n\nThe RPIC has final authority to modify, delay, or cancel a flight. In a true in-flight emergency requiring immediate action, the RPIC may deviate from Part 107 rules to the extent necessary to meet that emergency.",
+              "video_url": null,
+              "status": "NOT_STARTED",
+              "sub_units": []
+            },
+            {
+              "id": "u122",
+              "title": "Person Manipulating the Flight Controls",
+              "description": "Explain when a non-certificated person may manipulate flight controls and the supervision requirements for the RPIC.",
+              "text_content": "Under Part 107, the person manipulating the flight controls is physically operating the drone's controls but is not necessarily the Remote Pilot in Command (RPIC).\n\nIf the person manipulating the flight controls is not a certificated remote pilot, they may operate the controls only if:\n- The RPIC is supervising them directly.\n- The RPIC has the ability to immediately take control, either by standing next to them or through a radio or override system.\n- They understand the mission, safety procedures, and emergency actions.",
+              "video_url": null,
+              "status": "NOT_STARTED",
+              "sub_units": []
+            },
+            {
+              "id": "u123",
+              "title": "Visual Observer (VO)",
+              "description": "Explain the visual observer's role and when a VO is recommended to support situational awareness and VLOS.",
+              "text_content": "A Visual Observer (VO) assists the crew in avoiding hazards and obstacles and in maintaining situational awareness and VLOS. A VO is not always required but is recommended when mission complexity warrants extra eyes on the operation.",
+              "video_url": null,
+              "status": "NOT_STARTED",
+              "sub_units": []
+            },
+            {
+              "id": "u124",
+              "title": "Flight Crew Management and Communication",
+              "description": "Apply crew briefing, workload management, and communication methods including hands-free options and clock-position reporting.",
+              "text_content": "Depending on operation complexity, additional crew may be needed beyond the RPIC, VO, and person manipulating the controls—for example payload operators, camera operators, or other specialists.\n\nThe RPIC is responsible for task distribution and workload management.\n\nPre-flight considerations include assessing weather, airspace, terrain, and obstacles; aircraft condition and airworthiness; and crew readiness (mental and physical).\n\nPre-flight communications must include a crew briefing on emergency procedures, contingency plans, and potential hazards. Preflight familiarization and inspection include reviewing manufacturer instructions, inspecting components (propellers, battery, control link), and ensuring required documentation is available.\n\nEffective communication between crew members may use a two-way radio, cell phone, or other technology. The RPIC may choose any communication method as long as it is safe. If the person manipulating the flight controls cannot use a handheld device safely, use hands-free options such as an earpiece, headset, or speaker mode on a cell phone.\n\nWhen flying, it is important for everyone to maintain situational awareness. Communicating the UA's location using clock coordinates is recommended: 12:00 straight ahead of the RPIC, 3:00 to the right, 6:00 behind, and 9:00 to the left.\n\nIf the UA goes out of VLOS for more than 15 seconds, initiate a failsafe return to home.",
+              "video_url": null,
+              "status": "NOT_STARTED",
+              "sub_units": []
+            }
+          ]
         },
         {
           "id": "u13",
@@ -80,7 +90,7 @@
               "title": "Registration, Inspection, and Falsification",
               "description": "Explain requirements for aircraft registration, mandatory compliance inspections, and penalties for falsifying records.",
               "text_content": "Aircraft Registration: All non-recreational drones must be registered according to 14 CFR Part 47 or Part 48. The registration number must be legibly displayed on the aircraft, and the RPIC must carry proof of registration physically or digitally.\n\nInspection, Testing, and Compliance: Upon request, the RPIC, person controlling the aircraft, or the owner must present a remote pilot certificate with a sUAS rating, photo ID with signature and date of birth, and any documents, records, or reports required under Part 107 to the FAA, NTSB, Federal, State, or local law enforcement, or TSA.\n\nUpon request, the RPIC, visual observer, owner, operator, or person manipulating the controls must allow the FAA to inspect the aircraft and involved personnel, facilities, technical data, and any manufactured small UAS, and to witness any tests necessary to verify Part 107 compliance.\n\nFalsification, Reproduction, or Alteration: Providing false information or fraudulently altering or reproducing required records or reports—including omissions—can result in denial, suspension, or revocation of a certificate or waiver, or civil penalties (fines).",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u131-registration-inspection/faa-107-u131-registration-inspection.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -98,7 +108,7 @@
               "title": "Medical Conditions, Alcohol, and Drugs",
               "description": "Identify physical and mental fitness requirements for crew members, including prohibitions on operating while impaired by medical conditions, alcohol, or drugs.",
               "text_content": "Medical Condition: A medical certificate is not required to fly a sUAS or serve on the crew. However, if you know or have reason to believe your condition would interfere with safe operation, you must not fly. Examples include fatigue; medication that affects performance or situational awareness (including over-the-counter antihistamines and decongestants that may cause drowsiness); physical illness (flu, headaches) or mental illness; loss of hearing or voice that prevents communication; blurred vision that prevents satisfying see-and-avoid requirements; or temporary or permanent loss of the ability to control the drone effectively.\n\nAlcohol or Drugs: No person controlling a sUAS or serving as a crew member may have a medical condition that could risk the safety of the operation (for example epilepsy), be under the influence of alcohol, use drugs that affect capabilities, have consumed alcohol within the previous 8 hours, or have an alcohol concentration of 0.04 or greater. If requested by law enforcement, an individual must submit to a test to indicate alcohol concentration in the blood or breath.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u133-medical-alcohol-drugs/faa-107-u133-medical-alcohol-drugs.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },

@@ -37,8 +37,8 @@ import { QuestionModule } from './questions/question.module';
     EmailModule,
     QuestionModule,
     TypeOrmModule.forRoot({
-        ...defaultConnection,
-        migrationsRun: true,
+      ...defaultConnection,
+      migrationsRun: true,
     }),
     LoggingModule,
     HealthModule,
@@ -47,18 +47,19 @@ import { QuestionModule } from './questions/question.module';
     UsersModule,
     PurchaseModule,
     ProgressModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule {
-    configure(consumer: MiddlewareConsumer) {
-        // Apply RequestIdMiddleware to all routes
-        consumer.apply(RequestIdMiddleware).forRoutes('*');
+  configure(consumer: MiddlewareConsumer) {
+    // Apply RequestIdMiddleware to all routes
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
 
-        // Apply raw body parser only for the Stripe webhook route
-        consumer.apply(express.raw({ type: 'application/json' }))
-            .forRoutes({ path: 'purchases/webhook', method: RequestMethod.POST });
-    }
+    // Apply raw body parser only for the Stripe webhook route
+    consumer
+      .apply(express.raw({ type: 'application/json' }))
+      .forRoutes({ path: 'purchases/webhook', method: RequestMethod.POST });
+  }
 }

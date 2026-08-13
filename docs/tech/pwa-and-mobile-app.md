@@ -174,7 +174,7 @@ Part 107 is US-only, so consumer volume sits in the storefronts where link-out p
 
 **Caveat:** the 0% figure is court-imposed, not a permanent Apple/Google contract. Build bookkeeping that can absorb a future cost-based rate. Re-check policy before submitting.
 
-Retail price reference: [`docs/sales/packages.md`](../sales/packages.md) ($29 one-time for the FAA 107 retail SKU as of last package update).
+Retail price reference: [`docs/sales/packages.md`](../sales/packages.md) ($129 one-time for the FAA 107 retail SKU as of last package update).
 
 ---
 

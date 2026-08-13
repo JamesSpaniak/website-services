@@ -11,8 +11,18 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProgressService } from './progress.service';
-import { UpdateProgressDto, ProgressStatus, CourseDetails, UnitData } from '../courses/types/course.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  UpdateProgressDto,
+  ProgressStatus,
+  CourseDetails,
+  UnitData,
+} from '../courses/types/course.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('User Progress')
 @ApiBearerAuth()
@@ -28,7 +38,11 @@ export class ProgressController {
    * @requires Authentication.
    */
   @ApiOperation({ summary: "Get all courses with the current user's progress" })
-  @ApiResponse({ status: 200, description: 'A list of courses with progress data.', type: [CourseDetails] })
+  @ApiResponse({
+    status: 200,
+    description: 'A list of courses with progress data.',
+    type: [CourseDetails],
+  })
   @Get('courses')
   async getAllCoursesWithProgress(@Request() req) {
     return this.progressService.getAllCoursesWithProgress(req.user.userId);
@@ -42,7 +56,11 @@ export class ProgressController {
    * @requires Authentication.
    */
   @ApiOperation({ summary: "Reset a user's progress for a specific course" })
-  @ApiResponse({ status: 201, description: 'Course progress has been reset.', type: UpdateProgressDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Course progress has been reset.',
+    type: UpdateProgressDto,
+  })
   @Post('courses/:courseId/reset')
   async resetCourseProgress(
     @Request() req,
@@ -61,7 +79,11 @@ export class ProgressController {
    * @requires Authentication.
    */
   @ApiOperation({ summary: "Update the user's overall progress for a course" })
-  @ApiResponse({ status: 200, description: 'Course progress updated.', type: UpdateProgressDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Course progress updated.',
+    type: UpdateProgressDto,
+  })
   @Patch('courses/:courseId')
   async updateCourseProgress(
     @Request() req,
@@ -73,7 +95,7 @@ export class ProgressController {
       courseId,
       updateProgressDto.status,
     );
-    return {...updateProgressDto}
+    return { ...updateProgressDto };
   }
 
   /**
@@ -86,7 +108,11 @@ export class ProgressController {
    * @requires Authentication.
    */
   @ApiOperation({ summary: "Update the user's progress for a specific unit" })
-  @ApiResponse({ status: 200, description: 'Unit progress updated.', type: UnitData })
+  @ApiResponse({
+    status: 200,
+    description: 'Unit progress updated.',
+    type: UnitData,
+  })
   @Patch('courses/:courseId/units/:unitId')
   async updateUnitProgress(
     @Request() req,
@@ -101,5 +127,4 @@ export class ProgressController {
       updateProgressDto.status,
     );
   }
-
 }

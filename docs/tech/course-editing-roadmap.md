@@ -17,9 +17,10 @@
 |------|--------|-----------|
 | **Structure** | Visual editor supports **Add sub-unit** (header **Sub-unit** button and **Add sub-unit** inside expanded unit; max depth 8). | Optional drag-and-drop reorder, collapse/expand all. |
 | **Exams** | Exams are not editable in visual mode (JSON only). | Optional stepper or embedded form for questions/answers with correct flags (admin-only), aligned with `ExamData` in `course.dto.ts`. |
-| **Preview** | No live preview of learner `SectionComponent` / `CourseComponent` while editing. | Split pane or “Preview” tab that renders read-only components with draft state. |
+| **Preview** | **Media previews in the editor:** image URL fields render inline thumbnails; video fields have a collapsed **Preview video** toggle (`video-preview.tsx` → `VideoComponent`: HLS / direct file / YouTube-Vimeo embed). No live preview of learner `SectionComponent` / `CourseComponent` while editing. | Split pane or “Preview” tab that renders read-only components with draft state. |
 | **Validation** | Little client-side validation beyond required title. | Warn on duplicate unit IDs, invalid URLs, empty ordered units. |
-| **Media** | Uploads are per-field; no asset library. | Reuse recent uploads for the same course folder; show thumbnails in the editor lists. |
+| **Media** | Uploads are per-field; no asset library. | Reuse recent uploads for the same course folder. |
+| **Unsaved changes** | Dirty-state guard (`use-unsaved-changes.ts`): confirm on internal link clicks, Cancel, and refresh/close. | Browser back during client-side history navigation is not blocked (App Router limitation). |
 
 ---
 
@@ -27,7 +28,7 @@
 
 **Storage:** `courses.payload` is a **JSON string** of `CourseDetails` (not normalized per-column). Unit refs are normalized on save via `course-unit.util.ts`; the `course_units` table indexes the tree for queries and progress.
 
-**Freemium:** Set `free_preview: true` on a top-level unit to expose its content (and descendants) without purchase. Course price is stored on the `courses.price` column (e.g. `$29` for FAA 107).
+**Freemium:** Set `free_preview: true` on a top-level unit to expose its content (and descendants) without purchase. Course price is stored on the `courses.price` column (e.g. `$129` for FAA 107).
 
 **Public marketing:** `GET /courses/:id/public` returns a stripped payload for SSR at `/courses/:id/preview`.
 

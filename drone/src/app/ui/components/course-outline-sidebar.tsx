@@ -27,7 +27,7 @@ function OutlineNode({
     node,
     courseId,
     depth,
-    parentId,
+    rootUnitId,
     hasAccess,
     allUnits,
     activeUnitId,
@@ -37,7 +37,7 @@ function OutlineNode({
     node: UnitData;
     courseId: number;
     depth: number;
-    parentId: string | null;
+    rootUnitId: string;
     hasAccess: boolean;
     allUnits: UnitData[];
     activeUnitId?: string;
@@ -48,11 +48,10 @@ function OutlineNode({
     const children = node.sub_units ?? [];
     const hasChildren = children.length > 0;
     const isOpen = expanded[id] ?? depth === 0;
-    // Deep leaves render as sections inside their parent's page.
     const href =
-        !hasChildren && depth > 0 && parentId
-            ? unitPath(courseId, parentId, id)
-            : unitPath(courseId, id);
+        depth === 0
+            ? unitPath(courseId, rootUnitId)
+            : unitPath(courseId, rootUnitId, id);
     const isActive = activeUnitId === id;
     const locked = !hasAccess && !isUnitPreviewAccessible(allUnits, id);
 
@@ -102,7 +101,7 @@ function OutlineNode({
                             node={child}
                             courseId={courseId}
                             depth={depth + 1}
-                            parentId={id}
+                            rootUnitId={rootUnitId}
                             hasAccess={hasAccess}
                             allUnits={allUnits}
                             activeUnitId={activeUnitId}
@@ -197,7 +196,7 @@ export default function CourseOutlineSidebar({
                         node={unit}
                         courseId={courseId}
                         depth={0}
-                        parentId={null}
+                        rootUnitId={String(unit.id)}
                         hasAccess={hasAccess}
                         allUnits={units}
                         activeUnitId={activeUnitId}

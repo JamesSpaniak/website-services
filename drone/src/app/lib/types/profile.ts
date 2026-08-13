@@ -18,6 +18,8 @@ interface CreateUserDto {
     first_name?: string;
     last_name?: string;
     invite_code?: string;
+    /** Admin-generated promo/signup link code — grants course access on registration. */
+    signup_code?: string;
 }
 
 interface ContactPayload {

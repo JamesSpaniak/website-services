@@ -5,7 +5,9 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * The existing latest_exam_score decimal column is preserved for backward
  * compatibility with any in-flight progress records.
  */
-export class AddExamScoresToProgress1745100001000 implements MigrationInterface {
+export class AddExamScoresToProgress1745100001000
+  implements MigrationInterface
+{
   name = 'AddExamScoresToProgress1745100001000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

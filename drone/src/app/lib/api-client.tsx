@@ -576,6 +576,62 @@ async function logToServer(level: string, message: string, context: object) {
     }
 }
 
+// ── User management (admin) ──────────────────────────────────────────────────
+
+import type {
+    AdminUserRow,
+    SignupLinkRow,
+    CreateSignupLinkPayload,
+    SignupLinkInfo,
+} from './types/admin-users';
+
+async function getUsersAdmin(): Promise<AdminUserRow[]> {
+    return apiClient('users/admin/all');
+}
+
+async function grantUserCourse(userId: number, courseId: number): Promise<void> {
+    await apiClient(`users/${userId}/courses`, {
+        method: 'POST',
+        body: JSON.stringify({ course_id: courseId }),
+    });
+}
+
+async function revokeUserCourse(userId: number, courseId: number): Promise<void> {
+    await apiClient(`users/${userId}/courses/${courseId}`, { method: 'DELETE' });
+}
+
+async function deleteUserAdmin(userId: number): Promise<void> {
+    await apiClient(`users/${userId}`, { method: 'DELETE' });
+}
+
+async function adminSendPasswordReset(userId: number): Promise<{ message: string }> {
+    return apiClient(`auth/admin/users/${userId}/send-password-reset`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+async function adminResendVerification(userId: number): Promise<{ message: string }> {
+    return apiClient(`auth/admin/users/${userId}/resend-verification`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+async function getSignupLinks(): Promise<SignupLinkRow[]> {
+    return apiClient('users/admin/signup-links');
+}
+
+async function createSignupLink(payload: CreateSignupLinkPayload): Promise<SignupLinkRow> {
+    return apiClient('users/admin/signup-links', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+}
+
+async function deleteSignupLink(id: number): Promise<void> {
+    await apiClient(`users/admin/signup-links/${id}`, { method: 'DELETE' });
+}
+
+/** Public — describes a `?signup=` code for the register page. */
+async function getSignupLinkInfo(code: string): Promise<SignupLinkInfo> {
+    return apiClient(`users/signup-link-info?code=${encodeURIComponent(code)}`);
+}
+
 // ── Question Bank (admin) ─────────────────────────────────────────────────────
 
 async function getQuestions(courseId: number, status = 'active'): Promise<Question[]> {
@@ -709,6 +765,17 @@ export {
     uploadProfilePicture,
     resetMemberPicture,
     getUnitMedia,
+    // User management (admin)
+    getUsersAdmin,
+    grantUserCourse,
+    revokeUserCourse,
+    deleteUserAdmin,
+    adminSendPasswordReset,
+    adminResendVerification,
+    getSignupLinks,
+    createSignupLink,
+    deleteSignupLink,
+    getSignupLinkInfo,
     // Questions (admin)
     getQuestions,
     createQuestion,

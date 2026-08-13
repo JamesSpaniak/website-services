@@ -4,7 +4,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
-import { ExamPool, GenerateExamDto, GenerateClassExamDto } from './types/question.dto';
+import {
+  ExamPool,
+  GenerateExamDto,
+  GenerateClassExamDto,
+} from './types/question.dto';
 
 /** Tag on questions imported for end-of-course figure / cross-section items */
 export const FINAL_EXAM_STANDARD = 'FINAL_EXAM';
@@ -40,18 +44,28 @@ export class ExamGeneratorService {
       const scopeRefs = this.resolveScopeRefs(dto).slice().sort();
       const recent = await this.examRepository
         .createQueryBuilder('e')
-        .leftJoin('exam_attempts', 'ea', 'ea.exam_id = e.id AND ea.user_id = :uid', { uid: userId })
+        .leftJoin(
+          'exam_attempts',
+          'ea',
+          'ea.exam_id = e.id AND ea.user_id = :uid',
+          { uid: userId },
+        )
         .where('e.created_by_user_id = :uid', { uid: userId })
         .andWhere('e.course_id = :cid', { cid: dto.course_id })
         .andWhere('e.scope = :scope', { scope: dto.scope })
         .andWhere('e.exam_pool = :pool', { pool: this.resolveExamPool(dto) })
         .andWhere('e.generated_by = :gb', { gb: 'student' })
-        .andWhere('e.scope_refs <@ :refs::varchar[] AND e.scope_refs @> :refs::varchar[]', { refs: scopeRefs })
+        .andWhere(
+          'e.scope_refs <@ :refs::varchar[] AND e.scope_refs @> :refs::varchar[]',
+          { refs: scopeRefs },
+        )
         .andWhere('ea.id IS NULL')
         .orderBy('e.created_at', 'DESC')
         .getOne();
       if (recent) {
-        this.logger.log(`Reusing unattempted exam ${recent.id} for user ${userId}`);
+        this.logger.log(
+          `Reusing unattempted exam ${recent.id} for user ${userId}`,
+        );
         return recent;
       }
     }
@@ -78,13 +92,21 @@ export class ExamGeneratorService {
 
     if (isFixed) {
       const dedupKey = this.buildDedupKey(dto);
-      const existing = await this.examRepository.findOne({ where: { dedup_key: dedupKey } });
+      const existing = await this.examRepository.findOne({
+        where: { dedup_key: dedupKey },
+      });
       if (existing) {
         exam = existing;
         this.logger.log(`Reusing existing fixed exam ${exam.id} via dedup_key`);
       } else {
         const questions = await this.selectQuestions(dto);
-        exam = await this.saveExam(dto, questions, 'teacher', teacherId, dedupKey);
+        exam = await this.saveExam(
+          dto,
+          questions,
+          'teacher',
+          teacherId,
+          dedupKey,
+        );
       }
     } else {
       const questions = await this.selectQuestions(dto);
@@ -137,7 +159,9 @@ export class ExamGeneratorService {
 
     const selectGroup = (group: Question[], remaining: number): Question[] => {
       if (remaining <= 0) return [];
-      const ordered = isRandom ? shuffle(group) : group.slice().sort((a, b) => a.id - b.id);
+      const ordered = isRandom
+        ? shuffle(group)
+        : group.slice().sort((a, b) => a.id - b.id);
       return ordered.slice(0, remaining);
     };
 
@@ -152,7 +176,9 @@ export class ExamGeneratorService {
     selected.push(...selectGroup(supplemental, targetCount - selected.length));
 
     if (selected.length === 0) {
-      throw new BadRequestException('No questions available for the requested scope after filtering.');
+      throw new BadRequestException(
+        'No questions available for the requested scope after filtering.',
+      );
     }
 
     return selected.slice(0, targetCount);
@@ -176,7 +202,9 @@ export class ExamGeneratorService {
     examPool: ExamPool,
   ): void {
     if (examPool === 'final_only') {
-      qb.andWhere('q.standard = :finalStandard', { finalStandard: FINAL_EXAM_STANDARD });
+      qb.andWhere('q.standard = :finalStandard', {
+        finalStandard: FINAL_EXAM_STANDARD,
+      });
     } else if (examPool === 'scoped') {
       qb.andWhere('(q.standard IS NULL OR q.standard != :finalStandard)', {
         finalStandard: FINAL_EXAM_STANDARD,

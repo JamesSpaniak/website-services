@@ -8,7 +8,8 @@ assets/
 ├── articles/         Standalone article import JSON (CMS payloads)
 ├── news/             Editorial drafts, import JSON, hero images
 ├── visuals/          Brand kit (logo, colors, fonts, mockups, social templates)
-├── videos/           Source video for S3 upload / transcode
+├── videos/           Course source video for S3 upload / transcode
+├── media/            Marketing flight masters + edits (mostly gitignored)
 ├── archive/          Ad-hoc logs and scratch files (not product content)
 ```
 
@@ -18,6 +19,7 @@ assets/
 | [`articles/`](articles/) | Admin article editor / API import |
 | [`news/`](news/) | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
 | [`visuals/`](visuals/) | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+| [`media/`](media/) | [`media/README.md`](media/README.md) · [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 
 **Agent guide:** [`AGENTS.md`](AGENTS.md)
 

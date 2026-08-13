@@ -55,7 +55,13 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 - **Email verification:** `is_email_verified`, `email_verification_token`, `email_verification_expires_at`.
 - **Sessions / security:** `token_version` (invalidates JWTs when bumped).
 - **Pro:** `pro_membership_expires_at` (active Pro when in the future).
-- **Purchases:** many-to-many **`user_courses_purchased`** → `courses`.
+- **Purchases:** many-to-many **`user_courses_purchased`** → `courses`. The join table carries **access provenance**: `source` (`purchase` \| `admin_grant` \| `signup_link`, default `purchase` so the Stripe write path needs no changes), `granted_by_user_id`, `signup_link_id`, `granted_at` (migration `1745100007000`). Access checks read only the FK pair; provenance is written by admin grants and signup-link redemption via raw inserts.
+
+### `signup_links`
+
+- Admin-generated promo/gift links (`/register?signup=CODE`), **not** tied to organizations (contrast `invite_codes`).
+- `code` (unique), `kind` (`one_time` implemented; `campaign` reserved), `email` (optional lock — also triggers a send via `EmailService.sendSignupLinkEmail`), `course_ids` (int array), `note`, `max_uses`/`use_count`, `discount_percent`/`price_override` (schema-ready for future discounted campaign checkout), creator/redeemer refs, `expires_at`.
+- Redeeming grants each course via `user_courses_purchased` with `source='signup_link'` + `signup_link_id`, so per-link redemptions stay queryable. Managed by `SignupLinkService` (users module); consume runs in a transaction with a row lock.
 
 ### `courses`
 
@@ -164,23 +170,32 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | POST | `/auth/login` | Public | Returns tokens + user (+ org summary if any). |
-| POST | `/auth/register` | Public | Sends verification email. |
+| POST | `/auth/register` | Public | Sends verification email. Optional `invite_code` (org) and `signup_code` (promo link — validated before account creation, consumed after). |
 | POST | `/auth/verify-email` | Public | |
 | POST | `/auth/refresh` | Public | Body: refresh token. |
 | GET | `/auth/profile` | JWT | Current user. |
 | POST | `/auth/logout` | Public | Invalidates refresh session. |
 | POST | `/auth/forgot-password` | Public | Throttled. |
 | POST | `/auth/reset-password` | Public | Throttled. |
+| POST | `/auth/admin/users/:id/send-password-reset` | JWT + **Admin** | Email a reset link to a specific user. |
+| POST | `/auth/admin/users/:id/resend-verification` | JWT + **Admin** | Resend verification (400 if already verified). |
 
 ### Users — `/users`
 
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | GET | `/users` | JWT + **Admin** | All users (slim). |
+| GET | `/users/admin/all` | JWT + **Admin** | Detailed rows for the admin Users tab: role, verification, org, courses **with access source** (purchase/gift/promo). |
+| GET | `/users/admin/signup-links` | JWT + **Admin** | List signup links with status + redemption info. |
+| POST | `/users/admin/signup-links` | JWT + **Admin** | Create one-time link (`course_ids`, optional `email` lock+send, `note`, `expires_in_days`). |
+| DELETE | `/users/admin/signup-links/:id` | JWT + **Admin** | Only unused links (redeemed links are kept as records). |
+| GET | `/users/signup-link-info?code=` | Public | Register-page description of a `?signup=` code; `{ valid:false, reason }` instead of errors. |
 | POST | `/users` | JWT + **Admin** | Create user. |
 | GET | `/users/:username` | JWT | Public profile by username. |
 | PATCH | `/users/me` | JWT | Update self only. |
-| DELETE | `/users/:id` | JWT + **Admin** | |
+| POST | `/users/:id/courses` | JWT + **Admin** | Gift course access (`source='admin_grant'`); bumps target `token_version`. |
+| DELETE | `/users/:id/courses/:courseId` | JWT + **Admin** | Revoke course access (any source). |
+| DELETE | `/users/:id` | JWT + **Admin** | Hardened: refuses self-delete + admin targets; cleans `exam_attempts` (no FK) before delete. |
 
 ### Courses — `/courses`
 

@@ -161,3 +161,10 @@ crash.log
 # Brand deck — too large for GitHub (>100MB); keep locally or in cloud storage
 assets/visuals/Presentation/VisualIdentityDroneEdge.pdf
 assets/visuals/Presentation/*.pdf
+
+# Large drone / marketing media — local only (see assets/media/README.md)
+assets/media/raw/
+assets/media/edits/
+
+# Raw course recordings — uploaded to S3 via scripts/upload-faa-107-videos.sh, not committed
+assets/courses/*.mp4

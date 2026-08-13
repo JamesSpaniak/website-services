@@ -1,5 +1,20 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ArticleService } from './article.service';
 import { ArticleDto, ArticleFull, ArticleSlim } from './types/article.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -10,9 +25,7 @@ import { Role } from 'src/users/types/role.enum';
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticleController {
-  constructor(
-      private readonly articleService: ArticleService
-  ) {}
+  constructor(private readonly articleService: ArticleService) {}
 
   @ApiOperation({ summary: 'Get all published articles' })
   @ApiResponse({ status: 200, description: 'List of published articles.' })
@@ -35,7 +48,9 @@ export class ArticleController {
   @ApiResponse({ status: 200, description: 'Article details.' })
   @ApiResponse({ status: 404, description: 'Article not found.' })
   @Get(':id')
-  async getArticleById(@Param('id', ParseIntPipe) id: number): Promise<ArticleFull> {
+  async getArticleById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ArticleFull> {
     return this.articleService.getArticle(String(id));
   }
 
@@ -45,10 +60,8 @@ export class ArticleController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
-  async saveArticle(
-    @Body() article: ArticleDto
-  ): Promise<ArticleFull> {
-    return this.articleService.saveArticle(article)
+  async saveArticle(@Body() article: ArticleDto): Promise<ArticleFull> {
+    return this.articleService.saveArticle(article);
   }
 
   @ApiOperation({ summary: 'Update an existing article (Admin only)' })
@@ -59,10 +72,11 @@ export class ArticleController {
   @Roles(Role.Admin)
   async updateArticle(
     @Param('id', ParseIntPipe) id: number,
-    @Body() article: ArticleDto
+    @Body() article: ArticleDto,
   ): Promise<ArticleFull> {
-    return this.articleService.updateArticle(String(id), 
-        ArticleService.articleDtoToEntity(article)
+    return this.articleService.updateArticle(
+      String(id),
+      ArticleService.articleDtoToEntity(article),
     );
   }
 

@@ -6,7 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { ExamAttempt, AttemptAnswer, SectionBreakdown } from './types/exam-attempt.entity';
+import {
+  ExamAttempt,
+  AttemptAnswer,
+  SectionBreakdown,
+} from './types/exam-attempt.entity';
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
@@ -107,7 +111,11 @@ export class ExamAttemptService {
     const score = Math.round((correctCount / questions.length) * 100);
 
     // Build per-section breakdown
-    const breakdown = await this.buildBreakdown(scoredAnswers, questions, exam.course_id);
+    const breakdown = await this.buildBreakdown(
+      scoredAnswers,
+      questions,
+      exam.course_id,
+    );
 
     // Upsert: delete existing then insert fresh so updated_at reflects now
     await this.attemptRepository.delete({ user_id: userId, exam_id: examId });
@@ -137,7 +145,10 @@ export class ExamAttemptService {
 
   // ── Retrieval ──────────────────────────────────────────────────────────────
 
-  async getLatestAttempt(userId: number, examId: number): Promise<ExamAttempt | null> {
+  async getLatestAttempt(
+    userId: number,
+    examId: number,
+  ): Promise<ExamAttempt | null> {
     const attempt = await this.attemptRepository.findOne({
       where: { user_id: userId, exam_id: examId },
     });
@@ -172,7 +183,8 @@ export class ExamAttemptService {
     const classExam = await this.classExamRepository.findOne({
       where: { id: classExamId },
     });
-    if (!classExam) throw new NotFoundException(`ClassExam ${classExamId} not found`);
+    if (!classExam)
+      throw new NotFoundException(`ClassExam ${classExamId} not found`);
 
     // Fetch all attempts for this exam
     const attempts = await this.attemptRepository.find({
@@ -221,13 +233,16 @@ export class ExamAttemptService {
     courseId: number,
   ): Promise<SectionBreakdown[]> {
     // Group questions by unit_ref / sub_unit_ref
-    const sectionMap = new Map<string, {
-      unit_ref: string | null;
-      sub_unit_ref: string | null;
-      correct: number;
-      total: number;
-      failed_standards: Set<string>;
-    }>();
+    const sectionMap = new Map<
+      string,
+      {
+        unit_ref: string | null;
+        sub_unit_ref: string | null;
+        correct: number;
+        total: number;
+        failed_standards: Set<string>;
+      }
+    >();
 
     const questionById = new Map(questions.map((q) => [q.id, q]));
 
@@ -267,7 +282,9 @@ export class ExamAttemptService {
       unit_ref: s.unit_ref,
       sub_unit_ref: s.sub_unit_ref,
       unit_title: s.unit_ref ? (titleByRef.get(s.unit_ref) ?? null) : null,
-      sub_unit_title: s.sub_unit_ref ? (titleByRef.get(s.sub_unit_ref) ?? null) : null,
+      sub_unit_title: s.sub_unit_ref
+        ? (titleByRef.get(s.sub_unit_ref) ?? null)
+        : null,
       correct: s.correct,
       total: s.total,
       score_percent: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
@@ -308,11 +325,7 @@ export class ExamAttemptService {
       let filtered = existing.filter((s) => s.exam_id !== exam.id);
       if (exam.scope === 'full_course' && exam.exam_pool) {
         filtered = filtered.filter(
-          (s) =>
-            !(
-              s.scope === 'full_course' &&
-              s.exam_pool === exam.exam_pool
-            ),
+          (s) => !(s.scope === 'full_course' && s.exam_pool === exam.exam_pool),
         );
       }
       const updated = [...filtered, snapshot];
@@ -328,7 +341,10 @@ export class ExamAttemptService {
       }
       const capped: ExamScoreSnapshot[] = [];
       for (const arr of groups.values()) {
-        arr.sort((a, b) => new Date(b.taken_at).getTime() - new Date(a.taken_at).getTime());
+        arr.sort(
+          (a, b) =>
+            new Date(b.taken_at).getTime() - new Date(a.taken_at).getTime(),
+        );
         capped.push(...arr.slice(0, 10));
       }
       progress.exam_scores = capped;

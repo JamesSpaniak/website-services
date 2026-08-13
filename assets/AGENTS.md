@@ -12,7 +12,8 @@ Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AGENTS.md).
 | [`articles/`](articles/) | Standalone article import JSON | Admin import / API |
 | [`news/`](news/) | Editorial drafts, heroes | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
 | [`visuals/`](visuals/) | Brand kit | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
-| [`videos/`](videos/) | Source video for S3 upload | content-build workflow |
+| [`videos/`](videos/) | Course source video for S3 upload / transcode | content-build workflow |
+| [`media/`](media/) | Marketing flight masters + snips (gitignored binaries; tracked manifests) | [`media/README.md`](media/README.md), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 
 ## Before editing course content
 
@@ -29,6 +30,7 @@ Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AGENTS.md).
 | Course tree, units, exam pools | [`docs/tech/course-content-restructure-plan.md`](../docs/tech/course-content-restructure-plan.md) |
 | Question import stats, gaps, scripts | [`docs/tech/exam-generator-and-course-linking.md`](../docs/tech/exam-generator-and-course-linking.md), `assets/courses/README.md` |
 | Brand files or folder layout | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+| Marketing flight cuts / media layout | [`media/README.md`](media/README.md), [`media/manifests/`](media/manifests/), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 | Article/news inventory | [`docs/marketing/article-inventory.md`](../docs/marketing/article-inventory.md) |
 | Deployed to prod | [`docs/TODO.md`](../docs/TODO.md) → [`docs/TODO_COMPLETED.md`](../docs/TODO_COMPLETED.md) with date |
 

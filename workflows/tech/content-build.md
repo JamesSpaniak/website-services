@@ -38,18 +38,26 @@ Bulk image insertion (map folder → review → upload → merge): [`course-imag
 | Step | Action |
 |------|--------|
 | Record | One video per unit/section (or agreed granularity) |
-| Upload | `./scripts/bulk-upload-videos.sh` — source: `assets/videos/` |
+| Upload | `./scripts/bulk-upload-videos.sh <video-dir> --bucket droneedge-dev-raw-video`, or the reviewed Part 107 mapping script below |
 | Wire course | Set `video_url` on each node in `assets/courses/faa_107_course.json` |
 | Publish | Admin course save or API; invalidate CDN if needed |
 | Captions | Plan transcripts/captions track — WCAG (see TODO) |
 
-Pipeline:
+Reviewed FAA 107 mappings:
 
 ```bash
-./scripts/bulk-upload-videos.sh
+./scripts/upload-faa-107-videos.sh --wait
 ```
 
-Source files: `assets/videos/` → S3 raw bucket → MediaConvert → HLS on media CloudFront.
+The script gives each approved recording a stable, URL-safe key, uploads it to `droneedge-dev-raw-video`, and can wait for the expected HLS playlist in `droneedge-dev-media`. Add ambiguous recordings to its mapping only after choosing one course node.
+
+Generic uploads:
+
+```bash
+./scripts/bulk-upload-videos.sh assets/videos --bucket droneedge-dev-raw-video
+```
+
+Source files → S3 raw bucket → MediaConvert → `courses/videos/<name>/<name>.m3u8` on media CloudFront. Store that relative HLS path in `video_url`; the backend converts it to an authorized CloudFront URL.
 
 ## API types (after backend DTO changes)
 

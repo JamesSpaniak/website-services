@@ -31,10 +31,18 @@ export class CreateQuestionTables1745100000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "IDX_questions_course_id"          ON "questions" ("course_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_questions_course_unit"        ON "questions" ("course_id", "unit_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_questions_course_sub_unit"    ON "questions" ("course_id", "sub_unit_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_questions_status"             ON "questions" ("status")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_questions_course_id"          ON "questions" ("course_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_questions_course_unit"        ON "questions" ("course_id", "unit_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_questions_course_sub_unit"    ON "questions" ("course_id", "sub_unit_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_questions_status"             ON "questions" ("status")`,
+    );
 
     // ── exams ────────────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -53,8 +61,12 @@ export class CreateQuestionTables1745100000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "IDX_exams_course_id"    ON "exams" ("course_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_exams_course_scope" ON "exams" ("course_id", "scope")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_exams_course_id"    ON "exams" ("course_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_exams_course_scope" ON "exams" ("course_id", "scope")`,
+    );
 
     // ── exam_attempts ────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -71,8 +83,12 @@ export class CreateQuestionTables1745100000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "IDX_exam_attempts_user_id" ON "exam_attempts" ("user_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_exam_attempts_exam_id" ON "exam_attempts" ("exam_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_exam_attempts_user_id" ON "exam_attempts" ("user_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_exam_attempts_exam_id" ON "exam_attempts" ("exam_id")`,
+    );
 
     // ── class_exams ──────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -88,8 +104,12 @@ export class CreateQuestionTables1745100000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "IDX_class_exams_org"  ON "class_exams" ("organization_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_class_exams_exam" ON "class_exams" ("exam_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_class_exams_org"  ON "class_exams" ("organization_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_class_exams_exam" ON "class_exams" ("exam_id")`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

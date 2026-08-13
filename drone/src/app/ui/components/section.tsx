@@ -1,23 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useId } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UnitData, ProgressStatus, QuestionCounts } from '@/app/lib/types/course';
 import StatusIcon from './status-icon';
 import StatusUpdater from './status-updater';
 import { ChevronRightIcon, DocumentTextIcon, PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
-import VideoComponent from './video';
-import { getUnitMedia } from '@/app/lib/api-client';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import CourseImageStrip from './course-image-strip';
+import CourseUnitVideo from './course-unit-video';
 import ExamPlayer from './exam-player';
 import { PROSE_COMPACT } from '@/app/lib/prose-classes';
 import { findUnitInTree } from '@/app/lib/course-tree';
 import { hasScopedQuestions } from './unit';
+import { unitPath } from '@/app/lib/auth-redirect';
 
 interface SectionProps {
   section: UnitData;
   courseId: number;
+  rootUnitId: string;
   onStatusUpdate: (unitId: string, newStatus: ProgressStatus) => Promise<void>;
   level?: number;
   /** Section id to auto-expand and scroll to. */
@@ -26,19 +28,16 @@ interface SectionProps {
   questionCounts?: QuestionCounts;
 }
 
-function isCourseVideo(url?: string): boolean {
-  if (!url) return false;
-  return url.includes('courses/videos/') || url.endsWith('.m3u8');
-}
-
 export default function SectionComponent({
   section,
   courseId,
+  rootUnitId,
   onStatusUpdate,
   level = 0,
   focusUnitId,
   questionCounts,
 }: SectionProps) {
+  const router = useRouter();
   const { id, title, description, text_content, video_url, status, sub_units } = section;
   const sectionImages = mergeCourseImages(section);
   const isFocused = focusUnitId != null && String(id) === String(focusUnitId);
@@ -46,8 +45,6 @@ export default function SectionComponent({
     focusUnitId != null && !isFocused && findUnitInTree(sub_units, focusUnitId) != null;
   const [isExpanded, setIsExpanded] = useState(isFocused || containsFocus);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
-  const [videoLoading, setVideoLoading] = useState(false);
   const bodyId = useId();
   // Keep heading levels meaningful for screen readers: unit h1 → "Sections" h2 → h3, nested deeper → h4…h6.
   const HeadingTag = `h${Math.min(level + 3, 6)}` as 'h3' | 'h4' | 'h5' | 'h6';
@@ -60,30 +57,18 @@ export default function SectionComponent({
     }
   }, [isFocused, containsFocus]);
 
-  const needsSigning = isCourseVideo(video_url);
   const subUnitScopeRef = String(id);
   const isLeaf = !sub_units || sub_units.length === 0;
+  const handleToggle = () => {
+    const nextExpanded = !isExpanded;
+    setIsExpanded(nextExpanded);
 
-  const fetchSignedUrl = useCallback(async () => {
-    if (!needsSigning || signedVideoUrl) return;
-    setVideoLoading(true);
-    try {
-      const { video_url: signed } = await getUnitMedia(courseId, String(id));
-      setSignedVideoUrl(signed || null);
-    } catch {
-      setSignedVideoUrl(null);
-    } finally {
-      setVideoLoading(false);
+    if (nextExpanded) {
+      router.push(unitPath(courseId, rootUnitId, String(id)), { scroll: false });
+    } else if (isFocused || containsFocus) {
+      router.replace(unitPath(courseId, rootUnitId), { scroll: false });
     }
-  }, [courseId, id, needsSigning, signedVideoUrl]);
-
-  useEffect(() => {
-    if (isExpanded && needsSigning) {
-      fetchSignedUrl();
-    }
-  }, [isExpanded, needsSigning, fetchSignedUrl]);
-
-  const resolvedVideoUrl = needsSigning ? signedVideoUrl : video_url;
+  };
 
   return (
     <div ref={containerRef} tabIndex={-1} className={`mt-4 scroll-mt-24 outline-none ${level > 0 ? 'pl-4 border-l-2 border-[var(--surface-border)]' : ''}`}>
@@ -95,7 +80,7 @@ export default function SectionComponent({
           <HeadingTag className="flex-1 min-w-0 m-0 text-lg font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
             <button
               type="button"
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={handleToggle}
               aria-expanded={isExpanded}
               aria-controls={bodyId}
               className="flex w-full min-w-0 items-center gap-3 p-5 text-left cursor-pointer hover:bg-[var(--background)]/40 transition-colors"
@@ -149,13 +134,12 @@ export default function SectionComponent({
                     {sectionImages.length > 0 && (
                         <CourseImageStrip images={sectionImages} alt={title} />
                     )}
-                    {videoLoading && (
-                      <div role="status" className="flex items-center justify-center h-64 bg-[var(--brand-black)]" style={{ borderRadius: 'var(--radius-sm)' }}>
-                        <div className="animate-spin h-8 w-8 border-2 border-[var(--brand-primary)] border-t-transparent" style={{ borderRadius: '50%' }} aria-hidden />
-                        <span className="sr-only">Loading video…</span>
-                      </div>
-                    )}
-                    {!videoLoading && resolvedVideoUrl && <VideoComponent src={resolvedVideoUrl} title={title} />}
+                    <CourseUnitVideo
+                      courseId={courseId}
+                      unitId={String(id)}
+                      videoUrl={video_url}
+                      title={title}
+                    />
                 </div>
                 {text_content && <div className={`mt-4 ${PROSE_COMPACT}`} dangerouslySetInnerHTML={{ __html: text_content.replace(/\n/g, '<br />') }} />}
 
@@ -164,6 +148,7 @@ export default function SectionComponent({
                     key={subUnit.id}
                     section={subUnit}
                     courseId={courseId}
+                    rootUnitId={rootUnitId}
                     onStatusUpdate={onStatusUpdate}
                     level={level + 1}
                     focusUnitId={focusUnitId}

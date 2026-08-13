@@ -1,132 +1,142 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsDate, IsArray, IsNumber, IsUrl } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsDate,
+  IsArray,
+  IsNumber,
+  IsUrl,
+} from 'class-validator';
 import { Role } from './role.enum';
 
-
 export class UserSlim {
-    @ApiProperty()
-    @Expose()
-    @IsString()
-    username: string;
+  @ApiProperty()
+  @Expose()
+  @IsString()
+  username: string;
 
-    @ApiPropertyOptional()
-    @Expose()
-    @IsOptional()
-    @IsString()
-    first_name?: string;
+  @ApiPropertyOptional()
+  @Expose()
+  @IsOptional()
+  @IsString()
+  first_name?: string;
 
-    @ApiPropertyOptional()
-    @Expose()
-    @IsOptional()
-    @IsString()
-    last_name?: string;
+  @ApiPropertyOptional()
+  @Expose()
+  @IsOptional()
+  @IsString()
+  last_name?: string;
 
-    @ApiPropertyOptional()
-    @Expose()
-    @IsOptional()
-    @IsString()
-    picture_url?: string;
+  @ApiPropertyOptional()
+  @Expose()
+  @IsOptional()
+  @IsString()
+  picture_url?: string;
 }
 
 export class UserFull extends UserSlim {
-    @ApiProperty()
-    @Expose()
-    @IsNumber()
-    id: number;
+  @ApiProperty()
+  @Expose()
+  @IsNumber()
+  id: number;
 
-    @ApiProperty()
-    @Expose()
-    @IsEmail()
-    email: string;
+  @ApiProperty()
+  @Expose()
+  @IsEmail()
+  email: string;
 
-    @ApiProperty({ enum: Role })
-    @Expose()
-    role: Role;
+  @ApiProperty({ enum: Role })
+  @Expose()
+  role: Role;
 
-    @ApiProperty()
-    @Expose()
-    @Transform(({ obj }) => obj.is_email_verified ?? false)
-    email_verified: boolean;
+  @ApiProperty()
+  @Expose()
+  @Transform(({ obj }) => obj.is_email_verified ?? false)
+  email_verified: boolean;
 
-    @ApiPropertyOptional()
-    @Expose()
-    @IsOptional()
-    pro_membership_expires_at?: Date;
+  @ApiPropertyOptional()
+  @Expose()
+  @IsOptional()
+  pro_membership_expires_at?: Date;
 
-    @ApiPropertyOptional({ type: [String] })
-    @Expose()
-    @IsArray()
-    courses?: string[];
+  @ApiPropertyOptional({ type: [String] })
+  @Expose()
+  @IsArray()
+  courses?: string[];
 
-    @ApiProperty()
-    @Expose()
-    submitted_at?: Date;
+  @ApiProperty()
+  @Expose()
+  submitted_at?: Date;
 
-    @ApiProperty()
-    @Expose()
-    updated_at?: Date;
+  @ApiProperty()
+  @Expose()
+  updated_at?: Date;
 
-    @ApiPropertyOptional({ description: 'Organization membership info, if the user belongs to one.' })
-    @Expose()
-    @IsOptional()
-    organization?: { id: number; name: string; role: string };
+  @ApiPropertyOptional({
+    description: 'Organization membership info, if the user belongs to one.',
+  })
+  @Expose()
+  @IsOptional()
+  organization?: { id: number; name: string; role: string };
 }
 
 export class UserDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    username: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsString()
-    first_name?: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  first_name?: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsString()
-    last_name?: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  last_name?: string;
 
-    @ApiProperty()
-    @IsEmail()
-    email: string;
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsString()
-    picture_url?: string;
-};
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  picture_url?: string;
+}
 
 export class UpdateUserDto {
-    @ApiPropertyOptional({ description: "User's email address." })
-    @IsOptional()
-    @IsString()
-    @IsEmail()
-    email?: string;
+  @ApiPropertyOptional({ description: "User's email address." })
+  @IsOptional()
+  @IsString()
+  @IsEmail()
+  email?: string;
 
-    @ApiPropertyOptional({ description: "User's first name." })
-    @IsOptional()
-    @IsString()
-    first_name?: string;
+  @ApiPropertyOptional({ description: "User's first name." })
+  @IsOptional()
+  @IsString()
+  first_name?: string;
 
-    @ApiPropertyOptional({ description: "User's last name." })
-    @IsOptional()
-    @IsString()
-    last_name?: string;
+  @ApiPropertyOptional({ description: "User's last name." })
+  @IsOptional()
+  @IsString()
+  last_name?: string;
 
-    @ApiPropertyOptional({ description: "URL of the user's profile picture." })
-    @IsOptional()
-    @IsUrl()
-    picture_url?: string;
+  @ApiPropertyOptional({ description: "URL of the user's profile picture." })
+  @IsOptional()
+  @IsUrl()
+  picture_url?: string;
 }
 
 export class ResetPictureDto {
-    picture_url: null;
+  picture_url: null;
 }

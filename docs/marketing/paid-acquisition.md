@@ -14,7 +14,7 @@ Paid traffic amplifies whatever the funnel already does. Today it would amplify 
 
 | Gate | Why it blocks spend | Source |
 |------|---------------------|--------|
-| Part 107 video recordings shipped | 197 nodes, 0 with video. Cold traffic that lands on a text-only "course" bounces and the spend is gone. | [`TODO.md`](../TODO.md) P0 |
+| Part 107 video recordings shipped | 150 nodes; first 4 Ch.1 videos are uploaded and referenced in the repo payload, pending admin publish. Cold traffic that lands on an incomplete course still wastes spend. | [`TODO.md`](../TODO.md) P0 |
 | Conversion events instrumented | Without `signup_completed` / `purchase_completed`, bidding algorithms have nothing to optimize toward and you cannot compute CAC. | [`TODO.md`](../TODO.md) S10 · [`analytics-and-attribution.md`](../tech/analytics-and-attribution.md) |
 | Free Unit 1 preview + working join CTAs | The offer cold traffic responds to is "try it," not "buy it." | [`TODO.md`](../TODO.md) S3, S6 |
 | Public pricing page | Hidden pricing kills paid conversion rates and raises support load. | [`TODO.md`](../TODO.md) S2 |

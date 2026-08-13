@@ -118,8 +118,8 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 
 | Area | Endpoints used from the client |
 |------|--------------------------------|
-| Auth | `auth/login`, `auth/register`, `auth/refresh`, `auth/logout`, `auth/profile`, `auth/forgot-password`, `auth/reset-password`, `auth/verify-email` |
-| Users | `users/me`, `users/:username` |
+| Auth | `auth/login`, `auth/register`, `auth/refresh`, `auth/logout`, `auth/profile`, `auth/forgot-password`, `auth/reset-password`, `auth/verify-email`, `auth/admin/users/:id/send-password-reset`, `auth/admin/users/:id/resend-verification` |
+| Users | `users/me`, `users/:username`, `users/admin/all`, `users/:id/courses` POST/DELETE, `users/:id` DELETE, `users/admin/signup-links` GET/POST/DELETE, `users/signup-link-info?code=` |
 | Courses / progress | `courses`, `courses/:id`, `progress/courses`, `progress/courses/:id`, `progress/courses/:id/reset`, `progress/courses/:courseId/units/:unitId`, `courses/:courseId/units/:unitId/media` |
 | Articles (public + admin) | `articles`, `articles/:id`, `articles/admin/all`, `articles` POST, `articles/:id` PATCH/DELETE |
 | Comments | `articles/:articleId/comments`, `comments/:id` PATCH/DELETE, `comments/:id/upvote` |
@@ -195,8 +195,8 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | Public; redirects to sanitized `?redirect=` (else stashed redirect, else `/profile`) if logged in. Optional `?code=` invite. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
-| **API** | **`GET /organizations/invite-info?code=`** when `code` present → `getInviteCodeInfo`. **`POST /auth/register`** → `createUser` (includes `invite_code` when valid). |
+| **Permissions** | Public; redirects to sanitized `?redirect=` (else stashed redirect, else `/profile`) if logged in. Optional `?code=` org invite and `?signup=` admin promo link. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
+| **API** | **`GET /organizations/invite-info?code=`** when `code` present → `getInviteCodeInfo`. **`GET /users/signup-link-info?code=`** when `signup` present → `getSignupLinkInfo` (shows a "this link includes course access" banner listing courses; invalid links warn but don't block plain registration). **`POST /auth/register`** → `createUser` (includes `invite_code` and/or `signup_code` when valid). |
 | **Components** | `PageShell`, `ErrorComponent`, inline form (Heroicon), Suspense wrapper. |
 
 ### `/forgot-password` — `app/forgot-password/page.tsx`
@@ -299,9 +299,9 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | **No `AuthGuard`** in code, but **`GET /courses/:id`** requires JWT — unauthenticated users typically see an error from the fetch. Intended for logged-in learners. |
-| **API** | **`GET /courses/:id`** → `getCourseById` (client extracts unit). **`UnitComponent`:** `PATCH /progress/.../units/:unitId` → `updateUnitProgress`. **`SectionComponent`:** **`GET /courses/:courseId/units/:unitId/media`** → `getUnitMedia` for signed video URLs. |
-| **Components** | `CourseUnitNav` (breadcrumb + prev/next unit links), `UnitComponent` → `SectionComponent` (level-aware headings h3–h6; **full header row** toggles expand/collapse — status menu excluded), `ExamPlayer` (scoped practice exams), `CourseOutlineSidebar` (auto-expands ancestors of the active/focused unit so deep `?focus=` targets stay visible), `StatusUpdater`, `StatusIcon`. **Deep links:** leaf lessons do not get their own URL — outline links them as `/units/{parent}?focus={leaf}` which expands + scrolls that section. Mid-level nodes with children get their own page. **Layout:** full-width (no `max-w` cap) with a fixed-width outline column on `lg+` (sticky); on mobile the outline renders below the unit content instead of being hidden. |
+| **Permissions** | `AuthGuard`; backend `GET /courses/:id` and media/progress endpoints also require JWT. Course access controls whether the active focused node renders content or the locked-unit notice; `free_preview` applies through its descendant branch. |
+| **API** | **`GET /courses/:id`** → `getCourseById`. **`UnitComponent`:** `PATCH /progress/.../units/:unitId` → `updateUnitProgress` for the top-level unit or active focused descendant. **`CourseUnitVideo`** is shared by `UnitComponent` and `SectionComponent`; it calls **`GET /courses/:courseId/units/:unitId/media`** → `getUnitMedia` for signed video URLs. |
+| **Components** | `CourseUnitNav` (active-node breadcrumb + depth-first Previous/Next), `UnitComponent` → `SectionComponent` (level-aware headings h3–h6; opening a header updates focus while the status menu remains separate), shared `CourseUnitVideo`, focused-node `ExamPlayer`, `CourseOutlineSidebar` (active path expansion and canonical links), `StatusUpdater`, `StatusIcon`. **Focused navigation:** only top-level units own pages. Every descendant uses the shareable URL `/courses/{courseId}/units/{rootUnitId}?focus={descendantId}`; opening an inline section or clicking its outline title pushes that URL, expands/scrolls the path, and browser Back/Forward restores focus. Legacy direct descendant URLs such as `/units/u12` redirect to `/units/u1?focus=u12`; invalid or cross-unit focus values normalize to the root page. Previous/Next walks the complete tree depth-first, including stems and leaves. **Layout:** full-width (no `max-w` cap) with a fixed-width sticky outline column on `lg+`; on mobile the outline renders below the unit content. |
 
 ### `/admin/*` — `app/admin/**` (routed dashboard)
 
@@ -310,14 +310,17 @@ Each tab is a **real route** (shared tab bar renders on every admin page, includ
 | Route | Content / API |
 |-------|----------------|
 | `/admin/articles` | Article table — `GET /articles/admin/all`, `DELETE /articles/:id`. |
-| `/admin/articles/new`, `/admin/articles/[articleId]` | **`ArticleEditor`** (`createArticle` / `updateArticle`); edit route loads `GET /articles/:id`. Save/Cancel navigate back to `/admin/articles`. |
+| `/admin/articles/new`, `/admin/articles/[articleId]` | **`ArticleEditor`** (`createArticle` / `updateArticle`); edit route loads `GET /articles/:id`. Save/Cancel navigate back to `/admin/articles`. Unsaved-changes guard (see below). |
 | `/admin/courses` | Course table — `GET /courses`, `DELETE /courses/:id`. Per-row shortcut to `/admin/questions?course=<id>`. |
-| `/admin/courses/new`, `/admin/courses/[courseId]` | **`CourseEditor`** (`createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). Edit route loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present (`GET /courses` list strips nested content). Header link to the course's question bank. |
+| `/admin/courses/new`, `/admin/courses/[courseId]` | **`CourseEditor`** (`createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). Edit route loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present (`GET /courses` list strips nested content). Header link to the course's question bank. Visual ↔ JSON mode switch is in-memory (no save needed); image fields show inline thumbnails and video fields have a collapsed **Preview video** toggle (`video-preview.tsx`). |
 | `/admin/questions` | **`QuestionBankEditor`** — question CRUD, bulk import/export. Accepts `?course=<id>` to preselect a course. |
 | `/admin/organizations` | Org CRUD, invites (single + bulk), course assignment — `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. |
+| `/admin/users` | **Users table** (search; expandable row per user) — `GET /users/admin/all`. Per-user: course access list with **source badges** (Purchased / Gift / Promo link), gift a course (`POST /users/:id/courses`), revoke (`DELETE /users/:id/courses/:courseId`), send password reset (`POST /auth/admin/users/:id/send-password-reset`), resend verification, delete account (`DELETE /users/:id`). **Signup links panel** — create one-time promo links (courses, optional email lock+send, note, expiry) via `POST /users/admin/signup-links`, list with status/copy-URL, delete unused ones. Types in `lib/types/admin-users.ts`. |
 | `/admin/analytics` | `GET /audit/analytics/overview`, `GET /audit/analytics/daily`. |
 
 **Permissions:** middleware cookie + JWT `role === 'admin'` (prefix match covers all nested routes); `AdminGuard` in the layout; backend admin-only on mutating routes.
+
+**Unsaved-changes guard:** both editors track dirty state (serialized form vs mount snapshot) and use **`useUnsavedChangesGuard`** (`lib/use-unsaved-changes.ts`) — `beforeunload` for refresh/close plus a capture-phase interceptor for internal link clicks (tab bar/header), and a confirm on Cancel. Browser back and other `router.push` calls are not intercepted (App Router limitation).
 
 ### `/manager/*` — `app/manager/**` (routed dashboard)
 

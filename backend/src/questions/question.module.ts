@@ -33,7 +33,17 @@ import { ProgressModule } from '../progress/progress.module';
     ProgressModule, // provides ProgressService for ensureProgress
   ],
   controllers: [QuestionController, ExamController],
-  providers: [QuestionService, ExamGeneratorService, ExamAttemptService, ManagerOrAdminGuard],
-  exports: [QuestionService, ExamGeneratorService, ExamAttemptService, ManagerOrAdminGuard],
+  providers: [
+    QuestionService,
+    ExamGeneratorService,
+    ExamAttemptService,
+    ManagerOrAdminGuard,
+  ],
+  exports: [
+    QuestionService,
+    ExamGeneratorService,
+    ExamAttemptService,
+    ManagerOrAdminGuard,
+  ],
 })
 export class QuestionModule {}

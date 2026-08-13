@@ -14,13 +14,21 @@ import { User } from '../users/types/user.entity';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Organization, OrganizationMember, InviteCode, Progress, Course, CourseUnit, User]),
-        EmailModule,
-        ConfigModule,
-    ],
-    controllers: [OrganizationController],
-    providers: [OrganizationService, OrgManagerGuard],
-    exports: [OrganizationService],
+  imports: [
+    TypeOrmModule.forFeature([
+      Organization,
+      OrganizationMember,
+      InviteCode,
+      Progress,
+      Course,
+      CourseUnit,
+      User,
+    ]),
+    EmailModule,
+    ConfigModule,
+  ],
+  controllers: [OrganizationController],
+  providers: [OrganizationService, OrgManagerGuard],
+  exports: [OrganizationService],
 })
 export class OrganizationModule {}

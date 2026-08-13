@@ -4,8 +4,8 @@ import { AnalyticsService } from './analytics.service';
 
 @Global()
 @Module({
-    controllers: [AnalyticsController],
-    providers: [AnalyticsService],
-    exports: [AnalyticsService],
+  controllers: [AnalyticsController],
+  providers: [AnalyticsService],
+  exports: [AnalyticsService],
 })
 export class AnalyticsModule {}

@@ -7,53 +7,64 @@ import { AuditLogResponse } from './types/audit.dto';
 
 @Injectable()
 export class AuditService {
-    private readonly logger = new Logger(AuditService.name);
+  private readonly logger = new Logger(AuditService.name);
 
-    constructor(
-        @InjectRepository(AuditLog)
-        private auditRepository: Repository<AuditLog>,
-    ) {}
+  constructor(
+    @InjectRepository(AuditLog)
+    private auditRepository: Repository<AuditLog>,
+  ) {}
 
-    /**
-     * Fire-and-forget audit log entry. Failures are logged but never
-     * bubble up to callers so they don't break business logic.
-     */
-    async log(userId: number, action: AuditAction, metadata?: Record<string, unknown>): Promise<void> {
-        try {
-            const entry = this.auditRepository.create({
-                userId,
-                action,
-                metadata: metadata || null,
-            });
-            await this.auditRepository.save(entry);
-        } catch (err) {
-            this.logger.error(`Failed to write audit log: ${(err as Error).message}`, (err as Error).stack);
-        }
+  /**
+   * Fire-and-forget audit log entry. Failures are logged but never
+   * bubble up to callers so they don't break business logic.
+   */
+  async log(
+    userId: number,
+    action: AuditAction,
+    metadata?: Record<string, unknown>,
+  ): Promise<void> {
+    try {
+      const entry = this.auditRepository.create({
+        userId,
+        action,
+        metadata: metadata || null,
+      });
+      await this.auditRepository.save(entry);
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
     }
+  }
 
-    async getUserActivity(userId: number, limit = 50, offset = 0): Promise<AuditLogResponse[]> {
-        const logs = await this.auditRepository.find({
-            where: { userId },
-            order: { created_at: 'DESC' },
-            take: limit,
-            skip: offset,
-        });
+  async getUserActivity(
+    userId: number,
+    limit = 50,
+    offset = 0,
+  ): Promise<AuditLogResponse[]> {
+    const logs = await this.auditRepository.find({
+      where: { userId },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: offset,
+    });
 
-        return logs.map((l) => ({
-            id: l.id,
-            action: l.action,
-            metadata: l.metadata,
-            created_at: l.created_at,
-        }));
-    }
+    return logs.map((l) => ({
+      id: l.id,
+      action: l.action,
+      metadata: l.metadata,
+      created_at: l.created_at,
+    }));
+  }
 
-    /**
-     * Counts consecutive days (ending today or yesterday) where the user
-     * has at least one LOGIN entry. Returns 0 if no recent logins.
-     */
-    async getLoginStreak(userId: number): Promise<number> {
-        const result = await this.auditRepository.query(
-            `
+  /**
+   * Counts consecutive days (ending today or yesterday) where the user
+   * has at least one LOGIN entry. Returns 0 if no recent logins.
+   */
+  async getLoginStreak(userId: number): Promise<number> {
+    const result = await this.auditRepository.query(
+      `
             WITH login_dates AS (
                 SELECT DISTINCT DATE(created_at AT TIME ZONE 'UTC') AS d
                 FROM audit_logs
@@ -73,18 +84,18 @@ export class AuditService {
             ORDER BY streak_end DESC
             LIMIT 1
             `,
-            [userId],
-        );
+      [userId],
+    );
 
-        return result.length > 0 ? result[0].streak_len : 0;
-    }
+    return result.length > 0 ? result[0].streak_len : 0;
+  }
 
-    /**
-     * Returns daily aggregate counts for each action over the last N days.
-     */
-    async getDailyMetrics(days = 30): Promise<DailyMetric[]> {
-        return this.auditRepository.query(
-            `
+  /**
+   * Returns daily aggregate counts for each action over the last N days.
+   */
+  async getDailyMetrics(days = 30): Promise<DailyMetric[]> {
+    return this.auditRepository.query(
+      `
             SELECT
                 DATE(created_at AT TIME ZONE 'UTC') AS date,
                 action,
@@ -94,15 +105,15 @@ export class AuditService {
             GROUP BY date, action
             ORDER BY date
             `,
-            [days],
-        );
-    }
+      [days],
+    );
+  }
 
-    /**
-     * Returns headline stats for the admin dashboard.
-     */
-    async getOverviewStats(): Promise<OverviewStats> {
-        const rows = await this.auditRepository.query(`
+  /**
+   * Returns headline stats for the admin dashboard.
+   */
+  async getOverviewStats(): Promise<OverviewStats> {
+    const rows = await this.auditRepository.query(`
             SELECT
                 COUNT(*) FILTER (WHERE action = 'REGISTER')::int AS total_signups,
                 COUNT(*) FILTER (WHERE action = 'REGISTER' AND created_at >= CURRENT_DATE - 7)::int AS signups_7d,
@@ -116,25 +127,25 @@ export class AuditService {
                 COUNT(*) FILTER (WHERE action = 'COURSE_PURCHASED')::int AS total_purchases
             FROM audit_logs
         `);
-        return rows[0];
-    }
+    return rows[0];
+  }
 }
 
 export interface DailyMetric {
-    date: string;
-    action: string;
-    count: number;
+  date: string;
+  action: string;
+  count: number;
 }
 
 export interface OverviewStats {
-    total_signups: number;
-    signups_7d: number;
-    signups_30d: number;
-    dau: number;
-    wau: number;
-    mau: number;
-    total_course_starts: number;
-    total_course_completions: number;
-    total_exams_submitted: number;
-    total_purchases: number;
+  total_signups: number;
+  signups_7d: number;
+  signups_30d: number;
+  dau: number;
+  wau: number;
+  mau: number;
+  total_course_starts: number;
+  total_course_completions: number;
+  total_exams_submitted: number;
+  total_purchases: number;
 }

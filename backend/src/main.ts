@@ -1,10 +1,16 @@
 import { webcrypto } from 'crypto';
+import { setDefaultResultOrder } from 'dns';
 
 // Node < 19 has no global WebCrypto; @nestjs/schedule calls crypto.randomUUID()
 // at boot. Same polyfill as test/jest-e2e.setup.ts. Target runtime is Node 20+.
 if (!globalThis.crypto) {
   (globalThis as { crypto: Crypto }).crypto = webcrypto as Crypto;
 }
+
+// The VPC has no IPv6 egress, but dual-stack hosts (e.g. smtp-relay.gmail.com)
+// resolve AAAA records first under Node's default "verbatim" order, so SMTP
+// connects died with ENETUNREACH. Prefer IPv4 for all outbound lookups.
+setDefaultResultOrder('ipv4first');
 
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -22,7 +28,7 @@ import * as WinstonCloudWatch from 'winston-cloudwatch';
 import { getNamespace } from 'cls-hooked';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-require("dotenv").config();
+require('dotenv').config();
 
 async function bootstrap() {
   // A custom formatter to add the request ID to the log info object.
@@ -61,8 +67,8 @@ async function bootstrap() {
       level: 'error',
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true, // Zip old log files
-      maxSize: '20m',      // Rotate if file size exceeds 20MB
-      maxFiles: '14d',     // Keep logs for 14 days
+      maxSize: '20m', // Rotate if file size exceeds 20MB
+      maxFiles: '14d', // Keep logs for 14 days
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json(),
@@ -74,14 +80,18 @@ async function bootstrap() {
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '14d',
-      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json(),
+      ),
     }),
   ];
 
   // Add CloudWatch transport only in production environments
   if (process.env.NODE_ENV === 'production') {
     transports.push(
-      new WinstonCloudWatch({ // TODO add secrets
+      new WinstonCloudWatch({
+        // TODO add secrets
         logGroupName: process.env.CLOUDWATCH_LOG_GROUP_NAME,
         logStreamName: `${process.env.CLOUDWATCH_LOG_STREAM_NAME}-${Date.now()}`,
         awsRegion: process.env.AWS_REGION,
@@ -129,11 +139,13 @@ async function bootstrap() {
       transformOptions: { groups: ['COURSE_DETAILS'] },
     }),
   );
-  
+
   // --- Swagger (OpenAPI) Setup ---
   const config = new DocumentBuilder()
     .setTitle('Drone Website API')
-    .setDescription('API documentation for the course and user management system.')
+    .setDescription(
+      'API documentation for the course and user management system.',
+    )
     .setVersion('1.0')
     .addBearerAuth() // This is for JWT authentication
     .build();
@@ -163,7 +175,10 @@ async function bootstrap() {
     try {
       await seedTestData(dataSource, logger);
     } catch (err) {
-      logger.error('Test data seeding failed; continuing startup.', err instanceof Error ? err.stack : String(err));
+      logger.error(
+        'Test data seeding failed; continuing startup.',
+        err instanceof Error ? err.stack : String(err),
+      );
     }
   }
 

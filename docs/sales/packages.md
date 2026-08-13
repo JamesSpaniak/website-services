@@ -2,7 +2,7 @@
 
 Offer ladder for **B2B (schools)** and **B2C (individuals)**. Dollar amounts for school packages are **internal placeholders** until leadership signs off — mark quotes **DRAFT** until approved.
 
-Retail B2C pricing is public on course preview pages after deploy (`assets/courses/faa_107_course.json` → **$29** one-time, Unit 1 `free_preview`).
+Retail B2C pricing is public on course preview pages after deploy (`assets/courses/faa_107_course.json` → **$129** one-time, Unit 1 `free_preview`). All three courses (Part 107, Video & Photography, AI & Drones) are priced at **$129** as of 2026-08-12.
 
 ---
 
@@ -25,7 +25,7 @@ Retail B2C pricing is public on course preview pages after deploy (`assets/cours
 | Item | Detail |
 |------|--------|
 | **Product** | FAA Part 107 course — full lifetime access |
-| **Price** | **$29** one-time (USD) |
+| **Price** | **$129** one-time (USD) |
 | **Preview** | Unit 1 free with account |
 | **Purchase** | Stripe in-app after login |
 | **Includes** | All units, section practice exams, full-course practice/final exams, progress tracking |

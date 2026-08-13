@@ -36,6 +36,7 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 | Script | Purpose |
 |--------|---------|
 | `bulk-upload-videos.sh` | S3 raw video bulk upload |
+| `upload-faa-107-videos.sh` | Upload reviewed FAA 107 filename→unit mappings with canonical keys and optional MediaConvert verification |
 | `reconcile-state.sh` | Terraform state reconciliation (sourced by pipeline) |
 | `generate-api-types.sh` | Regenerate frontend types from OpenAPI |
 

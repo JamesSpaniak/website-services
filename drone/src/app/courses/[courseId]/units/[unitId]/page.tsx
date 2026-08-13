@@ -12,7 +12,7 @@ import CourseUnitNav from '@/app/ui/components/course-unit-nav';
 import CourseOutlineSidebar from '@/app/ui/components/course-outline-sidebar';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
-import { CourseData, UnitData } from '@/app/lib/types/course';
+import { CourseData } from '@/app/lib/types/course';
 import {
     findUnitInTree,
     isUnitPreviewAccessible,
@@ -57,7 +57,7 @@ function UnitPageContent() {
     const { courseId, unitId } = useParams();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const focusUnitId = searchParams.get(FOCUS_QUERY);
+    const requestedFocusUnitId = searchParams.get(FOCUS_QUERY);
     const { isLoading: isAuthLoading } = useAuth();
     const [course, setCourse] = useState<CourseData | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -90,18 +90,50 @@ function UnitPageContent() {
         fetchCourse();
     }, [courseId, unitId, isAuthLoading]);
 
-    // Deep leaf nodes don't get their own page — send the user to the parent
-    // unit's page with the leaf focused, so its context (unit/section) is visible.
+    // Only top-level units own pages. Preserve legacy descendant URLs by
+    // redirecting them to the root unit with the descendant focused.
     const pageTarget = course ? unitPageTarget(course.units, decodedUnitId) : null;
-    const needsRedirect = pageTarget != null && pageTarget.focusUnitId != null;
+    const needsPageRedirect =
+        pageTarget != null && pageTarget.pageUnitId !== decodedUnitId;
+    const requestedFocusTarget =
+        course && requestedFocusUnitId
+            ? unitPageTarget(course.units, requestedFocusUnitId)
+            : null;
+    const validFocusUnitId =
+        requestedFocusUnitId &&
+        requestedFocusTarget?.pageUnitId === decodedUnitId &&
+        requestedFocusTarget.focusUnitId === requestedFocusUnitId
+            ? requestedFocusUnitId
+            : null;
+    const hasInvalidFocus =
+        course != null &&
+        requestedFocusUnitId != null &&
+        !needsPageRedirect &&
+        validFocusUnitId == null;
+    const redirectFocusUnitId =
+        needsPageRedirect &&
+        requestedFocusUnitId &&
+        requestedFocusTarget?.pageUnitId === pageTarget?.pageUnitId
+            ? requestedFocusTarget.focusUnitId
+            : pageTarget?.focusUnitId;
 
     useEffect(() => {
-        if (needsRedirect && pageTarget) {
-            router.replace(unitPath(parsedCourseId, pageTarget.pageUnitId, pageTarget.focusUnitId));
+        if (needsPageRedirect && pageTarget) {
+            router.replace(unitPath(parsedCourseId, pageTarget.pageUnitId, redirectFocusUnitId));
+        } else if (hasInvalidFocus) {
+            router.replace(unitPath(parsedCourseId, decodedUnitId));
         }
-    }, [needsRedirect, pageTarget, parsedCourseId, router]);
+    }, [
+        decodedUnitId,
+        hasInvalidFocus,
+        needsPageRedirect,
+        pageTarget,
+        parsedCourseId,
+        redirectFocusUnitId,
+        router,
+    ]);
 
-    if (loading || isAuthLoading || needsRedirect) {
+    if (loading || isAuthLoading || needsPageRedirect || hasInvalidFocus) {
         return <LoadingComponent />;
     }
 
@@ -109,14 +141,18 @@ function UnitPageContent() {
         return <ErrorComponent message={error} />;
     }
 
-    const unit = course ? findUnitInTree(course.units, decodedUnitId) : undefined;
-    if (!unit || !course) {
+    const pageUnit = course ? findUnitInTree(course.units, decodedUnitId) : undefined;
+    const activeUnitId = validFocusUnitId ?? decodedUnitId;
+    const activeUnit = course ? findUnitInTree(course.units, activeUnitId) : undefined;
+    if (!pageUnit || !activeUnit || !course) {
         return <ErrorComponent message="Unit not found in this course." />;
     }
 
-    const ancestors = unitAncestors(course.units, decodedUnitId);
-    const { prev, next } = unitNavNeighbors(course.units, decodedUnitId);
-    const unitLocked = course.has_access === false && !isUnitPreviewAccessible(course.units, decodedUnitId);
+    const ancestors = unitAncestors(course.units, activeUnitId);
+    const { prev, next } = unitNavNeighbors(course.units, activeUnitId);
+    const unitLocked =
+        course.has_access === false &&
+        !isUnitPreviewAccessible(course.units, activeUnitId);
 
     return (
         <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
@@ -125,7 +161,7 @@ function UnitPageContent() {
                     <CourseUnitNav
                         courseId={parsedCourseId}
                         courseTitle={course.title}
-                        unitTitle={unit.title}
+                        unitTitle={activeUnit.title}
                         ancestors={ancestors}
                         prev={prev}
                         next={next}
@@ -133,14 +169,15 @@ function UnitPageContent() {
                     {unitLocked ? (
                         <LockedUnitNotice
                             courseId={parsedCourseId}
-                            unitTitle={unit.title}
+                            unitTitle={activeUnit.title}
                             price={Number(course.price) || 0}
                         />
                     ) : (
                         <UnitComponent
-                            unitData={unit}
+                            key={pageUnit.id}
+                            unitData={pageUnit}
                             courseId={parsedCourseId}
-                            focusUnitId={focusUnitId}
+                            focusUnitId={validFocusUnitId}
                             questionCounts={course.question_counts}
                         />
                     )}
@@ -151,7 +188,7 @@ function UnitPageContent() {
                             courseId={parsedCourseId}
                             units={course.units}
                             hasAccess={course.has_access !== false}
-                            activeUnitId={focusUnitId ?? decodedUnitId}
+                            activeUnitId={activeUnitId}
                         />
                     </div>
                 </aside>

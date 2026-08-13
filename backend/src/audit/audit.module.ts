@@ -6,12 +6,9 @@ import { AuditService } from './audit.service';
 import { OrganizationModule } from '../organizations/organization.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([AuditLog]),
-        OrganizationModule,
-    ],
-    controllers: [AuditController],
-    providers: [AuditService],
-    exports: [AuditService],
+  imports: [TypeOrmModule.forFeature([AuditLog]), OrganizationModule],
+  controllers: [AuditController],
+  providers: [AuditService],
+  exports: [AuditService],
 })
 export class AuditModule {}

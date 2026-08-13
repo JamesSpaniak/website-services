@@ -21,6 +21,8 @@ export class AddExamDedupKey1745100003000 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP INDEX IF EXISTS "UQ_exams_dedup_key"`);
-    await queryRunner.query(`ALTER TABLE "exams" DROP COLUMN IF EXISTS "dedup_key"`);
+    await queryRunner.query(
+      `ALTER TABLE "exams" DROP COLUMN IF EXISTS "dedup_key"`,
+    );
   }
 }

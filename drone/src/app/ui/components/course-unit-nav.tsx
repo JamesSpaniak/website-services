@@ -24,7 +24,8 @@ export default function CourseUnitNav({
     prev,
     next,
 }: CourseUnitNavProps) {
-    const unitHref = (id: string) => unitPath(courseId, id);
+    const unitHref = (node: FlatUnitNode) =>
+        unitPath(courseId, node.rootUnitId, node.depth > 0 ? node.id : null);
 
     return (
         <div className="mb-8">
@@ -32,14 +33,14 @@ export default function CourseUnitNav({
                 crumbs={[
                     { label: 'Courses', href: '/courses' },
                     { label: courseTitle, href: `/courses/${courseId}` },
-                    ...ancestors.map((a) => ({ label: a.title, href: unitHref(a.id) })),
+                    ...ancestors.map((a) => ({ label: a.title, href: unitHref(a) })),
                     { label: unitTitle },
                 ]}
             />
             <div className="flex flex-wrap items-center justify-between gap-3">
                 {prev ? (
                     <Link
-                        href={unitHref(prev.id)}
+                        href={unitHref(prev)}
                         aria-label={`Previous unit: ${prev.title}`}
                         className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors"
                     >
@@ -51,7 +52,7 @@ export default function CourseUnitNav({
                 )}
                 {next ? (
                     <Link
-                        href={unitHref(next.id)}
+                        href={unitHref(next)}
                         aria-label={`Next unit: ${next.title}`}
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand-primary)] hover:opacity-80 transition-opacity ml-auto"
                     >

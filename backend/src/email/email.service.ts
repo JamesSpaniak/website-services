@@ -17,12 +17,15 @@ export class EmailService {
   private readonly defaultFrom: string;
   private readonly supportFrom: string;
 
-  constructor(
-    private readonly configService: ConfigService,
-  ) {
-    this.emailEnabled = this.configService.get<string>('EMAIL_ENABLED') !== 'false';
-    this.defaultFrom = this.configService.get<string>('EMAIL_FROM') || 'Drone Edge <donotreply@thedroneedge.com>';
-    this.supportFrom = this.configService.get<string>('SUPPORT_EMAIL_FROM') || 'Drone Edge Support <support@thedroneedge.com>';
+  constructor(private readonly configService: ConfigService) {
+    this.emailEnabled =
+      this.configService.get<string>('EMAIL_ENABLED') !== 'false';
+    this.defaultFrom =
+      this.configService.get<string>('EMAIL_FROM') ||
+      'Drone Edge <donotreply@thedroneedge.com>';
+    this.supportFrom =
+      this.configService.get<string>('SUPPORT_EMAIL_FROM') ||
+      'Drone Edge Support <support@thedroneedge.com>';
 
     if (this.emailEnabled) {
       const host = this.configService.get<string>('EMAIL_HOST');
@@ -46,7 +49,9 @@ export class EmailService {
         transportOptions.auth = { user, pass };
         this.logger.log('SMTP transport configured with authentication.');
       } else {
-        this.logger.log('SMTP transport configured without auth (IP-whitelisted relay mode).');
+        this.logger.log(
+          'SMTP transport configured without auth (IP-whitelisted relay mode).',
+        );
       }
 
       this.transporter = nodemailer.createTransport(transportOptions);
@@ -62,16 +67,27 @@ export class EmailService {
       await this.transporter?.verify();
       this.logger.log('SMTP transport verified successfully.');
     } catch (err) {
-      this.logger.error('SMTP transport verification failed. Emails will fail at send time.', (err as Error).message);
+      this.logger.error(
+        'SMTP transport verification failed. Emails will fail at send time.',
+        (err as Error).message,
+      );
     }
   }
 
-  async sendContactMessage(contactDto: ContactDto): Promise<{ success: boolean; message: string }> {
+  async sendContactMessage(
+    contactDto: ContactDto,
+  ): Promise<{ success: boolean; message: string }> {
     if (!this.emailEnabled || !this.transporter) {
-      return { success: true, message: 'Email sending disabled in this environment.' };
+      return {
+        success: true,
+        message: 'Email sending disabled in this environment.',
+      };
     }
 
-    const sanitizeOptions = { allowedTags: [] as string[], allowedAttributes: {} };
+    const sanitizeOptions = {
+      allowedTags: [] as string[],
+      allowedAttributes: {},
+    };
     const sanitizedName = sanitizeHtml(contactDto.name, sanitizeOptions);
     const sanitizedContact = sanitizeHtml(contactDto.contact, sanitizeOptions);
     const sanitizedMessage = sanitizeHtml(contactDto.message, sanitizeOptions);
@@ -90,12 +106,17 @@ export class EmailService {
       `,
     });
 
-    return { success: true, message: 'Your message has been sent successfully!' };
+    return {
+      success: true,
+      message: 'Your message has been sent successfully!',
+    };
   }
 
   async sendPasswordResetEmail(user: User, resetLink: string): Promise<void> {
     if (!this.emailEnabled || !this.transporter) {
-      this.logger.warn(`Email disabled; skipping password reset email for ${user.email}.`);
+      this.logger.warn(
+        `Email disabled; skipping password reset email for ${user.email}.`,
+      );
       return;
     }
 
@@ -131,9 +152,16 @@ export class EmailService {
     });
   }
 
-  async sendOrganizationInvite(email: string, orgName: string, signUpLink: string, role: string): Promise<void> {
+  async sendOrganizationInvite(
+    email: string,
+    orgName: string,
+    signUpLink: string,
+    role: string,
+  ): Promise<void> {
     if (!this.emailEnabled || !this.transporter) {
-      this.logger.warn(`Email disabled; invite link for ${email}: ${signUpLink}`);
+      this.logger.warn(
+        `Email disabled; invite link for ${email}: ${signUpLink}`,
+      );
       return;
     }
 
@@ -154,13 +182,52 @@ export class EmailService {
     });
   }
 
-  async sendConsultationRequest(dto: ConsultationDto): Promise<{ success: boolean; message: string }> {
-    const sanitize = (s: string) => sanitizeHtml(s, { allowedTags: [], allowedAttributes: {} });
+  /** Emails an admin-generated signup link (promo/gift) to its designated recipient. */
+  async sendSignupLinkEmail(
+    email: string,
+    courseTitles: string[],
+    registerUrl: string,
+  ): Promise<void> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn(
+        `Email disabled; signup link for ${email}: ${registerUrl}`,
+      );
+      return;
+    }
+
+    const sanitize = (s: string) =>
+      sanitizeHtml(s, { allowedTags: [], allowedAttributes: {} });
+    const courseList = courseTitles
+      .map((t) => `<li>${sanitize(t)}</li>`)
+      .join('');
+
+    await this.transporter.sendMail({
+      from: this.supportFrom,
+      to: email,
+      subject: "You've been given access to Drone Edge",
+      html: `
+        <p>Hello,</p>
+        <p>You've been given access to the following course${courseTitles.length === 1 ? '' : 's'} on Drone Edge:</p>
+        <ul>${courseList}</ul>
+        <p>Click the link below to create your account — your access is applied automatically:</p>
+        <p><a href="${registerUrl}">Create Account</a></p>
+        <p>This link is single-use. If you did not expect this email, you can safely ignore it.</p>
+      `,
+    });
+  }
+
+  async sendConsultationRequest(
+    dto: ConsultationDto,
+  ): Promise<{ success: boolean; message: string }> {
+    const sanitize = (s: string) =>
+      sanitizeHtml(s, { allowedTags: [], allowedAttributes: {} });
     const name = sanitize(dto.name);
     const email = sanitize(dto.email);
     const org = sanitize(dto.organization);
     const role = sanitize(dto.role);
-    const count = dto.student_count ? sanitize(dto.student_count) : 'Not specified';
+    const count = dto.student_count
+      ? sanitize(dto.student_count)
+      : 'Not specified';
     const time = sanitize(dto.preferred_time);
     const topics = sanitize(dto.topics);
 
@@ -188,7 +255,7 @@ export class EmailService {
       await this.transporter.sendMail({
         from: this.supportFrom,
         to: email,
-        subject: 'Your Drone Edge consultation request — we\'ll be in touch',
+        subject: "Your Drone Edge consultation request — we'll be in touch",
         html: `
           <p>Hi ${name},</p>
           <p>Thanks for reaching out! We've received your consultation request and will contact you within one business day to confirm a time that works for you.</p>
@@ -203,20 +270,28 @@ export class EmailService {
         `,
       });
     } else {
-      this.logger.warn(`Email disabled; consultation request from ${email} not sent.`);
+      this.logger.warn(
+        `Email disabled; consultation request from ${email} not sent.`,
+      );
     }
 
-    return { success: true, message: 'Your request has been received. We\'ll be in touch within one business day.' };
+    return {
+      success: true,
+      message:
+        "Your request has been received. We'll be in touch within one business day.",
+    };
   }
 
-  async sendBroadcastEmail(broadcastDto: BroadcastDto): Promise<{ success: boolean; count: number }> {
+  async sendBroadcastEmail(
+    broadcastDto: BroadcastDto,
+  ): Promise<{ success: boolean; count: number }> {
     if (!this.emailEnabled || !this.transporter) {
       this.logger.warn('Email disabled; skipping broadcast email.');
       return { success: true, count: 0 };
     }
 
     const users: User[] = [];
-    const emails = users.map(user => user.email).filter(email => !!email);
+    const emails = users.map((user) => user.email).filter((email) => !!email);
 
     for (const email of emails) {
       await this.transporter.sendMail({
