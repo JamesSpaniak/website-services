@@ -1,0 +1,44 @@
+Function of components
+*	FC
+*	ESC
+*	Frame
+*	Motors
+*	Propellers
+*	Battery
+*	Receiver
+*	GPS (optional)
+
+Physics of Drone
+*	Balance
+*	Load
+*	Weight limits
+
+Laws of Custom Drones
+*	Registration
+*	RID
+
+Frame Design
+*	Dependent on physics
+*	Use CAD software with deformation estimation
+*	Strength design
+*	Mounting, room for parts
+
+Assembly
+*	Battery connector to ESC
+*	Motors to ESC
+*	Motors to Frame
+*	Receiver to FC
+*	GPS to FC
+*	FC to ESC to Frame
+*	Receiver and GPS positioning
+*	Propellers
+
+Software Setup
+*	Installation of Firmware (need modules for additional sensors)
+*	Calibration (sensors, battery)
+*	Enable receiver (UART2 usually)
+*	Bind receiver (select protocol, enable telemetry)
+*	Flight modes (arm, beeper for crash retrieval, will want angle or alt hold to begin)
+*	Setting controller inputs (switch to arm, switch for flight mode, button for beeper)
+
+Testing
