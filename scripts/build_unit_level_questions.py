@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Convert the author's compiled question-bank CSV into a unit-level bulk import.
 
-Source: assets/courses/Compiled Question Bank Sorted.xlsx - questions sorted and dups delet.csv
-Output: assets/courses/faa_107_questions_unit_level.bulk.json  (POST /questions/import)
-        assets/courses/faa_107_questions_unit_level_review.csv (per-row disposition)
+Source: assets/courses/faa-107/questions/Compiled Question Bank Sorted.xlsx - questions sorted and dups delet.csv
+Output: assets/courses/faa-107/questions/faa_107_questions_unit_level.bulk.json  (POST /questions/import)
+        assets/courses/faa-107/questions/faa_107_questions_unit_level_review.csv (per-row disposition)
 
 Questions are scoped to TOP-LEVEL units only (unit_ref set, sub_unit_ref null),
 per docs/tech/course-content-restructure-plan.md § "Question model". The CSV's
@@ -23,11 +23,12 @@ import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-SRC = REPO / "assets/courses/Compiled Question Bank Sorted.xlsx - questions sorted and dups delet.csv"
-OUT_BULK = REPO / "assets/courses/faa_107_questions_unit_level.bulk.json"
-OUT_REVIEW = REPO / "assets/courses/faa_107_questions_unit_level_review.csv"
+QUESTIONS = REPO / "assets/courses/faa-107/questions"
+SRC = QUESTIONS / "Compiled Question Bank Sorted.xlsx - questions sorted and dups delet.csv"
+OUT_BULK = QUESTIONS / "faa_107_questions_unit_level.bulk.json"
+OUT_REVIEW = QUESTIONS / "faa_107_questions_unit_level_review.csv"
 
-# Top-level unit refs in assets/courses/faa_107_course.json:
+# Top-level unit refs in assets/courses/faa-107/faa_107_course.json:
 #   u1  PART 107 REGULATIONS            u6  WEATHER EFFECTS ON AIRCRAFT PERFORMANCE
 #   u2  Airports, Airspace, Data Sources u7  LOADING AND PERFORMANCE
 #   u3  Airspace Classifications         u8  EMERGENCY PROCEDURES

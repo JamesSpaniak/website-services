@@ -6,6 +6,7 @@ import { CourseService } from './course.service';
 import { CourseUnitService } from './course-unit.service';
 import { Course } from './types/course.entity';
 import { User } from '../users/types/user.entity';
+import { Question } from '../questions/types/question.entity';
 import { MediaService } from '../media/media.service';
 import { OrganizationService } from '../organizations/organization.service';
 import { CourseDetails } from './types/course.dto';
@@ -23,6 +24,11 @@ describe('CourseService', () => {
 
   const userRepo = {
     findOne: jest.fn(),
+  };
+
+  // Only used by getQuestionCounts (not under test); module compilation needs it
+  const questionRepo = {
+    createQueryBuilder: jest.fn(),
   };
 
   const courseUnitService = {
@@ -48,6 +54,7 @@ describe('CourseService', () => {
         CourseService,
         { provide: getRepositoryToken(Course), useValue: courseRepo },
         { provide: getRepositoryToken(User), useValue: userRepo },
+        { provide: getRepositoryToken(Question), useValue: questionRepo },
         {
           provide: MediaService,
           useValue: {

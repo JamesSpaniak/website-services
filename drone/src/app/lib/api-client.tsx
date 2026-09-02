@@ -99,12 +99,20 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
         return response.json();
     } catch (error) {
         const duration = Date.now() - startTime;
-        logger.error(error as Error, {
-            endpoint,
-            options,
-            requestId,
-            durationMs: duration,
-        });
+        const message = error instanceof Error ? error.message : '';
+        // Logged-out visitors always 401 on profile (and refresh). That is the
+        // session-check path, not an outage — don't ship it as an error.
+        const expectedAnonymous =
+            endpoint === 'auth/profile' &&
+            (message.includes('Session expired') || message === 'Unauthorized');
+        if (!expectedAnonymous) {
+            logger.error(error as Error, {
+                endpoint,
+                options,
+                requestId,
+                durationMs: duration,
+            });
+        }
         throw error;
     }
 };
@@ -390,6 +398,7 @@ import type {
     OrganizationMember,
     InviteCode,
     InviteCodeInfo,
+    OrgClass,
     OrgCourse,
     MemberCourseProgressSummary,
     MemberCourseDetailedProgress,
@@ -449,10 +458,41 @@ async function getOrgMembers(orgId: number): Promise<OrganizationMember[]> {
     return apiClient(`organizations/${orgId}/members`);
 }
 
-async function addOrgMember(orgId: number, data: { email: string; role?: 'manager' | 'member' }): Promise<OrganizationMember> {
+async function addOrgMember(orgId: number, data: { email: string; role?: 'manager' | 'member'; class_id?: number }): Promise<OrganizationMember> {
     return apiClient(`organizations/${orgId}/members`, {
         method: 'POST',
         body: JSON.stringify(data),
+    });
+}
+
+// ── Organization Classes ──
+
+async function getOrgClasses(orgId: number): Promise<OrgClass[]> {
+    return apiClient(`organizations/${orgId}/classes`);
+}
+
+async function createOrgClass(orgId: number, data: { name: string; max_students?: number }): Promise<OrgClass> {
+    return apiClient(`organizations/${orgId}/classes`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+async function updateOrgClass(orgId: number, classId: number, data: { name?: string; max_students?: number | null }): Promise<OrgClass> {
+    return apiClient(`organizations/${orgId}/classes/${classId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    });
+}
+
+async function deleteOrgClass(orgId: number, classId: number): Promise<void> {
+    await apiClient(`organizations/${orgId}/classes/${classId}`, { method: 'DELETE' });
+}
+
+async function updateMemberClass(orgId: number, userId: number, classId: number | null): Promise<void> {
+    await apiClient(`organizations/${orgId}/members/${userId}/class`, {
+        method: 'PATCH',
+        body: JSON.stringify({ class_id: classId }),
     });
 }
 
@@ -467,7 +507,7 @@ async function updateMemberRole(orgId: number, userId: number, role: 'manager' |
     });
 }
 
-async function generateInviteCode(orgId: number, data: { email?: string; role?: 'manager' | 'member' }): Promise<InviteCode> {
+async function generateInviteCode(orgId: number, data: { email?: string; role?: 'manager' | 'member'; class_id?: number }): Promise<InviteCode> {
     return apiClient(`organizations/${orgId}/invite-codes`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -478,7 +518,7 @@ async function getInviteCodes(orgId: number): Promise<InviteCode[]> {
     return apiClient(`organizations/${orgId}/invite-codes`);
 }
 
-async function bulkGenerateInviteCodes(orgId: number, data: { emails: string[]; role?: 'manager' | 'member' }): Promise<InviteCode[]> {
+async function bulkGenerateInviteCodes(orgId: number, data: { emails: string[]; role?: 'manager' | 'member'; class_id?: number }): Promise<InviteCode[]> {
     return apiClient(`organizations/${orgId}/invite-codes/bulk`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -500,12 +540,14 @@ async function removeOrgCourse(orgId: number, courseId: number): Promise<void> {
     await apiClient(`organizations/${orgId}/courses/${courseId}`, { method: 'DELETE' });
 }
 
-async function getOrgProgress(orgId: number): Promise<MemberCourseProgressSummary[]> {
-    return apiClient(`organizations/${orgId}/progress`);
+async function getOrgProgress(orgId: number, classId?: number): Promise<MemberCourseProgressSummary[]> {
+    const query = classId !== undefined ? `?classId=${classId}` : '';
+    return apiClient(`organizations/${orgId}/progress${query}`);
 }
 
-async function getOrgCourseProgress(orgId: number, courseId: number): Promise<MemberCourseDetailedProgress[]> {
-    return apiClient(`organizations/${orgId}/progress/${courseId}`);
+async function getOrgCourseProgress(orgId: number, courseId: number, classId?: number): Promise<MemberCourseDetailedProgress[]> {
+    const query = classId !== undefined ? `?classId=${classId}` : '';
+    return apiClient(`organizations/${orgId}/progress/${courseId}${query}`);
 }
 
 // ── Course Media (Signed URLs) ──
@@ -745,6 +787,11 @@ export {
     addOrgMember,
     removeOrgMember,
     updateMemberRole,
+    getOrgClasses,
+    createOrgClass,
+    updateOrgClass,
+    deleteOrgClass,
+    updateMemberClass,
     generateInviteCode,
     getInviteCodes,
     bulkGenerateInviteCodes,

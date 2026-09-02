@@ -167,4 +167,8 @@ assets/media/raw/
 assets/media/edits/
 
 # Raw course recordings — uploaded to S3 via scripts/upload-faa-107-videos.sh, not committed
-assets/courses/*.mp4
+assets/courses/*/videos/
+# Chart source binaries (FAA GeoTIFFs) — keep local/S3, see docs/tech/sectional-chart-experience-plan.md
+assets/courses/**/*.zip
+assets/courses/**/*.tif
+assets/courses/**/*.tfw

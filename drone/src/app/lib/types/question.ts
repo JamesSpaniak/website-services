@@ -136,6 +136,7 @@ export interface ExamAttemptResult {
 
 export interface GenerateClassExamPayload extends GenerateExamPayload {
   organization_id: number;
+  class_id?: number;
   label?: string;
   due_date?: string | null;
 }
@@ -143,6 +144,8 @@ export interface GenerateClassExamPayload extends GenerateExamPayload {
 export interface ClassExamSummary {
   class_exam_id: number;
   exam_id: number;
+  class_id: number | null;
+  class_name: string | null;
   label: string | null;
   due_date: string | null;
   assigned_at: string;

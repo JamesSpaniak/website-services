@@ -15,8 +15,8 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 
 | Script | Purpose |
 |--------|---------|
-| `build_news_article_json.py` | Convert `assets/news/*.txt` → import JSON |
-| `brand_story11_images.py` | Branded hero images (`assets/visuals/Logo`, `assets/news/images/`) |
+| `build_news_article_json.py` | Convert `assets/articles/drafts/*.txt` → import JSON |
+| `brand_story11_images.py` | Branded hero images (`assets/visuals/Logo`, `assets/articles/images/`) |
 | `brand_school_article_images.py` | School article heroes (P0 B2B outreach) |
 
 ## Course / instructional
@@ -46,4 +46,4 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 |--------|---------|
 | `analyze_fulllogs.py` | VPC flow log summary (`assets/archive/fulllogs.csv`) |
 
-Removed: `rebuild_unit*.py` (superseded by editing `assets/courses/faa_107_course.json` directly).
+Removed: `rebuild_unit*.py` (superseded by editing `assets/courses/faa-107/faa_107_course.json` directly).

@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Organization } from './organization.entity';
+import { OrganizationClass } from './organization-class.entity';
 import { User } from '../../users/types/user.entity';
 import { OrgRole } from './org-role.enum';
 
@@ -28,6 +29,10 @@ export class InviteCode {
 
   @Column({ type: 'varchar', nullable: true })
   email: string | null;
+
+  /** Class the invitee joins on redemption; null = org-level invite. */
+  @Column({ name: 'class_id', nullable: true })
+  classId: number | null;
 
   @Column({ name: 'created_by_user_id' })
   createdByUserId: number;
@@ -57,4 +62,8 @@ export class InviteCode {
   @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'used_by_user_id' })
   usedBy: User;
+
+  @ManyToOne(() => OrganizationClass, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'class_id' })
+  orgClass: OrganizationClass | null;
 }

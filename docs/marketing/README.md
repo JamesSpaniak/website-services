@@ -13,7 +13,7 @@ Growth, SEO/GEO, brand, and content strategy.
 
 **Workflows:** [`workflows/marketing/`](../../workflows/marketing/)
 
-**Content drafts:** [`assets/news/`](../../assets/news/) (txt + json + images)
+**Content drafts:** [`assets/articles/`](../../assets/articles/) (drafts txt + import json + images)
 
 **Tracking & attribution:** [`docs/tech/analytics-and-attribution.md`](../tech/analytics-and-attribution.md)
 

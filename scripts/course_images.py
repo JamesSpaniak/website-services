@@ -16,11 +16,11 @@ Three subcommands with a human/agent review gate between map and upload:
 Publishing the JSON to prod stays manual (admin course editor / PUT /courses/:id).
 
 Examples:
-  python3 scripts/course_images.py map "assets/courses/Pictures for Airports" \
-      --json assets/courses/faa_107_course.json --unit 2 --unit 3
-  python3 scripts/course_images.py upload --csv assets/courses/pictures-for-airports_mapping.csv
+  python3 scripts/course_images.py map "assets/courses/faa-107/images/Pictures for Airports" \
+      --json assets/courses/faa-107/faa_107_course.json --unit 2 --unit 3
+  python3 scripts/course_images.py upload --csv "assets/courses/faa-107/images/pictures-for-airports_mapping.csv"
   python3 scripts/course_images.py upload --csv ... --execute
-  python3 scripts/course_images.py merge --csv ... --json assets/courses/faa_107_course.json
+  python3 scripts/course_images.py merge --csv ... --json assets/courses/faa-107/faa_107_course.json
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-DEFAULT_JSON = "assets/courses/faa_107_course.json"
+DEFAULT_JSON = "assets/courses/faa-107/faa_107_course.json"
 DEFAULT_BUCKET = "droneedge-dev-media"
 DEFAULT_DOMAIN = "media.thedroneedge.com"
 DEFAULT_REGION = "us-east-1"
@@ -385,7 +385,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_map = sub.add_parser("map", help="Scan folder, propose unit mapping, emit CSV + review.md")
-    p_map.add_argument("folder", help="Author image folder (e.g. 'assets/courses/Pictures for Airports')")
+    p_map.add_argument("folder", help="Author image folder (e.g. 'assets/courses/faa-107/images/Pictures for Airports')")
     p_map.add_argument("--json", default=DEFAULT_JSON, help="Course JSON payload")
     p_map.add_argument("--course-id", default="35")
     p_map.add_argument("--domain", default=DEFAULT_DOMAIN)

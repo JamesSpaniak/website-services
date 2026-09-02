@@ -5,7 +5,7 @@
   "description": "Prepare to earn your FAA Part 107 Remote Pilot Certificate. Covers every knowledge-test area: Part 107 regulations, airspace and sectional charts, airport operations, weather, aircraft performance and loading, emergency procedures, aeronautical decision making, and radio communications.",
   "text_content": "This course prepares you for the FAA Part 107 Remote Pilot Knowledge Test — the exam required to earn a Remote Pilot Certificate and fly small unmanned aircraft systems (sUAS) commercially. Units cover the Part 107 regulations, airspace classifications and charts, airport operations, weather, aircraft performance and loading, emergency procedures, aeronautical decision making, and radio communication procedures.",
   "images_url": [
-    "https://media.thedroneedge.com/courses/35/9c2099d5-a2a4-4af6-8d5e-e518ae0502b1.png"
+    "https://media.thedroneedge.com/courses/34/fe55f6c0-59d5-4f35-b4a4-8543cdf19a69.png"
   ],
   "price": "129",
   "has_access": true,
@@ -99,7 +99,7 @@
               "title": "Accident Reporting, In-Flight Emergency, and Hazardous Operations",
               "description": "Summarize rules for mandatory accident reporting, in-flight emergencies, and prohibitions against reckless or hazardous operations.",
               "text_content": "Accident Reporting: The RPIC must report an accident to the FAA within 10 days if it results in serious injury to any person or any loss of consciousness, or if it causes damage to property (other than the UAS) in excess of $500 to repair or replace (whichever is lower).\n\nIn-Flight Emergency: In an in-flight emergency requiring immediate action, the RPIC may deviate from any rule in Part 107 to the extent necessary to meet that emergency. Upon request from the Administrator, the RPIC who deviates must send a written report.\n\nHazardous Operations: No person may operate a sUAS in a reckless manner that endangers the life or property of another—for example, continuing to fly in inclement weather or in an area with many buildings, trees, or other structures. No person may allow an object to be dropped from a sUAS in a manner that creates an undue hazard to persons or property.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u132-falsification-accident-reporting/faa-107-u132-falsification-accident-reporting.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -117,7 +117,7 @@
               "title": "Operation Over People — General Rule",
               "description": "State the baseline prohibition on flight over people and the three exceptions before applying category-specific requirements.",
               "text_content": "Except in certain category-based situations described later in this unit, no person may operate a sUA over a human being unless that person is:\n- Directly participating in the operation of the sUA;\n- Located under a covered structure or inside a stationary vehicle that can provide reasonable protection from a falling sUA; or\n- Otherwise covered by the approved category rules for operations over people (Categories 1–4).\n\nThis general rule applies before considering kinetic-energy categories, labeling, and sustained-flight restrictions over crowds or moving vehicles.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u140-over-people-general/faa-107-u140-over-people-general.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -144,7 +144,7 @@
               "title": "Visual Line of Sight (VLOS) and Multi-Aircraft Rules",
               "description": "Define Visual Line of Sight (VLOS) requirements, VO duties when a visual observer is used, and the prohibition on controlling more than one unmanned aircraft at a time.",
               "text_content": "Visual Line of Sight (VLOS): The RPIC, person manipulating the flight controls, and VO (if used) must be able to see the UA throughout the flight unaided (corrective lenses only) in order to know the aircraft's location; determine its attitude, altitude, and direction of flight; observe the airspace for other traffic or hazards; and determine that the UA does not endanger the life or property of another.\n\nThroughout the entire flight, unaided vision (no binoculars) must be maintained by the RPIC and person manipulating the controls, or by a visual observer.\n\nWhen a visual observer is used, the RPIC, the person manipulating the flight controls, and the VO must maintain effective communication with each other at all times, scan the airspace for any potential collision hazard, and maintain awareness of the position of the sUA through direct visual observation.\n\nThe VO must keep the unmanned aircraft in VLOS unaided (corrective lenses only). Briefly looking at the flight controller to locate the aircraft for a second or to check battery life—or when the aircraft is momentarily behind smoke or a chimney—is acceptable if VLOS is maintained overall.\n\nOperation of Multiple Small Unmanned Aircraft: A person may not manipulate flight controls or act as RPIC or visual observer in the operation of more than one unmanned aircraft at the same time.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u135-vlos-multi-aircraft/faa-107-u135-vlos-multi-aircraft.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -171,7 +171,7 @@
               "title": "Preflight Familiarization, Inspection, and Airspace Operations",
               "description": "Outline preflight assessment requirements and restrictions on operating in controlled, prohibited, and restricted airspace.",
               "text_content": "Preflight Familiarization, Inspection, and Actions: Before flight, the RPIC must review the operating environment and assess hazards affecting persons or property on the surface or in the air, including local weather; local airspace and flight restrictions; location of persons and property on the surface; and other ground hazards.\n\nThe RPIC must ensure all persons directly participating are informed about operating conditions, emergency procedures, contingency procedures, roles and responsibilities, and potential hazards. The RPIC must ensure control links work, sufficient power exists for the intended flight, and any object attached or carried is secure and does not adversely affect flight characteristics or controllability. Before flight, the RPIC must verify the drone meets an approved category (1–4) when required and that documentation (certificate, registration, airworthiness certificate, waiver if needed) is available.\n\nOperation in Certain Airspace: Operations in Class B, C, or D airspace or within the lateral boundaries of the surface area of Class E airspace designated for an airport are prohibited unless prior authorization is obtained. A small drone must not interfere with manned aircraft traffic patterns or operations at any airport, heliport, or seaplane base—including causing manned aircraft to alter flight path or delay takeoff or landing. Operations in prohibited or restricted areas require authorization from the using or controlling agency. A NOTAM may establish a Temporary Flight Restriction (TFR) identifying the affected area and the hazard or condition.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u138-preflight-familiarization/faa-107-u138-preflight-familiarization.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -191,7 +191,7 @@
           "title": "Waivers and Airspace Authorization",
           "description": "Explain Certificate of Waiver requirements, which Part 107 rules may be waived, processing timelines, and how to obtain controlled-airspace authorization.",
           "text_content": "A waiver is special permission from the FAA that allows deviation from certain Part 107 rules only if the FAA believes the operation will still be safe. The FAA may issue a Certificate of Waiver (CoW) when you demonstrate the planned flight can be conducted safely.\n\nWaiver Application Requirements: A request must contain a complete description of the proposed operation and a justification establishing that the operation can safely be conducted under the waiver terms. Explain how safety will be maintained using equipment, technology, and/or other strategies. Even if approved, the FAA may add conditions or limits. Failing to follow every condition and limitation makes the operation illegal.\n\nRules That May Be Waived: A CoW may be issued for operation from a moving vehicle or aircraft (no waiver will be issued to allow carriage of another person's property for compensation or hire by aircraft); visual observer requirements; visual line of sight aircraft operation (same compensation/hire limitation); daylight operations; anti-collision lights required for night and civil twilight; operation of multiple small unmanned aircraft; yielding the right of way; operation over people; operation in certain airspace; and operating limitations for small unmanned aircraft.\n\nApplication Process: Use the FAA waiver portal at https://aviationsafetyportal.faa.gov/. Submit at least 90 days before the proposed operation date. Requests submitted with less notice may not be processed in time and could be cancelled or denied. Your lateness may result in the inability to conduct proposed operations on your planned dates. Actual processing time varies depending on complexity and completeness of the application—complete the application as soon as you know your date. Airspace authorizations are generally processed faster than airspace waivers and on a first-come, first-served basis.\n\nEmergencies: The FAA offers Special Governmental Interest (SGI) waivers for public safety, first responders, and critical organizations.\n\nAirspace Authorization: Operations in controlled airspace require authorization. Part 107 remote pilots must use FAA DroneZone or a Low Altitude Authorization and Notification Capability (LAANC) provider. Do not contact ATC directly by radio or phone for drone authorization. ATC's primary role is keeping aircraft safe, supporting smooth traffic flow, and supporting national security and defense when needed.",
-          "video_url": null,
+          "video_url": "courses/videos/faa-107-u14-waivers/faa-107-u14-waivers.m3u8",
           "status": "NOT_STARTED",
           "sub_units": []
         },
@@ -200,7 +200,7 @@
           "title": "Remote ID Requirements",
           "description": "Summarize the Remote ID rule timeline, registration scope, and the three compliance paths (Standard UA, broadcast module, FRIA).",
           "text_content": "In April 2021 the FAA introduced rules for Remote ID, operations over people and moving objects, and night operations under certain conditions. Remote ID became mandatory as of September 16, 2023 (except as stated in 14 CFR Part 89).\n\nNo person may operate a UA in the United States unless the operation meets Remote ID requirements. Remote ID is like a digital license plate broadcasting identity, location, altitude, and velocity so authorities and the public can see who is flying and whether the operation appears safe.\n\nAll drones require registration—including those flown for recreation, business, or public safety, including aircraft weighing less than 0.55 lbs.\n\nThere are three ways to meet identification requirements: Standard Remote ID UA, UA with a Remote ID broadcast module, or operation within an FAA-Recognized Identification Area (FRIA). The lessons below cover each path.",
-          "video_url": null,
+          "video_url": "courses/videos/faa-107-u15-remote-id-intro/faa-107-u15-remote-id-intro.m3u8",
           "status": "NOT_STARTED",
           "sub_units": [
             {
@@ -208,7 +208,7 @@
               "title": "Standard Remote ID",
               "description": "Describe built-in Standard Remote ID requirements, broadcast content, and performance limits.",
               "text_content": "A Standard Remote ID unmanned aircraft is produced with built-in FAA Remote ID broadcast capability from takeoff to shutdown. New products must meet all Standard Remote ID requirements.\n\nThe drone serial number must match an FAA-accepted Declaration of Compliance and be linked to FAA registration before operation. The aircraft must self-test and must not take off if Remote ID is not functional. Remote ID must remain fully functional for the entire flight; land immediately if broadcasting fails.\n\nRemote ID equipment must not be modified, blocked, or disabled. The aircraft must broadcast required information continuously over unlicensed radio frequency spectrum and be designed to maximize broadcast range. Standard Remote ID operations are limited to VLOS.\n\nRemote ID is available to personal wireless devices in range using Bluetooth or Wi-Fi-type signals. The FAA and law enforcement may request access when needed.\n\nRequired broadcast elements include: Remote ID serial number; location and altitude; velocity; control station location and elevation; time mark; and emergency status.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u151-standard-remote-id/faa-107-u151-standard-remote-id.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -217,7 +217,7 @@
               "title": "Remote ID Broadcast Module",
               "description": "Explain retrofit broadcast modules, registration linkage, and broadcast content differences from Standard Remote ID.",
               "text_content": "A broadcast module is a device produced to meet FAA requirements that broadcasts identification and location information for the drone and takeoff location. It can be added to retrofit a drone with Remote ID capability.\n\nThe module serial number must be included in the UA registration. The UA or module must be fully functional from takeoff to shutdown, must self-test, and must not take off if Remote ID is not functional. Land immediately if broadcasting fails. The pilot must maintain VLOS throughout the flight when using a broadcast module.\n\nFrom takeoff to shutdown the module broadcasts via radio frequency (Wi-Fi and Bluetooth) with range comparable to Standard Remote ID: drone ID (serial number), location and altitude, velocity, takeoff location and elevation, and time mark.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u152-remote-id-broadcast-module/faa-107-u152-remote-id-broadcast-module.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             },
@@ -226,7 +226,7 @@
               "title": "FRIA and Alternative Remote Identification",
               "description": "Explain where Remote ID broadcast is not required, FRIA eligibility and renewal, and limited alternative compliance paths.",
               "text_content": "FAA-Recognized Identification Areas (FRIA) are geographic areas where drones may operate without broadcasting Remote ID. FRIAs are the only locations where routine operations may occur without broadcast. Both the drone and pilot must remain within the FRIA boundaries and within VLOS throughout the flight.\n\nOnly FAA-recognized Community Based Organizations (CBOs) and educational institutions (primary and secondary schools, trade schools, colleges, and universities) may request a FRIA. A FRIA is effective for 48 calendar months after FAA approval. Renewal requests must be submitted no later than 120 days before expiration. The FAA may terminate a FRIA if the application contained false information or if the area poses a risk to aviation, public safety, homeland security, or national security.\n\nAlternative Remote Identification: The Administrator may authorize operations without Remote ID for aeronautical research or to demonstrate compliance with regulations. ADS-B Out equipment cannot be used to comply with Remote ID requirements. A foreign-registered drone with Remote ID may not be flown in the United States unless a Notice of Identification is submitted to the FAA.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u153-fria/faa-107-u153-fria.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             }
@@ -245,7 +245,7 @@
               "title": "Means of Compliance and Declaration of Compliance",
               "description": "Distinguish MoC and DoC for operations over people and explain manufacturer and RPIC verification responsibilities.",
               "text_content": "Means of Compliance (MoC) is the FAA-approved method a manufacturer uses to show that a small unmanned aircraft meets safety requirements for operations over people under Part 107—including limits on exposed rotating parts, impact kinetic energy, and safety defects. There are three types: FAA-provided MoC, FAA-accepted or FAA-approved MoC submitted to the FAA, and custom MoC developed by applicants and approved if they demonstrate compliance.\n\nDeclaration of Compliance (DoC): The submitter must have proof the aircraft or broadcast module meets an FAA-accepted MoC; maintain a process to notify the public and FAA about unsafe conditions that make the aircraft non-compliant; allow FAA inspections, facility access, and records access; and confirm the aircraft has no safety defects. Records directly related to the DoC must be kept for two years (longer for custom MoC while the MoC remains accepted).\n\nThe RPIC is responsible for verifying category eligibility, labeling, and documentation before flight over people.",
-              "video_url": null,
+              "video_url": "courses/videos/faa-107-u161-means-declaration-compliance/faa-107-u161-means-declaration-compliance.m3u8",
               "status": "NOT_STARTED",
               "sub_units": []
             }
@@ -256,7 +256,7 @@
           "title": "Flying Over People: Category Operations",
           "description": "Apply Category 1-4 eligibility requirements, sustained-flight restrictions over open-air assemblies, and rules for operations over moving vehicles.",
           "text_content": "Category 1 through 4 eligibility, sustained flight over open-air assemblies, and operations over people inside moving vehicles are covered in the lessons below.",
-          "video_url": null,
+          "video_url": "courses/videos/faa-107-u165-category-operations/faa-107-u165-category-operations.m3u8",
           "status": "NOT_STARTED",
           "sub_units": [
             {
@@ -293,7 +293,7 @@
           "title": "Flying At Night Under Certain Conditions",
           "description": "Explain when night operations are permitted without a waiver and how civil twilight lighting rules relate to anti-collision lighting.",
           "text_content": "Night and civil twilight operations are allowed under Part 107 without a waiver when training and lighting requirements are met. Eligibility, civil twilight definitions, and manned-aircraft lighting recognition are covered in the first lesson below; hazards and mitigation strategies are in the second. No waiver is required unless you cannot meet these requirements.",
-          "video_url": null,
+          "video_url": "courses/videos/faa-107-u17-night-operations/faa-107-u17-night-operations.m3u8",
           "status": "NOT_STARTED",
           "sub_units": [
             {

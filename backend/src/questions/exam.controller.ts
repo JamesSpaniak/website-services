@@ -21,6 +21,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Role } from 'src/users/types/role.enum';
 import { OrganizationMember } from 'src/organizations/types/organization-member.entity';
+import { OrganizationClass } from 'src/organizations/types/organization-class.entity';
 import { OrgRole } from 'src/organizations/types/org-role.enum';
 import { ManagerOrAdminGuard } from './guards/manager-or-admin.guard';
 import { ExamGeneratorService } from './exam-generator.service';
@@ -65,6 +66,8 @@ export class ExamController {
     private questionRepository: Repository<Question>,
     @InjectRepository(OrganizationMember)
     private memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(OrganizationClass)
+    private orgClassRepository: Repository<OrganizationClass>,
   ) {}
 
   // ── Static routes first (must precede :examId to avoid route capture) ────────
@@ -138,6 +141,11 @@ export class ExamController {
     const exams = await this.examRepository.findBy({ id: In(examIds) });
     const examMap = new Map(exams.map((e) => [e.id, e]));
 
+    const orgClasses = await this.orgClassRepository.find({
+      where: { organizationId: orgId },
+    });
+    const classNameMap = new Map(orgClasses.map((c) => [c.id, c.name]));
+
     return classExams
       .map((ce) => {
         const exam = examMap.get(ce.exam_id);
@@ -145,6 +153,11 @@ export class ExamController {
         return {
           class_exam_id: ce.id,
           exam_id: ce.exam_id,
+          class_id: ce.class_id,
+          class_name:
+            ce.class_id !== null
+              ? (classNameMap.get(ce.class_id) ?? null)
+              : null,
           label: ce.label,
           due_date: ce.due_date,
           assigned_at: ce.assigned_at,
@@ -175,10 +188,20 @@ export class ExamController {
     if (memberships.length === 0) return [];
 
     const orgIds = memberships.map((m) => m.organizationId);
-    const classExams = await this.classExamRepository.find({
+    const allClassExams = await this.classExamRepository.find({
       where: { organization_id: In(orgIds) },
       order: { assigned_at: 'DESC' },
     });
+    // Org-wide exams (class_id null) are visible to everyone in the org;
+    // class-scoped exams only to members of that class.
+    const memberClassByOrg = new Map(
+      memberships.map((m) => [m.organizationId, m.classId]),
+    );
+    const classExams = allClassExams.filter(
+      (ce) =>
+        ce.class_id === null ||
+        ce.class_id === memberClassByOrg.get(ce.organization_id),
+    );
     if (classExams.length === 0) return [];
 
     const examIds = [...new Set(classExams.map((ce) => ce.exam_id))];
@@ -313,10 +336,18 @@ export class ExamController {
     }
 
     const orgIds = memberships.map((m) => m.organizationId);
-    const assignment = await this.classExamRepository.findOne({
+    const assignments = await this.classExamRepository.find({
       where: { exam_id: exam.id, organization_id: In(orgIds) },
     });
-    if (!assignment) {
+    const memberClassByOrg = new Map(
+      memberships.map((m) => [m.organizationId, m.classId]),
+    );
+    const allowed = assignments.some(
+      (a) =>
+        a.class_id === null ||
+        a.class_id === memberClassByOrg.get(a.organization_id),
+    );
+    if (!allowed) {
       throw new ForbiddenException('You do not have access to this course.');
     }
   }

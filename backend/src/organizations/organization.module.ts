@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Organization } from './types/organization.entity';
 import { OrganizationMember } from './types/organization-member.entity';
+import { OrganizationClass } from './types/organization-class.entity';
 import { InviteCode } from './types/invite-code.entity';
 import { OrganizationController } from './organization.controller';
 import { OrganizationService } from './organization.service';
@@ -18,6 +19,7 @@ import { EmailModule } from '../email/email.module';
     TypeOrmModule.forFeature([
       Organization,
       OrganizationMember,
+      OrganizationClass,
       InviteCode,
       Progress,
       Course,

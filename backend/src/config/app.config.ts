@@ -8,6 +8,7 @@ import { Progress } from '../progress/types/progress.entity';
 import { Session } from '../auth/types/session.entity';
 import { Organization } from '../organizations/types/organization.entity';
 import { OrganizationMember } from '../organizations/types/organization-member.entity';
+import { OrganizationClass } from '../organizations/types/organization-class.entity';
 import { InviteCode } from '../organizations/types/invite-code.entity';
 import { AuditLog } from '../audit/types/audit-log.entity';
 import { Comment } from '../comments/types/comment.entity';
@@ -38,6 +39,7 @@ const defaultConnection: DataSourceOptions = {
     Session,
     Organization,
     OrganizationMember,
+    OrganizationClass,
     InviteCode,
     AuditLog,
     Comment,

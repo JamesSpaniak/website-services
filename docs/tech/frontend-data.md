@@ -125,7 +125,7 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 | Comments | `articles/:articleId/comments`, `comments/:id` PATCH/DELETE, `comments/:id/upvote` |
 | Purchases | `purchases/create-payment-intent`, `purchases/confirm-payment`, `purchases/course` |
 | Media | `media/presigned-url`, `media/profile-picture`, `media` GET/DELETE, `media?folder&subfolder` |
-| Organizations | `organizations/my`, `organizations/invite-info`, `organizations`, `organizations/:id`, members, invite-codes, courses, progress |
+| Organizations | `organizations/my`, `organizations/invite-info`, `organizations`, `organizations/:id`, members, classes, invite-codes, courses, progress |
 | Audit / analytics | `audit/my`, `audit/users/:userId`, `audit/analytics/overview`, `audit/analytics/daily` |
 | Email | `email/contact`, `email/consultation` |
 | Analytics | `analytics/event` (see below) |
@@ -149,7 +149,7 @@ The **Exam** UI (`exam.tsx`) submits answers via **`submitUnitExam`** → **`POS
 
 - **`usePageAnalytics`** (root layout via `PageAnalytics`) calls **`trackPageView`** on route changes.
 - **`trackArticleView`**, **`trackCourseView`** send structured events to **`POST /analytics/event`**.
-- Client **`logger`** can forward to **`POST /logs`** via `logToServer`.
+- Client **`logger`** can forward to **`POST /logs`** via `logToServer`. Levels sent are `info` / `warn` / `error` (`logger.info` maps to `info`; sending `log` is a 400). Warn/error always ship; info only if `NEXT_PUBLIC_CLIENT_SEND_INFO_LOGS` or API-timing flags are on.
 
 ---
 
@@ -314,7 +314,7 @@ Each tab is a **real route** (shared tab bar renders on every admin page, includ
 | `/admin/courses` | Course table — `GET /courses`, `DELETE /courses/:id`. Per-row shortcut to `/admin/questions?course=<id>`. |
 | `/admin/courses/new`, `/admin/courses/[courseId]` | **`CourseEditor`** (`createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). Edit route loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present (`GET /courses` list strips nested content). Header link to the course's question bank. Visual ↔ JSON mode switch is in-memory (no save needed); image fields show inline thumbnails and video fields have a collapsed **Preview video** toggle (`video-preview.tsx`). |
 | `/admin/questions` | **`QuestionBankEditor`** — question CRUD, bulk import/export. Accepts `?course=<id>` to preselect a course. |
-| `/admin/organizations` | Org CRUD, invites (single + bulk), course assignment — `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. |
+| `/admin/organizations` | Org CRUD, invites (single + bulk, optional class selector for students), **classes panel** (create/rename/delete periods with member counts — `GET/POST/PATCH/DELETE .../classes`), course assignment — `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. |
 | `/admin/users` | **Users table** (search; expandable row per user) — `GET /users/admin/all`. Per-user: course access list with **source badges** (Purchased / Gift / Promo link), gift a course (`POST /users/:id/courses`), revoke (`DELETE /users/:id/courses/:courseId`), send password reset (`POST /auth/admin/users/:id/send-password-reset`), resend verification, delete account (`DELETE /users/:id`). **Signup links panel** — create one-time promo links (courses, optional email lock+send, note, expiry) via `POST /users/admin/signup-links`, list with status/copy-URL, delete unused ones. Types in `lib/types/admin-users.ts`. |
 | `/admin/analytics` | `GET /audit/analytics/overview`, `GET /audit/analytics/daily`. |
 
@@ -328,10 +328,10 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 
 | Route | Content / API |
 |-------|----------------|
-| `/manager/members` | `getOrgMembers`, `addOrgMember`, `removeOrgMember`, `updateMemberRole`. |
-| `/manager/invites` | `getInviteCodes`, `generateInviteCode`. |
-| `/manager/progress` | `getOrgProgress`, `getOrgCourseProgress`, per-student `getStudentActivity` (`GET /audit/users/:userId`), `resetMemberPicture`. |
-| `/manager/exams` | Class exams: `getOrgCourses`, `getOrgClassExams`, `generateClassExam`, `getClassExamResults`, CSV export. |
+| `/manager/members` | `getOrgMembers`, `addOrgMember` (optional class), `removeOrgMember`, `updateMemberRole`, **classes panel** (`getOrgClasses`, `createOrgClass`, `updateOrgClass`, `deleteOrgClass`), per-row class assignment (`updateMemberClass`), class filter. |
+| `/manager/invites` | `getInviteCodes`, `generateInviteCode` (optional class), **bulk invite panel** (`bulkGenerateInviteCodes`, optional class). |
+| `/manager/progress` | `getOrgProgress`, `getOrgCourseProgress`, class filter dropdown (client-side on `class_id`), per-student `getStudentActivity` (`GET /audit/users/:userId`), `resetMemberPicture`. |
+| `/manager/exams` | Class exams: `getOrgCourses`, `getOrgClasses`, `getOrgClassExams`, `generateClassExam` (optional target class — students outside a targeted class don't see the exam), `getClassExamResults` (roster scoped to target class), CSV export. |
 
 **Permissions:** middleware any logged-in cookie (org role not in JWT); `ManagerGuard` requires org **`role === 'manager'`** or global **admin**.
 
