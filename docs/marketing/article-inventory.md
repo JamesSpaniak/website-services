@@ -2,7 +2,7 @@
 
 Tracks **repo drafts** vs **production CMS** (admin dashboard). Public URLs use numeric id after import: `https://thedroneedge.com/articles/[id]`.
 
-**Import:** Admin article editor → import JSON from `assets/news/articles/*.json`  
+**Import:** Admin article editor → import JSON from `assets/articles/import/*.json`  
 **Update this file** when an article is published, hidden, or assigned a prod id.
 
 ---
@@ -35,7 +35,7 @@ Sync from prod as of July 2026. Fill **Prod ID** when known (check admin or URL 
 
 ### Other published repo articles (confirm in admin)
 
-These exist in `assets/news/articles/` — confirm Published/Hidden and dates in admin:
+These exist in `assets/articles/import/` — confirm Published/Hidden and dates in admin:
 
 | Repo slug | Title (from manifest) | Prod status |
 |-----------|----------------------|-------------|
@@ -99,6 +99,6 @@ These exist in `assets/news/articles/` — confirm Published/Hidden and dates in
 
 - [`workflows/marketing/outreach-content-calendar.md`](../../workflows/marketing/outreach-content-calendar.md) — priorities and content model
 - [`workflows/marketing/content-and-seo.md`](../../workflows/marketing/content-and-seo.md) — publish workflow
-- [`assets/news/articles/manifest.json`](../../assets/news/articles/manifest.json) — slug index (legacy + story series)
+- [`assets/articles/import/manifest.json`](../../assets/articles/import/manifest.json) — slug index (legacy + story series)
 
 *Update prod ID column after each import.*

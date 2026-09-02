@@ -27,6 +27,9 @@ import { OrganizationService } from './organization.service';
 import {
   CreateOrganizationDto,
   UpdateOrganizationDto,
+  CreateOrgClassDto,
+  UpdateOrgClassDto,
+  UpdateMemberClassDto,
   GenerateInviteCodeDto,
   BulkGenerateInviteCodesDto,
   AssignCoursesDto,
@@ -35,6 +38,7 @@ import {
   OrganizationResponse,
   OrganizationMemberResponse,
   InviteCodeResponse,
+  OrgClassResponse,
   OrgCourseResponse,
   MemberCourseProgressSummary,
   MemberCourseDetailedProgress,
@@ -138,7 +142,63 @@ export class OrganizationController {
       orgId,
       dto.email,
       dto.role || OrgRole.Member,
+      dto.class_id,
     );
+  }
+
+  // ── Class endpoints ──
+
+  @ApiOperation({ summary: 'List classes (periods) in the organization' })
+  @Get(':id/classes')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async getClasses(
+    @Param('id', ParseIntPipe) orgId: number,
+  ): Promise<OrgClassResponse[]> {
+    return this.orgService.getClasses(orgId);
+  }
+
+  @ApiOperation({ summary: 'Create a class (period) in the organization' })
+  @Post(':id/classes')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async createClass(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Body() dto: CreateOrgClassDto,
+  ): Promise<OrgClassResponse> {
+    return this.orgService.createClass(orgId, dto);
+  }
+
+  @ApiOperation({ summary: 'Update a class (rename / soft cap)' })
+  @Patch(':id/classes/:classId')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async updateClass(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('classId', ParseIntPipe) classId: number,
+    @Body() dto: UpdateOrgClassDto,
+  ): Promise<OrgClassResponse> {
+    return this.orgService.updateClass(orgId, classId, dto);
+  }
+
+  @ApiOperation({
+    summary: 'Delete a class (must be empty; members must be moved first)',
+  })
+  @Delete(':id/classes/:classId')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async deleteClass(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('classId', ParseIntPipe) classId: number,
+  ): Promise<void> {
+    return this.orgService.deleteClass(orgId, classId);
+  }
+
+  @ApiOperation({ summary: "Assign or clear a member's class" })
+  @Patch(':id/members/:userId/class')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async updateMemberClass(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() dto: UpdateMemberClassDto,
+  ): Promise<void> {
+    return this.orgService.updateMemberClass(orgId, userId, dto.class_id);
   }
 
   @ApiOperation({ summary: 'Remove a member from the organization' })
@@ -245,8 +305,13 @@ export class OrganizationController {
   @UseGuards(JwtAuthGuard, OrgManagerGuard)
   async getOrgProgress(
     @Param('id', ParseIntPipe) orgId: number,
+    @Query('classId') classId?: string,
   ): Promise<MemberCourseProgressSummary[]> {
-    return this.orgService.getOrgProgressSummary(orgId);
+    const parsedClassId = classId ? parseInt(classId, 10) : undefined;
+    return this.orgService.getOrgProgressSummary(
+      orgId,
+      Number.isNaN(parsedClassId as number) ? undefined : parsedClassId,
+    );
   }
 
   @ApiOperation({
@@ -257,7 +322,13 @@ export class OrganizationController {
   async getOrgCourseProgress(
     @Param('id', ParseIntPipe) orgId: number,
     @Param('courseId', ParseIntPipe) courseId: number,
+    @Query('classId') classId?: string,
   ): Promise<MemberCourseDetailedProgress[]> {
-    return this.orgService.getOrgCourseDetailedProgress(orgId, courseId);
+    const parsedClassId = classId ? parseInt(classId, 10) : undefined;
+    return this.orgService.getOrgCourseDetailedProgress(
+      orgId,
+      courseId,
+      Number.isNaN(parsedClassId as number) ? undefined : parsedClassId,
+    );
   }
 }

@@ -93,15 +93,21 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 ### `organizations`
 
 - `name` (unique), `max_students`, `school_year`, `semester`.
-- Relations: **`members`** (`organization_members`), **`invite_codes`**, **`courses`** (M2M for org-assigned courses).
+- Relations: **`members`** (`organization_members`), **`invite_codes`**, **`classes`** (`organization_classes`), **`courses`** (M2M for org-assigned courses).
+
+### `organization_classes`
+
+- A class/period/section inside an org (e.g. "Period 2"). `organizationId` (FK, cascade), `name` (unique per org), `maxStudents` (nullable, display-only soft cap), `createdAt`.
+- Seat enforcement stays at the org level (`max_students`); class caps are cosmetic.
+- Deleting a class is blocked while it has members (move them first); DB FK is `SET NULL` as a safety net.
 
 ### `organization_members`
 
-- `organizationId`, `userId` (unique pair), **`role`:** `manager` \| `member` (`OrgRole`).
+- `organizationId`, `userId` (unique pair), **`role`:** `manager` \| `member` (`OrgRole`), `classId` (nullable FK → `organization_classes`, `SET NULL`; null = unassigned / org-wide manager).
 
 ### `invite_codes`
 
-- `code` (unique), `organizationId`, `role`, optional `email`, `createdByUserId`, `usedByUserId`, `usedAt`, `expiresAt`.
+- `code` (unique), `organizationId`, `role`, optional `email`, `classId` (nullable — invitee joins that class on redemption), `createdByUserId`, `usedByUserId`, `usedAt`, `expiresAt`.
 
 ### `audit_logs`
 
@@ -250,19 +256,24 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | PATCH | `/organizations/:id` | JWT + **Admin** | |
 | DELETE | `/organizations/:id` | JWT + **Admin** | |
 | GET | `/organizations/:id` | JWT + **Org manager** | Details. |
-| GET | `/organizations/:id/members` | JWT + **Org manager** | |
-| POST | `/organizations/:id/members` | JWT + **Org manager** | Add by email. |
+| GET | `/organizations/:id/members` | JWT + **Org manager** | Includes `class_id`/`class_name`. |
+| POST | `/organizations/:id/members` | JWT + **Org manager** | Add by email; optional `class_id`. |
 | DELETE | `/organizations/:id/members/:userId` | JWT + **Org manager** | |
 | DELETE | `/organizations/:id/members/:userId/picture` | JWT + **Org manager** | |
 | PATCH | `/organizations/:id/members/:userId/role` | JWT + **Org manager** | |
-| POST | `/organizations/:id/invite-codes` | JWT + **Org manager** | |
+| PATCH | `/organizations/:id/members/:userId/class` | JWT + **Org manager** | Assign/clear member's class (`class_id: number \| null`). |
+| GET | `/organizations/:id/classes` | JWT + **Org manager** | List classes with member counts. |
+| POST | `/organizations/:id/classes` | JWT + **Org manager** | Create class (`name`, optional `max_students` soft cap). |
+| PATCH | `/organizations/:id/classes/:classId` | JWT + **Org manager** | Rename / soft cap. |
+| DELETE | `/organizations/:id/classes/:classId` | JWT + **Org manager** | Blocked while class has members. |
+| POST | `/organizations/:id/invite-codes` | JWT + **Org manager** | Optional `class_id`. |
 | GET | `/organizations/:id/invite-codes` | JWT + **Org manager** | |
-| POST | `/organizations/:id/invite-codes/bulk` | JWT + **Org manager** | |
+| POST | `/organizations/:id/invite-codes/bulk` | JWT + **Org manager** | Optional `class_id`. |
 | GET | `/organizations/:id/courses` | JWT + **Org manager** | |
 | POST | `/organizations/:id/courses` | JWT + **Admin** | Assign courses to org. |
 | DELETE | `/organizations/:id/courses/:courseId` | JWT + **Admin** | |
-| GET | `/organizations/:id/progress` | JWT + **Org manager** | Summary. |
-| GET | `/organizations/:id/progress/:courseId` | JWT + **Org manager** | Detailed. |
+| GET | `/organizations/:id/progress` | JWT + **Org manager** | Summary; optional `?classId=` filter. |
+| GET | `/organizations/:id/progress/:courseId` | JWT + **Org manager** | Detailed; optional `?classId=` filter. |
 
 ### Media — `/media`
 
@@ -311,7 +322,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
-| POST | `/logs` | Public | Frontend client logs; excluded from Swagger; avoid abuse in production (consider auth/rate limits). |
+| POST | `/logs` | Public | Frontend client logs (`FrontendLogDto`: `level` must be `info`\|`warn`\|`error`). Excluded from Swagger; throttled 10/min. |
 
 ### Health — `/health`
 

@@ -35,6 +35,13 @@ export class ClassExam {
   organization_id: number;
 
   /**
+   * Optional class/period within the org this exam targets.
+   * Null = assigned to the whole organization.
+   */
+  @Column({ type: 'int', nullable: true })
+  class_id: number | null;
+
+  /**
    * Human-readable label for the exam assignment, e.g.
    * "Unit 3 Quiz — Period 2" or "Final Exam — Spring 2025"
    */

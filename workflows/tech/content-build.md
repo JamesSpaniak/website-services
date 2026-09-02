@@ -6,12 +6,12 @@ Rebuild course questions and publish course/article/media assets.
 
 | Step | Action |
 |------|--------|
-| Edit structure | `assets/courses/faa_107_course.json` or admin course editor |
-| Source outlines | Reference only: `assets/courses/outlines/` |
+| Edit structure | `assets/courses/faa-107/faa_107_course.json` or admin course editor |
+| Source outlines | Reference only: `assets/courses/faa-107/outlines/` |
 | Regenerate questions | `python3 scripts/build_faa_107_questions.py` |
-| Review mapping | `assets/courses/faa_107_questions_review.csv`, `faa_107_questions_gaps.md` |
+| Review mapping | `assets/courses/faa-107/questions/faa_107_questions_review.csv`, `faa_107_questions_gaps.md` |
 | Publish course | Admin `PUT /courses/:id` or API |
-| Import questions | `assets/courses/faa_107_questions.bulk.json` via admin or API |
+| Import questions | `assets/courses/faa-107/questions/faa_107_questions.bulk.json` via admin or API |
 
 See [`docs/tech/exam-generator-and-course-linking.md`](../../docs/tech/exam-generator-and-course-linking.md).
 
@@ -25,7 +25,7 @@ Optional maintenance scripts (run once when needed, not part of deploy):
 
 Legacy batch payloads: `assets/articles/*.json` → admin article editor.
 
-News pipeline: [`workflows/marketing/content-and-seo.md`](../marketing/content-and-seo.md) (`assets/news/`).
+Article pipeline: [`workflows/marketing/content-and-seo.md`](../marketing/content-and-seo.md) (`assets/articles/`).
 
 ## Course images
 
@@ -39,7 +39,7 @@ Bulk image insertion (map folder → review → upload → merge): [`course-imag
 |------|--------|
 | Record | One video per unit/section (or agreed granularity) |
 | Upload | `./scripts/bulk-upload-videos.sh <video-dir> --bucket droneedge-dev-raw-video`, or the reviewed Part 107 mapping script below |
-| Wire course | Set `video_url` on each node in `assets/courses/faa_107_course.json` |
+| Wire course | Set `video_url` on each node in `assets/courses/faa-107/faa_107_course.json` |
 | Publish | Admin course save or API; invalidate CDN if needed |
 | Captions | Plan transcripts/captions track — WCAG (see TODO) |
 
@@ -54,7 +54,7 @@ The script gives each approved recording a stable, URL-safe key, uploads it to `
 Generic uploads:
 
 ```bash
-./scripts/bulk-upload-videos.sh assets/videos --bucket droneedge-dev-raw-video
+./scripts/bulk-upload-videos.sh assets/courses/faa-107/videos --bucket droneedge-dev-raw-video
 ```
 
 Source files → S3 raw bucket → MediaConvert → `courses/videos/<name>/<name>.m3u8` on media CloudFront. Store that relative HLS path in `video_url`; the backend converts it to an authorized CloudFront URL.

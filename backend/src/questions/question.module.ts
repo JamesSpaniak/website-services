@@ -7,6 +7,7 @@ import { ClassExam } from './types/class-exam.entity';
 import { Progress } from '../progress/types/progress.entity';
 import { User } from '../users/types/user.entity';
 import { OrganizationMember } from '../organizations/types/organization-member.entity';
+import { OrganizationClass } from '../organizations/types/organization-class.entity';
 import { CourseUnit } from '../courses/types/course-unit.entity';
 import { QuestionService } from './question.service';
 import { ExamGeneratorService } from './exam-generator.service';
@@ -27,6 +28,7 @@ import { ProgressModule } from '../progress/progress.module';
       Progress,
       User,
       OrganizationMember,
+      OrganizationClass,
       CourseUnit,
     ]),
     CourseModule, // provides CourseService for access-control checks

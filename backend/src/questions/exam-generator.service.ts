@@ -4,6 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
+import { OrganizationClass } from '../organizations/types/organization-class.entity';
 import {
   ExamPool,
   GenerateExamDto,
@@ -24,6 +25,8 @@ export class ExamGeneratorService {
     private classExamRepository: Repository<ClassExam>,
     @InjectRepository(Question)
     private questionRepository: Repository<Question>,
+    @InjectRepository(OrganizationClass)
+    private orgClassRepository: Repository<OrganizationClass>,
   ) {}
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -87,6 +90,17 @@ export class ExamGeneratorService {
     dto: GenerateClassExamDto,
     teacherId: number,
   ): Promise<{ exam: Exam; classExam: ClassExam }> {
+    if (dto.class_id !== undefined && dto.class_id !== null) {
+      const orgClass = await this.orgClassRepository.findOne({
+        where: { id: dto.class_id, organizationId: dto.organization_id },
+      });
+      if (!orgClass) {
+        throw new BadRequestException(
+          'Class not found in this organization.',
+        );
+      }
+    }
+
     const isFixed = dto.is_randomized === false;
     let exam: Exam;
 
@@ -117,6 +131,7 @@ export class ExamGeneratorService {
       exam_id: exam.id,
       assigned_by_user_id: teacherId,
       organization_id: dto.organization_id,
+      class_id: dto.class_id ?? null,
       label: dto.label ?? null,
       due_date: dto.due_date ?? null,
     });

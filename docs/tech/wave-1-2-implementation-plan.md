@@ -59,7 +59,7 @@ ready to go when content lands.
 | Task | File | Detail |
 |------|------|--------|
 | Hero primary CTA | `drone/src/app/page.tsx` | Replace primary "Courses" button with **"Try Unit 1 free"** → `registerHref(coursePath(FEATURED_COURSE_ID))`. Keep "Courses" as secondary (border style). |
-| Hero secondary CTA | `page.tsx` | Add **"Part 107 course — $29"** → `/courses/1/preview` (price/preview surface; preview page handles auth-aware CTAs). Drop "Articles" from hero buttons (nav covers it). |
+| Hero secondary CTA | `page.tsx` | Add **"Part 107 course — $129"** → `/courses/1/preview` (price/preview surface; preview page handles auth-aware CTAs). Drop "Articles" from hero buttons (nav covers it). |
 | `HomeAuthCta` | `home-auth-cta.tsx` | Logged-out: **"Create account"** (visible button style) + keep "Sign in" as text link; logged-in: "Profile" unchanged. |
 | Header join CTA | `header.tsx` | Logged-out: primary **"Get started"** → `/register`, demote "Login" to text link (unify label with "Sign in"). Mobile menu: same pair. |
 | FAA track card | `page.tsx` | Point the Part 107 track card at `/courses/1/preview` instead of `/courses`. |

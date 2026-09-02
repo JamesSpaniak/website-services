@@ -29,7 +29,7 @@ assets/media/
 
 Do **not** use iCloud Obsidian for 4K masters, Git LFS for bulk video, or `droneedge-dev-raw-video` as a library (7-day lifecycle).
 
-Course lesson source destined for the MediaConvert pipeline still goes under [`assets/videos/`](../videos/), not here.
+Course lesson source destined for the MediaConvert pipeline goes under the course folder (e.g. [`assets/courses/faa-107/videos/`](../courses/faa-107/)), not here.
 
 ## Manifests
 

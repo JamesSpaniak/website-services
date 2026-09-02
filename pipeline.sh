@@ -35,6 +35,7 @@ BUILD_FRONTEND=true
 DOCKER_NO_CACHE=false
 DOCKER_PROGRESS="${DOCKER_PROGRESS:-auto}"
 TERRAFORM_APPLY=true
+TF_REPLACE_ARGS=()
 WAIT_TIMEOUT_SECONDS="${WAIT_TIMEOUT_SECONDS:-900}"
 WAIT_INTERVAL_SECONDS="${WAIT_INTERVAL_SECONDS:-10}"
 
@@ -42,7 +43,7 @@ WAIT_INTERVAL_SECONDS="${WAIT_INTERVAL_SECONDS:-10}"
 
 usage() {
   cat <<'EOF'
-Usage: ./pipeline.sh [--backend-only|--frontend-only] [--env <dev|prod>] [--tfvars <path>] [--no-cache] [--plan-only]
+Usage: ./pipeline.sh [--backend-only|--frontend-only] [--env <dev|prod>] [--tfvars <path>] [--no-cache] [--plan-only] [--replace <addr>]
 
 Flags:
   --backend-only   Build/deploy backend only
@@ -51,6 +52,9 @@ Flags:
   --tfvars         Path to a tfvars file (overrides --env)
   --no-cache       Force Docker to rebuild without cache
   --plan-only      Run terraform plan only (skip apply/deploy)
+  --replace ADDR   Pass -replace=ADDR to terraform (repeatable). Use for stuck
+                   resources that look healthy in AWS but are dead (e.g.
+                   aws_nat_gateway.nat). Do not run terraform apply by hand.
   -h, --help       Show help
 
 Env overrides:
@@ -72,6 +76,9 @@ while [[ $# -gt 0 ]]; do
     --frontend-only) BUILD_BACKEND=false;  shift ;;
     --no-cache)      DOCKER_NO_CACHE=true; shift ;;
     --plan-only)     TERRAFORM_APPLY=false; shift ;;
+    --replace)
+      TF_REPLACE_ARGS+=("-replace=${2:?--replace requires a resource address}")
+      shift 2 ;;
     --env)
       ENVIRONMENT="${2:?--env requires a value}"
       TFVARS_FILE="${TF_DIR}/env/${ENVIRONMENT}.tfvars"
@@ -232,10 +239,14 @@ log_service_state "pre-terraform" "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERV
     -var "cloudfront_signing_public_key_pem=${CF_PUBLIC_KEY_PEM}"
   )
 
+  if [[ ${#TF_REPLACE_ARGS[@]} -gt 0 ]]; then
+    echo "Terraform -replace: ${TF_REPLACE_ARGS[*]}" >&2
+  fi
+
   if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
-    terraform apply -input=false -auto-approve "${COMMON_VARS[@]}"
+    terraform apply -input=false -auto-approve "${COMMON_VARS[@]}" ${TF_REPLACE_ARGS[@]+"${TF_REPLACE_ARGS[@]}"}
   else
-    terraform plan -input=false "${COMMON_VARS[@]}"
+    terraform plan -input=false "${COMMON_VARS[@]}" ${TF_REPLACE_ARGS[@]+"${TF_REPLACE_ARGS[@]}"}
   fi
 )
 

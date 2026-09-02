@@ -20,7 +20,7 @@ export default function CoursePreviewActions({ courseId, price }: CoursePreviewA
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const courseRedirect = coursePath(courseId);
   const purchaseRedirect = coursePath(courseId, true);
-  const displayPrice = price > 0 ? price : 29;
+  const displayPrice = price > 0 ? price : 129;
 
   useEffect(() => {
     if (!user) {

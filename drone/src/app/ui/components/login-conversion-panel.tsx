@@ -59,7 +59,7 @@ export default function LoginConversionPanel({
           </h2>
           <p className="mt-2 text-sm text-[var(--brand-muted)] leading-relaxed">
             Create a free account to preview Unit 1, track progress, and try practice questions.
-            Full course access is a one-time $29 purchase.
+            Full course access is a one-time $129 purchase.
           </p>
           <div className="mt-5 flex flex-col gap-2">
             <Link
@@ -74,7 +74,7 @@ export default function LoginConversionPanel({
               className="flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--background)] transition-colors"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Purchase full course — $29
+              Purchase full course — $129
             </Link>
           </div>
         </>

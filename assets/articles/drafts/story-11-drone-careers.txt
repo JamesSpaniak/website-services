@@ -6,7 +6,7 @@ Drone careers beyond the hobby: agriculture, fire, logistics, media, and what's 
 ────────────────────────────────────────────────────────────
 STATUS
 ────────────────────────────────────────────────────────────
-PUBLISH-READY DRAFT — JSON body in assets/news/articles/story-11-drone-careers.json (May 2026). Re-verify salary bands and wire article IDs into Related reading links on CMS import.
+PUBLISH-READY DRAFT — JSON body in assets/articles/import/story-11-drone-careers.json (May 2026). Re-verify salary bands and wire article IDs into Related reading links on CMS import.
 
 ────────────────────────────────────────────────────────────
 STORY OPENING (live in JSON)
@@ -47,9 +47,9 @@ In-article figures (CMS article 39 — media.thedroneedge.com):
   Fire: https://media.thedroneedge.com/articles/39/0aa3df9c-f289-45d0-ab00-9ab36c1a42c5.png
   Delivery: https://media.thedroneedge.com/articles/39/eed2f635-d528-4f41-9721-e22c19c6ae90.png
   Infra: https://media.thedroneedge.com/articles/39/57494370-f75b-46a1-96ff-92d6c9f7f159.png
-  Local fallbacks: assets/news/images/story-11-*.png
+  Local fallbacks: assets/articles/images/story-11-*.png
 
-Sources on disk: assets/news/images/ → copy to drone/public/images/articles/
+Sources on disk: assets/articles/images/ → copy to drone/public/images/articles/
 
 ────────────────────────────────────────────────────────────
 SEO / GEO PHRASES (seo_phrases in JSON)

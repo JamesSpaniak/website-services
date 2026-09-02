@@ -169,7 +169,7 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 | Public subnets | `10.0.10.0/24`, `10.0.11.0/24` (2 AZs) |
 | Private subnets | `10.0.20.0/24`, `10.0.21.0/24` |
 | Internet gateway | Public ingress/egress |
-| NAT gateway | Single NAT + EIP (private subnet egress; also in SPF for SMTP) |
+| NAT gateway | Single NAT + EIP (private subnet egress; also in SPF for SMTP). Recreate a stuck NAT with `./pipeline.sh --env dev --replace aws_nat_gateway.nat` — keeps `aws_eip.nat` so SPF/SMTP allowlist stay valid. Do not apply terraform by hand. |
 | VPC endpoints (gateway) | S3 → private route table |
 | VPC endpoints (interface) | Secrets Manager, CloudWatch Logs, ECR API, ECR DKR |
 
@@ -221,7 +221,9 @@ Separate roles: MediaConvert, transcode Lambdas, VPC flow logs.
 | Log group `/ecs/droneedge-dev/api-server` | API container stdout + Winston CloudWatch transport |
 | Log group `/ecs/droneedge-dev/frontend` | Next.js stdout |
 | Log group `/vpc/droneedge-dev/flow-logs` | VPC flow logs (optional, default on) |
-| Budget | `droneedge-dev-monthly-budget` — $150/mo alerts |
+| Budget | `droneedge-dev-monthly-budget` — $150/mo alerts to `admin_email` |
+| SNS `droneedge-dev-ops-alerts` | CloudWatch alarm emails to `admin_email` (`james@thedroneedge.com`). Confirm the AWS subscription mail once. |
+| Alarm `droneedge-dev-nat-no-egress` | NAT `ConnectionEstablishedCount` = 0 for 2 hours. Console: CloudWatch → Alarms. Recreate a stuck NAT with `./pipeline.sh --env dev --replace aws_nat_gateway.nat`. |
 
 ### App autoscaling
 

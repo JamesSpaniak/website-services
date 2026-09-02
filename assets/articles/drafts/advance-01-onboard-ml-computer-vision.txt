@@ -61,7 +61,7 @@ HEADER IMAGES (Social theme — assets/visuals/Assets/Social)
 ────────────────────────────────────────────────────────────
 Primary hero (targeting / detection HUD):
   /images/articles/advance-01-hero-cv-targeting.png
-  Source: assets/news/images/advance-01-hero-cv-targeting.png
+  Source: assets/articles/images/advance-01-hero-cv-targeting.png
 
 Alternate hero (flight + controller HUD):
   /images/articles/advance-01-hero-cv-flight.png

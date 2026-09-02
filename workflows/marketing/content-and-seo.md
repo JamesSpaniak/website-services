@@ -4,13 +4,13 @@ Recurring marketing work: articles, SEO/GEO, and promotion. Strategy detail: [`d
 
 ## Publish a news / article piece
 
-1. **Draft** — Write or edit source in `assets/news/*.txt` (or advance series).
-2. **Images** — Add heroes under `assets/news/images/`; use `scripts/brand_story11_images.py` if generating branded variants.
+1. **Draft** — Write or edit source in `assets/articles/drafts/*.txt` (or advance series).
+2. **Images** — Add heroes under `assets/articles/images/`; use `scripts/brand_story11_images.py` if generating branded variants.
 3. **JSON** — Build import payload:
    ```bash
    python3 scripts/build_news_article_json.py
    ```
-   Output under `assets/news/articles/*.json`.
+   Output under `assets/articles/import/*.json`.
 4. **Review** — Check title, subheading, `image_url`, content blocks, links.
 5. **Publish** — Admin article editor on production or API; invalidate CloudFront if needed after frontend-only deploy.
 6. **Promote** — Social (templates in [`docs/marketing/brand-assets.md`](../../docs/marketing/brand-assets.md)), communities per SEO plan § recurring promotion.

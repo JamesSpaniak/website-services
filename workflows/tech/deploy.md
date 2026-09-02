@@ -32,6 +32,15 @@ This will:
 ./pipeline.sh --env dev --backend-only
 ./pipeline.sh --env dev --frontend-only --no-cache   # force fresh Next.js build
 ./pipeline.sh --env dev --plan-only                  # terraform plan, no deploy
+./pipeline.sh --env dev --replace aws_nat_gateway.nat  # recreate stuck NAT (keeps EIP)
+```
+
+`--replace ADDR` is passed through to `terraform apply -replace=…`. Use it for resources that still exist in AWS/state but are dead (NAT gateway that reports `available` with zero `ConnectionAttemptCount`). Do **not** run `terraform apply` outside this script — that forks `terraform.tfstate` from the next pipeline run. Repeat `--replace` for multiple addresses. After one successful replace, later deploys omit the flag.
+
+NAT replace + image deploy in one shot (SMTP timeouts live in the API image):
+
+```bash
+./pipeline.sh --env dev --backend-only --replace aws_nat_gateway.nat
 ```
 
 ## Verify
@@ -43,6 +52,7 @@ This will:
    ```
 2. CloudWatch logs: `/ecs/droneedge-dev/frontend`, `/ecs/droneedge-dev/api-server`
 3. Site: https://thedroneedge.com (hard refresh after invalidation)
+4. After the first apply that creates `droneedge-dev-ops-alerts`, confirm the SNS email sent to `admin_email` (`james@thedroneedge.com`). Until then NAT alarm `droneedge-dev-nat-no-egress` is still visible under CloudWatch → Alarms but will not email. OK/ALARM both email after confirm.
 
 ## Do not
 
