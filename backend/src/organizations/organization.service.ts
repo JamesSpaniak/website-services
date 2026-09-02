@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Organization } from './types/organization.entity';
 import { OrganizationMember } from './types/organization-member.entity';
+import { OrganizationClass } from './types/organization-class.entity';
 import { InviteCode } from './types/invite-code.entity';
 import { OrgRole } from './types/org-role.enum';
 import { User } from '../users/types/user.entity';
@@ -26,11 +27,14 @@ import {
   OrganizationResponse,
   OrganizationMemberResponse,
   InviteCodeResponse,
+  OrgClassResponse,
   OrgCourseResponse,
   MemberCourseProgressSummary,
   MemberCourseDetailedProgress,
   CreateOrganizationDto,
   UpdateOrganizationDto,
+  CreateOrgClassDto,
+  UpdateOrgClassDto,
   GenerateInviteCodeDto,
   BulkGenerateInviteCodesDto,
   AssignCoursesDto,
@@ -45,6 +49,8 @@ export class OrganizationService {
     private orgRepository: Repository<Organization>,
     @InjectRepository(OrganizationMember)
     private memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(OrganizationClass)
+    private classRepository: Repository<OrganizationClass>,
     @InjectRepository(InviteCode)
     private inviteCodeRepository: Repository<InviteCode>,
     @InjectRepository(Progress)
@@ -210,12 +216,115 @@ export class OrganizationService {
     await this.orgRepository.remove(org);
   }
 
+  // ── Classes ──
+
+  async getClasses(orgId: number): Promise<OrgClassResponse[]> {
+    const classes = await this.classRepository.find({
+      where: { organizationId: orgId },
+      order: { name: 'ASC' },
+    });
+    const results: OrgClassResponse[] = [];
+    for (const cls of classes) {
+      const memberCount = await this.memberRepository.count({
+        where: { organizationId: orgId, classId: cls.id, role: OrgRole.Member },
+      });
+      results.push(this.toClassResponse(cls, memberCount));
+    }
+    return results;
+  }
+
+  async createClass(
+    orgId: number,
+    dto: CreateOrgClassDto,
+  ): Promise<OrgClassResponse> {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) throw new NotFoundException('Organization not found.');
+
+    const existing = await this.classRepository.findOne({
+      where: { organizationId: orgId, name: dto.name },
+    });
+    if (existing) {
+      throw new BadRequestException(
+        `A class named "${dto.name}" already exists in this organization.`,
+      );
+    }
+
+    const cls = this.classRepository.create({
+      organizationId: orgId,
+      name: dto.name,
+      maxStudents: dto.max_students ?? null,
+    });
+    const saved = await this.classRepository.save(cls);
+    return this.toClassResponse(saved, 0);
+  }
+
+  async updateClass(
+    orgId: number,
+    classId: number,
+    dto: UpdateOrgClassDto,
+  ): Promise<OrgClassResponse> {
+    const cls = await this.assertClassInOrg(orgId, classId);
+
+    if (dto.name !== undefined && dto.name !== cls.name) {
+      const existing = await this.classRepository.findOne({
+        where: { organizationId: orgId, name: dto.name },
+      });
+      if (existing) {
+        throw new BadRequestException(
+          `A class named "${dto.name}" already exists in this organization.`,
+        );
+      }
+      cls.name = dto.name;
+    }
+    if (dto.max_students !== undefined) cls.maxStudents = dto.max_students;
+
+    const saved = await this.classRepository.save(cls);
+    const memberCount = await this.memberRepository.count({
+      where: { organizationId: orgId, classId: classId, role: OrgRole.Member },
+    });
+    return this.toClassResponse(saved, memberCount);
+  }
+
+  async deleteClass(orgId: number, classId: number): Promise<void> {
+    const cls = await this.assertClassInOrg(orgId, classId);
+
+    const memberCount = await this.memberRepository.count({
+      where: { organizationId: orgId, classId },
+    });
+    if (memberCount > 0) {
+      throw new BadRequestException(
+        `Cannot delete class "${cls.name}" — it still has ${memberCount} member(s). Move them to another class first.`,
+      );
+    }
+
+    await this.classRepository.remove(cls);
+  }
+
+  async updateMemberClass(
+    orgId: number,
+    userId: number,
+    classId: number | null,
+  ): Promise<void> {
+    const member = await this.memberRepository.findOne({
+      where: { organizationId: orgId, userId },
+    });
+    if (!member)
+      throw new NotFoundException('Member not found in this organization.');
+
+    if (classId !== null) {
+      await this.assertClassInOrg(orgId, classId);
+    }
+
+    member.classId = classId;
+    await this.memberRepository.save(member);
+  }
+
   // ── Members ──
 
   async getMembers(orgId: number): Promise<OrganizationMemberResponse[]> {
     const members = await this.memberRepository.find({
       where: { organizationId: orgId },
-      relations: ['user'],
+      relations: ['user', 'orgClass'],
       order: { joinedAt: 'ASC' },
     });
 
@@ -227,6 +336,8 @@ export class OrganizationService {
       first_name: m.user.first_name,
       last_name: m.user.last_name,
       role: m.role,
+      class_id: m.classId,
+      class_name: m.orgClass?.name ?? null,
       joined_at: m.joinedAt,
     }));
   }
@@ -235,9 +346,15 @@ export class OrganizationService {
     orgId: number,
     email: string,
     role: OrgRole,
+    classId?: number,
   ): Promise<OrganizationMemberResponse> {
     const org = await this.orgRepository.findOne({ where: { id: orgId } });
     if (!org) throw new NotFoundException('Organization not found.');
+
+    let orgClass: OrganizationClass | null = null;
+    if (classId !== undefined && classId !== null) {
+      orgClass = await this.assertClassInOrg(orgId, classId);
+    }
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
@@ -266,6 +383,7 @@ export class OrganizationService {
       organizationId: orgId,
       userId: user.id,
       role,
+      classId: orgClass?.id ?? null,
     });
     const saved = await this.memberRepository.save(membership);
 
@@ -277,6 +395,8 @@ export class OrganizationService {
       first_name: user.first_name,
       last_name: user.last_name,
       role: saved.role,
+      class_id: saved.classId,
+      class_name: orgClass?.name ?? null,
       joined_at: saved.joinedAt,
     };
   }
@@ -344,6 +464,11 @@ export class OrganizationService {
       await this.assertSeatAvailable(org);
     }
 
+    let orgClass: OrganizationClass | null = null;
+    if (dto.class_id !== undefined && dto.class_id !== null) {
+      orgClass = await this.assertClassInOrg(orgId, dto.class_id);
+    }
+
     const code = this.generateRandomCode();
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
@@ -353,10 +478,12 @@ export class OrganizationService {
       code,
       role,
       email: dto.email || null,
+      classId: orgClass?.id ?? null,
       createdByUserId,
       expiresAt,
     });
     const saved = await this.inviteCodeRepository.save(inviteCode);
+    saved.orgClass = orgClass;
 
     if (dto.email) {
       const frontendUrl = this.configService.get<string>('FRONTEND_URL');
@@ -366,6 +493,7 @@ export class OrganizationService {
         org.name,
         signUpLink,
         role,
+        orgClass?.name ?? null,
       );
     }
 
@@ -375,7 +503,7 @@ export class OrganizationService {
   async getInviteCodes(orgId: number): Promise<InviteCodeResponse[]> {
     const codes = await this.inviteCodeRepository.find({
       where: { organizationId: orgId },
-      relations: ['usedBy'],
+      relations: ['usedBy', 'orgClass'],
       order: { createdAt: 'DESC' },
     });
     return codes.map((c) => this.toInviteCodeResponse(c));
@@ -442,6 +570,7 @@ export class OrganizationService {
         organizationId: org.id,
         userId,
         role: inviteCode.role,
+        classId: inviteCode.classId ?? null,
       });
       await manager.save(OrganizationMember, membership);
 
@@ -451,18 +580,24 @@ export class OrganizationService {
 
   // ── My Organization ──
 
-  async getMyOrganization(
-    userId: number,
-  ): Promise<{ id: number; name: string; role: OrgRole } | null> {
+  async getMyOrganization(userId: number): Promise<{
+    id: number;
+    name: string;
+    role: OrgRole;
+    class_id: number | null;
+    class_name: string | null;
+  } | null> {
     const membership = await this.memberRepository.findOne({
       where: { userId },
-      relations: ['organization'],
+      relations: ['organization', 'orgClass'],
     });
     if (!membership) return null;
     return {
       id: membership.organization.id,
       name: membership.organization.name,
       role: membership.role,
+      class_id: membership.classId,
+      class_name: membership.orgClass?.name ?? null,
     };
   }
 
@@ -473,12 +608,14 @@ export class OrganizationService {
 
   // ── Invite Code Lookup (for registration page) ──
 
-  async getInviteCodeInfo(
-    code: string,
-  ): Promise<{ organization_name: string; role: OrgRole } | null> {
+  async getInviteCodeInfo(code: string): Promise<{
+    organization_name: string;
+    role: OrgRole;
+    class_name: string | null;
+  } | null> {
     const inviteCode = await this.inviteCodeRepository.findOne({
       where: { code },
-      relations: ['organization'],
+      relations: ['organization', 'orgClass'],
     });
     if (
       !inviteCode ||
@@ -490,6 +627,7 @@ export class OrganizationService {
     return {
       organization_name: inviteCode.organization.name,
       role: inviteCode.role,
+      class_name: inviteCode.orgClass?.name ?? null,
     };
   }
 
@@ -497,9 +635,13 @@ export class OrganizationService {
 
   async getOrgProgressSummary(
     orgId: number,
+    classId?: number,
   ): Promise<MemberCourseProgressSummary[]> {
     const members = await this.memberRepository.find({
-      where: { organizationId: orgId },
+      where:
+        classId !== undefined
+          ? { organizationId: orgId, classId }
+          : { organizationId: orgId },
       relations: ['user'],
     });
     const memberUserIds = members.map((m) => m.userId);
@@ -556,6 +698,7 @@ export class OrganizationService {
           username: member.user.username,
           first_name: member.user.first_name,
           last_name: member.user.last_name,
+          class_id: member.classId,
           course_id: course.id,
           course_title: course.title,
           status: progress?.status || ProgressStatus.NOT_STARTED,
@@ -573,9 +716,13 @@ export class OrganizationService {
   async getOrgCourseDetailedProgress(
     orgId: number,
     courseId: number,
+    classId?: number,
   ): Promise<MemberCourseDetailedProgress[]> {
     const members = await this.memberRepository.find({
-      where: { organizationId: orgId },
+      where:
+        classId !== undefined
+          ? { organizationId: orgId, classId }
+          : { organizationId: orgId },
       relations: ['user'],
     });
     const memberUserIds = members.map((m) => m.userId);
@@ -671,6 +818,11 @@ export class OrganizationService {
       }
     }
 
+    let orgClass: OrganizationClass | null = null;
+    if (dto.class_id !== undefined && dto.class_id !== null) {
+      orgClass = await this.assertClassInOrg(orgId, dto.class_id);
+    }
+
     const results: InviteCodeResponse[] = [];
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
@@ -684,10 +836,12 @@ export class OrganizationService {
         code,
         role,
         email,
+        classId: orgClass?.id ?? null,
         createdByUserId,
         expiresAt,
       });
       const saved = await this.inviteCodeRepository.save(inviteCode);
+      saved.orgClass = orgClass;
 
       const signUpLink = `${frontendUrl}/register?code=${code}`;
       await this.emailService.sendOrganizationInvite(
@@ -695,6 +849,7 @@ export class OrganizationService {
         org.name,
         signUpLink,
         role,
+        orgClass?.name ?? null,
       );
 
       results.push(this.toInviteCodeResponse(saved));
@@ -826,11 +981,41 @@ export class OrganizationService {
       code: code.code,
       role: code.role,
       email: code.email,
+      class_id: code.classId ?? null,
+      class_name: code.orgClass?.name ?? null,
       used: !!code.usedByUserId,
       used_by_username: code.usedBy?.username || null,
       expires_at: code.expiresAt,
       created_at: code.createdAt,
     };
+  }
+
+  private toClassResponse(
+    cls: OrganizationClass,
+    memberCount: number,
+  ): OrgClassResponse {
+    return {
+      id: cls.id,
+      name: cls.name,
+      max_students: cls.maxStudents,
+      member_count: memberCount,
+      created_at: cls.createdAt,
+    };
+  }
+
+  private async assertClassInOrg(
+    orgId: number,
+    classId: number,
+  ): Promise<OrganizationClass> {
+    const cls = await this.classRepository.findOne({
+      where: { id: classId, organizationId: orgId },
+    });
+    if (!cls) {
+      throw new BadRequestException(
+        'Class not found in this organization.',
+      );
+    }
+    return cls;
   }
 
   async resetMemberPicture(orgId: number, userId: number): Promise<void> {

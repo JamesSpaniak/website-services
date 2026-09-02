@@ -120,7 +120,7 @@ See [`competitor-analysis.md`](competitor-analysis.md) for detail.
 
 | Claim | Source / note |
 |-------|----------------|
-| Structured FAA Part 107 course with nested units/sections | Live product + [`assets/courses/faa_107_course.json`](../../assets/courses/faa_107_course.json) |
+| Structured FAA Part 107 course with nested units/sections | Live product + [`assets/courses/faa-107/faa_107_course.json`](../../assets/courses/faa-107/faa_107_course.json) |
 | 600+ ACS-tagged practice questions | Site copy; verify current import count before decks |
 | Org accounts, invite codes, manager dashboard | [`features.md`](features.md) |
 | Browser-based, no app install | Product |

@@ -8,7 +8,13 @@ interface UserDto {
     picture_url?: string;
     role: string; // e.g., 'user', 'admin', 'pro'
     pro_membership_expires_at?: Date;
-    organization?: { id: number; name: string; role: 'manager' | 'member' };
+    organization?: {
+        id: number;
+        name: string;
+        role: 'manager' | 'member';
+        class_id?: number | null;
+        class_name?: string | null;
+    };
 }
 
 interface CreateUserDto {

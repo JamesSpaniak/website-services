@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { OrganizationMember } from './organization-member.entity';
+import { OrganizationClass } from './organization-class.entity';
 import { InviteCode } from './invite-code.entity';
 import { Course } from '../../courses/types/course.entity';
 
@@ -42,6 +43,9 @@ export class Organization {
 
   @OneToMany(() => InviteCode, (code) => code.organization)
   invite_codes: InviteCode[];
+
+  @OneToMany(() => OrganizationClass, (cls) => cls.organization)
+  classes: OrganizationClass[];
 
   @ManyToMany(() => Course)
   @JoinTable({ name: 'organization_courses' })

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
-import type { Organization, OrgCourse } from '@/app/lib/types/organization';
+import type { Organization, OrgClass, OrgCourse } from '@/app/lib/types/organization';
 import {
     getCourses,
     getOrganizations,
@@ -14,10 +14,14 @@ import {
     assignOrgCourses,
     removeOrgCourse,
     getOrgCourses,
+    getOrgClasses,
+    createOrgClass,
+    updateOrgClass,
+    deleteOrgClass,
 } from '@/app/lib/api-client';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
-import { PlusIcon, PencilSquareIcon, TrashIcon, BuildingOfficeIcon } from '@heroicons/react/24/solid';
+import { PlusIcon, PencilSquareIcon, TrashIcon, BuildingOfficeIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
 export default function AdminOrganizationsPage() {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -80,14 +84,22 @@ function OrganizationsPanel({
     const [inviteOrgId, setInviteOrgId] = useState<number | null>(null);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState<'manager' | 'member'>('manager');
+    const [inviteClassId, setInviteClassId] = useState<number | null>(null);
     const [inviteResult, setInviteResult] = useState<string | null>(null);
     const [bulkEmails, setBulkEmails] = useState('');
     const [bulkRole, setBulkRole] = useState<'manager' | 'member'>('member');
+    const [bulkClassId, setBulkClassId] = useState<number | null>(null);
     const [bulkSending, setBulkSending] = useState(false);
     const [bulkResult, setBulkResult] = useState<string | null>(null);
     const [courseOrgId, setCourseOrgId] = useState<number | null>(null);
     const [orgCourses, setOrgCourses] = useState<OrgCourse[]>([]);
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+    const [classOrgId, setClassOrgId] = useState<number | null>(null);
+    const [orgClasses, setOrgClasses] = useState<OrgClass[]>([]);
+    const [inviteClasses, setInviteClasses] = useState<OrgClass[]>([]);
+    const [newClassName, setNewClassName] = useState('');
+    const [newClassCap, setNewClassCap] = useState('');
+    const [classSaving, setClassSaving] = useState(false);
 
     const handleCreate = async () => {
         if (!name.trim()) return;
@@ -139,11 +151,29 @@ function OrganizationsPanel({
         }
     };
 
+    const handleOpenInvites = async (orgId: number) => {
+        if (inviteOrgId === orgId) {
+            setInviteOrgId(null);
+            return;
+        }
+        setInviteResult(null);
+        setBulkResult(null);
+        setInviteClassId(null);
+        setBulkClassId(null);
+        try {
+            setInviteClasses(await getOrgClasses(orgId));
+        } catch {
+            setInviteClasses([]);
+        }
+        setInviteOrgId(orgId);
+    };
+
     const handleGenerateInvite = async (orgId: number) => {
         try {
             const code = await generateInviteCode(orgId, {
                 email: inviteEmail.trim() || undefined,
                 role: inviteRole,
+                class_id: inviteRole === 'member' && inviteClassId !== null ? inviteClassId : undefined,
             });
             const link = `${window.location.origin}/register?code=${code.code}`;
             setInviteResult(link);
@@ -161,13 +191,70 @@ function OrganizationsPanel({
         if (emails.length === 0) return;
         setBulkSending(true);
         try {
-            const results = await bulkGenerateInviteCodes(orgId, { emails, role: bulkRole });
+            const results = await bulkGenerateInviteCodes(orgId, {
+                emails,
+                role: bulkRole,
+                class_id: bulkRole === 'member' && bulkClassId !== null ? bulkClassId : undefined,
+            });
             setBulkResult(`Sent ${results.length} invite(s) successfully.`);
             setBulkEmails('');
         } catch (err) {
             onError(err instanceof Error ? err.message : 'Failed to send bulk invites');
         } finally {
             setBulkSending(false);
+        }
+    };
+
+    const handleOpenClasses = async (orgId: number) => {
+        if (classOrgId === orgId) {
+            setClassOrgId(null);
+            return;
+        }
+        try {
+            setOrgClasses(await getOrgClasses(orgId));
+            setClassOrgId(orgId);
+        } catch (err) {
+            onError(err instanceof Error ? err.message : 'Failed to load classes');
+        }
+    };
+
+    const handleCreateClass = async (orgId: number) => {
+        if (!newClassName.trim()) return;
+        setClassSaving(true);
+        try {
+            const cap = parseInt(newClassCap, 10);
+            const created = await createOrgClass(orgId, {
+                name: newClassName.trim(),
+                max_students: Number.isNaN(cap) ? undefined : cap,
+            });
+            setOrgClasses((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+            setNewClassName('');
+            setNewClassCap('');
+        } catch (err) {
+            onError(err instanceof Error ? err.message : 'Failed to create class');
+        } finally {
+            setClassSaving(false);
+        }
+    };
+
+    const handleRenameClass = async (orgId: number, cls: OrgClass) => {
+        const name = window.prompt('Rename class:', cls.name);
+        if (!name || name.trim() === '' || name.trim() === cls.name) return;
+        try {
+            const updated = await updateOrgClass(orgId, cls.id, { name: name.trim() });
+            setOrgClasses((prev) => prev.map((c) => (c.id === cls.id ? updated : c)));
+        } catch (err) {
+            onError(err instanceof Error ? err.message : 'Failed to rename class');
+        }
+    };
+
+    const handleDeleteClass = async (orgId: number, cls: OrgClass) => {
+        if (!confirm(`Delete class "${cls.name}"? It must be empty (members moved out first).`)) return;
+        try {
+            await deleteOrgClass(orgId, cls.id);
+            setOrgClasses((prev) => prev.filter((c) => c.id !== cls.id));
+        } catch (err) {
+            onError(err instanceof Error ? err.message : 'Failed to delete class');
         }
     };
 
@@ -363,11 +450,18 @@ function OrganizationsPanel({
                                         ) : (
                                             <>
                                                 <button
-                                                    onClick={() => { setInviteOrgId(inviteOrgId === org.id ? null : org.id); setInviteResult(null); setBulkResult(null); }}
+                                                    onClick={() => handleOpenInvites(org.id)}
                                                     className="p-1.5 text-green-600 hover:text-green-800 rounded hover:bg-green-50"
                                                     title="Invite members"
                                                 >
                                                     <PlusIcon className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleOpenClasses(org.id)}
+                                                    className="p-1.5 text-[var(--brand-primary)] hover:opacity-90 rounded hover:bg-[var(--comment-secondary-bg)]"
+                                                    title="Manage classes (periods)"
+                                                >
+                                                    <UserGroupIcon className="h-4 w-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -413,6 +507,18 @@ function OrganizationsPanel({
                                                     <option value="manager">Manager (Teacher)</option>
                                                     <option value="member">Student</option>
                                                 </select>
+                                                {inviteRole === 'member' && inviteClasses.length > 0 && (
+                                                    <select
+                                                        value={inviteClassId ?? ''}
+                                                        onChange={(e) => setInviteClassId(e.target.value ? Number(e.target.value) : null)}
+                                                        className="px-2 py-1 border border-[var(--input-border)] rounded text-sm"
+                                                    >
+                                                        <option value="">No class (whole org)</option>
+                                                        {inviteClasses.map((c) => (
+                                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                )}
                                                 <button
                                                     onClick={() => handleGenerateInvite(org.id)}
                                                     className="px-3 py-1 text-xs font-medium text-[var(--background)] bg-[var(--brand-primary)] rounded hover:opacity-90"
@@ -453,6 +559,18 @@ function OrganizationsPanel({
                                                     <option value="member">Student</option>
                                                     <option value="manager">Manager (Teacher)</option>
                                                 </select>
+                                                {bulkRole === 'member' && inviteClasses.length > 0 && (
+                                                    <select
+                                                        value={bulkClassId ?? ''}
+                                                        onChange={(e) => setBulkClassId(e.target.value ? Number(e.target.value) : null)}
+                                                        className="px-2 py-1 border border-[var(--input-border)] rounded text-sm"
+                                                    >
+                                                        <option value="">No class (whole org)</option>
+                                                        {inviteClasses.map((c) => (
+                                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                )}
                                                 <button
                                                     onClick={() => handleBulkInvite(org.id)}
                                                     disabled={bulkSending || !bulkEmails.trim()}
@@ -463,6 +581,67 @@ function OrganizationsPanel({
                                                 {bulkResult && (
                                                     <p className="text-xs text-green-600 font-medium">{bulkResult}</p>
                                                 )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Classes panel */}
+                                    {classOrgId === org.id && (
+                                        <div className="mt-3 p-3 bg-[var(--comment-secondary-bg)] rounded-lg text-left">
+                                            <p className="text-xs font-semibold text-[var(--brand-foreground)] mb-2">Classes (Periods)</p>
+                                            {orgClasses.length > 0 ? (
+                                                <ul className="space-y-1 mb-3">
+                                                    {orgClasses.map((c) => (
+                                                        <li key={c.id} className="flex items-center justify-between text-xs gap-2">
+                                                            <span className="text-[var(--brand-foreground)]">
+                                                                {c.name}
+                                                                <span className="text-[var(--brand-muted)]">
+                                                                    {' '}· {c.member_count}{c.max_students != null ? `/${c.max_students}` : ''} students
+                                                                </span>
+                                                            </span>
+                                                            <span className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => handleRenameClass(org.id, c)}
+                                                                    className="text-[var(--brand-primary)] hover:underline"
+                                                                >
+                                                                    Rename
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteClass(org.id, c)}
+                                                                    className="text-red-500 hover:text-red-700"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-xs text-[var(--brand-muted)] mb-3">No classes yet. Members are org-wide until classes are created.</p>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Class name (e.g. Period 2)"
+                                                    value={newClassName}
+                                                    onChange={(e) => setNewClassName(e.target.value)}
+                                                    className="flex-1 px-2 py-1 border border-[var(--input-border)] rounded text-xs"
+                                                />
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    placeholder="Cap"
+                                                    value={newClassCap}
+                                                    onChange={(e) => setNewClassCap(e.target.value)}
+                                                    className="w-16 px-2 py-1 border border-[var(--input-border)] rounded text-xs"
+                                                />
+                                                <button
+                                                    onClick={() => handleCreateClass(org.id)}
+                                                    disabled={classSaving || !newClassName.trim()}
+                                                    className="px-3 py-1 text-xs font-medium text-[var(--background)] bg-[var(--brand-primary)] rounded hover:opacity-90 disabled:opacity-50"
+                                                >
+                                                    Add
+                                                </button>
                                             </div>
                                         </div>
                                     )}

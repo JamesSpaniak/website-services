@@ -7,6 +7,7 @@ import {
 import { Exam } from './types/exam.entity';
 import { ClassExam } from './types/class-exam.entity';
 import { Question } from './types/question.entity';
+import { OrganizationClass } from '../organizations/types/organization-class.entity';
 import { GenerateExamDto } from './types/question.dto';
 
 function q(
@@ -87,6 +88,10 @@ describe('ExamGeneratorService', () => {
         { provide: getRepositoryToken(Exam), useValue: examRepo },
         { provide: getRepositoryToken(ClassExam), useValue: classExamRepo },
         { provide: getRepositoryToken(Question), useValue: questionRepo },
+        {
+          provide: getRepositoryToken(OrganizationClass),
+          useValue: { findOne: jest.fn(async () => null) },
+        },
       ],
     }).compile();
 

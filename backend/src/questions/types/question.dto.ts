@@ -311,6 +311,14 @@ export class GenerateClassExamDto extends GenerateExamDto {
   @IsInt()
   organization_id: number;
 
+  @ApiPropertyOptional({
+    description:
+      'Class/period within the org this exam targets; omit for org-wide.',
+  })
+  @IsOptional()
+  @IsInt()
+  class_id?: number;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -509,6 +517,12 @@ export class ClassExamSummaryDto {
 
   @ApiProperty()
   exam_id: number;
+
+  @ApiPropertyOptional()
+  class_id: number | null;
+
+  @ApiPropertyOptional()
+  class_name: string | null;
 
   @ApiPropertyOptional()
   label: string | null;

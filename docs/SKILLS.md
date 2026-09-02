@@ -14,8 +14,9 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | Analytics, pixels, ad conversion tracking | [`docs/tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) | `drone/src/app/lib/analytics.ts`, `backend/src/analytics/`, `backend/src/audit/` |
 | PWA / mobile app / App Store / Capacitor vs React Native | [`docs/tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) | `drone/src/app/manifest.ts`, `drone/src/middleware.ts`, `backend/src/auth/`, `backend/src/media/signed-url.service.ts` |
 | Edit course structure / exams | [`docs/tech/course-editing-roadmap.md`](tech/course-editing-roadmap.md) | Admin UI, course JSON |
-| Edit FAA 107 course / questions | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) | `assets/courses/`, `scripts/build_faa_107_questions.py` |
-| FAA 107 course quality review (outline ↔ JSON) | [`assets/courses/faa_107_course_quality_review.md`](../assets/courses/faa_107_course_quality_review.md) | Compare `outlines/` + `faa_107_course.json`; apply confirmed items; leave structure decisions open until author confirm |
+| Edit FAA 107 course / questions | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) | `assets/courses/faa-107/`, `scripts/build_faa_107_questions.py` |
+| Draft drone-building course outline | [`assets/courses/drone-building/outlines/drone-building-course-draft.md`](../assets/courses/drone-building/outlines/drone-building-course-draft.md) | Author intake only — no payload or catalog track |
+| FAA 107 course quality review (outline ↔ JSON) | [`assets/courses/faa-107/faa_107_course_quality_review.md`](../assets/courses/faa-107/faa_107_course_quality_review.md) | Compare `outlines/` + `faa_107_course.json`; apply confirmed items; leave structure decisions open until author confirm |
 | Bulk course images (map/upload/merge) | [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) | `scripts/course_images.py`, media S3 bucket |
 | Course image sizes / hero vs unit display | [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) § Display modes / Authoring | `CourseImageStrip`, preview page, catalog cards |
 | Question bank build | [`docs/tech/exam-generator-and-course-linking.md`](tech/exam-generator-and-course-linking.md) | `scripts/build_faa_107_questions.py` |
@@ -47,9 +48,9 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | Launch / optimize a paid campaign | [`workflows/marketing/paid-ads.md`](../workflows/marketing/paid-ads.md) | Ad platform consoles |
 | Ad tracking, pixels, attribution | [`docs/tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) | `drone/src/middleware.ts`, `backend/src/purchases/` |
 | Content calendar & promotion | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | — |
-| Publish news article to JSON | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/build_news_article_json.py`, `assets/news/` |
+| Publish news article to JSON | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/build_news_article_json.py`, `assets/articles/` |
 | Brand assets (logo, social) | [`docs/marketing/brand-assets.md`](marketing/brand-assets.md) | `assets/visuals/Logo/`, `assets/visuals/Assets/Social/` |
-| Article hero / story images | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/brand_story11_images.py`, `assets/news/images/` |
+| Article hero / story images | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/brand_story11_images.py`, `assets/articles/images/` |
 
 ## Adding Cursor project skills
 

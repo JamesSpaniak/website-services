@@ -19,7 +19,7 @@ const FAA_FAQ = [
   },
   {
     question: 'How much does full access cost?',
-    answer: 'Full lifetime access to the Part 107 course is a one-time $29 purchase. There is no subscription.',
+    answer: 'Full lifetime access to the Part 107 course is a one-time $129 purchase. There is no subscription.',
   },
   {
     question: 'Does this replace the FAA knowledge test?',

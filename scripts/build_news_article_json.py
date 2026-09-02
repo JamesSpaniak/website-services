@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate news/articles/*.json from embedded payloads. Run: python3 scripts/build_news_article_json.py"""
+"""Generate assets/articles/import/*.json from embedded payloads. Run: python3 scripts/build_news_article_json.py"""
 
 import html
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "assets" / "news" / "articles"
+OUT = ROOT / "assets" / "articles" / "import"
 HERO = "/images/articles/hero-default.svg"
 
 

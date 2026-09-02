@@ -8,12 +8,12 @@ Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AGENTS.md).
 
 | Path | Purpose | Workflow / doc |
 |------|---------|----------------|
-| [`courses/`](courses/) | Course JSON, question bulk files, outlines | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) |
-| [`articles/`](articles/) | Standalone article import JSON | Admin import / API |
-| [`news/`](news/) | Editorial drafts, heroes | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
+| [`courses/`](courses/) | One folder per course: course JSON, `questions/`, `outlines/`, `images/`, `reference/`, `videos/` | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md), [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) |
+| [`articles/`](articles/) | Site articles: `drafts/` (txt), `import/` (JSON payloads), `images/` | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
 | [`visuals/`](visuals/) | Brand kit | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
-| [`videos/`](videos/) | Course source video for S3 upload / transcode | content-build workflow |
 | [`media/`](media/) | Marketing flight masters + snips (gitignored binaries; tracked manifests) | [`media/README.md`](media/README.md), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+
+Course lesson video sources live inside the course folder (`courses/<course>/videos/`, gitignored) — there is no separate top-level `videos/` folder. New course material lands in the matching `courses/<course>/` subfolder: question CSVs → `questions/`, unit figures / hero art → `images/`, maps · sectionals · symbol legends → `reference/`, recordings → `videos/`.
 
 ## Before editing course content
 

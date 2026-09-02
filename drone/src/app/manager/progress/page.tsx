@@ -7,8 +7,9 @@ import {
     getOrgCourseProgress,
     getStudentActivity,
     resetMemberPicture,
+    getOrgClasses,
 } from '@/app/lib/api-client';
-import type { MemberCourseProgressSummary, MemberCourseDetailedProgress } from '@/app/lib/types/organization';
+import type { MemberCourseProgressSummary, MemberCourseDetailedProgress, OrgClass } from '@/app/lib/types/organization';
 import type { AuditLogEntry } from '@/app/lib/types/audit';
 import { AUDIT_ACTION_TONE, PROGRESS_STATUS_TONE, progressBarTone } from '@/app/lib/status-tones';
 import LoadingComponent from '@/app/ui/components/loading';
@@ -20,6 +21,8 @@ export default function ManagerProgressPage() {
     const orgId = org.id;
 
     const [progressData, setProgressData] = useState<MemberCourseProgressSummary[]>([]);
+    const [classes, setClasses] = useState<OrgClass[]>([]);
+    const [filterClassId, setFilterClassId] = useState<'all' | 'none' | number>('all');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [expandedCourse, setExpandedCourse] = useState<number | null>(null);
@@ -29,8 +32,12 @@ export default function ManagerProgressPage() {
     const load = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await getOrgProgress(orgId);
+            const [data, classData] = await Promise.all([
+                getOrgProgress(orgId),
+                getOrgClasses(orgId),
+            ]);
             setProgressData(data);
+            setClasses(classData);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load progress');
         } finally {
@@ -40,9 +47,15 @@ export default function ManagerProgressPage() {
 
     useEffect(() => { load(); }, [load]);
 
+    const visibleRows = progressData.filter((row) => {
+        if (filterClassId === 'all') return true;
+        if (filterClassId === 'none') return row.class_id === null;
+        return row.class_id === filterClassId;
+    });
+
     // Group progress by course
     const courseMap = new Map<number, { title: string; members: MemberCourseProgressSummary[] }>();
-    for (const row of progressData) {
+    for (const row of visibleRows) {
         if (!courseMap.has(row.course_id)) {
             courseMap.set(row.course_id, { title: row.course_title, members: [] });
         }
@@ -71,13 +84,39 @@ export default function ManagerProgressPage() {
 
     if (loading) return <LoadingComponent />;
 
+    const classFilter = classes.length > 0 && (
+        <div className="flex items-center gap-2">
+            <label className="text-sm text-[var(--brand-muted)]">Class:</label>
+            <select
+                value={filterClassId === 'all' || filterClassId === 'none' ? filterClassId : String(filterClassId)}
+                onChange={(e) => {
+                    const v = e.target.value;
+                    setFilterClassId(v === 'all' || v === 'none' ? v : Number(v));
+                }}
+                className="px-3 py-1.5 border border-[var(--input-border)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--brand-primary)]"
+            >
+                <option value="all">All classes</option>
+                <option value="none">Unassigned</option>
+                {classes.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+            </select>
+        </div>
+    );
+
     if (courseMap.size === 0) {
-        return <div className="text-center py-12 text-[var(--brand-muted)]">No course progress data available yet.</div>;
+        return (
+            <div>
+                {classFilter && <div className="mb-4">{classFilter}</div>}
+                <div className="text-center py-12 text-[var(--brand-muted)]">No course progress data available yet.</div>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-4">
             {error && <ErrorComponent message={error} />}
+            {classFilter}
             {Array.from(courseMap.entries()).map(([courseId, { title, members }]) => {
                 const isExpanded = expandedCourse === courseId;
                 const membersWithProgress = members.filter((m) => m.status !== 'NOT_STARTED');

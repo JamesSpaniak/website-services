@@ -194,8 +194,15 @@ export class ExamAttemptService {
     // Fetch all members of the organization using the OrganizationMember
     // repository directly — avoids a broken join on the User entity's
     // 'organizations' relation which may not be defined.
+    // Class-scoped exams only include the roster of that class.
     const orgMembers = await this.memberRepository.find({
-      where: { organizationId: classExam.organization_id },
+      where:
+        classExam.class_id !== null
+          ? {
+              organizationId: classExam.organization_id,
+              classId: classExam.class_id,
+            }
+          : { organizationId: classExam.organization_id },
       relations: { user: true },
     });
     const members = orgMembers

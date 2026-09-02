@@ -132,7 +132,7 @@ export default async function Home() {
               className="inline-flex items-center justify-center min-h-[44px] border border-[var(--surface-border)] text-[var(--brand-foreground)] font-medium text-sm tracking-wide px-5 hover:bg-[var(--surface)] transition-colors ring-focus touch-manipulation"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Part 107 course — $29
+              Part 107 course — $129
             </Link>
             <Link
               href="/courses"

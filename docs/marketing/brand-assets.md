@@ -29,13 +29,13 @@ Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to a
 | [`assets/media/`](../../assets/media/) | Business drone masters (`raw/`), snips/previews (`edits/`), tracked cut lists (`manifests/`) |
 | [`assets/media/README.md`](../../assets/media/README.md) | Hybrid archive rules: external SSD primary, this folder working set, B2/Glacier later; never iCloud for 4K masters |
 
-Personal/family footage does **not** live in this repo. Course lesson source for MediaConvert stays under [`assets/videos/`](../../assets/videos/). Finished site uploads go to S3/CloudFront only.
+Personal/family footage does **not** live in this repo. Course lesson source for MediaConvert stays under [`assets/courses/faa-107/videos/`](../../assets/courses/faa-107/videos/). Finished site uploads go to S3/CloudFront only.
 
 ## Editorial content
 
 | Path | Contents |
 |------|----------|
-| [`assets/news/`](../../assets/news/) | Article drafts (`.txt`), import JSON, hero images |
+| [`assets/articles/`](../../assets/articles/) | Article drafts (`.txt`), import JSON, hero images |
 | [`assets/articles/`](../../assets/articles/) | Standalone article import JSON |
 | [`assets/courses/`](../../assets/courses/) | Course JSON and question bank artifacts |
 | [`article-inventory.md`](article-inventory.md) | Repo vs prod CMS status, slugs, prod IDs |
@@ -43,5 +43,5 @@ Personal/family footage does **not** live in this repo. Course lesson source for
 ## Usage notes
 
 - Prefer **Logo/SVG** for web; PNG for slides and email.
-- News images: `scripts/brand_story11_images.py` or `assets/news/images/`.
+- News images: `scripts/brand_story11_images.py` or `assets/articles/images/`.
 - Course JSON and news JSON are the usual commit targets; avoid large binary churn.

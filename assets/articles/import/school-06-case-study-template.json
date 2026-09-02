@@ -1,0 +1,19 @@
+{
+  "slug": "school-06-case-study-template",
+  "title": "Case Study: [School Name] Part 107 Pathway",
+  "sub_heading": "TEMPLATE — publish after first pilot completes and customer grants written permission.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "drone program case study school",
+    "Part 107 CTE success",
+    "high school drone program"
+  ],
+  "body_html": "<p><em>BLOCKED — do not import until pilot year completes and school approves quotes.</em></p>\n\n<h2>Template sections (fill after pilot)</h2>\n<ul>\n<li><strong>District / program context</strong> — [HS / CC / academy], [state], [CTE pathway name]</li>\n<li><strong>Cohort size</strong> — [N] students, [semester/year]</li>\n<li><strong>Delivery model</strong> — teacher-led / hybrid / async</li>\n<li><strong>Why Drone Edge</strong> — [customer quote]</li>\n<li><strong>Implementation</strong> — onboarding, invite flow, weeks to first unit exam</li>\n<li><strong>Outcomes</strong> — completion rates, exam participation (no pass rates unless school publishes)</li>\n<li><strong>Next steps</strong> — expansion to [full year / second section]</li>\n</ul>\n\n<p>Trigger: first paid pilot completes one full term. Owner: sales + marketing. See <code>docs/marketing/article-inventory.md</code>.</p>",
+  "marketability_review": "BLOCKED template. Highest credibility asset once filled.",
+  "readability_review": "Not for publish — placeholder only.",
+  "considerations": [
+    "BLOCKED on pilot completion + permission",
+    "Rename slug/title with real school name before publish",
+    "No pass rate claims without documented school approval"
+  ]
+}

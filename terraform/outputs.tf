@@ -3,6 +3,11 @@ output "nat_gateway_eip" {
   value       = aws_eip.nat.public_ip
 }
 
+output "ops_alerts_topic_arn" {
+  description = "SNS topic for CloudWatch ops alarms (email to admin_email after subscription confirm)."
+  value       = aws_sns_topic.alerts.arn
+}
+
 output "media_cloudfront_domain" {
   description = "CloudFront domain for the media distribution."
   value       = aws_cloudfront_distribution.media_distribution.domain_name

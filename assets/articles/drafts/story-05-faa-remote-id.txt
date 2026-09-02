@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+FAA Remote ID rollout: digital transparency for U.S. drone operations (rulemaking → enforcement window)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+The FAA advanced Remote ID requirements so many drones broadcast identity/location information in flight, aiming to integrate UAS safely into busier airspace and support law-enforcement accountability. Implementation involved phased compliance dates, module add-ons for older aircraft, and ongoing debates about privacy and burden on hobbyists.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Regulatory shift from “see and avoid” toward networked surveillance-friendly accountability.
+- Hardware ecosystem: built-in vs. aftermarket Remote ID modules.
+- Tension: airspace safety vs. pilot anonymity concerns in sensitive contexts.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Aviation regulation; privacy; airspace integration
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Regulatory implementation
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Frustrated compliance fatigue mixed with safety optimism
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Commercial operators often accepted Remote ID as the price of expansion. Hobbyist communities split between support for professionalism and resistance to tracking. Privacy advocates raised questions about data access and retention by third parties.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Enforcement milestones; international harmonization efforts; evolving standards for broadcast vs. network-based ID; continued updates to FAA guidance.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Rule development pre-2021 → phased compliance 2023–2025+ depending on aircraft class and modules.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+A foundational layer for scalable beyond-visual-line-of-sight rules later.

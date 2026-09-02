@@ -3,16 +3,16 @@
 Build a bulk-upload JSON for the FAA Part 107 question bank.
 
 Reads:
-  - assets/courses/Compiled questions Part 107 Testing.xlsx - test.csv
-  - assets/courses/Compiled questions Part 107 Testing.xlsx - end of unit questions.csv
-  - assets/courses/faa_107_course.json
+  - assets/courses/faa-107/questions/Compiled questions Part 107 Testing.xlsx - test.csv
+  - assets/courses/faa-107/questions/Compiled questions Part 107 Testing.xlsx - end of unit questions.csv
+  - assets/courses/faa-107/faa_107_course.json
 
-Writes:
-  - assets/courses/faa_107_questions.bulk.json          POST body for /questions/import
-  - assets/courses/faa_107_questions_review.csv           full mapping review (all questions)
-  - assets/courses/faa_107_questions_needs_review.csv     rows needing mapping attention
-  - assets/courses/faa_107_course_leaf_paths.csv          canonical leaf lessons
-  - assets/courses/faa_107_questions_gaps.md              gap report + risks
+Writes (to assets/courses/faa-107/questions/):
+  - faa_107_questions.bulk.json          POST body for /questions/import
+  - faa_107_questions_review.csv         full mapping review (all questions)
+  - faa_107_questions_needs_review.csv   rows needing mapping attention
+  - faa_107_course_leaf_paths.csv        canonical leaf lessons
+  - faa_107_questions_gaps.md            gap report + risks
 
 Final-exam-only questions use standard="FINAL_EXAM", priority=3, unit_ref=null,
 sub_unit_ref=null so they only appear in full_course exam generation (see ExamGeneratorService).
@@ -42,18 +42,19 @@ from course_question_mapper import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ROOT / "assets" / "courses"
-CSV_TEST = ASSETS / "Compiled questions Part 107 Testing.xlsx - test.csv"
-CSV_EOU = ASSETS / "Compiled questions Part 107 Testing.xlsx - end of unit questions.csv"
-COURSE_JSON = ASSETS / "faa_107_course.json"
+COURSE_DIR = ROOT / "assets" / "courses" / "faa-107"
+QUESTIONS = COURSE_DIR / "questions"
+CSV_TEST = QUESTIONS / "Compiled questions Part 107 Testing.xlsx - test.csv"
+CSV_EOU = QUESTIONS / "Compiled questions Part 107 Testing.xlsx - end of unit questions.csv"
+COURSE_JSON = COURSE_DIR / "faa_107_course.json"
 
 # Tag stored in questions.standard — filter in UI or future exam generator if needed
 FINAL_EXAM_STANDARD = "FINAL_EXAM"
 
-OUT_JSON = ASSETS / "faa_107_questions.bulk.json"
-OUT_CSV = ASSETS / "faa_107_questions_review.csv"
-OUT_NEEDS_REVIEW = ASSETS / "faa_107_questions_needs_review.csv"
-OUT_GAPS = ASSETS / "faa_107_questions_gaps.md"
+OUT_JSON = QUESTIONS / "faa_107_questions.bulk.json"
+OUT_CSV = QUESTIONS / "faa_107_questions_review.csv"
+OUT_NEEDS_REVIEW = QUESTIONS / "faa_107_questions_needs_review.csv"
+OUT_GAPS = QUESTIONS / "faa_107_questions_gaps.md"
 
 REVIEW_CSV_HEADER = [
     "sheet", "row", "category", "sub_category",
@@ -1040,7 +1041,7 @@ def main() -> None:
 
     from course_question_mapper import course_paths_report
     leaf_paths = course_paths_report()
-    paths_csv = ASSETS / "faa_107_course_leaf_paths.csv"
+    paths_csv = QUESTIONS / "faa_107_course_leaf_paths.csv"
     with paths_csv.open("w", newline="") as fh:
         pw = csv.writer(fh)
         pw.writerow(["unit_id", "sub_unit_id", "unit_ref", "sub_unit_ref", "course_path"])

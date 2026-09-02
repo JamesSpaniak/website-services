@@ -7,8 +7,9 @@ import {
     generateClassExam,
     getOrgClassExams,
     getClassExamResults,
+    getOrgClasses,
 } from '@/app/lib/api-client';
-import type { OrgCourse } from '@/app/lib/types/organization';
+import type { OrgCourse, OrgClass } from '@/app/lib/types/organization';
 import type { ClassExamSummary, ClassExamResults, StudentExamResult } from '@/app/lib/types/question';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
@@ -30,6 +31,7 @@ export default function ManagerExamsPage() {
     const orgId = org.id;
 
     const [courses, setCourses] = useState<OrgCourse[]>([]);
+    const [classes, setClasses] = useState<OrgClass[]>([]);
     const [exams, setExams] = useState<ClassExamSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -47,16 +49,19 @@ export default function ManagerExamsPage() {
     const [questionCount, setQuestionCount] = useState('');
     const [label, setLabel] = useState('');
     const [dueDate, setDueDate] = useState('');
+    const [examClassId, setExamClassId] = useState<number | null>(null);
 
     const load = useCallback(async () => {
         setLoading(true);
         try {
-            const [c, e] = await Promise.all([
+            const [c, e, cls] = await Promise.all([
                 getOrgCourses(orgId),
                 getOrgClassExams(orgId),
+                getOrgClasses(orgId),
             ]);
             setCourses(c);
             setExams(e);
+            setClasses(cls);
             setCourseId((prev) => (prev === '' && c.length > 0 ? c[0].id : prev));
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load exam data');
@@ -94,6 +99,7 @@ export default function ManagerExamsPage() {
                 version: version.trim() || 'v1',
                 question_count: questionCount ? parseInt(questionCount) : undefined,
                 organization_id: orgId,
+                class_id: examClassId ?? undefined,
                 label: label.trim() || undefined,
                 due_date: dueDate || undefined,
             });
@@ -107,6 +113,7 @@ export default function ManagerExamsPage() {
             setQuestionCount('');
             setLabel('');
             setDueDate('');
+            setExamClassId(null);
             // Reload list
             const updated = await getOrgClassExams(orgId);
             setExams(updated);
@@ -160,6 +167,21 @@ export default function ManagerExamsPage() {
                                 {courses.length === 0 && <option disabled>No courses assigned to this org</option>}
                             </select>
                         </div>
+
+                        {/* Class */}
+                        {classes.length > 0 && (
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--brand-muted)] mb-1">Class</label>
+                                <select
+                                    value={examClassId ?? ''}
+                                    onChange={(e) => setExamClassId(e.target.value ? Number(e.target.value) : null)}
+                                    className="w-full px-3 py-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)]"
+                                >
+                                    <option value="">Whole organization</option>
+                                    {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                        )}
 
                         {/* Scope */}
                         <div>
@@ -304,6 +326,9 @@ export default function ManagerExamsPage() {
                     <thead className="bg-[var(--comment-secondary-bg)]">
                         <tr>
                             <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-[var(--brand-muted)] uppercase">Label / Scope</th>
+                            {classes.length > 0 && (
+                                <th className="hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-[var(--brand-muted)] uppercase">Class</th>
+                            )}
                             <th className="hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-[var(--brand-muted)] uppercase">Course</th>
                             <th className="hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-[var(--brand-muted)] uppercase">Version</th>
                             <th className="hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-[var(--brand-muted)] uppercase">Questions</th>
@@ -328,6 +353,9 @@ export default function ManagerExamsPage() {
                                             <p className="text-xs text-[var(--brand-muted)]">{scopeLabel}</p>
                                         )}
                                     </td>
+                                    {classes.length > 0 && (
+                                        <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm text-[var(--brand-muted)]">{e.class_name || 'Whole org'}</td>
+                                    )}
                                     <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm text-[var(--brand-muted)] max-w-[150px] truncate">{courseName}</td>
                                     <td className="hidden md:table-cell px-4 sm:px-6 py-4">
                                         <span className="text-xs font-mono px-2 py-0.5 bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)] rounded">
@@ -358,7 +386,7 @@ export default function ManagerExamsPage() {
                         })}
                         {exams.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="px-6 py-10 text-center text-sm text-[var(--brand-muted)]">
+                                <td colSpan={classes.length > 0 ? 8 : 7} className="px-6 py-10 text-center text-sm text-[var(--brand-muted)]">
                                     No class exams assigned yet. Click <strong>Assign Exam</strong> to create one.
                                 </td>
                             </tr>

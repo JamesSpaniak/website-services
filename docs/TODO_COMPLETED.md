@@ -4,6 +4,14 @@ Items moved from [`TODO.md`](TODO.md) when shipped. **Each entry is dated** so y
 
 ---
 
+## 2026-09-01
+
+| Item | Notes |
+|------|--------|
+| **Organization classes (periods)** | One org can now hold multiple classes (e.g. "Period 2" / "Period 5") under one teacher: `organization_classes` table + nullable `class_id` on members/invites/class exams (migration `1762600000000`); class CRUD + member-class endpoints; class-aware invites (single/bulk, email + register page show class), progress filter, class-targeted exams; admin classes panel, manager classes/filters, **manager bulk invite panel**. Design: [`tech/organization-classes-plan.md`](tech/organization-classes-plan.md) |
+
+---
+
 ## 2026-07-08
 
 | Item | Notes |
