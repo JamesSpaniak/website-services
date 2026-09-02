@@ -16,7 +16,7 @@ Publish workflow: [`content-and-seo.md`](content-and-seo.md). Strategy: [`docs/m
 
 **Rule:** P0–P2 **editorial pieces are `/articles`**, not copy pasted into schools pages. Schools/consultation pages get **light cross-links** only (e.g. "Resources" block → 2–4 article cards). Do not duplicate full article body on static pages.
 
-Articles are seeded in `assets/news/*.txt` → `assets/news/articles/*.json` → admin import. Slug in JSON is for editorial tracking; public URL is numeric id after publish (`/articles/42`).
+Articles are seeded in `assets/articles/drafts/*.txt` → `assets/articles/import/*.json` → admin import. Slug in JSON is for editorial tracking; public URL is numeric id after publish (`/articles/42`).
 
 ---
 
@@ -59,7 +59,7 @@ All numbered items below are **`/articles`** unless noted.
 
 | Slug | Title | Format | Status in repo |
 |------|-------|--------|----------------|
-| `school-01-part-107-cte-classroom` | **Part 107 in the HS CTE classroom + teacher visibility** | Single `/articles` piece (combined former #1 + #2) | **Ready** — `assets/news/articles/school-01-part-107-cte-classroom.json` |
+| `school-01-part-107-cte-classroom` | **Part 107 in the HS CTE classroom + teacher visibility** | Single `/articles` piece (combined former #1 + #2) | **Ready** — `assets/articles/import/school-01-part-107-cte-classroom.json` |
 | `school-02-funding-drone-programs` | **Funding drone programs in schools** | `/articles` companion to `/schools/funding` | **Ready** — `school-02-funding-drone-programs.json` |
 
 **P0 page tie-in:** After prod import, link both from `/schools` Resources; funding article also from `/schools/funding`.
@@ -78,7 +78,7 @@ All numbered items below are **`/articles`** unless noted.
 
 **P1 delivery checklist (each article):**
 
-1. Draft `assets/news/school-XX-[slug].txt`
+1. Draft `assets/articles/drafts/school-XX-[slug].txt`
 2. Hero image (brand kit or product screenshot)
 3. `build_news_article_json.py` → JSON with `seo_phrases`, FAQ block
 4. Import to CMS; note numeric id in this doc
@@ -187,7 +187,7 @@ Lower priority; largely covered by `story-11-drone-careers`. Defer or merge into
 - **FAQ block** — 3–5 questions (GEO / snippet friendly)  
 - **No** pass rates, grant guarantees, or unreleased features as live  
 
-Draft: `assets/news/*.txt` → JSON via `scripts/build_news_article_json.py`.
+Draft: `assets/articles/drafts/*.txt` → JSON via `scripts/build_news_article_json.py`.
 
 ---
 

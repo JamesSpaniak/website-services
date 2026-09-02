@@ -66,7 +66,7 @@ The browser scales the file as-uploaded (CloudFront media is `unoptimized` in Ne
 | 2. Review | Open the review .md (images embedded) or have an agent read each image; fix `proposed_unit_id` in the CSV. Rows with empty unit id are `needs_review` and block upload |
 | 3. Dry run | `python3 scripts/course_images.py upload --csv <mapping.csv>` — prints planned S3 keys, refreshes CSV keys/URLs after review edits |
 | 4. Upload | Same command with `--execute` (needs AWS credentials; writes to the live media bucket) |
-| 5. Merge | `python3 scripts/course_images.py merge --csv <mapping.csv> --json assets/courses/faa_107_course.json` — appends to each unit's `images_url` (deduped) |
+| 5. Merge | `python3 scripts/course_images.py merge --csv <mapping.csv> --json assets/courses/faa-107/faa_107_course.json` — appends to each unit's `images_url` (deduped) |
 | 7. Publish | **Manual**: paste/save the JSON via the admin course editor (`PUT /courses/:id`). Nothing touches the prod DB automatically |
 
 ## Notes
@@ -81,10 +81,11 @@ The browser scales the file as-uploaded (CloudFront media is `unoptimized` in Ne
 
 ## Example (done Jul 8 2026)
 
-`assets/courses/Pictures for Airports` → 61 images mapped to 31 units under units 2 and 3 of course 35, uploaded, and merged into `faa_107_course.json`. Artifacts: `assets/courses/pictures-for-airports_mapping.csv`, `pictures-for-airports_review.md`.
+`assets/courses/faa-107/images/Pictures for Airports` → 61 images mapped to 31 units under units 2 and 3 of course 35, uploaded, and merged into `faa_107_course.json`. Artifacts: `assets/courses/faa-107/images/pictures-for-airports_mapping.csv`, `pictures-for-airports_review.md`.
 
 ## Related
 
+- [`docs/tech/sectional-chart-experience-plan.md`](../../docs/tech/sectional-chart-experience-plan.md) — sectional GeoTIFF → crops (this pipeline) + future interactive viewer
 - [`content-build.md`](content-build.md) — course/question/video publishing
 - [`docs/tech/course-content-restructure-plan.md`](../../docs/tech/course-content-restructure-plan.md) § step 7 (image insertion)
 - [`docs/tech/backend-data.md`](../../docs/tech/backend-data.md) — media endpoints and `images_url` semantics

@@ -1,0 +1,51 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+EU drone rules and EASA frameworks mature: classes, registration, and operator categories (2020s)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Europe standardized drone operations through risk-based categories (Open/Specific/Certified), harmonizing many national quirks. Registration, remote pilot competency, and geo-awareness features became mainstream requirements for mid-sized drones, influencing global manufacturers’ product design.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- EU approach ties operation type to aircraft capability and operational risk.
+- UK post-Brexit regimes diverged but remained conceptually similar in places.
+- CE marking and class labels shaped consumer drone SKUs sold worldwide.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Aviation regulation; product compliance; market access
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Regulatory harmonization
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Bureaucratic but stabilizing for industry planning
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+European hobbyists debated burden vs. safety; industry generally preferred one harmonized rulebook over 27 fragmented ones. Environmental voices occasionally linked drones to wildlife disturbance in protected areas.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+BVLOS and U-space development; cross-border operations; updates to class definitions; ongoing national exceptions during transitions.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Phased application through the early–mid 2020s with continued iterative updates.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Provided a template other regions referenced when drafting modern UAS rules.

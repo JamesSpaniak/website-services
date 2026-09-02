@@ -59,7 +59,10 @@ const log = (
   if (!shouldShipToServer(level, message)) return;
 
   try {
-    logToServer(level, message, {
+    // Backend FrontendLogDto only accepts info|warn|error. logger.info() uses
+    // console's 'log' internally — map it or POST /logs returns 400.
+    const serverLevel = level === 'log' ? 'info' : level;
+    logToServer(serverLevel, message, {
       ...context,
       url: typeof window !== 'undefined' ? window.location.href : 'N/A',
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',

@@ -1,6 +1,6 @@
 # Course content restructure plan — FAA 107
 
-Plan for rebalancing the Part 107 course tree (`assets/courses/faa_107_course.json`), merging split example sections, standardizing video placement, simplifying the question model to unit-level / final-exam-only scoping, applying the author's content-review notes, and cleaning markdown artifacts course-wide.
+Plan for rebalancing the Part 107 course tree (`assets/courses/faa-107/faa_107_course.json`), merging split example sections, standardizing video placement, simplifying the question model to unit-level / final-exam-only scoping, applying the author's content-review notes, and cleaning markdown artifacts course-wide.
 
 Status: **deployed to prod** (Jul 8 2026) — restructured payload live; unit-level question bank imported. Repo canonical: `faa_107_course.json` (**150 nodes** / **114 leaves**, string refs `u{n}`, Ch.1–5 + Ch.8 done; Ch.6–7 + Ch.9–10 partial through Aug 5 2026; **do not combine** `u5`/`u6`; numeric twin / refs twin removed), `faa_107_questions_unit_level.bulk.json` (463 unit-scoped items). Remaining: admin re-publish of reviewed Ch.1–10 edits and the first 4 Ch.1 video references (ship **Ch.3+4 together**), `u422` runway figures, Ch.6/7/9/10 images, remaining Ch.7/9/10 author notes, leaf `ExamPlayer` removal, final-exam pool carry-over (see below).
 
@@ -11,7 +11,7 @@ Post-deploy edit (Jul 8 2026, **not yet re-uploaded**): course retitled in the r
 ### Unit 7 is one-leaf-per-slide
 
 Unit 7 (Loading and Performance) was imported one leaf per PowerPoint slide from
-`assets/courses/outlines/7- Loading & Performance 2026.pptx.txt`: **31 flat children averaging ~46 words each**, including slide artifacts ("QUESTIONS AND COMMENTS", 8 words) that are not course content. Every other unit was editorially grouped (3–10 children, 100–250 word leaves, max depth 3). The outline itself is two decks concatenated — "Weight, Balance and Loading" and "Load Factors and Performance" — which gives the natural stem split.
+`assets/courses/faa-107/outlines/7- Loading & Performance 2026.pptx.txt`: **31 flat children averaging ~46 words each**, including slide artifacts ("QUESTIONS AND COMMENTS", 8 words) that are not course content. Every other unit was editorially grouped (3–10 children, 100–250 word leaves, max depth 3). The outline itself is two decks concatenated — "Weight, Balance and Loading" and "Load Factors and Performance" — which gives the natural stem split.
 
 ### Examples split from their concepts
 
@@ -93,9 +93,9 @@ Verified against the repo JSON: **17 nodes have artifacts, all in unit 9 (Aerona
 
 ## Author content-review intake (Jul 2026)
 
-Ongoing quality backlog: see [`assets/courses/faa_107_course_quality_review.md`](../../assets/courses/faa_107_course_quality_review.md). **Ch.1–5 + Ch.8 done**; **Ch.6–7 + Ch.9–10 partial (through Aug 5 2026)**. Ch.9 now has study-format CRM/SRM, separate Physiology/Vision leaves, shorter overviews, HTML risk lists/headings, and merged decision/IMSAFE-PAVE leaves. Ch.10 is consolidated from 11 leaves to 3. **Do not combine** weather units 5/6. Repo payload: **150 nodes / 114 leaves**, with 4 Ch.1 video references. **Open:** figures/images and remaining detailed review for Ch.7/9/10.
+Ongoing quality backlog: see [`assets/courses/faa-107/faa_107_course_quality_review.md`](../../assets/courses/faa-107/faa_107_course_quality_review.md). **Ch.1–5 + Ch.8 done**; **Ch.6–7 + Ch.9–10 partial (through Aug 5 2026)**. Ch.9 now has study-format CRM/SRM, separate Physiology/Vision leaves, shorter overviews, HTML risk lists/headings, and merged decision/IMSAFE-PAVE leaves. Ch.10 is consolidated from 11 leaves to 3. **Do not combine** weather units 5/6. Repo payload: **150 nodes / 114 leaves**, with 4 Ch.1 video references. **Open:** figures/images and remaining detailed review for Ch.7/9/10.
 
-Raw notes from the course author, organized per unit. Slide numbers refer to the source decks in `assets/courses/outlines/`. Items marked **(structure)** change the tree; **(content)** edit text in place; **(images)** need a picture inserted; **(questions)** affect the question bank.
+Raw notes from the course author, organized per unit. Slide numbers refer to the source decks in `assets/courses/faa-107/outlines/`. Items marked **(structure)** change the tree; **(content)** edit text in place; **(images)** need a picture inserted; **(questions)** affect the question bank.
 
 ### Course-wide
 
@@ -199,7 +199,7 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 4. ~~Unit-3 merges~~ — **done**: chart examples merged into Class B/C/D/E leaves; "Introduction and Airspace Classifications" leaf combines the intro, symbols, and controlled-overview text; stem renamed "Controlled Airspace Classes".
 5. ~~Units 1, 2, 4, 8 structure~~ — **done**: "Operating Rules" rename; Flying Over People split into overview + "Category Operations" stems (mirrors deck title slide 121); unit 2 stems "Airports, Charts, and Data Sources" + "Aeronautical Charts" (charts moved up a level, max depth now 3); unit 4 "Airport Classification and Control" stem; unit 8 consolidated to one leaf. **Night operations (slides 44–49) NOT added** — blocked on author confirmation (see caveats).
 6. ~~Content edits with exact text~~ — **done**: waiver lead time 60 → 90 days; VO duties added to the VLOS leaf; night no-waiver sentence; coordinate format example; chart-supplement PDF link + purchase advice; "Example Airport Data" retitle; MEF own-supplement sentence removed; duplicate chart-info block deduplicated into the Aeronautical Charts stem. Items already present in the repo text (Part 89 sentence, ATC role, additional roles, required documentation, NOTAM note, red-lines sentence, sectional ATC-frequency sentence) needed no change.
-7. **Insert images** — **partially done (Jul 8 2026)**: `assets/courses/Pictures for Airports` processed via `scripts/course_images.py` ([`workflows/tech/course-images.md`](../../workflows/tech/course-images.md)) — 61 images uploaded to `s3://droneedge-dev-media/courses/35/{unitId}/` and merged into `images_url` in `faa_107_course.json` (units 2 and 3 subtrees). Remaining: other author image folders (unit 7 load-factor charts, airport ops, etc.) and the manual admin publish of the JSON (tracked in `docs/TODO.md` P0).
+7. **Insert images** — **partially done (Jul 8 2026)**: `assets/courses/faa-107/images/Pictures for Airports` processed via `scripts/course_images.py` ([`workflows/tech/course-images.md`](../../workflows/tech/course-images.md)) — 61 images uploaded to `s3://droneedge-dev-media/courses/35/{unitId}/` and merged into `images_url` in `faa_107_course.json` (units 2 and 3 subtrees). Remaining: other author image folders (unit 7 load-factor charts, airport ops, etc.) and the manual admin publish of the JSON (tracked in `docs/TODO.md` P0).
 8. ~~Canonical string-ref payload + leaf-paths~~ — **done (Jul 26 2026; refreshed Aug 12 2026 for the `u12` crew stem)**: single file `faa_107_course.json` with `u{n}` refs (**150 nodes**; stems include crew roles `u12`, `u21`, Class E `u325`, signs `u440`, weather `u61`/`u65`); twin numeric/refs files removed; `faa_107_course_leaf_paths.csv` has **114 leaves**. Prefer not to rerun legacy `scripts/build_faa_107_questions.py` just to refresh leaf paths.
 9. ~~Question file for unit-level scoping~~ — **done**: `faa_107_questions_unit_level.bulk.json` (463 items from the author's sorted/deduped CSV, all `sub_unit_ref: null`, unit_refs u1–u10 all present in the restructured tree). **Gap: it contains no `FINAL_EXAM` items**, so the final-exam pool (`exam_pool: final_only`) would be empty — carry over or re-tag the 77 FINAL_EXAM items from `faa_107_questions.bulk.json` before retiring the old file.
 10. **Remove the leaf-level `ExamPlayer` from `section.tsx`** — **open** (leaf quizzes will error once questions are unit-level only).
@@ -209,7 +209,7 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 
 ## Caveats
 
-- **Live payload may be newer than the repo JSON**: the author's notes quote starred/markdown text (units 2, 7, 8) that does not exist in `assets/courses/faa_107_course.json` — the deployed course and the repo have diverged. Export and diff before any edit, or content fixed locally may be clobbered/mismatched on upload.
+- **Live payload may be newer than the repo JSON**: the author's notes quote starred/markdown text (units 2, 7, 8) that does not exist in `assets/courses/faa-107/faa_107_course.json` — the deployed course and the repo have diverged. Export and diff before any edit, or content fixed locally may be clobbered/mismatched on upload.
 - **Author notes are partial**: unit 5 notes cut off mid-review; units 6, 9, 10 were "only checked for main headings, not detailed content". Expect a second intake round.
 - **Night operations overlap**: unit 1 already has "Flying At Night Under Certain Conditions" (2 leaves); the "missing night operations, slides 44–49" note likely refers to the operating-rules night section of the reordered deck — confirm with the author before adding to avoid duplicating content.
 - **Image insertion depends on an external folder**: image files are prepared outside the repo; confirm the folder location and filename→slide mapping before step 7.

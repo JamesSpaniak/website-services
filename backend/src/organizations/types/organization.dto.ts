@@ -9,6 +9,7 @@ import {
   IsString,
   Min,
   ArrayMinSize,
+  ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrgRole } from './org-role.enum';
@@ -86,6 +87,13 @@ export class GenerateInviteCodeDto {
   @IsOptional()
   @IsEnum(OrgRole)
   role?: OrgRole;
+
+  @ApiPropertyOptional({
+    description: 'Class the invitee joins on redemption (must belong to org).',
+  })
+  @IsOptional()
+  @IsInt()
+  class_id?: number;
 }
 
 export class BulkGenerateInviteCodesDto {
@@ -102,6 +110,13 @@ export class BulkGenerateInviteCodesDto {
   @IsOptional()
   @IsEnum(OrgRole)
   role?: OrgRole;
+
+  @ApiPropertyOptional({
+    description: 'Class the invitees join on redemption (must belong to org).',
+  })
+  @IsOptional()
+  @IsInt()
+  class_id?: number;
 }
 
 export class AssignCoursesDto {
@@ -122,6 +137,57 @@ export class UpdateMemberRoleDto {
   role: OrgRole;
 }
 
+export class CreateOrgClassDto {
+  @ApiProperty({ description: 'Class/period name, e.g. "Period 2"' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional display-only soft cap for this class',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  max_students?: number;
+}
+
+export class UpdateOrgClassDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+
+  @ApiPropertyOptional({
+    description: 'Soft cap; send null to clear',
+    nullable: true,
+  })
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @Min(1)
+  max_students?: number | null;
+}
+
+export class UpdateMemberClassDto {
+  @ApiProperty({
+    description: 'Class to assign the member to; null to unassign',
+    nullable: true,
+  })
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  class_id: number | null;
+}
+
+export class OrgClassResponse {
+  id: number;
+  name: string;
+  max_students: number | null;
+  member_count: number;
+  created_at: Date;
+}
+
 export class AddMemberDto {
   @ApiProperty({ description: 'Email address of an existing user to add' })
   @IsEmail()
@@ -131,6 +197,13 @@ export class AddMemberDto {
   @IsOptional()
   @IsEnum(OrgRole)
   role?: OrgRole;
+
+  @ApiPropertyOptional({
+    description: 'Class to place the member in (must belong to org).',
+  })
+  @IsOptional()
+  @IsInt()
+  class_id?: number;
 }
 
 export class OrganizationResponse {
@@ -153,6 +226,8 @@ export class OrganizationMemberResponse {
   first_name?: string;
   last_name?: string;
   role: OrgRole;
+  class_id: number | null;
+  class_name: string | null;
   joined_at: Date;
 }
 
@@ -161,6 +236,8 @@ export class InviteCodeResponse {
   code: string;
   role: OrgRole;
   email: string | null;
+  class_id: number | null;
+  class_name: string | null;
   used: boolean;
   used_by_username: string | null;
   expires_at: Date;
@@ -177,6 +254,7 @@ export class MemberCourseProgressSummary {
   username: string;
   first_name?: string;
   last_name?: string;
+  class_id: number | null;
   course_id: number;
   course_title: string;
   status: string;

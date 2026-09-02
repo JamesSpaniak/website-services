@@ -1,0 +1,20 @@
+{
+  "slug": "story-09-counter-uas-industry",
+  "title": "Counter-UAS (C-UAS): Airports, Events, and the Business of Stopping Drones",
+  "sub_heading": "Detection and defeat technologies scaled with the threat—under spectrum law and false-positive constraints.",
+  "hero_image": "/images/articles/hero-default.svg",
+  "seo_phrases": [
+    "counter drone system",
+    "C-UAS airport",
+    "drone jamming laws",
+    "UAS detection radar",
+    "anti-drone technology"
+  ],
+  "body_html": "<p><strong>In short:</strong> C-UAS stacks combine radar, RF sensing, EO/IR, and defeat modes from jamming to nets. <strong>Civilian jamming legality</strong> varies; integration with ATC is non-trivial.</p>\n\n<h2>Key takeaways</h2><ul><li>False positives erode trust—tuning matters as much as range.</li><li>Defeat has collateral spectrum effects.</li><li>Market grew with high-profile incursions near airports and stadiums.</li></ul>\n\n<p><strong>Hook:</strong> Stopping a drone is a <strong>systems integration</strong> problem: policy, physics, and software—not a single silver-bullet gun.</p>\n\n<h3>Can I jam drones on my farm?</h3>\n<p>Often illegal for civilians; can interfere with lawful communications—get jurisdiction-specific legal advice.</p>\n\n<h2>SEO clusters</h2><p>Target “<strong>airport drone detection</strong>,” “<strong>stadium anti-drone</strong>,” and “<strong>C-UAS procurement</strong>” with separate landing pages over time.</p>\n\n<h2>Topics & related search terms</h2>\n<p>Topics and queries covered in this piece: <strong>counter drone system</strong>, <strong>C-UAS airport</strong>, <strong>drone jamming laws</strong>, <strong>UAS detection radar</strong>, <strong>anti-drone technology</strong>.</p>",
+  "marketability_review": "B2G and enterprise security interest; gated whitepapers work well. Consumer appeal limited.",
+  "readability_review": "FAQ handles the dangerous legal question up front—good risk reduction.",
+  "considerations": [
+    "Never encourage illegal jamming.",
+    "Vendor-neutral tone avoids alienating partners."
+  ]
+}

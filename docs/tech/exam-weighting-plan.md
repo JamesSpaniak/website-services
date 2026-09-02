@@ -73,7 +73,7 @@ generator should enforce the bands instead of inheriting drift.
 
 ### Current bank skew (unit-level bulk, 463 questions, Aug 5 2026)
 
-From `assets/courses/faa_107_questions_unit_level.bulk.json`, grouped by the default
+From `assets/courses/faa-107/questions/faa_107_questions_unit_level.bulk.json`, grouped by the default
 category→unit mapping in §3:
 
 | Category | Units | Bank count | Bank % | FAA range | Unweighted 60-Q draw (expected) |

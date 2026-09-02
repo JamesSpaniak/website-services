@@ -64,7 +64,7 @@ Full detail: [`docs/tech/architecture.md`](tech/architecture.md) § Resource own
 | Positioning, competitors, contact strategy | `docs/sales/` |
 | SEO/GEO, brand, content strategy | `docs/marketing/` |
 | Repeatable process steps | `workflows/<domain>/` |
-| Course/article source data | `assets/courses/`, `assets/articles/`, `assets/news/` |
+| Course/article source data | `assets/courses/`, `assets/articles/` |
 | Brand logos and mockups | `assets/visuals/Logo/`, `assets/visuals/Assets/` |
 | Outreach outputs | `outreach/` |
 
@@ -73,7 +73,7 @@ Full detail: [`docs/tech/architecture.md`](tech/architecture.md) § Resource own
 - Product capabilities: [`docs/sales/features.md`](sales/features.md)
 - School collateral URLs: [`workflows/sales/outreach.md`](../workflows/sales/outreach.md) § Reference links
 - Contact scripts: `scripts/collect_school_contacts.py`, `scripts/draft_contact_emails.py`, `scripts/contact_sources.yaml`
-- News → JSON: `scripts/build_news_article_json.py`, `assets/news/`
+- Articles → JSON: `scripts/build_news_article_json.py`, `assets/articles/`
 
 ## Commits
 

@@ -1,0 +1,97 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+U.S. restrictions on Chinese-made drones (DJI, Autel) and FCC “Covered List” dynamics (2024–2026)
+
+────────────────────────────────────────────────────────────
+STORY OPENING (narrative hook)
+────────────────────────────────────────────────────────────
+Your drone program used to start with a budget spreadsheet and a Part 107 study guide. In 2025–2026 it also starts with a **compliance spreadsheet**: Who made the radio? Where does telemetry go? Will this model still be importable next year? National-security policy met the farm field and the film set—and fleet owners discovered that “approved to fly today” is not the same as “approved to buy tomorrow.”
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+U.S. policy moved from agency-level cautions toward harder market restrictions tied to national security, supply-chain integrity, and fears of data exfiltration. Legislative pressure (including NDAA-related mechanisms) and FCC actions increased friction for **new authorizations** for certain foreign manufacturers, while existing fleets in agriculture, filmmaking, and public safety faced uncertain long-term upgrade paths. A pivotal 2025–2026 chapter: broad FCC Covered List placement for foreign UAS (Dec 2025), followed by **narrow exemptions** for Blue UAS–cleared and certain domestic-end-product pathways (Jan 2026)—while DJI remained restricted for new FCC approvals.
+
+────────────────────────────────────────────────────────────
+QUESTIONS & ANSWERS (story-style)
+────────────────────────────────────────────────────────────
+
+Q: Is every Chinese drone “banned” in the U.S. now?
+A: Policy targets **new market access** (FCC authorization, imports, sales of non-exempt models)—not necessarily bricking every aircraft already in hangars. Always verify **current** FCC, NDAA, and state rules; grandfathering and exemptions shifted in early 2026.
+
+Q: Why does the FCC care about drones?
+A: Radios and video links need FCC equipment authorization. Putting manufacturers or “foreign-produced UAS” on the **Covered List** blocks new authorizations—functionally a market gate, not just a military procurement rule.
+
+Q: What changed in late 2025 and early 2026?
+A: (Verify primary sources before publish.) Press and legal summaries describe: **Dec 22, 2025** — broad addition of foreign-produced UAS and critical components to the Covered List under FY25 NDAA national-security determinations. **Jan 7, 2026** — FCC announced exclusions through Jan 1, 2027 for items on the **Blue UAS Cleared List** and some “domestic end product” categories—benefiting some non-Chinese vendors and component suppliers, not DJI for new approvals.
+
+Q: I run a small ag or survey business—what should I plan for?
+A: Document fleet models and firmware policies; budget **refresh cycles** and spare parts; check municipal/insurance vendor requirements; evaluate Blue UAS or U.S./allied alternatives where contracts require it. Treat compliance as a 3–5 year capital plan, not a one-time purchase.
+
+Q: Is this only about China?
+A: Framing is geopolitical (PRC-linked supply chains), but implementation is **procedure-based**: covered lists, NDAA sections, federal procurement, state laws, and enterprise security questionnaires—overlapping layers.
+
+Q: How does this connect to the Ukraine/China “dual-use” story?
+A: Same global supply chains feed civil and military small UAS. Export controls (story-04), import restrictions (this story), and battlefield demand (story-01) squeeze **components**—ESCs, radios, cameras—not only finished drones.
+
+────────────────────────────────────────────────────────────
+LATEST UPDATES (verify before publish — 2025–2026)
+────────────────────────────────────────────────────────────
+- FCC Covered List expansion for foreign-produced UAS (Dec 2025 reporting).
+- Jan 2026 exemptions for Blue UAS Cleared List and certain domestic-end-product determinations (through Jan 1, 2027 in summaries).
+- DJI: widely reported as remaining on Covered List without that exemption path for new authorizations.
+- State-level restrictions continue in some jurisdictions (parallel to federal rules).
+- “Blue UAS” and enterprise procurement lists gain importance for public agencies.
+- User associations and manufacturers continue lobbying; enterprise buyers split on cost vs. compliance.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Security debate centers on firmware, telemetry, cloud sync, and update channels—not only hardware origin.
+- Economic tension: U.S. users often preferred Chinese platforms on price/performance.
+- Domestic industrial policy push: incentives for non-Chinese alternatives and U.S. assembly.
+- Compliance is layered: federal authorization, federal procurement, state law, insurer/vendor audits.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Industrial policy; telecommunications authorization; national security; commercial UAS market structure
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Regulatory / geopolitical business news
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Polarized—security hawks vs. pragmatic operators; anxiety for small businesses; relief for exempt vendors
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Split: public-safety and enterprise users worried about cost and capability gaps; privacy-focused constituencies supported tighter controls. Online drone communities often framed bans as disruptive to hobbyists and farmers. Tech press emphasized phased implementation and grandfathered devices where applicable. Early 2026 exemption news created confusion—“ban lifted?” vs. “narrow carve-outs.”
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Monitor FCC orders and NDAA reauthorizations; state preemption debates; test standards for “trusted” drones; training content on fleet compliance documentation; partnership pages for Blue UAS alternatives.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+Multi-year arc: recurring NDAA debates → 2024–2025 legislative pressure → **Dec 2025 / Jan 2026 FCC milestones** → ongoing market shifts through 2026.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Reshapes the global civil drone market by coupling safety certification with geopolitical trust assumptions—operators must think like telecom compliance officers, not only pilots.
+
+────────────────────────────────────────────────────────────
+EXPANSION NOTES (for JSON/article build)
+────────────────────────────────────────────────────────────
+- FAQ: “Does this brick my drone?” / “What is Blue UAS?” / “Jan 2026 exemptions explained.”
+- Timeline sidebar: 2024 lawsuit context (story-03) → 2025 NDAA → Dec 2025 list → Jan 2026 carve-outs.
+- Cite FCC Covered List FAQs and orders when publishing live.
+- Cross-link story-04 (China export controls), story-05 (Remote ID), story-11 (careers in compliant fleets).

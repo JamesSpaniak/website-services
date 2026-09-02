@@ -1,0 +1,70 @@
+────────────────────────────────────────────────────────────
+TITLE
+────────────────────────────────────────────────────────────
+DJI challenges U.S. “Chinese military company” listing and related federal restrictions (2024)
+
+────────────────────────────────────────────────────────────
+SUMMARY
+────────────────────────────────────────────────────────────
+Shenzhen DJI, the world’s largest civil drone vendor, contested U.S. government listings that connect the firm to Chinese military interests—impacting federal procurement and reputational risk in Western markets. The dispute sits at the intersection of civil-market branding, export control politics, and strategic competition.
+
+────────────────────────────────────────────────────────────
+KEY INSIGHTS
+────────────────────────────────────────────────────────────
+- Legal fights highlight how “military company” labels can act like secondary sanctions in practice.
+- Civil/military dual-use ambiguity is central: cameras, autonomy stacks, and supply chains overlap.
+- Global customers face compliance screens beyond FAA-style airworthiness.
+
+────────────────────────────────────────────────────────────
+TOPIC
+────────────────────────────────────────────────────────────
+Corporate law; defense industrial policy; U.S.–China tech competition
+
+────────────────────────────────────────────────────────────
+GENRE
+────────────────────────────────────────────────────────────
+Legal / international trade
+
+────────────────────────────────────────────────────────────
+MOOD
+────────────────────────────────────────────────────────────
+Adversarial; high-stakes reputational combat
+
+────────────────────────────────────────────────────────────
+PUBLIC OPINION
+────────────────────────────────────────────────────────────
+Tech-skeptical audiences often assumed worst-case surveillance scenarios; many drone pilots defended DJI’s product quality and accused politicization. International observers saw a broader pattern of decoupling in critical tech supply chains.
+
+────────────────────────────────────────────────────────────
+QUESTIONS & ANSWERS (story-style)
+────────────────────────────────────────────────────────────
+
+Q: Why sue over a label instead of selling elsewhere?
+A: “Chinese military company” and related listings act like reputational and procurement poison—even for civil customers who never touch DoD contracts. The fight is over **trust infrastructure** for networked devices.
+
+Q: Does the lawsuit stop the FCC Covered List?
+A: No—legal tracks run in parallel. Procurement/listing litigation (this story) and **telecom authorization** restrictions (story-02) stack. Fleet owners must watch both.
+
+Q: Should hobby pilots pick sides online?
+A: Better to read **filed claims** and primary agency actions. Education sites win on neutral, dated summaries—not rumor threads.
+
+────────────────────────────────────────────────────────────
+LATEST UPDATES (verify — 2025–2026)
+────────────────────────────────────────────────────────────
+- Case and related coverage continue alongside Dec 2025 / Jan 2026 FCC Covered List actions affecting new DJI authorizations (story-02).
+- Enterprise buyers increasingly treat legal labels as vendor-risk inputs alongside cyber reviews.
+
+────────────────────────────────────────────────────────────
+FOLLOW-UPS
+────────────────────────────────────────────────────────────
+Parallel debates in other jurisdictions; continued U.S. procurement bans; market share shifts toward alternatives where available; recurring OSINT claims and company rebuttals; cross-link FCC timeline in story-02.
+
+────────────────────────────────────────────────────────────
+TIMELINE
+────────────────────────────────────────────────────────────
+2024 filing and related coverage; echoes in subsequent U.S. regulatory moves through 2025–2026.
+
+────────────────────────────────────────────────────────────
+SIGNIFICANCE
+────────────────────────────────────────────────────────────
+Illustrates how strategic competition now runs through courts, lists, and procurement rules—not only tariffs.

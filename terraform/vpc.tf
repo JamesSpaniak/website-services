@@ -61,6 +61,9 @@ resource "aws_eip" "nat" {
   }
 }
 
+# Recreate a stuck NAT via the pipeline, not a hand apply:
+#   ./pipeline.sh --env dev --replace aws_nat_gateway.nat
+# That keeps aws_eip.nat (SMTP allowlist / SPF) and updates the private route.
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id # Place NAT Gateway in the first public subnet

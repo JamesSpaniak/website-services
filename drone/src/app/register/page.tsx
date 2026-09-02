@@ -216,10 +216,14 @@ function RegisterPageInner() {
                     <div className="mb-6 p-4 rounded-lg bg-[var(--comment-secondary-bg)] border border-[var(--surface-border)]">
                         <div className="flex items-center gap-2 text-[var(--brand-foreground)]">
                             <BuildingOfficeIcon className="h-5 w-5 text-[var(--brand-primary)]" />
-                            <span className="font-semibold">{inviteInfo.organization_name}</span>
+                            <span className="font-semibold">
+                                {inviteInfo.organization_name}
+                                {inviteInfo.class_name ? ` — ${inviteInfo.class_name}` : ''}
+                            </span>
                         </div>
                         <p className="text-sm text-[var(--brand-muted)] mt-1">
-                            You&apos;re joining as {inviteInfo.role === 'manager' ? 'a course manager' : 'a student'}.
+                            You&apos;re joining as {inviteInfo.role === 'manager' ? 'a course manager' : 'a student'}
+                            {inviteInfo.class_name ? ` in ${inviteInfo.class_name}` : ''}.
                         </p>
                     </div>
                 )}

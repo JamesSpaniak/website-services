@@ -15,6 +15,14 @@ export interface OrgCourse {
     title: string;
 }
 
+export interface OrgClass {
+    id: number;
+    name: string;
+    max_students: number | null;
+    member_count: number;
+    created_at: string;
+}
+
 export interface OrganizationMember {
     id: number;
     user_id: number;
@@ -23,6 +31,8 @@ export interface OrganizationMember {
     first_name?: string;
     last_name?: string;
     role: 'manager' | 'member';
+    class_id: number | null;
+    class_name: string | null;
     joined_at: string;
 }
 
@@ -31,6 +41,8 @@ export interface InviteCode {
     code: string;
     role: 'manager' | 'member';
     email: string | null;
+    class_id: number | null;
+    class_name: string | null;
     used: boolean;
     used_by_username: string | null;
     expires_at: string;
@@ -40,6 +52,7 @@ export interface InviteCode {
 export interface InviteCodeInfo {
     organization_name: string;
     role: 'manager' | 'member';
+    class_name: string | null;
 }
 
 export interface MemberCourseProgressSummary {
@@ -47,6 +60,7 @@ export interface MemberCourseProgressSummary {
     username: string;
     first_name?: string;
     last_name?: string;
+    class_id: number | null;
     course_id: number;
     course_title: string;
     status: string;
@@ -67,4 +81,6 @@ export interface UserOrganization {
     id: number;
     name: string;
     role: 'manager' | 'member';
+    class_id: number | null;
+    class_name: string | null;
 }

@@ -8,6 +8,7 @@ import {
   Unique,
 } from 'typeorm';
 import { Organization } from './organization.entity';
+import { OrganizationClass } from './organization-class.entity';
 import { User } from '../../users/types/user.entity';
 import { OrgRole } from './org-role.enum';
 
@@ -26,6 +27,10 @@ export class OrganizationMember {
   @Column({ type: 'enum', enum: OrgRole, default: OrgRole.Member })
   role: OrgRole;
 
+  /** Class/period within the org; null = unassigned (or org-wide manager). */
+  @Column({ name: 'class_id', nullable: true })
+  classId: number | null;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'joined_at' })
   joinedAt: Date;
 
@@ -36,4 +41,8 @@ export class OrganizationMember {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => OrganizationClass, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'class_id' })
+  orgClass: OrganizationClass | null;
 }

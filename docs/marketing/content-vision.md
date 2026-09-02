@@ -1,6 +1,6 @@
 # Content vision — Drone Edge
 
-Canonical north star for **all content and articles created with or by AI** (Cursor agents, drafting assistants, CI bots) and for content **consumed by AI** (generative engines citing us). Read this before drafting anything under `assets/news/`, `assets/articles/`, or site copy.
+Canonical north star for **all content and articles created with or by AI** (Cursor agents, drafting assistants, CI bots) and for content **consumed by AI** (generative engines citing us). Read this before drafting anything under `assets/articles/` or site copy.
 
 Positioning source of truth: [`docs/sales/positioning.md`](../sales/positioning.md). Tactics: [`seo-geo-strategy.md`](seo-geo-strategy.md). Process: [`workflows/marketing/content-and-seo.md`](../../workflows/marketing/content-and-seo.md).
 
