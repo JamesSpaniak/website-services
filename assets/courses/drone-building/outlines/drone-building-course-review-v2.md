@@ -43,8 +43,8 @@ Joe's tree is a **CTE semester lab** (~31–36+ periods). v1 was a **quarter min
 | 1 | Safety | 2 | 1 | Cut; workshop rules deferred to school | See §4.1 — we keep a gate |
 | 2 | Function of components | 2 | 3 | + optional parts session | Accept |
 | 3 | Laws | 1 | 1 | Swapped ahead of Physics; adds night lighting | Accept order |
-| 4 | Physics | 1 | 5 | + weather, placement, materials, power | Accept 4; trim weather to one leaf |
-| 5 | Frame design | 2–3 | 5–10 | From-scratch CAD, critiques every 2–3 days | Accept as CTE; needs a bounded B2C variant |
+| 4 | Physics | 1 | 5 | + weather, placement, materials, power | Accept 5–6; weather becomes a review leaf, add materials / heat / battery science (§4.4) |
+| 5 | Frame design | 2–3 | 5–10 | From-scratch CAD, critiques every 2–3 days | Accept as CTE; add CAD fundamentals + two tiers + non-print path (§4.5) |
 | 6 | Assembly | 3–4 | 3+ | Smoke-stopper power-on inside assembly | Accept sequence; add checks (§4.6) |
 | 7 | Software | 2 | 3 | + registration/RID session at end | Accept 3; fix content (§4.7) |
 | 8 | Testing | 2 | 10 | RPIC-queued flights + iteration | Accept as CTE; add bench gate (§4.8) |
@@ -99,21 +99,43 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Site brief:** airspace check, not over people, bystanders — short, pointing to `faa-107` for depth.
 - **Do-not-fly-at-home closeout** until registered and RID-equipped.
 
+**On RPIC (ours to document, not a Joe question):** aircraft size does not change the answer. Under Part 107 an RPIC is required for every flight regardless of weight. Under the recreational exception there is no RPIC, but every flyer needs a TRUST certificate and the operation must qualify as recreational — whether a school class qualifies is the FAA wording in §7 we must verify. If students or the teacher take this course **after** Part 107, the RPIC exists by definition. The course states the fork; the school picks the path.
+
 **Recommendation:** Single session is fine. Build from `faa-107` `u1` registration/RID leaves so wording is maintained once. This unit is also the natural **cross-sell for the teacher's Part 107 certificate** — if the class flies under 107, the school needs a certificated RPIC, which is the product we already sell.
 
 ### 4.4 Unit 4 — Physics (5 sessions)
 
 **v2 has:** Weather (open frames are sensitive); part placement for CG, cable management, RC signal; load/strength with 3D-print and production materials, CAD references; drone power (KV, prop size/pitch, voltage/capacity, manufacturer lift charts); quiz. Placed immediately before CAD.
 
-**Technical value:** High for placement, materials, and power. Low-medium for weather in a *build* course — one leaf on wind/temperature effects on a small open quad is enough; the depth lives in `faa-107` `u5`/`u6`.
+**Technical value:** High for placement, materials, and power. Weather is a *review* topic here — for students who have taken 107 it is a recap leaf; for students who have not, we expand it (ours to write, pulled from `faa-107` `u5`/`u6`). Either way it is not Joe's problem.
 
-**Add:**
+**Add — builder physics:**
 - **Thrust-to-weight and hover current** worked example from a real motor chart → "will this lift, for how long."
 - **AUW budget** table students fill for their own design (frame, stack, battery, guards).
 - **Vibration / soft-mount** as the bridge to gyro noise in Unit 7.
 - **Legal weight line** callout linking back to Unit 3.
 
-**Recommendation:** 4 sessions of real content + the quiz; fold weather to a single leaf in session 1. Keep `faa-107` `u7` as canonical for exam phrasing (load factor, CG vs CP); this unit uses shop language and student-owned numbers.
+**Add — basic materials science (new stem):** the CAD unit that follows has nothing to stand on without this.
+- Stress vs strain, stiffness vs strength, and why a stiff arm and a strong arm are not the same part.
+- **Fatigue**: repeated crash and vibration loads crack arms that a single load would not.
+- **Printed plastics**: PLA / PETG / nylon / TPU — glass transition, layer adhesion, print orientation as a strength decision (anisotropy). Why guards are TPU and arms are not PLA.
+- **Carbon fiber**: layup, why it is stiff and light, why it is conductive (antenna and mag interference; shorts) and dusty when cut.
+- One hands-on: break a printed test bar in two orientations.
+
+**Add — heat transfer for technicals (new stem):**
+- **Where heat comes from**: I²R in motors, ESC FETs, and wires; why thin wire and bad solder joints get hot.
+- **Where it goes**: conduction into the frame plate, convection from prop wash (why ESCs sit under the props), radiation is negligible at this scale.
+- **Why it matters**: motor demag and ESC thermal throttling; LiPo temperature after a flight as a health check; iron temperature, thermal mass, and dwell time when soldering (ties to Unit 6 safety).
+- One hands-on: IR thermometer on motors and ESC after a bench spin (Unit 8) and log it.
+
+**Add — battery science for future use (new stem):** transferable to EVs, phones, and anything Joe's students touch next.
+- **LiPo chemistry** at a plain-language level: cell voltage window (~3.0–4.2 V), nominal 3.7 V, series cells (2S–4S) and why voltage sets motor speed.
+- **Capacity vs C-rating vs internal resistance**: what "sag" is, why a small high-C pack beats a big low-C pack for a 3–3.5" quad, energy density vs power density.
+- **Care**: storage voltage, balance charging, puffing, cycle life, what a puffed cell tells you, disposal.
+- **Chemistry landscape**: LiPo vs Li-ion (18650/21700 for long-range vs high discharge), a sentence each on LiFePO4 and solid-state so students know the field is moving.
+- One hands-on: measure pack voltage before/after a bench run and compute Wh used.
+
+**Recommendation:** 5–6 sessions: (1) weather review + part placement, (2) materials science, (3) heat transfer, (4–5) drone power + battery science, (6) quiz + AUW worksheet. Keep `faa-107` `u7` as canonical for exam phrasing (load factor, CG vs CP); this unit uses shop language and student-owned numbers. The three new stems are ours to draft with Joe as technical reviewer.
 
 ### 4.5 Unit 5 — Frame design (5–10 sessions)
 
@@ -122,13 +144,27 @@ Each section: what v2 has → technical value → add → recommendation.
 **Technical value:** High as engineering pedagogy — iteration with critique is the strongest part of the whole outline. Low as *course content* — "not much formal instruction" means there is nothing to author unless we write the scaffolding.
 
 **Add (this is what makes the unit a course, not a studio):**
+- **CAD fundamentals stem (new, 2 sessions):** if students touch CAD they need a CAD lesson — sketch and constraints, extrude/cut, hole patterns, fillets, a two-part assembly, measuring a real part with calipers, exporting STL. Skip only if the exercise is Tier A below.
 - **Design brief** with hard constraints: motor mount pattern, stack pattern (20 / 25.5 / 30.5 mm), prop clearance, guard clearance, battery envelope, RX/GPS keep-outs, max AUW from Unit 4.
-- **Materials leaf:** printed PETG/nylon vs TPU guards vs carbon plate; a realistic v1 is a **hybrid** — carbon or aluminum base plate with printed guards/mounts — so students design the parts a printer is good at.
+- **Materials leaf:** applies the Unit 4 materials stem — a realistic v1 is a **hybrid**: carbon or aluminum base plate from the kit, students design the printed parts (guards, mounts, battery tray, antenna holders) that a printer is good at and that break in crashes.
 - **Critique rubric** for the every-2–3-days reviews (fit, strength, weight, serviceability).
 - **Crash-replaceable parts list** so Unit 8 iteration has spare arms/guards.
-- **Starter CAD** as an optional path for schools without design time.
 
-**Recommendation:** Accept 5–10 sessions for the school edition. Name a default CAD tool for our materials (Onshape is browser-based and free for education; schools with Fusion/SolidWorks licenses use their own). Provide the brief and rubric as teacher assets. Optional FEA stays out.
+**Two tiers, chosen per school:**
+
+| Tier | Work | Tool | Sessions | Who it fits |
+|------|------|------|----------|-------------|
+| **A — Modify** | Change a supplied parametric guard/mount (thicker rib, moved hole, new tray) | Tinkercad or Onshape | 2–3, no CAD stem needed | Schools without design time or CAD experience |
+| **B — Design** | Design printed parts from measured kit components under the brief | Onshape (default), Fusion, or school license | 5–10 incl. 2 CAD fundamentals sessions | CTE / engineering pathways |
+
+**Non-print schools — the real question:** a CAD "starter file" is worthless without a printer. Replace that idea with:
+1. **Stock frame in every kit.** Joe already wants spare known-good frames for Unit 8; make the stock frame the guaranteed flyer so no student is grounded by a design that did not print.
+2. **Print-and-ship by us.** At the end of Unit 5 the teacher uploads the class STLs; we print (PETG/nylon structural, TPU guards), QC, and ship one batch. This is an operations service we own: turnaround target, cost per class, material list, failed-print policy, deadline aligned to the Unit 5 end date. It is what makes Tier B possible without a printer.
+3. **Local makerspace / library** as a documented fallback where 1–2 are not wanted.
+
+**CAD software cost (verify current terms before publishing):** Onshape has a free education plan and runs in a browser, so it works on Chromebooks with no install — our default for screenshots. Autodesk Fusion has a free education license for students and educators. Tinkercad is free and sufficient for Tier A. FreeCAD is free and open source. SolidWorks for Education is paid — schools that already have it use it. Net: **no school needs to buy CAD for this course.**
+
+**Recommendation:** Accept 5–10 sessions for the school edition as Tier B; Tier A is the compact path. Ship the brief, rubric, and a parametric guard/mount as teacher assets. Optional FEA stays out.
 
 ### 4.6 Unit 6 — Assembly (3+ sessions)
 
@@ -171,8 +207,8 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Bench checklist gate** (props off → restrained props on): motor spin/direction, failsafe demo, radio range, GPS lock if fitted, arm/disarm.
 - **Maiden protocol:** angle mode, hover only, abort criteria, spotter, netted cage or tether option indoors.
 - **Post-flight inspection:** screws, motor heat, solder joints, LiPo temp, guard damage.
-- **Debrief leaf:** what the failure taught (wrong direction, loose motor, weak arm) — this is where the CAD iteration loop closes.
-- **RPIC plan:** who is RPIC on flight days is a school constraint; the course should state it plainly (ties to Unit 3 fork).
+- **Debrief leaf:** what the failure taught (wrong direction, loose motor, weak arm) — this is where the CAD iteration loop closes. Log motor/ESC/LiPo temperatures here (Unit 4 heat stem).
+- **Operating authority note:** who supervises flight days follows the Unit 3 fork (107 RPIC vs recreational + TRUST). The course states it; the school decides. Not a curriculum question.
 
 **Recommendation:** Keep 10 sessions for the school edition. Publish the checklist as the **grading rubric** so "does it fly" has a pass/fail structure teachers can defend.
 
@@ -211,39 +247,47 @@ These are not in v2 and should not be negotiable:
 
 ## 7. Facts to verify before authoring (do not paraphrase from memory)
 
-- Recreational exception vs educational use — current FAA wording and what it means for who must hold Part 107.
+- Recreational exception vs educational use — current FAA wording, whether a school class qualifies, and therefore whether an RPIC (107) or TRUST (recreational) is required on flight days.
 - Registration weight threshold and Remote ID applicability for homebuilt aircraft; broadcast-module and FRIA options.
 - Betaflight version with position/altitude hold and the sensors it requires.
 - Actual AUW of the reference 3–3.5" build with guards and battery.
+- Current education-license terms for Onshape, Fusion, Tinkercad (free today; confirm before it goes in a leaf).
 
 ---
 
 ## 8. Still blocking a payload
 
-| Blocker | Why it matters |
-|---------|----------------|
-| Solder vs plug-in kit as the **default** | Assembly lab steps, cost, and school objection |
-| Print vs no-print in the target school | Grouping and turn-in in Unit 5 |
-| GPS / camera / VTX in the kit or not | Unit 7 hold modes and Unit 2 optional parts |
-| Who is RPIC on flight days | Unit 3 fork and Unit 8 throughput |
-| Reference BOM | Photos, quiz items, AUW numbers all depend on it |
-| Named CAD tool for our materials | Screenshots and the design brief |
+| Blocker | Why it matters | Owner |
+|---------|----------------|-------|
+| Solder vs plug-in kit as the **default** | Assembly lab steps, cost, and school objection | Joe |
+| GPS / camera / VTX in the kit or not | Unit 7 hold modes and Unit 2 optional parts | Joe |
+| Reference BOM | Photos, quiz items, AUW numbers all depend on it | Joe |
+| Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Joe on parts; us on ops |
+| Print-and-ship service design | Turnaround, cost, material, failed-print policy | Us |
+| Operating authority wording (107 vs recreational) | Unit 3 fork, Unit 8 supervision | Us (§7 verify) |
+| Weather review vs expanded leaf | Depends on whether students took 107 first | Us |
+| CAD tool default + license check | Screenshots and the design brief | Us (Onshape default) |
 
 ---
 
-## 9. Questions for Joe — v3
+## 9. Questions for Joe — v3 (drone-technical only)
 
-1. Default assembly track: solder, or plug-in with solder optional?
-2. Is GPS in the base kit? If not, drop hold modes from v1 and keep GPS as an optional stem.
-3. Confirm the reference parts list (motor, ESC/AIO, FC, RX, battery, props, guards) so we can weigh and photograph one build.
-4. Who is RPIC on test days in the schools you have in mind — teacher with 107, or a partner?
-5. CAD tool for our screenshots (Onshape default?) and whether you want a starter file for non-print schools.
-6. Weather in Physics: OK to cut to one leaf and point at `faa-107` for depth?
-7. Assessment: agree to add bench + maiden rubrics as the U8 grade structure?
+Joe owns the hardware and build answers. Regs, pacing, weather, assessments, CAD licensing, and print-and-ship ops are ours and are not listed here.
 
-## 10. Our next steps after v3
+1. **Default assembly track:** solder, or plug-in with solder optional?
+2. **GPS in the base kit?** If not, we drop hold modes from v1 and keep GPS as an optional stem.
+3. **Reference parts list** (motor, ESC/AIO, FC, RX, battery, props, guards, base plate) so we can weigh and photograph one build.
+4. **Non-print schools — what do we hand them?** A CAD file is useless without a printer. Options on the table: (a) stock frame in every kit as the guaranteed flyer, (b) we print their class STLs and ship one batch, (c) makerspace fallback. Which parts should students be *designing* (guards, mounts, tray?) vs receiving pre-made (base plate, arms?) so that option (a) still flies and option (b) is a small, printable batch?
+5. **Printed-part materials:** for a 3–3.5" guarded quad, which parts are safe as PETG/nylon prints and which must stay carbon/aluminum? This sets the Tier A/B design brief.
+6. **CAD scope check:** is a Tier A "modify a supplied guard/mount" exercise still worth doing technically, or is it too trivial to teach anything about the airframe?
+
+## 10. Our next steps (parallel to v3)
 
 - Fold v3 answers into this file (§2, §8).
+- Verify §7 facts (FAA authority wording, RID/registration for homebuilt, Betaflight hold version, CAD license terms).
+- Draft the three new Unit 4 stems (materials science, heat transfer, battery science) with Joe as technical reviewer.
+- Write the CAD fundamentals stem and the Tier A parametric guard/mount.
+- Design the print-and-ship service (turnaround, cost, materials, failed-print policy, Unit 5 deadline).
 - Write Unit 1 checklist, Unit 7 failsafe leaf, Unit 8 bench/maiden rubric as the first teacher assets.
-- Draft Units 2–4 leaves (150–350 words) from the reference BOM and `faa-107` regs leaves.
+- Draft Units 2–4 leaves (150–350 words) from the reference BOM and `faa-107` regs leaves; weather as a review leaf with an expanded variant for non-107 students.
 - Only then: `drone_building_course.json` with string refs (`u1`…), no homepage track until Part 107 is complete.
