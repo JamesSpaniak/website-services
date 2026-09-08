@@ -31,6 +31,47 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 ---
 
+## P1 — Drone-building course (draft, not in catalog)
+
+*Outline is v3.1 and drafting is unblocked. Canonical: [`assets/courses/drone-building/outlines/drone-building-course-outline-v3.md`](../assets/courses/drone-building/outlines/drone-building-course-outline-v3.md) (draft from this) · [`…/outlines/drone-building-course-review-v2.md`](../assets/courses/drone-building/outlines/drone-building-course-review-v2.md) (rationale) · [`…/reference/parts-list-draft-v1.md`](../assets/courses/drone-building/reference/parts-list-draft-v1.md) (parts, costs, goggles, materials). No payload, questions, or homepage track until Part 107 P0 is published. Joe owns hardware facts on `branch-joe`; we fold and bump.*
+
+### Joe — hardware confirmations (blocking final numbers)
+
+| Item | Status | Source |
+|------|--------|--------|
+| **Compatibility pass on the GetFPV quote** — Spark 1404 mount pattern + prop mount; GOKU 20A ESC motor pads vs plugs (16 vs 4 joints); FC↔O4 cable; GPS UART + I²C socket vs pads; battery dimensions + XT30/XT60 class standard; stack height; Betaflight target for GN405 V3 | Open | parts list § 7.1 |
+| **Weigh one Base and one Video build** — per component and complete with battery, props, RID; hover current and flight time on 1000 mAh; component photos for Unit 2 | Open | parts list § 7.2 |
+| **Count solder joints actually made** per kit | Open | parts list § 7.3 |
+| **Stock-frame CAD** with `arm_thickness` and `hole_clearance` variables; STL for print-and-ship | Open | parts list § 9 · outline Unit 5 |
+| Re-price the quote at order time; swap superseded parts | Open | parts list § 1 |
+
+### Ours — curriculum drafting (can start now)
+
+| Item | Status | Source |
+|------|--------|--------|
+| **Unit 1 Safety** — 2 sessions, shop-cert checklist, per-unit safety briefs for Units 2–8; RID/radio charging in the LiPo routine | Not started | outline Unit 1 |
+| **Unit 4 Physics** — materials (with the parts-list § 3 density/Tg table as the worked example), heat transfer, battery mechanics (no chemistry), AUW worksheet | Not started | outline Unit 4 |
+| **Unit 3 Laws** — cut from `faa-107` `u1`: Part 107 path, register every aircraft, shared HSRID module procedure, **VO required for FPV flights**; confirm same-serial-on-multiple-registrations in DroneZone at first class registration | Not started | outline Unit 3 · parts list § 5 |
+| **Unit 8** — bench checklist (adds RID charged/fitted/broadcasting; VO assigned for FPV), maiden protocol, post-flight rubric | Not started | outline Unit 8 |
+| **Unit 5** — CAD fundamentals stem, design brief with 16×16 stack and *verify* placeholders, **material-profile slicer table** (PLA/PETG/ASA/nylon/TPU rows), critique rubric | Not started | outline Unit 5 · parts list § 9 |
+| **Unit 2 + Unit 6 text** from the reference parts list; photos wait on hardware | Not started | outline Units 2, 6 |
+| **Unit 7** leaves against the GOKU GN405 V3 (baro, built-in ELRS, no OSD → telemetry warnings); screenshots wait on hardware, Betaflight 2026.6 | Not started | outline Unit 7 |
+| **Weather leaf** — review variant for 107 grads + expanded variant for others | Not started | outline Unit 4 · `faa-107` `u5`/`u6` |
+| **Unit draft template** — one markdown skeleton per unit (stems → leaves → labs/clips → checkpoint) so drafts land in a consistent shape before JSON | Not started | outline § 5 |
+| **Parts-list template** for future kit revisions | **Done Sep 8 2026** — [`reference/parts-list-template.md`](../assets/courses/drone-building/reference/parts-list-template.md) | — |
+
+### Ours — ops, sales, frontend
+
+| Item | Status | Source |
+|------|--------|--------|
+| **Print-and-ship service design** — turnaround, cost per class, materials offered (PETG default; nylon our-side only), failed-print policy, Unit 5 deadline | Not started | outline § 8 |
+| **Kit one-pager for sales** — Base ~$185 / Video ~$365–385 per aircraft; class items (radios, 2× HSRID $80, N3 goggles $229, charger); class-of-10 landed examples; material choice as a kit-order option with the enclosure/ventilation qualification question | Blocked on Joe's confirmations | parts list § 6, § 8, § 9 · [`sales/packages.md`](sales/packages.md) |
+| **Goggles tier per school** — N3 default, Goggles 3 for the RPIC; VO rule in the flight-day guidance | Decided; write into one-pager | parts list § 8 |
+| **Frontend: step-clip video pattern** — Units 6–8 want several 1–2 min clips per leaf; course UI renders one `video_url` per node today. Decide: one node per step vs content-block gallery | Not started | [`tech/frontend-data.md`](tech/frontend-data.md) · `drone/src/app/ui/components/unit.tsx` |
+| **Confirm HSRID model that ships** from Amazon B0CGTTNJXL against the FAA DOC list before first purchase | Open | parts list § 5 |
+
+---
+
 ## P1 — Sales & GTM (schools)
 
 *Rep can outreach; close gaps before scaled pipeline.*
@@ -297,4 +338,4 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 2. Link the **source doc** (not a chat thread).
 3. When done, move to [`TODO_COMPLETED.md`](TODO_COMPLETED.md) with the ship date and delete the row here.
 
-*Last reviewed: Jul 26 2026 — added P0 item for back-half unit spacing / weather 5+6 combine vs video splits.*
+*Last reviewed: Sep 8 2026 — added the Drone-building course section (Joe confirmations, drafting items, ops/sales/frontend).*
