@@ -57,4 +57,3 @@ Author intake for a future build/assembly course. **No payload, questions, or ho
 | `outlines/drone-building-course-outline-v3.md` | **v3.1 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
 | `reference/parts-list-draft-v1.md` | Reference parts list (Base/Video), frame material call, RID sharing, cost framing; source quote PDF alongside |
 | `outlines/drone-building-course-review-v2.md` | Review, technical value, verified facts, Betaflight/sensor options, readiness |
-| `outlines/joe-drone-building-outline.txt` | v0 — Joe’s original topic list (Aug 5 2026) |
