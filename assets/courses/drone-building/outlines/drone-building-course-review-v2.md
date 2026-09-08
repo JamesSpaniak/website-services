@@ -17,6 +17,7 @@
 | **v2** | [`joe-drone-build-feedback-v2.md`](joe-drone-build-feedback-v2.md) | Joe (`05642b2`, `512c701`) | Sep 6 2026 | Answers all six open decisions, per-unit session tables, assessments |
 | v2 review | this file | Drone Edge | Sep 7 2026 | Section review, technical value, additions, recommendations |
 | **v3 answers** | §2a of this file | Joe (verbal, Sep 8 2026) | Sep 8 2026 | Ordering rationale, safety ownership, battery scope, kit tiers, sub-250 g target, CF frames for video kits |
+| **v3.1 parts** | [`../reference/parts-list-draft-v1.md`](../reference/parts-list-draft-v1.md) + [`../reference/getfpv-quote-2026-09-08.pdf`](../reference/getfpv-quote-2026-09-08.pdf) | Joe (quote + notes, Sep 8 2026 PM) | Sep 8 2026 | GetFPV quote ($364.91, six lines), full-PLA frame flew, material second look, shared strap-on RID module. Folded into outline v3.1 |
 
 Branch facts (Sep 8): `origin/branch-joe` is unchanged since `512c701` (Sep 6) — no new files. Joe's v3 came in conversation and is recorded in §2a. Our folder `assets/courses/drone-building/` is on `main` via PR #1. Joe's v0 `.txt` is unchanged; it still lists GPS as optional and starts Assembly at the battery connector, which v2 supersedes.
 
@@ -278,7 +279,9 @@ These are not in v2 and should not be negotiable:
 | Recreational vs educational; RPIC or TRUST on flight days | **Closed by decision** | RPIC present every flight day → Part 107 path. TRUST/recreational removed from scope |
 | Registration and Remote ID for homebuilt sub-250 g under 107 | **Verified** (FAA registration FAQ, FAA Remote ID page) | Register regardless of weight; Part 107 registers each device separately; RID via broadcast module with serial listed per aircraft; VLOS. Re-check FAA pages at authoring time; link them in the leaf |
 | Betaflight hold-mode version and sensors | **Verified** (Betaflight wiki, 2025.12 + 2026.6 release notes) | Hold modes since 2025.12 (4.6, stable Jan 2026); current 2026.6. GPS required; baro optional; mag strongly recommended or `pos_hold_without_mag` + straight-line fly |
-| Actual AUW of reference builds | **Open — Joe BOM** | Two BOMs with AUW |
+| Actual AUW of reference builds | **Estimated — Joe to weigh** | Parts list gives Base ~230–250 g, Video ~245–265 g from vendor weights; battery (~90 g) and frame (~60–70 g) dominate. Real weigh-in still needed |
+| Reference FC has a barometer; GPS has a mag | **Verified** (Flywoo GN405 V3 specs; HGLRC M100 Pro specs) | DP310 baro on the FC → Option A needs no extra part. M100 Pro has QMC5883L → it is Option C for the Video kit. FC has **no OSD**; Base voltage warnings go via ELRS telemetry + beeper |
+| One RID module on several Part 107 aircraft | **Verified in FAA flow; confirm in DroneZone** | Each aircraft registered separately; the FAA process lets the same module serial be entered on each aircraft's device entry. Class buys modules = aircraft airborne at once |
 | CAD education licenses | **Verified** (Onshape education plans; Autodesk education) | Onshape Student/Educator free, browser, Chromebook; Fusion free for eligible students/educators, 1-year renewable, Chromebook OK; both need education verification. Tinkercad free |
 
 ### 7a. Betaflight and sensor options — pick one
@@ -297,10 +300,11 @@ These are not in v2 and should not be negotiable:
 
 | Blocker | Why it matters | Owner |
 |---------|----------------|-------|
-| ~~Solder vs plug-in default~~ → **minimal-solder locked (v3)**; joint list still needed | Assembly lab steps, cost, and school objection | Joe (joint list) |
-| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; ~~GPS~~ → **Option A: no GPS in Base, GPS+mag optional on Video (§7a)** | Unit 7 hold modes | Closed |
-| **Reference BOM × 2** (Base, Video/FPV), each with AUW and solder-joint count | Photos, quiz items, AUW numbers, Assembly steps all depend on it | Joe |
-| Which structural parts students may print (Tier B) vs receive | Design brief and print-and-ship batch size | Joe |
+| ~~Solder vs plug-in default~~ → **minimal-solder locked (v3)**; ~~joint list~~ → **≈16 on Base estimated from the reference stack (v3.1)**; confirm ESC pads vs plugs | Assembly lab steps, cost, and school objection | Joe (confirm) |
+| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; ~~GPS~~ → **Option A: no GPS in Base, GPS+mag optional on Video (§7a)**; parts named in v3.1 | Unit 7 hold modes | Closed |
+| ~~Reference BOM × 2~~ → **reference parts list v1 (Sep 8 PM)** from Joe's GetFPV quote; Base = quote minus O4/GPS/CF frame. Still needs compatibility check, real AUW, joint count | Photos, quiz items, AUW numbers, Assembly steps | Joe (confirm) |
+| ~~Which structural parts students may print~~ → **whole frame (v3.1)**; Joe flew a full PLA frame | Design brief and print-and-ship batch size | Closed |
+| ~~Printed-part material~~ → **PETG default; ABS/ASA only enclosed + ventilated; no nylon for students (v3.1)** | Unit 4 materials stem, Unit 5 brief, print-and-ship | Closed (ours, from Joe's data) |
 | Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Us on ops |
 | Print-and-ship service design | Turnaround, cost, material, failed-print policy | Us |
 | ~~Operating authority~~ → **Part 107 path, RPIC on every flight day (Sep 8)** | Unit 3, Unit 8 supervision | Closed |
@@ -311,13 +315,12 @@ These are not in v2 and should not be negotiable:
 
 ## 9. Questions for Joe — v4 (drone-technical only)
 
-Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Still open:
+Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Answered Sep 8 PM (v3.1): reference parts (GetFPV quote), Tier B scope (whole frame), material (PETG default from his PLA/PETG/ABS/nylon comparison), RID module style (shared strap-on). Still open — all confirmations on the parts list, see its §7:
 
-1. **Two reference BOMs** — Base and Video/FPV: motor, AIO/ESC **with barometer, no GPS on Base**, FC, RX, battery, props, guards, frame (CF for Video), camera/VTX for Video, optional GPS+mag module for Video. For each: AUW with battery and **number of solder joints**.
-2. **Tier B print scope:** on the Base kit, which structural parts may students print (guards, mounts, tray only? arms? full plate?) while staying light and flyable. This sets the design brief and the print-and-ship batch.
-3. **Printed-part materials:** which parts are safe as PETG/nylon and which must stay carbon/aluminum on a 3–3.5" guarded quad.
-4. **Video-kit goggles/monitor:** in the kit, shared per class, or a school purchase? Affects the Video & Photography hand-off.
-5. **Remote ID module:** a specific broadcast module that fits a 3–3.5" frame (weight, mounting, power) — one per aircraft under Part 107.
+1. **Compatibility pass** on the quote: Spark 1404 mount pattern and prop mount; GOKU 20A ESC motor pads vs plugs; pack dimensions; XT30 vs XT60 class-wide.
+2. **Weigh one Base and one Video build** with battery; count the joints actually soldered.
+3. ~~Remote ID module product name~~ → **Holy Stone HSRID** (Amazon B0CGTTNJXL, $39.99; HSRID01 FAA DOC RID000000290; standalone GPS + battery, 14–16 g). Closed Sep 8 PM; we confirm the shipped model on the DOC list at purchase.
+4. **Goggles model** for the Video kit (O4 needs DJI goggles; N3 class assumed) — one class set.
 
 ## 10. Remaining before drafting initial versions
 
@@ -331,9 +334,10 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 | Unit 1 Safety: 2 sessions, checklist, signed cert, per-unit safety briefs | Gate for Unit 6 | Not started — ours per v3 |
 | Unit 4 stems: materials science, heat transfer, battery mechanics (no chemistry) | Unit 5 brief; Units 6–8 recall | Scoped; drafting can start |
 | Weather review leaf + expanded variant for non-107 students | Unit 4 session 1 | Not started; source `faa-107` `u5`/`u6` |
-| Unit 3 Laws leaves cut from `faa-107` `u1`; Part 107 registration + RID-module procedure | Unit 3 | Unblocked Sep 8; needs RID module pick from Joe |
-| CAD fundamentals stem (2 sessions) + Tier A parametric guard/mount + design brief + critique rubric | Unit 5 | Can start; brief needs BOM numbers |
-| Unit 7 failsafe / motor-direction / calibration / backup leaves | Unit 7 | Can start generically; screenshots need the kit FC |
+| Unit 3 Laws leaves cut from `faa-107` `u1`; Part 107 registration + shared RID-module procedure | Unit 3 | Unblocked Sep 8 PM; module is the Holy Stone HSRID |
+| CAD fundamentals stem (2 sessions) + Tier A guard/cage/mount + design brief + critique rubric | Unit 5 | Can start; brief has 16×16 stack, whole-frame scope, PETG; motor pattern and pack dims are *verify* placeholders |
+| Unit 7 failsafe / motor-direction / calibration / telemetry-warning / backup leaves | Unit 7 | Can start against the GOKU GN405 V3 (baro, built-in ELRS, no OSD); screenshots need the real FC |
+| Unit 2 parts text and Unit 6 step list | Units 2, 6 | Can start from the reference parts list; photos wait on hardware |
 | Unit 8 bench checklist + maiden protocol + post-flight rubric | Unit 8 grading | Can start |
 | Print-and-ship service: turnaround, cost/class, materials, failed-print policy, deadline | Non-print schools | Not started |
 | Frontend check: step-clip video pattern vs one `video_url` per node | Units 6–8 authoring format | Not started |
@@ -342,15 +346,15 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 
 | Item | Blocks |
 |------|--------|
-| Base + Video BOMs with AUW and solder-joint count | Unit 2 photos/quiz, Unit 4 AUW worksheet, Unit 6 step list, Unit 8 weigh-in |
-| Tier B print scope + printed-part materials | Unit 5 design brief, print-and-ship batch |
-| Goggles/monitor in Video kit | Unit 2 Video parts, Video & Photography hand-off |
-| Remote ID broadcast module pick | Unit 3 procedure, Unit 6 mounting, BOM weight |
+| ~~Base + Video BOMs~~ → **reference parts list v1 exists.** Compatibility pass, real AUW, joint count | Unit 2 photos/quiz images, final Unit 4 AUW numbers, Unit 8 weigh-in targets |
+| ~~Tier B print scope + printed-part materials~~ | **Closed Sep 8 PM** |
+| Goggles model (class set) | Unit 2 Video parts, Video & Photography hand-off |
+| ~~Remote ID module pick~~ → **Holy Stone HSRID, closed Sep 8 PM** | — |
 
 ### Is it ready for development?
 
-**Curriculum drafting — mostly yes as of Sep 8.** The tree, order, session counts, kit tiers, weight target, operating authority, firmware version, sensor option, CAD tool, and ownership split are locked, and the §7 facts are verified. We can draft **Units 1, 3, 4, 8** and the generic parts of **5 and 7** now. **Units 2 and 6** and the Unit 5 design brief wait on the two BOMs — the single remaining blocker, and it is Joe's.
+**Curriculum drafting — yes as of Sep 8 PM.** The tree, order, session counts, kit tiers, weight target, operating authority, firmware version, sensor option, CAD tool, ownership split, reference electronics, frame scope, and frame material are locked, and the §7 facts are verified. Every unit can be drafted in text now; **Units 2 and 6** use the reference parts list with *verify* placeholders where Joe still has to confirm (motor pattern, pads vs plugs, pack dims, real AUW, goggles). Nothing on the curriculum side is blocked; photos, quiz images, and screenshots wait on hardware in hand.
 
 **Course payload / code — no.** No `drone_building_course.json`, no questions, no homepage track until: (1) both BOMs exist, (2) Part 107 recordings/publish are done (P0). The step-clip video format also needs a frontend answer before Units 6–8 are authored to it.
 
-**Order of work:** Unit 1 → Unit 4 → Unit 3 → Unit 8 rubrics → (BOMs land) → Unit 2 → Unit 5 brief → Unit 6 → Unit 7 → payload. Drafting works from [`drone-building-course-outline-v3.md`](drone-building-course-outline-v3.md).
+**Order of work:** Unit 1 → Unit 4 → Unit 3 → Unit 8 rubrics → Unit 2 → Unit 5 brief → Unit 6 → Unit 7 → (Joe confirms parts, hardware in hand: photos, screenshots) → payload. Drafting works from [`drone-building-course-outline-v3.md`](drone-building-course-outline-v3.md).
