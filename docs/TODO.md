@@ -39,9 +39,10 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | Item | Status | Source |
 |------|--------|--------|
-| **Compatibility pass on the GetFPV quote** — Spark 1404 mount pattern + prop mount; GOKU 20A ESC motor pads vs plugs (16 vs 4 joints); FC↔O4 cable; GPS UART + I²C socket vs pads; battery dimensions + XT30/XT60 class standard; stack height; Betaflight target for GN405 V3 | Open | parts list § 7.1 |
-| **Weigh one Base and one Video build** — per component and complete with battery, props, RID; hover current and flight time on 1000 mAh; component photos for Unit 2 | Open | parts list § 7.2 |
-| **Count solder joints actually made** per kit | Open | parts list § 7.3 |
+| ~~Compatibility pass on the GetFPV quote~~ | **Desk-checked Sep 8 2026** from manufacturer diagrams and the Betaflight config repo: motor Ø9 T-mount, ESC solder pads (Base = 16 joints), O4 plug on UART3, GPS pads (+6), stack 12.5 mm, battery 70×35×18 mm / 81 g, target `FLYWOOF405NANO`. Two mismatches found: CF frame arms 12×12 vs motor Ø9; XT60 pack vs included XT30 pigtail | parts list § 7.1 |
+| **Joe's picks from the desk check** — motor KV on 3S (keep 4000 or 4500–5000); an XT30 3S 850–1100 mAh pack (publish dims); Video-kit frame (QAV-S Mini + 12→9 motor and 14→20 camera adapters, or a 1404/O4-native 3" frame such as QAV-S 2 Sub-250 SE); GPS 4.5 V vs 5 V pad; prop model (Gemfan 3016/3018, HQ T3×3) | Open | parts list § 7.1b |
+| **Weigh one Base and one Video build** — per component and complete with battery, props, RID; hover current and flight time; component photos for Unit 2 | Open | parts list § 7.2 |
+| **In-person checks** — capacitor value in the box, motor lead ends, Setup-tab model motion on first flash (Betaflight config #1064 alignment report), CF standoff height, battery fit; confirm the 16-joint tally | Open | parts list § 7.1c |
 | **Stock-frame CAD** with `arm_thickness` and `hole_clearance` variables; STL for print-and-ship | Open | parts list § 9 · outline Unit 5 |
 | Re-price the quote at order time; swap superseded parts | Open | parts list § 1 |
 
