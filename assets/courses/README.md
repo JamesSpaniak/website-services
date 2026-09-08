@@ -54,7 +54,8 @@ Author intake for a future build/assembly course. **No payload, questions, or ho
 | File | Purpose |
 |------|---------|
 | `README.md` | Folder status and version table |
-| `outlines/joe-drone-build-feedback-v2.md` | **v2 source of truth** — Joe’s decisions and per-unit session tables (`origin/branch-joe`, Sep 6 2026) |
-| `outlines/drone-building-course-review-v2.md` | Section review, technical value, additions, recommendations, v3 questions |
+| `outlines/drone-building-course-outline-v3.md` | **v3 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
+| `outlines/joe-drone-build-feedback-v2.md` | Joe’s v2 decisions and per-unit session tables (`origin/branch-joe`, Sep 6 2026) |
+| `outlines/drone-building-course-review-v2.md` | Review, technical value, verified facts, Betaflight/sensor options, readiness |
 | `outlines/drone-building-course-draft.md` | v1 draft (superseded, kept for history) |
 | `outlines/joe-drone-building-outline.txt` | v0 — Joe’s original topic list (Aug 5 2026) |
