@@ -1,6 +1,6 @@
 # Drone building course — v2 review
 
-**Status:** Review of Joe's Sep 6 2026 feedback. **Source of truth for v2 is [`joe-drone-build-feedback-v2.md`](joe-drone-build-feedback-v2.md)** (verbatim copy of `docs/building/Drone Build Feedback.md` from `origin/branch-joe`, commits `05642b2` + `512c701`). The v1 draft ([`drone-building-course-draft.md`](drone-building-course-draft.md)) is kept for history and is superseded where the two disagree.
+**Status:** Review of Joe's Sep 6 2026 feedback. **Source of truth for v2 was `joe-drone-build-feedback-v2.md`** (verbatim copy of `docs/building/Drone Build Feedback.md` from `origin/branch-joe`, commits `05642b2` + `512c701`). That file and the v1 draft (`drone-building-course-draft.md`) were removed from this folder on Sep 8 2026 once the v3 outline carried every decision; both remain in git history at `8183817`. This review quotes what v2 said, so the rationale stands without them.
 
 **Not a payload.** No course JSON, questions, images, or homepage track come from this folder yet. Part 107 recordings remain P0 ([`docs/TODO.md`](../../../../docs/TODO.md)).
 
@@ -13,8 +13,8 @@
 | Version | File | Author | Date | What it is |
 |---------|------|--------|------|------------|
 | v0 | [`joe-drone-building-outline.txt`](joe-drone-building-outline.txt) | Joe (`dd4ce7f`) | Aug 5 2026 | 44-line topic list, 7 headings, Testing empty |
-| v1 | [`drone-building-course-draft.md`](drone-building-course-draft.md) | Drone Edge (`7c3579e`) | Sep 1 2026 | Our expansion: Safety unit, stems/leaves, gaps, ~15-period mini-course |
-| **v2** | [`joe-drone-build-feedback-v2.md`](joe-drone-build-feedback-v2.md) | Joe (`05642b2`, `512c701`) | Sep 6 2026 | Answers all six open decisions, per-unit session tables, assessments |
+| v1 | `drone-building-course-draft.md` (removed Sep 8; history at `8183817`) | Drone Edge (`7c3579e`) | Sep 1 2026 | Our expansion: Safety unit, stems/leaves, gaps, ~15-period mini-course |
+| **v2** | `joe-drone-build-feedback-v2.md` (removed Sep 8; history at `8183817`; original on `origin/branch-joe`) | Joe (`05642b2`, `512c701`) | Sep 6 2026 | Answers all six open decisions, per-unit session tables, assessments |
 | v2 review | this file | Drone Edge | Sep 7 2026 | Section review, technical value, additions, recommendations |
 | **v3 answers** | §2a of this file | Joe (verbal, Sep 8 2026) | Sep 8 2026 | Ordering rationale, safety ownership, battery scope, kit tiers, sub-250 g target, CF frames for video kits |
 | **v3.1 parts** | [`../reference/parts-list-draft-v1.md`](../reference/parts-list-draft-v1.md) + [`../reference/getfpv-quote-2026-09-08.pdf`](../reference/getfpv-quote-2026-09-08.pdf) | Joe (quote + notes, Sep 8 2026 PM) | Sep 8 2026 | GetFPV quote ($364.91, six lines), full-PLA frame flew, material second look, shared strap-on RID module. Folded into outline v3.1 |
