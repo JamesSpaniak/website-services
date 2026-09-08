@@ -4,7 +4,7 @@
 
 **Not a payload.** No course JSON, questions, images, or homepage track come from this folder yet. Part 107 recordings remain P0 ([`docs/TODO.md`](../../../../docs/TODO.md)).
 
-**How to use:** Joe reads §2–§5, answers the questions in §9, and pushes v3 to `branch-joe`. We fold the answers back here. Once §8 is clear, authoring of 150–350 word leaves starts.
+**How to use:** This file holds rationale, verified facts, and readiness. **Drafting works from [`drone-building-course-outline-v3.md`](drone-building-course-outline-v3.md).** Joe answers §9 and pushes hardware changes to `branch-joe`; we fold them into the v3 outline.
 
 ---
 
@@ -27,7 +27,7 @@ Branch facts (Sep 8): `origin/branch-joe` is unchanged since `512c701` (Sep 6) �
 | Decision | v1 default | Joe v2 | Our read | Recommendation |
 |----------|-----------|--------|----------|----------------|
 | Airframe | 5-inch or guarded trainer | **3–3.5 inch, prop guards** (more CAD work) | Right size for a classroom: cheaper crashes, guards are a legitimate design surface | **Lock.** Weigh a reference build with battery early — a guarded 3–3.5" often lands near or above 250 g, which decides registration and Remote ID for every student aircraft |
-| Firmware | Betaflight, or INAV if alt-hold | **Betaflight**; GPS hold now exists | Correct for angle-mode first flights. Position/altitude hold in Betaflight is recent and needs baro + GPS on the FC | **Lock Betaflight, pin the version**, and test hold modes on the actual kit FC before promising them in a leaf. If GPS is not in the kit, drop hold modes from v1 content |
+| Firmware | Betaflight, or INAV if alt-hold | **Betaflight**; GPS hold now exists | Verified Sep 8: hold modes arrived in **2025.12 (4.6)**, stable Jan 2026; current is **2026.6**. GPS required for hold; baro optional; mag strongly recommended or `pos_hold_without_mag` + straight-line fly | **Locked: Betaflight, pin 2026.6 for screenshots.** Sensor option chosen in §7a: **Option A (no GPS) for the Base kit**; GPS + mag as the Video-kit upgrade |
 | Soldering | Teacher-solder or full lab | Students **should** solder; no-solder kits cost more but are reusable | Agree on learning value; the buyer objection is real | **Ship two assembly tracks** in the same unit: *Solder* (default) and *Plug-in* (school opts out). Same leaves, different lab steps |
 | 107 overlap | Cross-link 107 | Cover regs **here**; not all students take 107. Reuse 107 slides/quizzes, keep FAA links current | Agree. Builder regs unit is thin but must stand alone | Build the unit from `faa-107` `u1` registration/RID leaves, cut to builder scope. Do not fork the wording — link the source leaf id so updates flow once |
 | Hardware | Course-owned kit BOM | Curated kits possible, expensive; no-solder reusable | Still commercial, not curricular | Publish a **reference BOM** (parts list, not a SKU) with the Components unit so schools can BYO or buy |
@@ -46,6 +46,8 @@ Branch facts (Sep 8): `origin/branch-joe` is unchanged since `512c701` (Sep 6) �
 | **Kit tiers** | Base kit vs a higher-end camera/VTX/FPV kit that feeds the Video & Photography course so schools reuse finished drones there | Strong. It turns a one-semester build into a two-course hardware investment and gives the Video track its aircraft | **Locked.** Two kits: **Base** (flyer, guards) and **Video/FPV** (camera, VTX, optionally goggles). Unit 2 "optional parts" becomes the Video kit's required parts |
 | **Weight** | Plenty of FPV kits under 250 g; all kits should target sub-250 g with or without FPV, provided student frames keep weight down | Agree, with a caveat: sub-250 g matters most on the recreational path. Under Part 107, registration is required regardless of weight and Remote ID follows registration — so the weight line helps only if the class flies recreationally (§7 verify). Either way it forces a real weight budget into the design brief | **Locked target.** Every kit, every student frame: AUW ≤ 250 g with battery. Weigh-in becomes a Unit 5 gate and a Unit 8 bench item |
 | **Video-kit frame** | Video kits should ship with a CF frame; designing proper camera/VTX mounts would make Design take too long | Agree. It also cleanly splits the CAD tiers: Base kit students design printed structure (Tier B); Video kit students get a stock CF frame and design only small printed parts — camera cage, antenna mount, battery tray (Tier A) | **Locked.** CAD tier follows kit tier |
+| **Operating authority** (Sep 8, second round) | An RPIC — teacher or paid employee — is present on all flight days | This selects the **Part 107 path**. Verified consequences: every aircraft registered regardless of weight (Part 107 registers each device separately, ~$5), Remote ID required and met with a broadcast module listed per aircraft, VLOS. TRUST/recreational path is off the table. The RPIC must hold a Part 107 certificate — that is our existing course | **Locked.** §7 authority item closed |
+| **Weight** (Sep 8, second round) | Keep drones light to reduce kit cost; can go bigger if needed | Under 107 sub-250 g buys no regulatory relief, so it is a **cost and crash-energy target with a soft cap**, not a gate. Design brief carries a weight budget; going over is a documented trade, not a fail | **Locked.** Weigh-in stays as a Unit 5 checkpoint and Unit 8 bench item; hard 250 g gate removed |
 
 ---
 
@@ -118,7 +120,7 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Site brief:** airspace check, not over people, bystanders — short, pointing to `faa-107` for depth.
 - **Do-not-fly-at-home closeout** until registered and RID-equipped.
 
-**On RPIC (ours to document, not a Joe question):** aircraft size does not change the answer. Under Part 107 an RPIC is required for every flight regardless of weight. Under the recreational exception there is no RPIC, but every flyer needs a TRUST certificate and the operation must qualify as recreational — whether a school class qualifies is the FAA wording in §7 we must verify. If students or the teacher take this course **after** Part 107, the RPIC exists by definition. The course states the fork; the school picks the path.
+**On RPIC — decided Sep 8:** an RPIC (teacher or paid employee) is present on every flight day, so the class flies under **Part 107**. Verified consequences for the unit: register every aircraft regardless of weight (Part 107 registers each device separately in FAADroneZone, ~$5 each); Remote ID is required and met with a **broadcast module** whose serial is listed on that aircraft's registration; fly VLOS. The recreational/TRUST fork is removed from the course; one sentence notes it exists so students know why hobby drones differ. The RPIC needs a Part 107 certificate — the school buys that from us.
 
 **Recommendation:** Single session is fine. Build from `faa-107` `u1` registration/RID leaves so wording is maintained once. This unit is also the natural **cross-sell for the teacher's Part 107 certificate** — if the class flies under 107, the school needs a certificated RPIC, which is the product we already sell.
 
@@ -217,9 +219,9 @@ Joe's reasoning for the CF frame on the Video kit — designing proper camera/VT
 - **Accel/gyro calibration** and battery voltage scaling (OSD warnings).
 - **Angle mode** named as the first-flight mode; arm switch; beeper on a switch (Joe's v0 had these — carry them forward).
 - **Settings dump/backup** step so a re-flash doesn't cost a period.
-- **GPS hold** only if GPS is in the kit; otherwise remove from v1 content.
+- **GPS hold** — per §7a, **not in the Base kit**; Video-kit upgrade only. Base-kit v1 content is angle mode + failsafe + beeper.
 
-**Recommendation:** 3 sessions is right. Move the registration/RID *action* here as Joe suggests (aircraft is real now), but teach the *rule* in Unit 3 so students know it's coming.
+**Recommendation:** 3 sessions is right. Move the registration/RID *action* here as Joe suggests (aircraft is real now), but teach the *rule* in Unit 3 so students know it's coming. Pin **Betaflight 2026.6** for all Configurator screenshots.
 
 ### 4.8 Unit 8 — Testing (10 sessions)
 
@@ -269,13 +271,25 @@ These are not in v2 and should not be negotiable:
 
 ---
 
-## 7. Facts to verify before authoring (do not paraphrase from memory)
+## 7. Facts to verify before authoring — status Sep 8 2026
 
-- Recreational exception vs educational use — current FAA wording, whether a school class qualifies, and therefore whether an RPIC (107) or TRUST (recreational) is required on flight days.
-- Registration weight threshold and Remote ID applicability for homebuilt aircraft; broadcast-module and FRIA options.
-- Betaflight version with position/altitude hold and the sensors it requires.
-- Actual AUW of the reference 3–3.5" build with guards and battery.
-- Current education-license terms for Onshape, Fusion, Tinkercad (free today; confirm before it goes in a leaf).
+| Fact | Status | Result |
+|------|--------|--------|
+| Recreational vs educational; RPIC or TRUST on flight days | **Closed by decision** | RPIC present every flight day → Part 107 path. TRUST/recreational removed from scope |
+| Registration and Remote ID for homebuilt sub-250 g under 107 | **Verified** (FAA registration FAQ, FAA Remote ID page) | Register regardless of weight; Part 107 registers each device separately; RID via broadcast module with serial listed per aircraft; VLOS. Re-check FAA pages at authoring time; link them in the leaf |
+| Betaflight hold-mode version and sensors | **Verified** (Betaflight wiki, 2025.12 + 2026.6 release notes) | Hold modes since 2025.12 (4.6, stable Jan 2026); current 2026.6. GPS required; baro optional; mag strongly recommended or `pos_hold_without_mag` + straight-line fly |
+| Actual AUW of reference builds | **Open — Joe BOM** | Two BOMs with AUW |
+| CAD education licenses | **Verified** (Onshape education plans; Autodesk education) | Onshape Student/Educator free, browser, Chromebook; Fusion free for eligible students/educators, 1-year renewable, Chromebook OK; both need education verification. Tinkercad free |
+
+### 7a. Betaflight and sensor options — pick one
+
+| Option | Sensors | What students get | Cost / weight / teaching load | Fit |
+|--------|---------|-------------------|-------------------------------|-----|
+| **A — No GPS** | Gyro + accel (required), baro if the FC has one | Angle mode, failsafe drop/disarm, beeper, OSD voltage. No hold modes | Cheapest, lightest, no extra UART or solder, nothing to calibrate but accel | **Base kit v1.** Flights are short, VLOS, in a cage or small field with an RPIC; a hover-on-a-switch is not what the course is teaching |
+| **B — GPS, no mag** | A + GPS module (~5 g) | Altitude Hold, Position Hold after a straight-line fly, GPS Rescue | +1 UART, +1 solder or plug, sat lock wait, "POSHOLD FAIL" until heading is learned | Weak for beginners in a cage — the straight-line prerequisite is the opposite of a small-field first flight |
+| **C — GPS + mag** | B + magnetometer, baro | Position Hold from takeoff, best rescue | Mag calibration, interference from CF/wiring/motors, most to teach and to get wrong | **Video-kit upgrade.** Outdoor cinematic hover is exactly the Video & Photography use case |
+
+**Pick: Option A for the Base kit, pin Betaflight 2026.6 for Configurator screenshots** (state "2025.12 or newer" in the text). Option C is the Video kit's optional add-on and gets its own leaf in Unit 7 tagged to that kit. Joe's BOM should therefore specify an AIO/FC **with a barometer** (cheap, useful for altitude OSD, and it keeps the Video upgrade open) and **no GPS** in the Base kit.
 
 ---
 
@@ -284,14 +298,14 @@ These are not in v2 and should not be negotiable:
 | Blocker | Why it matters | Owner |
 |---------|----------------|-------|
 | ~~Solder vs plug-in default~~ → **minimal-solder locked (v3)**; joint list still needed | Assembly lab steps, cost, and school objection | Joe (joint list) |
-| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; GPS still undecided | Unit 7 hold modes; GPS in Base, Video, neither? | Joe |
+| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; ~~GPS~~ → **Option A: no GPS in Base, GPS+mag optional on Video (§7a)** | Unit 7 hold modes | Closed |
 | **Reference BOM × 2** (Base, Video/FPV), each with AUW and solder-joint count | Photos, quiz items, AUW numbers, Assembly steps all depend on it | Joe |
 | Which structural parts students may print (Tier B) vs receive | Design brief and print-and-ship batch size | Joe |
 | Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Us on ops |
 | Print-and-ship service design | Turnaround, cost, material, failed-print policy | Us |
-| Operating authority wording (107 vs recreational) | Unit 3 fork, Unit 8 supervision | Us (§7 verify) |
+| ~~Operating authority~~ → **Part 107 path, RPIC on every flight day (Sep 8)** | Unit 3, Unit 8 supervision | Closed |
 | Weather review vs expanded leaf | Depends on whether students took 107 first | Us |
-| CAD tool default + license check | Screenshots and the design brief | Us (Onshape default) |
+| ~~CAD license check~~ → **verified free (Onshape, Fusion, Tinkercad)** | Screenshots and the design brief | Closed; Onshape default |
 
 ---
 
@@ -299,11 +313,11 @@ These are not in v2 and should not be negotiable:
 
 Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Still open:
 
-1. **Two reference BOMs** — Base and Video/FPV: motor, AIO/ESC, FC, RX, battery, props, guards, frame (CF for Video), camera/VTX for Video. For each: AUW with battery and **number of solder joints**.
-2. **GPS:** in the Base kit, the Video kit, or neither? Decides whether Betaflight hold modes appear anywhere in v1.
-3. **Tier B print scope:** on the Base kit, which structural parts may students print (guards, mounts, tray only? arms? full plate?) while staying under 250 g and flyable. This sets the design brief and the print-and-ship batch.
-4. **Printed-part materials:** which parts are safe as PETG/nylon and which must stay carbon/aluminum on a 3–3.5" guarded quad.
-5. **Video-kit goggles/monitor:** in the kit, shared per class, or a school purchase? Affects the Video & Photography hand-off.
+1. **Two reference BOMs** — Base and Video/FPV: motor, AIO/ESC **with barometer, no GPS on Base**, FC, RX, battery, props, guards, frame (CF for Video), camera/VTX for Video, optional GPS+mag module for Video. For each: AUW with battery and **number of solder joints**.
+2. **Tier B print scope:** on the Base kit, which structural parts may students print (guards, mounts, tray only? arms? full plate?) while staying light and flyable. This sets the design brief and the print-and-ship batch.
+3. **Printed-part materials:** which parts are safe as PETG/nylon and which must stay carbon/aluminum on a 3–3.5" guarded quad.
+4. **Video-kit goggles/monitor:** in the kit, shared per class, or a school purchase? Affects the Video & Photography hand-off.
+5. **Remote ID module:** a specific broadcast module that fits a 3–3.5" frame (weight, mounting, power) — one per aircraft under Part 107.
 
 ## 10. Remaining before drafting initial versions
 
@@ -311,12 +325,13 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 
 | Item | Feeds | Status |
 |------|-------|--------|
-| Verify §7 FAA facts (authority for school classes, sub-250 g under recreational vs 107, homebuilt RID) | Units 3, 8; weight target | Not started |
-| Verify Betaflight hold-mode version + sensor needs; CAD education-license terms | Units 5, 7 | Not started |
+| ~~Verify §7 FAA facts~~ | Units 3, 8 | **Done Sep 8** — Part 107 path; register all, RID module per aircraft |
+| ~~Verify Betaflight version + sensors; CAD licenses~~ | Units 5, 7 | **Done Sep 8** — 2026.6 pinned, Option A no-GPS Base; Onshape/Fusion free |
+| Consolidated v3 outline with terms | Everything downstream | **Done Sep 8** — [`drone-building-course-outline-v3.md`](drone-building-course-outline-v3.md) |
 | Unit 1 Safety: 2 sessions, checklist, signed cert, per-unit safety briefs | Gate for Unit 6 | Not started — ours per v3 |
 | Unit 4 stems: materials science, heat transfer, battery mechanics (no chemistry) | Unit 5 brief; Units 6–8 recall | Scoped; drafting can start |
 | Weather review leaf + expanded variant for non-107 students | Unit 4 session 1 | Not started; source `faa-107` `u5`/`u6` |
-| Unit 3 Laws leaves cut from `faa-107` `u1`, plus operating-authority fork worksheet | Unit 3 | Blocked on FAA verification |
+| Unit 3 Laws leaves cut from `faa-107` `u1`; Part 107 registration + RID-module procedure | Unit 3 | Unblocked Sep 8; needs RID module pick from Joe |
 | CAD fundamentals stem (2 sessions) + Tier A parametric guard/mount + design brief + critique rubric | Unit 5 | Can start; brief needs BOM numbers |
 | Unit 7 failsafe / motor-direction / calibration / backup leaves | Unit 7 | Can start generically; screenshots need the kit FC |
 | Unit 8 bench checklist + maiden protocol + post-flight rubric | Unit 8 grading | Can start |
@@ -328,14 +343,14 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 | Item | Blocks |
 |------|--------|
 | Base + Video BOMs with AUW and solder-joint count | Unit 2 photos/quiz, Unit 4 AUW worksheet, Unit 6 step list, Unit 8 weigh-in |
-| GPS decision | Unit 7 hold-mode content |
 | Tier B print scope + printed-part materials | Unit 5 design brief, print-and-ship batch |
 | Goggles/monitor in Video kit | Unit 2 Video parts, Video & Photography hand-off |
+| Remote ID broadcast module pick | Unit 3 procedure, Unit 6 mounting, BOM weight |
 
 ### Is it ready for development?
 
-**Curriculum drafting — partially yes.** The tree, order, session counts, kit tiers, weight target, and ownership split are locked. We can draft **Units 1, 4, 8** and the generic parts of **5 and 7** now. **Unit 3** waits on FAA verification. **Units 2 and 6** and the Unit 5 design brief wait on the two BOMs — that is the single biggest blocker, and it is Joe's.
+**Curriculum drafting — mostly yes as of Sep 8.** The tree, order, session counts, kit tiers, weight target, operating authority, firmware version, sensor option, CAD tool, and ownership split are locked, and the §7 facts are verified. We can draft **Units 1, 3, 4, 8** and the generic parts of **5 and 7** now. **Units 2 and 6** and the Unit 5 design brief wait on the two BOMs — the single remaining blocker, and it is Joe's.
 
-**Course payload / code — no.** No `drone_building_course.json`, no questions, no homepage track until: (1) both BOMs exist, (2) §7 facts are verified, (3) Part 107 recordings/publish are done (P0). The step-clip video format also needs a frontend answer before Units 6–8 are authored to it.
+**Course payload / code — no.** No `drone_building_course.json`, no questions, no homepage track until: (1) both BOMs exist, (2) Part 107 recordings/publish are done (P0). The step-clip video format also needs a frontend answer before Units 6–8 are authored to it.
 
-**Order of work once BOMs land:** Unit 1 → Unit 4 → Unit 2 → Unit 5 brief → Unit 6 → Unit 7 → Unit 8 rubrics → Unit 3 (after verification) → payload.
+**Order of work:** Unit 1 → Unit 4 → Unit 3 → Unit 8 rubrics → (BOMs land) → Unit 2 → Unit 5 brief → Unit 6 → Unit 7 → payload. Drafting works from [`drone-building-course-outline-v3.md`](drone-building-course-outline-v3.md).
