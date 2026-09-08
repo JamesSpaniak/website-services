@@ -12,7 +12,7 @@
 
 | Version | File | Author | Date | What it is |
 |---------|------|--------|------|------------|
-| v0 | [`joe-drone-building-outline.txt`](joe-drone-building-outline.txt) | Joe (`dd4ce7f`) | Aug 5 2026 | 44-line topic list, 7 headings, Testing empty |
+| v0 | `joe-drone-building-outline.txt` (removed Sep 8; history at `8183817`; original on `origin/branch-joe`) | Joe (`dd4ce7f`) | Aug 5 2026 | 44-line topic list, 7 headings, Testing empty |
 | v1 | `drone-building-course-draft.md` (removed Sep 8; history at `8183817`) | Drone Edge (`7c3579e`) | Sep 1 2026 | Our expansion: Safety unit, stems/leaves, gaps, ~15-period mini-course |
 | **v2** | `joe-drone-build-feedback-v2.md` (removed Sep 8; history at `8183817`; original on `origin/branch-joe`) | Joe (`05642b2`, `512c701`) | Sep 6 2026 | Answers all six open decisions, per-unit session tables, assessments |
 | v2 review | this file | Drone Edge | Sep 7 2026 | Section review, technical value, additions, recommendations |

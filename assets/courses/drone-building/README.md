@@ -11,9 +11,8 @@ Initial **build / assembly** course intake. Not in the catalog. No `*_course.jso
 | [`reference/getfpv-quote-2026-09-08.pdf`](reference/getfpv-quote-2026-09-08.pdf) | source | Joe's quote (six lines, $364.91) |
 | [`reference/parts-list-template.md`](reference/parts-list-template.md) | template | Blank parts list for future kit revisions |
 | [`outlines/drone-building-course-review-v2.md`](outlines/drone-building-course-review-v2.md) | v2 review + v3 answers | Rationale, technical-value review, verified facts, Betaflight/sensor options, readiness |
-| [`outlines/joe-drone-building-outline.txt`](outlines/joe-drone-building-outline.txt) | v0 | Joe's original topic list (Aug 5 2026) |
 
-Superseded files removed Sep 8 2026 (in git history at `8183817`): v1 `drone-building-course-draft.md` (our first expansion) and v2 `joe-drone-build-feedback-v2.md` (Joe's Sep 6 feedback; original on `origin/branch-joe` as `docs/building/Drone Build Feedback.md`). Everything they decided is carried in the v3 outline and the review.
+Superseded files removed Sep 8 2026 (in git history at `8183817`): v0 `joe-drone-building-outline.txt` (Joe's Aug 5 topic list), v1 `drone-building-course-draft.md` (our first expansion), and v2 `joe-drone-build-feedback-v2.md` (Joe's Sep 6 feedback). Joe's originals remain on `origin/branch-joe` under `docs/building/`. Everything they decided is carried in the v3 outline and the review.
 
 Open work is tracked in [`docs/TODO.md`](../../../docs/TODO.md) § Drone-building course.
 
