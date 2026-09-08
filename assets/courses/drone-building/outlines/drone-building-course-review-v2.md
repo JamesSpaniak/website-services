@@ -16,8 +16,9 @@
 | v1 | [`drone-building-course-draft.md`](drone-building-course-draft.md) | Drone Edge (`7c3579e`) | Sep 1 2026 | Our expansion: Safety unit, stems/leaves, gaps, ~15-period mini-course |
 | **v2** | [`joe-drone-build-feedback-v2.md`](joe-drone-build-feedback-v2.md) | Joe (`05642b2`, `512c701`) | Sep 6 2026 | Answers all six open decisions, per-unit session tables, assessments |
 | v2 review | this file | Drone Edge | Sep 7 2026 | Section review, technical value, additions, recommendations |
+| **v3 answers** | §2a of this file | Joe (verbal, Sep 8 2026) | Sep 8 2026 | Ordering rationale, safety ownership, battery scope, kit tiers, sub-250 g target, CF frames for video kits |
 
-Branch facts (Sep 7): `origin/branch-joe` is 3 commits ahead of `origin/main` and only touches `docs/building/`. Our folder `assets/courses/drone-building/` is on `main` via PR #1. Joe's v0 `.txt` is unchanged; it still lists GPS as optional and starts Assembly at the battery connector, which v2 supersedes.
+Branch facts (Sep 8): `origin/branch-joe` is unchanged since `512c701` (Sep 6) — no new files. Joe's v3 came in conversation and is recorded in §2a. Our folder `assets/courses/drone-building/` is on `main` via PR #1. Joe's v0 `.txt` is unchanged; it still lists GPS as optional and starts Assembly at the battery connector, which v2 supersedes.
 
 ---
 
@@ -34,13 +35,27 @@ Branch facts (Sep 7): `origin/branch-joe` is 3 commits ahead of `origin/main` an
 
 ---
 
+## 2a. v3 answers (Joe, Sep 8 2026) and how they land
+
+| Topic | Joe v3 | Our read | Result |
+|-------|--------|----------|--------|
+| **Unit order** | Laws → Physics → Design was intentional: physics fresh in mind when students start CAD | Agree. Retrieval is strongest right after teaching; Physics feeding straight into the design brief is the right sequence. Heat and battery stems also feed Assembly and Testing, so those units open with a one-paragraph recall, not a re-teach | **Locked.** Order 1 Safety → 2 Components → 3 Laws → 4 Physics → 5 Design → 6 Assembly → 7 Software → 8 Testing |
+| **Safety** | Defer to us; "make it vital for students" | We own Unit 1 and every per-unit safety brief. Restore 2 sessions; the three gates in §5 are non-negotiable | **Ours.** Unit 1 = 2 sessions + signed cert; per-unit briefs written by us |
+| **Battery content** | Avoid chemistry in the classroom; chemistry class can do electrochemistry. Is high-level battery mechanics better? | Yes. The course teaches battery **mechanics** — voltage window, series cells, capacity, C-rating, internal resistance and sag, temperature, storage, puffing, disposal, LiPo vs Li-ion as a use-case choice. No redox, no electrode chemistry. One optional teacher note points a chemistry class at the electrochemistry if they want the cross-curricular hook | **Locked.** §4.4 battery stem retitled "battery mechanics"; chemistry landscape reduced to a one-line "these exist" |
+| **Soldering** | Cannot go fully no-solder; can get close. Fewer joints = easier to teach | Design the base kit around the minimum joints: motor leads to AIO/ESC pads (or pre-soldered motor plugs if the AIO supports them), battery pigtail, capacitor. Everything else plug-in (FC↔ESC ribbon, RX on a plug, camera/VTX on plugs) | **Locked direction.** "Minimal-solder" is the default track; the joint count goes in the BOM |
+| **Kit tiers** | Base kit vs a higher-end camera/VTX/FPV kit that feeds the Video & Photography course so schools reuse finished drones there | Strong. It turns a one-semester build into a two-course hardware investment and gives the Video track its aircraft | **Locked.** Two kits: **Base** (flyer, guards) and **Video/FPV** (camera, VTX, optionally goggles). Unit 2 "optional parts" becomes the Video kit's required parts |
+| **Weight** | Plenty of FPV kits under 250 g; all kits should target sub-250 g with or without FPV, provided student frames keep weight down | Agree, with a caveat: sub-250 g matters most on the recreational path. Under Part 107, registration is required regardless of weight and Remote ID follows registration — so the weight line helps only if the class flies recreationally (§7 verify). Either way it forces a real weight budget into the design brief | **Locked target.** Every kit, every student frame: AUW ≤ 250 g with battery. Weigh-in becomes a Unit 5 gate and a Unit 8 bench item |
+| **Video-kit frame** | Video kits should ship with a CF frame; designing proper camera/VTX mounts would make Design take too long | Agree. It also cleanly splits the CAD tiers: Base kit students design printed structure (Tier B); Video kit students get a stock CF frame and design only small printed parts — camera cage, antenna mount, battery tray (Tier A) | **Locked.** CAD tier follows kit tier |
+
+---
+
 ## 3. Course shape and pacing
 
-Joe's tree is a **CTE semester lab** (~31–36+ periods). v1 was a **quarter mini-course** (~15). He also moved **Laws before Physics**.
+Joe's tree is a **CTE semester lab** (~31–36+ periods). v1 was a **quarter mini-course** (~15). He moved **Laws before Physics** so physics is fresh going into Design — confirmed intentional in v3 and locked.
 
 | # | Unit | v1 sessions | Joe v2 | Delta | Where it goes |
 |---|------|------------:|-------:|-------|---------------|
-| 1 | Safety | 2 | 1 | Cut; workshop rules deferred to school | See §4.1 — we keep a gate |
+| 1 | Safety | 2 | 1 | Cut; workshop rules deferred to school | **v3: ours, back to 2** — see §4.1; gates in §5 |
 | 2 | Function of components | 2 | 3 | + optional parts session | Accept |
 | 3 | Laws | 1 | 1 | Swapped ahead of Physics; adds night lighting | Accept order |
 | 4 | Physics | 1 | 5 | + weather, placement, materials, power | Accept 5–6; weather becomes a review leaf, add materials / heat / battery science (§4.4) |
@@ -70,11 +85,15 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Incident procedure** (burn, cut, runaway motor, LiPo puff) — one leaf.
 - **Signed shop cert** checklist before Unit 6. Even if the school owns the content, the course should provide the checklist.
 
-**Recommendation:** Keep at 1 session but make it a **gate**, not a lecture. Provide the checklist as a downloadable teacher asset.
+**v3:** Joe deferred Safety to us. We own it fully.
+
+**Recommendation:** **2 sessions.** Session 1: LiPo (handling, charging in a bag, storage, puffing, fire can, never unattended), tools and PPE (iron temperature, fume extraction, eye protection, hot-work zone), incident procedure. Session 2: bench rules as a demonstration — props-off until Unit 8, smoke stopper on first power-up, arming discipline, failsafe vocabulary — then the **signed shop cert**. Every later unit opens with a written 3–5 line safety brief that we author, not the teacher. Provide the checklist and briefs as downloadable teacher assets.
 
 ### 4.2 Unit 2 — Function of components (3 sessions)
 
 **v2 has:** Essential parts (frame, motors, props, ESC, FC, battery, receiver, Remote ID module); optional parts (GPS, camera, VTX, AIO vs separate ESC); 5–10 min ID quiz. Part selection by weight/use case.
+
+**v3:** "optional parts" maps to the **Video/FPV kit** (camera, VTX, goggles) — required there, absent in the Base kit. Teach the stem once; tag leaves by kit.
 
 **Technical value:** High. Correct scope for a first unit; AIO vs 4-in-1 vs separate ESC and "what goes where" is exactly what beginners lack.
 
@@ -128,14 +147,15 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Why it matters**: motor demag and ESC thermal throttling; LiPo temperature after a flight as a health check; iron temperature, thermal mass, and dwell time when soldering (ties to Unit 6 safety).
 - One hands-on: IR thermometer on motors and ESC after a bench spin (Unit 8) and log it.
 
-**Add — battery science for future use (new stem):** transferable to EVs, phones, and anything Joe's students touch next.
-- **LiPo chemistry** at a plain-language level: cell voltage window (~3.0–4.2 V), nominal 3.7 V, series cells (2S–4S) and why voltage sets motor speed.
-- **Capacity vs C-rating vs internal resistance**: what "sag" is, why a small high-C pack beats a big low-C pack for a 3–3.5" quad, energy density vs power density.
-- **Care**: storage voltage, balance charging, puffing, cycle life, what a puffed cell tells you, disposal.
-- **Chemistry landscape**: LiPo vs Li-ion (18650/21700 for long-range vs high discharge), a sentence each on LiFePO4 and solid-state so students know the field is moving.
+**Add — battery mechanics (new stem; v3: no chemistry in the classroom):** what the pack *does*, not what happens at the electrodes. Transferable to EVs, phones, and anything students touch next.
+- **Voltage**: cell window (~3.0–4.2 V), nominal 3.7 V, series cells (2S–4S) and why pack voltage sets motor speed and prop choice.
+- **Capacity vs C-rating vs internal resistance**: what "sag" is, why a small high-C pack beats a big low-C pack on a 3–3.5" quad, energy density vs power density, why weight per Wh matters under a 250 g budget.
+- **Temperature**: warm after flight is normal, hot is a fault; cold packs sag (ties to the heat stem and the weather review).
+- **Care**: storage voltage, balance charging in a bag, puffing, cycle life, what a puffed cell tells you, disposal.
+- **Use-case choice, one line each**: LiPo (high discharge) vs Li-ion 18650/21700 (long range) — and a single sentence that other chemistries exist. **Optional teacher note** points a chemistry class at the electrochemistry for a cross-curricular hook; the drone course does not teach it.
 - One hands-on: measure pack voltage before/after a bench run and compute Wh used.
 
-**Recommendation:** 5–6 sessions: (1) weather review + part placement, (2) materials science, (3) heat transfer, (4–5) drone power + battery science, (6) quiz + AUW worksheet. Keep `faa-107` `u7` as canonical for exam phrasing (load factor, CG vs CP); this unit uses shop language and student-owned numbers. The three new stems are ours to draft with Joe as technical reviewer.
+**Recommendation:** 5–6 sessions: (1) weather review + part placement, (2) materials science, (3) heat transfer, (4–5) drone power + battery mechanics, (6) quiz + AUW worksheet. Keep `faa-107` `u7` as canonical for exam phrasing (load factor, CG vs CP); this unit uses shop language and student-owned numbers. The three new stems are ours to draft with Joe as technical reviewer. Units 6–8 open with a short recall of the heat and battery stems rather than re-teaching them, so the Laws → Physics → Design ordering stays intact.
 
 ### 4.5 Unit 5 — Frame design (5–10 sessions)
 
@@ -150,12 +170,14 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Critique rubric** for the every-2–3-days reviews (fit, strength, weight, serviceability).
 - **Crash-replaceable parts list** so Unit 8 iteration has spare arms/guards.
 
-**Two tiers, chosen per school:**
+**Two tiers — v3: the tier follows the kit:**
 
-| Tier | Work | Tool | Sessions | Who it fits |
-|------|------|------|----------|-------------|
-| **A — Modify** | Change a supplied parametric guard/mount (thicker rib, moved hole, new tray) | Tinkercad or Onshape | 2–3, no CAD stem needed | Schools without design time or CAD experience |
-| **B — Design** | Design printed parts from measured kit components under the brief | Onshape (default), Fusion, or school license | 5–10 incl. 2 CAD fundamentals sessions | CTE / engineering pathways |
+| Tier | Kit | Work | Tool | Sessions | Who it fits |
+|------|-----|------|------|----------|-------------|
+| **A — Modify** | **Video/FPV kit** (stock CF frame) or any school short on design time | Design/modify small printed parts only: camera cage, antenna mount, battery tray, guard rib | Tinkercad or Onshape | 2–3, CAD stem optional | Schools feeding the Video & Photography course; no CAD background |
+| **B — Design** | **Base kit** | Design printed structure (guards, mounts, tray; arms/plate per Joe's answer to §9 Q5) from measured components under the brief, **AUW ≤ 250 g** | Onshape (default), Fusion, or school license | 5–10 incl. 2 CAD fundamentals sessions | CTE / engineering pathways |
+
+Joe's reasoning for the CF frame on the Video kit — designing proper camera/VTX mounts would blow up the Design schedule — is right, and it gives Tier A real content instead of a token exercise. **Weigh-in** is a Tier B gate before anything is printed.
 
 **Non-print schools — the real question:** a CAD "starter file" is worthless without a printer. Replace that idea with:
 1. **Stock frame in every kit.** Joe already wants spare known-good frames for Unit 8; make the stock frame the guaranteed flyer so no student is grounded by a design that did not print.
@@ -179,7 +201,9 @@ Each section: what v2 has → technical value → add → recommendation.
 - **Checkpoint photos** per session (motors, ESC, FC, RX) for the completion grade.
 - **Plug-in track** variant for no-solder schools (same steps, different power-lead leaf).
 
-**Recommendation:** Accept Joe's order (ESC + power first) because he pairs it with the smoke stopper. Keep the **battery-before-failsafe** risk explicit: the smoke-stopper power-on is fine; **no motor spin** until Unit 7 failsafe is set.
+**v3 — minimal-solder default:** Joe: can't go fully no-solder, can get close. Base kit joint list should be the minimum: motor leads to AIO pads (or pre-soldered motor plugs if the AIO has them), battery pigtail, capacitor. FC↔ESC ribbon, RX, camera, and VTX on plugs. The **joint count is a BOM field** so a school knows exactly how much soldering it is signing up for.
+
+**Recommendation:** Accept Joe's order (ESC + power first) because he pairs it with the smoke stopper. Keep the **battery-before-failsafe** risk explicit: the smoke-stopper power-on is fine; **no motor spin** until Unit 7 failsafe is set. Video kit adds one session for camera/VTX install after the essentials.
 
 ### 4.7 Unit 7 — Software (3 sessions)
 
@@ -259,10 +283,11 @@ These are not in v2 and should not be negotiable:
 
 | Blocker | Why it matters | Owner |
 |---------|----------------|-------|
-| Solder vs plug-in kit as the **default** | Assembly lab steps, cost, and school objection | Joe |
-| GPS / camera / VTX in the kit or not | Unit 7 hold modes and Unit 2 optional parts | Joe |
-| Reference BOM | Photos, quiz items, AUW numbers all depend on it | Joe |
-| Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Joe on parts; us on ops |
+| ~~Solder vs plug-in default~~ → **minimal-solder locked (v3)**; joint list still needed | Assembly lab steps, cost, and school objection | Joe (joint list) |
+| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; GPS still undecided | Unit 7 hold modes; GPS in Base, Video, neither? | Joe |
+| **Reference BOM × 2** (Base, Video/FPV), each with AUW and solder-joint count | Photos, quiz items, AUW numbers, Assembly steps all depend on it | Joe |
+| Which structural parts students may print (Tier B) vs receive | Design brief and print-and-ship batch size | Joe |
+| Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Us on ops |
 | Print-and-ship service design | Turnaround, cost, material, failed-print policy | Us |
 | Operating authority wording (107 vs recreational) | Unit 3 fork, Unit 8 supervision | Us (§7 verify) |
 | Weather review vs expanded leaf | Depends on whether students took 107 first | Us |
@@ -270,24 +295,47 @@ These are not in v2 and should not be negotiable:
 
 ---
 
-## 9. Questions for Joe — v3 (drone-technical only)
+## 9. Questions for Joe — v4 (drone-technical only)
 
-Joe owns the hardware and build answers. Regs, pacing, weather, assessments, CAD licensing, and print-and-ship ops are ours and are not listed here.
+Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Still open:
 
-1. **Default assembly track:** solder, or plug-in with solder optional?
-2. **GPS in the base kit?** If not, we drop hold modes from v1 and keep GPS as an optional stem.
-3. **Reference parts list** (motor, ESC/AIO, FC, RX, battery, props, guards, base plate) so we can weigh and photograph one build.
-4. **Non-print schools — what do we hand them?** A CAD file is useless without a printer. Options on the table: (a) stock frame in every kit as the guaranteed flyer, (b) we print their class STLs and ship one batch, (c) makerspace fallback. Which parts should students be *designing* (guards, mounts, tray?) vs receiving pre-made (base plate, arms?) so that option (a) still flies and option (b) is a small, printable batch?
-5. **Printed-part materials:** for a 3–3.5" guarded quad, which parts are safe as PETG/nylon prints and which must stay carbon/aluminum? This sets the Tier A/B design brief.
-6. **CAD scope check:** is a Tier A "modify a supplied guard/mount" exercise still worth doing technically, or is it too trivial to teach anything about the airframe?
+1. **Two reference BOMs** — Base and Video/FPV: motor, AIO/ESC, FC, RX, battery, props, guards, frame (CF for Video), camera/VTX for Video. For each: AUW with battery and **number of solder joints**.
+2. **GPS:** in the Base kit, the Video kit, or neither? Decides whether Betaflight hold modes appear anywhere in v1.
+3. **Tier B print scope:** on the Base kit, which structural parts may students print (guards, mounts, tray only? arms? full plate?) while staying under 250 g and flyable. This sets the design brief and the print-and-ship batch.
+4. **Printed-part materials:** which parts are safe as PETG/nylon and which must stay carbon/aluminum on a 3–3.5" guarded quad.
+5. **Video-kit goggles/monitor:** in the kit, shared per class, or a school purchase? Affects the Video & Photography hand-off.
 
-## 10. Our next steps (parallel to v3)
+## 10. Remaining before drafting initial versions
 
-- Fold v3 answers into this file (§2, §8).
-- Verify §7 facts (FAA authority wording, RID/registration for homebuilt, Betaflight hold version, CAD license terms).
-- Draft the three new Unit 4 stems (materials science, heat transfer, battery science) with Joe as technical reviewer.
-- Write the CAD fundamentals stem and the Tier A parametric guard/mount.
-- Design the print-and-ship service (turnaround, cost, materials, failed-print policy, Unit 5 deadline).
-- Write Unit 1 checklist, Unit 7 failsafe leaf, Unit 8 bench/maiden rubric as the first teacher assets.
-- Draft Units 2–4 leaves (150–350 words) from the reference BOM and `faa-107` regs leaves; weather as a review leaf with an expanded variant for non-107 students.
-- Only then: `drone_building_course.json` with string refs (`u1`…), no homepage track until Part 107 is complete.
+**Ours** (no Joe dependency — can start now):
+
+| Item | Feeds | Status |
+|------|-------|--------|
+| Verify §7 FAA facts (authority for school classes, sub-250 g under recreational vs 107, homebuilt RID) | Units 3, 8; weight target | Not started |
+| Verify Betaflight hold-mode version + sensor needs; CAD education-license terms | Units 5, 7 | Not started |
+| Unit 1 Safety: 2 sessions, checklist, signed cert, per-unit safety briefs | Gate for Unit 6 | Not started — ours per v3 |
+| Unit 4 stems: materials science, heat transfer, battery mechanics (no chemistry) | Unit 5 brief; Units 6–8 recall | Scoped; drafting can start |
+| Weather review leaf + expanded variant for non-107 students | Unit 4 session 1 | Not started; source `faa-107` `u5`/`u6` |
+| Unit 3 Laws leaves cut from `faa-107` `u1`, plus operating-authority fork worksheet | Unit 3 | Blocked on FAA verification |
+| CAD fundamentals stem (2 sessions) + Tier A parametric guard/mount + design brief + critique rubric | Unit 5 | Can start; brief needs BOM numbers |
+| Unit 7 failsafe / motor-direction / calibration / backup leaves | Unit 7 | Can start generically; screenshots need the kit FC |
+| Unit 8 bench checklist + maiden protocol + post-flight rubric | Unit 8 grading | Can start |
+| Print-and-ship service: turnaround, cost/class, materials, failed-print policy, deadline | Non-print schools | Not started |
+| Frontend check: step-clip video pattern vs one `video_url` per node | Units 6–8 authoring format | Not started |
+
+**Joe's** (blocking):
+
+| Item | Blocks |
+|------|--------|
+| Base + Video BOMs with AUW and solder-joint count | Unit 2 photos/quiz, Unit 4 AUW worksheet, Unit 6 step list, Unit 8 weigh-in |
+| GPS decision | Unit 7 hold-mode content |
+| Tier B print scope + printed-part materials | Unit 5 design brief, print-and-ship batch |
+| Goggles/monitor in Video kit | Unit 2 Video parts, Video & Photography hand-off |
+
+### Is it ready for development?
+
+**Curriculum drafting — partially yes.** The tree, order, session counts, kit tiers, weight target, and ownership split are locked. We can draft **Units 1, 4, 8** and the generic parts of **5 and 7** now. **Unit 3** waits on FAA verification. **Units 2 and 6** and the Unit 5 design brief wait on the two BOMs — that is the single biggest blocker, and it is Joe's.
+
+**Course payload / code — no.** No `drone_building_course.json`, no questions, no homepage track until: (1) both BOMs exist, (2) §7 facts are verified, (3) Part 107 recordings/publish are done (P0). The step-clip video format also needs a frontend answer before Units 6–8 are authored to it.
+
+**Order of work once BOMs land:** Unit 1 → Unit 4 → Unit 2 → Unit 5 brief → Unit 6 → Unit 7 → Unit 8 rubrics → Unit 3 (after verification) → payload.
