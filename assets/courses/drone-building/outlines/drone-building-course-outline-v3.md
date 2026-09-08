@@ -155,7 +155,7 @@ Source: `faa-107` `u1` registration/RID leaves. Link FAA pages; re-check at auth
 ### Unit 5 — Frame design (Tier B 5–10 / Tier A 2–3) — *ours brief and rubric; Joe scope and materials*
 
 **CAD fundamentals (2 sessions, Tier B; optional Tier A):** sketch and constraints · extrude/cut · hole patterns · fillets · two-part assembly · calipers on a real part · export STL. Onshape default.
-**Design brief:** motor mount pattern (1404, *verify pattern*) · **stack pattern 16×16 mm M2** · 3" prop and guard clearance · battery envelope (1000 mAh 3S, *verify dims*) · antenna / RID-module / GPS keep-outs · AUW budget from Unit 4 · **students may print the entire frame** (arms, plates, guards, tray); only bolts, nuts, and standoffs are bought · material per the Frame material decision (PETG default)
+**Design brief:** motor mount **4× M2 on Ø9 mm** (Spark 1404, T-mount props) · **stack pattern 16×16 mm M2, ≥ 12.5 mm clear height** · 3" prop and guard clearance · battery envelope (XT30 3S pack, dims once Joe picks it; quoted 1000 mAh is 70 × 35 × 18 mm) · antenna / RID-module / GPS keep-outs · AUW budget from Unit 4 · **students may print the entire frame** (arms, plates, guards, tray); only bolts, nuts, and standoffs are bought · material per the Frame material decision (PETG default)
 **Material profiles:** one slicer-settings table (nozzle, bed, enclosure, shrinkage %, walls, infill) with a row per material; stock frame and student frames carry `arm_thickness` and `hole_clearance` variables set from that row
 **Tier B (Base kit):** design the whole printed frame from measured components; critique every 2–3 sessions using the rubric (fit, strength, weight, serviceability); weigh-in checkpoint; STL turn-in
 **Tier A (Video kit / short time):** design or modify prop guards, O4 camera cage, antenna mount, battery tray, RID-module mount on the stock CF frame
@@ -217,14 +217,15 @@ Full parts, weights, and costs: [`../reference/parts-list-draft-v1.md`](../refer
 
 | | Base | Video |
 |--|------|-------|
-| Frame | **Student-printed whole frame** (PETG default) + hardware pack; our stock-frame STL as the fallback | Stock CF frame (3" freestyle) + printed guards |
+| Frame | **Student-printed whole frame** (PETG default) + hardware pack; our stock-frame STL as the fallback | Stock CF frame + printed guards. *Frame choice reopened:* the quoted QAV-S Mini has 12×12 arms (motor is Ø9) and a 19 mm cam cage (O4 needs an adapter) — Joe to pick adapters or a 1404/O4-native frame |
 | FC / ESC | 16×16 F4 stack, 20A 4-in-1, barometer on FC, **no GPS** | Same; optional GPS + mag module |
 | Motors / battery | 4× 1404 4000KV · 1000 mAh 3S | Same |
 | Radio | ELRS RX built into the FC; radio per team | Same |
 | Remote ID | Holy Stone HSRID, $40, **shared class set** (one per aircraft airborne) | Same |
 | Video | — | DJI O4 Air Unit (plugs into FC); class goggles set: N3 default ($229), Goggles 3 for the RPIC |
-| Solder joints | ≈16 (motors 12, pigtail 2, capacitor 2); 4 if the ESC has motor plugs (*verify*) | Same; O4 adds 0; GPS adds ~4–6 |
-| AUW estimate | ~230–250 g (*Joe to weigh*) | ~245–265 g (*Joe to weigh*) |
+| Solder joints | **16** (motors 12, pigtail 2, capacitor 2) — confirmed from the ESC pad map | 16; O4 plugs in (0); GPS option +6 |
+| AUW estimate | ~230 g (*Joe to weigh*) | ~245 g, ~253 g with GPS (*Joe to weigh*) |
+| Connector | **XT30** (pigtail ships with the stack); quoted XT60 pack to be swapped | Same |
 | Per-aircraft cost (list, approx.) | ~$185 | ~$365–385 |
 | CAD tier | B | A |
 | Hand-off | — | Video & Photography course |
@@ -240,7 +241,9 @@ Full parts, weights, and costs: [`../reference/parts-list-draft-v1.md`](../refer
 | ~~Printed-part materials~~ | Joe → ours | **Closed:** PETG default; table in parts list §3 |
 | ~~Remote ID module~~ → **Holy Stone HSRID** (Amazon B0CGTTNJXL); confirm which HSRID model ships and its FAA DOC entry at purchase | Ours at purchase | **Closed** (Sep 8 PM) |
 | ~~Goggles model~~ → N3 default, Goggles 3 upgrade; tiers in parts list §8 | Ours | **Closed** (Sep 8 PM) |
-| Compatibility pass: motor mount pattern, ESC plugs vs pads, battery dims, XT30/XT60, O4 and GPS cabling, stack height (parts list §7.1) | Joe | Open; design brief and joint count need them |
+| ~~Compatibility pass~~ → desk-checked Sep 8 from manufacturer diagrams (parts list §7.1). Motor Ø9 T-mount, ESC pads (16 joints), O4 plug on UART3, GPS pads (+6), stack 12.5 mm, battery 70×35×18 / 81 g, target `FLYWOOF405NANO` | Ours | **Closed** |
+| **Joe's picks from the desk check:** motor KV on 3S (4000 vs 4500–5000), XT30 3S pack (stack ships XT30; quoted pack is XT60), Video-kit frame (QAV-S Mini needs 12→9 motor and 14→20 camera adapters, or pick a 1404/O4-native frame), GPS power pad, prop model (parts list §7.1b) | Joe | Open; design brief and Video BOM need them |
+| In-person checks: capacitor value, motor lead ends, Setup-tab alignment on first flash (issue #1064), CF standoff height, battery fit (parts list §7.1c) | Joe | Open; with hardware in hand |
 | Material profiles table + `arm_thickness` / `hole_clearance` variables in the stock frame | Ours + Joe's model | Open |
 | VO requirement on the Unit 8 FPV checklist | Ours | Added to outline; write into the checklist |
 | Confirm same RID serial on several Part 107 registrations at first class registration | Ours | Open; FAA flow supports it |
