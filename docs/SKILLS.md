@@ -11,11 +11,14 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | Understand deployed infra | [`docs/tech/architecture.md`](tech/architecture.md) | `terraform/` |
 | Understand API surface | [`docs/tech/backend-data.md`](tech/backend-data.md) | `backend/src/` |
 | Understand frontend data flow | [`docs/tech/frontend-data.md`](tech/frontend-data.md) | `drone/src/app/lib/` |
+| Purchase / Pro membership flows | [`docs/tech/purchase-flows.md`](tech/purchase-flows.md) | `backend/src/purchases/`, Stripe Dashboard |
+| Pricing model (target vs current) | [`docs/sales/pricing-model.md`](sales/pricing-model.md) | Stripe Products/Prices, `packages.md` |
 | Analytics, pixels, ad conversion tracking | [`docs/tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) | `drone/src/app/lib/analytics.ts`, `backend/src/analytics/`, `backend/src/audit/` |
 | PWA / mobile app / App Store / Capacitor vs React Native | [`docs/tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) | `drone/src/app/manifest.ts`, `drone/src/middleware.ts`, `backend/src/auth/`, `backend/src/media/signed-url.service.ts` |
 | Edit course structure / exams | [`docs/tech/course-editing-roadmap.md`](tech/course-editing-roadmap.md) | Admin UI, course JSON |
 | Edit FAA 107 course / questions | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) | `assets/courses/faa-107/`, `scripts/build_faa_107_questions.py` |
-| Draft drone-building course outline | [`assets/courses/drone-building/outlines/drone-building-course-draft.md`](../assets/courses/drone-building/outlines/drone-building-course-draft.md) | Author intake only — no payload or catalog track |
+| Drone-building course outline (v3.1) | [`assets/courses/drone-building/outlines/drone-building-course-outline-v3.md`](../assets/courses/drone-building/outlines/drone-building-course-outline-v3.md) | Draft from v3.1; rationale in `drone-building-course-review-v2.md`; open work in [`TODO.md`](TODO.md) § Drone-building course; no payload or catalog track |
+| Drone-building kit parts, costs, goggles, frame materials | [`assets/courses/drone-building/reference/parts-list-draft-v1.md`](../assets/courses/drone-building/reference/parts-list-draft-v1.md) | Reference parts list from Joe's quote; template alongside for new kit revisions |
 | FAA 107 course quality review (outline ↔ JSON) | [`assets/courses/faa-107/faa_107_course_quality_review.md`](../assets/courses/faa-107/faa_107_course_quality_review.md) | Compare `outlines/` + `faa_107_course.json`; apply confirmed items; leave structure decisions open until author confirm |
 | Bulk course images (map/upload/merge) | [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) | `scripts/course_images.py`, media S3 bucket |
 | Course image sizes / hero vs unit display | [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) § Display modes / Authoring | `CourseImageStrip`, preview page, catalog cards |

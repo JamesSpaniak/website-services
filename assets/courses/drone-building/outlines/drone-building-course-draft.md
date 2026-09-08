@@ -1,6 +1,6 @@
 # Drone building — initial course draft outline
 
-**Status:** Author intake draft. Not a course payload. Do not publish, stub a homepage track, or import JSON from this file.
+**Status:** v1 draft (Sep 1 2026) — **superseded by v2.** Joe's Sep 6 feedback is the source of truth: [`joe-drone-build-feedback-v2.md`](joe-drone-build-feedback-v2.md); our review and recommendations: [`drone-building-course-review-v2.md`](drone-building-course-review-v2.md). Kept for history. Not a course payload.
 
 **Source:** Joe’s topic list on `origin/branch-joe` (`docs/building/Drone Building Outline.txt`, commit `dd4ce7f`, Aug 5 2026). Verbatim copy: [`joe-drone-building-outline.txt`](joe-drone-building-outline.txt).
 
