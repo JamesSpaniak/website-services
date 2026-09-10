@@ -62,6 +62,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Weather leaf** — review variant for 107 grads + expanded variant for others | Not started | outline Unit 4 · `faa-107` `u5`/`u6` |
 | **Unit draft template** — one markdown skeleton per unit (stems → leaves → labs/clips → checkpoint) so drafts land in a consistent shape before JSON | Not started | outline § 5 |
 | **Parts-list template** for future kit revisions | **Done Sep 8 2026** — [`reference/parts-list-template.md`](../assets/courses/drone-building/reference/parts-list-template.md) | — |
+| **Course 2 / Drone Repair and Custom Builds** — decide whether to pursue (semester-2 elective or club block; soldering-first; consumes the fleet's crash spares); depends on v1 sales | Proposal, not started | [`reference/soldering-lab.md`](../assets/courses/drone-building/reference/soldering-lab.md) § 6 |
 
 ### Ours — ops, sales, frontend
 
@@ -69,7 +70,8 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 |------|--------|--------|
 | **Print-and-ship service design** — turnaround, cost per class, materials offered (PETG default; nylon our-side only), failed-print policy, Unit 5 deadline | Not started | outline § 8 |
 | **Kit one-pager for sales** — Base ~$280 / Video ~$460 per aircraft; Solder vs Pre-soldered SKU (+$25–40); class items (radios, chargers, N3 goggles $230, smoke stoppers); class-of-10 landed examples (~$3.7k Base / ~$5.9k Video vs PCS $26k, DroneBlocks $10–13k); material choice as a kit-order option with the enclosure/ventilation qualification question | Blocked on Joe's frame/battery picks | parts list v2 § 3, § 5 · v1 § 8, § 9 · [`sales/packages.md`](sales/packages.md) |
-| **Pre-soldered SKU design** — who solders the ESC + motor harness (us vs vendor), minutes per kit, price, QA (motor order/direction test before shipping), practice-board lab for the soldering leaf | Not started | parts list v2 § 3 |
+| **Pre-soldered SKU design** — ours to solder (no vendor service exists at scale); confirm ~25 min/kit vs Joe's build time; price inside +$25–40 (+$15–20 cost); QA (motor order/direction test before shipping); practice-board lab for the soldering leaf | Not started | parts list v2 § 3 · soldering-lab § 5 |
+| **Soldering lab kit list → kit one-pager / sales qualification** — "do you own irons?" question; budget ($1,200) / standard ($2,000) / top-up ($20–60) tiers for a 6-station lab, consumables ~$100–150/semester, lead-free SAC305, ≤ 6 irons per adult, SDS + shop cert + hazard analysis handed to the CTE director | Not started | soldering-lab § 1–3 · [`sales/packages.md`](sales/packages.md) |
 | **Goggles tier per school** — N3 default, Goggles 3 for the RPIC; teacher view = N3 phone mirror to the room display; VO rule in the flight-day guidance | Decided; write into one-pager | parts list v1 § 8 |
 | **Frontend: step-clip video pattern** — Units 6–8 want several 1–2 min clips per leaf; course UI renders one `video_url` per node today. Decide: one node per step vs content-block gallery | Not started | [`tech/frontend-data.md`](tech/frontend-data.md) · `drone/src/app/ui/components/unit.tsx` |
 | **Confirm BeeID V1.1 on the FAA DOC list (RID000001995) and its serial format** at first purchase | Open | parts list v2 § 1 |

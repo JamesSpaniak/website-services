@@ -58,9 +58,9 @@ Every line below was desk-checked Sep 9 against manufacturer pages, Flywoo's wir
 | SKU | Who solders | Student build | Price delta | Buyer |
 |-----|-------------|---------------|------------:|-------|
 | **Solder** (v1 default) | Students, 16–20 joints, one board | Full Unit 6 | — | CTE labs, engineering academies |
-| **Pre-soldered** | We (or the vendor) solder motors, pigtail, capacitor onto the ESC and terminate the RX before shipping; students bolt, plug, and route | Unit 6 becomes mechanical + plugs; soldering moves to an optional practice-board lab | +$25–40 labor | Middle schools, general STEM, no-lab schools |
+| **Pre-soldered** | We solder motors, pigtail, capacitor onto the ESC and terminate the RX before shipping; students bolt, plug, and route | Unit 6 becomes mechanical + plugs; soldering moves to an optional practice-board lab | **+$25–40 price** (+$15–20 our cost: ~25 min per kit at $30–40/h loaded + ~$1 materials — derivation in [`soldering-lab.md`](soldering-lab.md) §5) | Middle schools, general STEM, no-lab schools |
 
-This is Joe's "custom parts to avoid it" without custom parts: a pre-built ESC + motor harness. Constraint: motor leads are fixed at 150 mm, so printed frames must keep arm length inside that — 3.5" arms are ~75–90 mm, fine. Reusability across cohorts is a selling point competitors push; the Pre-soldered SKU restores it.
+This is Joe's "custom parts to avoid it" without custom parts: a pre-built ESC + motor harness. Motor leads are fixed at 150 mm and 3.5" arms are ~75–90 mm, so lead length is not a design constraint. Vendor build services do not exist at scale (GetFPV, RDQ, Pyrodrone, NewBeeDrone sell BNF instead — soldering-lab §5 option C), so this is our labor. Reusability across cohorts is a selling point competitors push; the Pre-soldered SKU restores it. What a school needs to buy to run the Solder SKU (stations, extraction, PPE, consumables: ~$1,200–2,000 for a 6-station lab, ~$20–60 top-up if they already own irons) is in `soldering-lab.md` §1–2.
 
 ---
 
@@ -87,7 +87,7 @@ For the **Base printed frame**, the design brief now reads: 12×12 M2 arm tips (
 
 Class-level: Pocket radio $85 per team; Imars charger $33 (×2–3 or one multi-port ~$100); smoke stopper $10 ×2; N3 goggles $230 (Video, 1–2); LiPo bags + fire can ~$40; spares 10–15 %. Remote ID is no longer a class item.
 
-Worked class of 10 Base: 10 × $280 = $2,800 + 5 radios $425 + chargers $100 + smoke stoppers $20 + bags $40 + spares $300 ≈ **$3,700** (~$370 landed per aircraft). Ten Video: 10 × $460 = $4,600 + same class items + 2 N3 $460 ≈ **$5,900**. Pre-soldered SKU adds ~$300–400 per class of 10.
+Worked class of 10 Base: 10 × $280 = $2,800 + 5 radios $425 + chargers $100 + smoke stoppers $20 + bags $40 + spares $300 ≈ **$3,700** (~$370 landed per aircraft). Ten Video: 10 × $460 = $4,600 + same class items + 2 N3 $460 ≈ **$5,900**. Pre-soldered SKU adds ~$250–400 per class of 10.
 
 For comparison, PCS Edventures sells 10 no-solder RubiQ drones for $25,995 and DroneBlocks 5 DEXI-5 for $10.5–13.2k; our landed numbers are a fraction of that with more build content.
 
@@ -127,7 +127,7 @@ The 45 A stack and XT60 hardware add ~10 g over v1. Sub-250 is tighter; still a 
 | BeeID harness pitch vs F722 GPS socket; RX socket pitch | In person |
 | Confirm FC socket cables are included in the stack box | In person |
 | One Base + one Video build weighed; joints tallied; component photos | Joe, in person |
-| Pre-soldered SKU: labor time per kit, price, who solders (us vs vendor) | Ours |
+| Pre-soldered SKU: confirm ~25 min/kit against Joe's build time; QA procedure; price inside +$25–40 (soldering-lab §5) | Ours |
 | Fleet registration workflow: one Part 107 account, per-aircraft entries with BeeID serials | Ours (Unit 3) |
 | Unit 7: GPS on UART5 at 115200, GPS Rescue config as safety net, no hold modes on Base | Ours |
 
