@@ -54,6 +54,7 @@ Author intake for a future build/assembly course. **No payload, questions, or ho
 | File | Purpose |
 |------|---------|
 | `README.md` | Folder status and version table |
-| `outlines/drone-building-course-outline-v3.md` | **v3.1 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
-| `reference/parts-list-draft-v1.md` | Reference parts list (Base/Video), frame material call, RID sharing, cost framing; source quote PDF alongside |
+| `outlines/drone-building-course-outline-v3.md` | **v3.2 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
+| `reference/parts-list-draft-v2.md` | Current reference parts list (Joe Sep 9, verified), Solder/Pre-soldered SKUs, costs |
+| `reference/parts-list-draft-v1.md` | Superseded for parts; keeps material table, module rules, goggles options; source quote PDF alongside |
 | `outlines/drone-building-course-review-v2.md` | Review, technical value, verified facts, Betaflight/sensor options, readiness |
