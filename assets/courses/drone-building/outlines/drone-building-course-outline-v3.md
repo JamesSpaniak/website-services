@@ -25,7 +25,7 @@
 | **Checkpoint** | Completion evidence (photo, file, teacher tick) that earns points but does not block |
 | **Base kit** | Flyer only: 3.5" guarded quad on a **student-printed frame**, no camera. Electronics: 20×20 F722 stack (baro, OSD, plug sockets), ELRS receiver, BeeID GPS + Remote ID, 4× 1404, 3S XT60 pack |
 | **Video kit** | Same electronics + stock CF frame + DJI O4 Air Unit (camera and video link in one part). Optional compass module. Goggles shared per class. Feeds the Video & Photography course |
-| **Solder / Pre-soldered SKU** | Same parts, two builds. *Solder:* students make the 16 ESC joints (motors 12, pigtail 2, capacitor 2) and the receiver end. *Pre-soldered:* we ship the ESC + motor harness and receiver terminated; students bolt, plug, and route; soldering becomes an optional practice-board lab |
+| **Solder / Pre-soldered SKU** | Same parts, two builds. *Solder:* students make the 16 ESC joints (motors 12, pigtail 2, capacitor 2) and the receiver end. *Pre-soldered:* we ship the ESC + motor harness and receiver terminated; students bolt, plug, and route; soldering becomes an optional practice-board lab. **+$25–40 price** (+$15–20 our cost, ~25 min/kit) — derivation, classroom lab cost, and safety in [`../reference/soldering-lab.md`](../reference/soldering-lab.md) |
 | **Minimal-solder** | The design goal: everything that can be a plug is a plug (receiver, GPS/RID, video). On a 3–3.5" build motors and battery stay pads; plug-and-play boards exist only ≤ 2" |
 | **Tier A / Tier B** | CAD scope. A = modify/design small printed parts (guards, camera cage, mounts) on the stock CF frame (Video kit or short-time schools). B = design the **whole printed frame** from measured parts (Base kit) |
 | **Print-and-ship** | Our service: teacher uploads class STLs at end of Unit 5; we print, QC, ship one batch |
@@ -247,7 +247,8 @@ Full parts, weights, and costs: [`../reference/parts-list-draft-v2.md`](../refer
 | **Video-kit 3.5" frame** — Tony 5 is a 5" frame; need 20×20 stack, 12×12 motors, standard-O4 camera plates, top battery, ≤ 65 g (parts list v2 §4); shortlist 2–3 | Joe | Open; blocks the Video BOM |
 | **Battery** — product name, 3S, mAh, dims, **XT60**; smoke stopper and adapter names (or drop the adapter) | Joe | Open; blocks the design-brief tray |
 | **Receiver** — one that ships with the FC's 4-pin plug, or accept 4 joints at the RX end | Joe | Open |
-| **Pre-soldered SKU** — labor time per kit, price (+$25–40), who solders (us or vendor) | Ours | Open; parts list v2 §3 |
+| **Pre-soldered SKU** — confirm ~25 min/kit against Joe's build time; QA procedure; price inside +$25–40 | Ours | Open; parts list v2 §3 · soldering-lab §5 |
+| **Soldering lab and course 2** — soldering-lab kit list (stations, extraction, PPE; $1,200–2,000 new / $20–60 top-up) goes into the sales one-pager as a qualification question; **"Drone Repair and Custom Builds" (course 2) is a proposal, not locked** — decide after v1 sells | Ours | Open; soldering-lab §1–2, §6 |
 | In-person checks: BeeID harness pitch vs GPS socket, RX socket pitch, socket cables in the box, capacitor value, Setup-tab alignment on first flash, battery fit | Joe | Open; with hardware in hand |
 | Material profiles table + `arm_thickness` / `hole_clearance` variables in the stock frame | Ours + Joe's model | Open |
 | VO requirement on the Unit 8 FPV checklist | Ours | Added to outline; write into the checklist |

@@ -8,6 +8,7 @@ Initial **build / assembly** course intake. Not in the catalog. No `*_course.jso
 |------|---------|---------|
 | [`outlines/drone-building-course-outline-v3.md`](outlines/drone-building-course-outline-v3.md) | **v3.2 — draft from this** | Terms, locked decisions, tree, per-unit stems/leaves/labs/gates, kits, assessments, open items |
 | [`reference/parts-list-draft-v2.md`](reference/parts-list-draft-v2.md) | **parts v2 — current** | Joe's Sep 9 list verified: F722 Mini stack, XILO 1404, BeeID GPS+RID, N3; frame rejected (5"); Solder vs Pre-soldered SKUs with market research; costs; open items |
+| [`reference/soldering-lab.md`](reference/soldering-lab.md) | research note, Sep 9 | Classroom soldering station cost (budget/standard/top-up tiers), class sizing, safety and published guidance, iron time, kit options A–D with the Pre-soldered SKU derivation, and the **course 2 "Drone Repair and Custom Builds" proposal (not locked)** |
 | [`reference/parts-list-draft-v1.md`](reference/parts-list-draft-v1.md) | parts v1 (superseded for parts) | Still current: frame material table, Part 107 module rules, goggles options, material-choice mechanism, v1 desk check |
 | [`reference/getfpv-quote-2026-09-08.pdf`](reference/getfpv-quote-2026-09-08.pdf) | source | Joe's quote (six lines, $364.91) |
 | [`reference/parts-list-template.md`](reference/parts-list-template.md) | template | Blank parts list for future kit revisions |
