@@ -18,6 +18,7 @@
 | v2 review | this file | Drone Edge | Sep 7 2026 | Section review, technical value, additions, recommendations |
 | **v3 answers** | §2a of this file | Joe (verbal, Sep 8 2026) | Sep 8 2026 | Ordering rationale, safety ownership, battery scope, kit tiers, sub-250 g target, CF frames for video kits |
 | **v3.1 parts** | [`../reference/parts-list-draft-v1.md`](../reference/parts-list-draft-v1.md) + [`../reference/getfpv-quote-2026-09-08.pdf`](../reference/getfpv-quote-2026-09-08.pdf) | Joe (quote + notes, Sep 8 2026 PM) | Sep 8 2026 | GetFPV quote ($364.91, six lines), full-PLA frame flew, material second look, shared strap-on RID module. Folded into outline v3.1 |
+| **v3.2 parts** | [`../reference/parts-list-draft-v2.md`](../reference/parts-list-draft-v2.md) | Joe (13-line list + notes, Sep 9 2026) | Sep 9 2026 | Minimal-solder "not working" on 3–3.5" (plug-and-play only ≤ 2"); F722 Mini V2 20×20 stack with plug sockets, XILO 1404, BeeID GPS+RID per aircraft, N3, PLA→PETG. Tony 5 frame rejected (5"). Two SKUs (Solder / Pre-soldered) added by us with market research. Folded into outline v3.2 |
 
 Branch facts (Sep 8): `origin/branch-joe` is unchanged since `512c701` (Sep 6) — no new files. Joe's v3 came in conversation and is recorded in §2a. Our folder `assets/courses/drone-building/` is on `main` via PR #1. Joe's v0 `.txt` is unchanged; it still lists GPS as optional and starts Assembly at the battery connector, which v2 supersedes.
 
@@ -300,9 +301,9 @@ These are not in v2 and should not be negotiable:
 
 | Blocker | Why it matters | Owner |
 |---------|----------------|-------|
-| ~~Solder vs plug-in default~~ → **minimal-solder locked (v3)**; ~~joint list~~ → **≈16 on Base estimated from the reference stack (v3.1)**; confirm ESC pads vs plugs | Assembly lab steps, cost, and school objection | Joe (confirm) |
-| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; ~~GPS~~ → **Option A: no GPS in Base, GPS+mag optional on Video (§7a)**; parts named in v3.1 | Unit 7 hold modes | Closed |
-| ~~Reference BOM × 2~~ → **reference parts list v1 (Sep 8 PM)** from Joe's GetFPV quote; Base = quote minus O4/GPS/CF frame. Still needs compatibility check, real AUW, joint count | Photos, quiz items, AUW numbers, Assembly steps | Joe (confirm) |
+| ~~Solder vs plug-in default~~ → **16 ESC joints confirmed from the F722 Mini V2 pad map (v3.2)**; RX/GPS/DJI are plug sockets. School objection answered with a **Pre-soldered SKU** (parts list v2 §3) | Assembly lab steps, cost, and school objection | Closed; RX-end joints (0–4) on Joe's receiver pick |
+| ~~GPS / camera / VTX in kit~~ → **two kits locked (v3)**; ~~GPS~~ → **v3.2: GPS on every aircraft via BeeID (comes with Remote ID), no compass; Base still teaches Angle only, GPS Rescue as safety net** | Unit 7 hold modes | Closed |
+| ~~Reference BOM × 2~~ → **parts list v2 (Sep 9)**, desk-checked. Open: Video-kit 3.5" frame (Tony 5 is 5"), battery name/dims, receiver plug | Photos, quiz items, AUW numbers, Assembly steps | Joe |
 | ~~Which structural parts students may print~~ → **whole frame (v3.1)**; Joe flew a full PLA frame | Design brief and print-and-ship batch size | Closed |
 | ~~Printed-part material~~ → **PETG default; ABS/ASA only enclosed + ventilated; no nylon for students (v3.1)** | Unit 4 materials stem, Unit 5 brief, print-and-ship | Closed (ours, from Joe's data) |
 | Non-print school deliverable (stock frame + print-and-ship) | Whether Tier B is sellable without a printer | Us on ops |
@@ -315,12 +316,13 @@ These are not in v2 and should not be negotiable:
 
 ## 9. Questions for Joe — v4 (drone-technical only)
 
-Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Answered Sep 8 PM (v3.1): reference parts (GetFPV quote), Tier B scope (whole frame), material (PETG default from his PLA/PETG/ABS/nylon comparison), RID module style (shared strap-on). Still open — all confirmations on the parts list, see its §7:
+Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit tiers, sub-250 g, CF frame for Video kit. Answered Sep 8 PM (v3.1): reference parts (GetFPV quote), Tier B scope (whole frame), material (PETG default). Answered Sep 9 (v3.2): full second parts list, soldering stance (motors + power only), goggles (N3), PLA→PETG flow, RID as BeeID. Still open — parts list v2 §8:
 
-1. **Compatibility pass** on the quote: Spark 1404 mount pattern and prop mount; GOKU 20A ESC motor pads vs plugs; pack dimensions; XT30 vs XT60 class-wide.
-2. **Weigh one Base and one Video build** with battery; count the joints actually soldered.
-3. ~~Remote ID module product name~~ → **Holy Stone HSRID** (Amazon B0CGTTNJXL, $39.99; HSRID01 FAA DOC RID000000290; standalone GPS + battery, 14–16 g). Closed Sep 8 PM; we confirm the shipped model on the DOC list at purchase.
-4. **Goggles model** for the Video kit (O4 needs DJI goggles; N3 class assumed) — one class set.
+1. **Video-kit 3.5" frame**: 20×20 stack, 12×12 M2 motors, standard-O4 camera plates, top battery, ≤ 65 g; the Tony 5 is a 5" frame.
+2. **Battery**: product name, 3S, mAh, dims, XT60 (and the smoke stopper / adapter names — the Amazon short links don't resolve).
+3. **Receiver**: one that ships with the FC's 4-pin plug, or accept 4 solder joints at the RX end.
+4. **Weigh one Base and one Video build** with battery; count the joints actually soldered; check BeeID harness pitch against the GPS socket.
+5. ~~Remote ID module~~ → **BeeID per aircraft** (DOC RID000001995). ~~Goggles~~ → **N3**, teacher view via phone mirror to the room display.
 
 ## 10. Remaining before drafting initial versions
 
@@ -334,9 +336,9 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 | Unit 1 Safety: 2 sessions, checklist, signed cert, per-unit safety briefs | Gate for Unit 6 | Not started — ours per v3 |
 | Unit 4 stems: materials science, heat transfer, battery mechanics (no chemistry) | Unit 5 brief; Units 6–8 recall | Scoped; drafting can start |
 | Weather review leaf + expanded variant for non-107 students | Unit 4 session 1 | Not started; source `faa-107` `u5`/`u6` |
-| Unit 3 Laws leaves cut from `faa-107` `u1`; Part 107 registration + shared RID-module procedure | Unit 3 | Unblocked Sep 8 PM; module is the Holy Stone HSRID |
-| CAD fundamentals stem (2 sessions) + Tier A guard/cage/mount + design brief + critique rubric | Unit 5 | Can start; brief has 16×16 stack, whole-frame scope, PETG; motor pattern and pack dims are *verify* placeholders |
-| Unit 7 failsafe / motor-direction / calibration / telemetry-warning / backup leaves | Unit 7 | Can start against the GOKU GN405 V3 (baro, built-in ELRS, no OSD); screenshots need the real FC |
+| Unit 3 Laws leaves cut from `faa-107` `u1`; Part 107 registration + per-aircraft BeeID serial procedure | Unit 3 | Unblocked; module is the BeeID (v3.2) |
+| CAD fundamentals stem (2 sessions) + Tier A guard/cage/mount + design brief + critique rubric | Unit 5 | Can start; brief has 20×20 stack, 12×12 motors, BeeID pocket, whole-frame scope, PLA→PETG; pack dims are a *verify* placeholder |
+| Unit 7 failsafe / motor-direction / calibration / telemetry-warning / backup leaves | Unit 7 | Can start against the GOKU F722 Mini V2 (`FLYWOOF722PROV2`, baro, OSD, GPS on UART5); screenshots need the real FC |
 | Unit 2 parts text and Unit 6 step list | Units 2, 6 | Can start from the reference parts list; photos wait on hardware |
 | Unit 8 bench checklist + maiden protocol + post-flight rubric | Unit 8 grading | Can start |
 | Print-and-ship service: turnaround, cost/class, materials, failed-print policy, deadline | Non-print schools | Not started |
@@ -346,14 +348,14 @@ Answered in v3: ordering, safety ownership, battery scope, minimal-solder, kit t
 
 | Item | Blocks |
 |------|--------|
-| ~~Base + Video BOMs~~ → **reference parts list v1 exists.** Compatibility pass, real AUW, joint count | Unit 2 photos/quiz images, final Unit 4 AUW numbers, Unit 8 weigh-in targets |
+| ~~Base + Video BOMs~~ → **parts list v2 (Sep 9), desk-checked.** Open: Video-kit frame, battery, receiver plug; real AUW, joint count | Video BOM, Unit 5 battery tray, Unit 2 photos/quiz images, Unit 8 weigh-in targets |
 | ~~Tier B print scope + printed-part materials~~ | **Closed Sep 8 PM** |
-| Goggles model (class set) | Unit 2 Video parts, Video & Photography hand-off |
-| ~~Remote ID module pick~~ → **Holy Stone HSRID, closed Sep 8 PM** | — |
+| ~~Goggles model (class set)~~ → **N3** | **Closed Sep 9** |
+| ~~Remote ID module pick~~ → **BeeID per aircraft, Sep 9** (replaces Holy Stone) | — |
 
 ### Is it ready for development?
 
-**Curriculum drafting — yes as of Sep 8 PM.** The tree, order, session counts, kit tiers, weight target, operating authority, firmware version, sensor option, CAD tool, ownership split, reference electronics, frame scope, and frame material are locked, and the §7 facts are verified. Every unit can be drafted in text now; **Units 2 and 6** use the reference parts list with *verify* placeholders where Joe still has to confirm (motor pattern, pads vs plugs, pack dims, real AUW, goggles). Nothing on the curriculum side is blocked; photos, quiz images, and screenshots wait on hardware in hand.
+**Curriculum drafting — yes (Sep 8 PM, reconfirmed Sep 9 with v3.2).** The tree, order, session counts, kit tiers and SKUs, weight target, operating authority, firmware version and target, sensor set, CAD tool, ownership split, reference electronics, frame scope, and frame material are locked, and the §7 facts are verified. Every unit can be drafted in text now; **Units 2 and 6** use parts list v2 with *verify* placeholders where Joe still owes a pick (Video-kit frame, battery, receiver) or an in-person check (real AUW, harness pitches). Nothing on the curriculum side is blocked; photos, quiz images, and screenshots wait on hardware in hand.
 
 **Course payload / code — no.** No `drone_building_course.json`, no questions, no homepage track until: (1) both BOMs exist, (2) Part 107 recordings/publish are done (P0). The step-clip video format also needs a frontend answer before Units 6–8 are authored to it.
 

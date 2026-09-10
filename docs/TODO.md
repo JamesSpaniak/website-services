@@ -33,30 +33,32 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 ## P1 — Drone-building course (draft, not in catalog)
 
-*Outline is v3.1 and drafting is unblocked. Canonical: [`assets/courses/drone-building/outlines/drone-building-course-outline-v3.md`](../assets/courses/drone-building/outlines/drone-building-course-outline-v3.md) (draft from this) · [`…/outlines/drone-building-course-review-v2.md`](../assets/courses/drone-building/outlines/drone-building-course-review-v2.md) (rationale) · [`…/reference/parts-list-draft-v1.md`](../assets/courses/drone-building/reference/parts-list-draft-v1.md) (parts, costs, goggles, materials). No payload, questions, or homepage track until Part 107 P0 is published. Joe owns hardware facts on `branch-joe`; we fold and bump.*
+*Outline is v3.2 and drafting is unblocked. Canonical: [`assets/courses/drone-building/outlines/drone-building-course-outline-v3.md`](../assets/courses/drone-building/outlines/drone-building-course-outline-v3.md) (draft from this) · [`…/outlines/drone-building-course-review-v2.md`](../assets/courses/drone-building/outlines/drone-building-course-review-v2.md) (rationale) · [`…/reference/parts-list-draft-v2.md`](../assets/courses/drone-building/reference/parts-list-draft-v2.md) (parts, costs, SKUs; v1 alongside keeps materials/goggles). No payload, questions, or homepage track until Part 107 P0 is published. Joe owns hardware facts on `branch-joe`; we fold and bump.*
 
 ### Joe — hardware confirmations (blocking final numbers)
 
 | Item | Status | Source |
 |------|--------|--------|
-| ~~Compatibility pass on the GetFPV quote~~ | **Desk-checked Sep 8 2026** from manufacturer diagrams and the Betaflight config repo: motor Ø9 T-mount, ESC solder pads (Base = 16 joints), O4 plug on UART3, GPS pads (+6), stack 12.5 mm, battery 70×35×18 mm / 81 g, target `FLYWOOF405NANO`. Two mismatches found: CF frame arms 12×12 vs motor Ø9; XT60 pack vs included XT30 pigtail | parts list § 7.1 |
-| **Joe's picks from the desk check** — motor KV on 3S (keep 4000 or 4500–5000); an XT30 3S 850–1100 mAh pack (publish dims); Video-kit frame (QAV-S Mini + 12→9 motor and 14→20 camera adapters, or a 1404/O4-native 3" frame such as QAV-S 2 Sub-250 SE); GPS 4.5 V vs 5 V pad; prop model (Gemfan 3016/3018, HQ T3×3) | Open | parts list § 7.1b |
-| **Weigh one Base and one Video build** — per component and complete with battery, props, RID; hover current and flight time; component photos for Unit 2 | Open | parts list § 7.2 |
-| **In-person checks** — capacitor value in the box, motor lead ends, Setup-tab model motion on first flash (Betaflight config #1064 alignment report), CF standoff height, battery fit; confirm the 16-joint tally | Open | parts list § 7.1c |
-| **Stock-frame CAD** with `arm_thickness` and `hole_clearance` variables; STL for print-and-ship | Open | parts list § 9 · outline Unit 5 |
-| Re-price the quote at order time; swap superseded parts | Open | parts list § 1 |
+| ~~Compatibility pass on the GetFPV quote (v1)~~ · ~~Compatibility pass on Joe's Sep 9 list (v2)~~ | **Desk-checked Sep 9 2026**: F722 Mini V2 stack (pads for motors/battery, plug sockets RX/GPS/DJI, `FLYWOOF722PROV2`, in stock at GetFPV), XILO 1404 12×12 T-mount, Gemfan 3525, BeeID DOC RID000001995, BetaFPV RX (pads, no plug). **Tony 5 rejected — 5" frame** | parts list v2 § 1 |
+| **Video-kit 3.5" frame** — 20×20 stack, 12×12 M2 motors, standard-O4 camera plates, top battery, ≤ 65 g; shortlist 2–3 | Open; blocks Video BOM | parts list v2 § 4 |
+| **Battery** — product name, 3S, mAh, dims, XT60; smoke stopper and adapter names (Amazon short links don't resolve for us) | Open; blocks design-brief tray | parts list v2 § 8 |
+| **Receiver** — one shipping with the FC's 4-pin plug, or accept 4 joints at the RX end | Open | parts list v2 § 3 |
+| **Weigh one Base and one Video build** — per component and complete with battery, props, BeeID; hover current and flight time; component photos for Unit 2 | Open | parts list v2 § 6 |
+| **In-person checks** — BeeID harness pitch vs GPS socket, RX socket pitch, socket cables in the box, capacitor value, Setup-tab alignment on first flash, battery fit; confirm the 16-joint tally | Open | parts list v2 § 8 |
+| **Stock-frame CAD** with `arm_thickness` and `hole_clearance` variables; STL for print-and-ship | Open | parts list v1 § 9 · outline Unit 5 |
+| Re-price at order time; swap superseded parts | Open | parts list v2 § 5 |
 
 ### Ours — curriculum drafting (can start now)
 
 | Item | Status | Source |
 |------|--------|--------|
-| **Unit 1 Safety** — 2 sessions, shop-cert checklist, per-unit safety briefs for Units 2–8; RID/radio charging in the LiPo routine | Not started | outline Unit 1 |
-| **Unit 4 Physics** — materials (with the parts-list § 3 density/Tg table as the worked example), heat transfer, battery mechanics (no chemistry), AUW worksheet | Not started | outline Unit 4 |
-| **Unit 3 Laws** — cut from `faa-107` `u1`: Part 107 path, register every aircraft, shared HSRID module procedure, **VO required for FPV flights**; confirm same-serial-on-multiple-registrations in DroneZone at first class registration | Not started | outline Unit 3 · parts list § 5 |
-| **Unit 8** — bench checklist (adds RID charged/fitted/broadcasting; VO assigned for FPV), maiden protocol, post-flight rubric | Not started | outline Unit 8 |
-| **Unit 5** — CAD fundamentals stem, design brief with 16×16 stack and *verify* placeholders, **material-profile slicer table** (PLA/PETG/ASA/nylon/TPU rows), critique rubric | Not started | outline Unit 5 · parts list § 9 |
-| **Unit 2 + Unit 6 text** from the reference parts list; photos wait on hardware | Not started | outline Units 2, 6 |
-| **Unit 7** leaves against the GOKU GN405 V3 (baro, built-in ELRS, no OSD → telemetry warnings); screenshots wait on hardware, Betaflight 2026.6 | Not started | outline Unit 7 |
+| **Unit 1 Safety** — 2 sessions, shop-cert checklist, per-unit safety briefs for Units 2–8; radio/goggles charging in the LiPo routine | Not started | outline Unit 1 |
+| **Unit 4 Physics** — materials (with the parts-list v1 § 3 density/Tg table as the worked example), heat transfer, battery mechanics (no chemistry), AUW worksheet | Not started | outline Unit 4 |
+| **Unit 3 Laws** — cut from `faa-107` `u1`: Part 107 path, register every aircraft with its BeeID serial, **VO required for FPV flights**; fleet-registration workflow (one account, per-aircraft entries) | Not started | outline Unit 3 · parts list v1 § 5 |
+| **Unit 8** — bench checklist (BeeID broadcasting + GPS lock; VO assigned for FPV), maiden protocol, post-flight rubric | Not started | outline Unit 8 |
+| **Unit 5** — CAD fundamentals stem, design brief with 20×20 stack, 12×12 motors, BeeID pocket and *verify* placeholders, **material-profile slicer table** (PLA/PETG/ASA/nylon/TPU rows), critique rubric | Not started | outline Unit 5 · parts list v1 § 9 |
+| **Unit 2 + Unit 6 text** from parts list v2, Unit 6 in two variants (Solder / Pre-soldered); photos wait on hardware | Not started | outline Units 2, 6 |
+| **Unit 7** leaves against the GOKU F722 Mini V2 (`FLYWOOF722PROV2`, baro, OSD, GPS UART5 → GPS Rescue as safety net, telemetry warnings); screenshots wait on hardware, Betaflight 2026.6 | Not started | outline Unit 7 |
 | **Weather leaf** — review variant for 107 grads + expanded variant for others | Not started | outline Unit 4 · `faa-107` `u5`/`u6` |
 | **Unit draft template** — one markdown skeleton per unit (stems → leaves → labs/clips → checkpoint) so drafts land in a consistent shape before JSON | Not started | outline § 5 |
 | **Parts-list template** for future kit revisions | **Done Sep 8 2026** — [`reference/parts-list-template.md`](../assets/courses/drone-building/reference/parts-list-template.md) | — |
@@ -66,10 +68,11 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | Item | Status | Source |
 |------|--------|--------|
 | **Print-and-ship service design** — turnaround, cost per class, materials offered (PETG default; nylon our-side only), failed-print policy, Unit 5 deadline | Not started | outline § 8 |
-| **Kit one-pager for sales** — Base ~$185 / Video ~$365–385 per aircraft; class items (radios, 2× HSRID $80, N3 goggles $229, charger); class-of-10 landed examples; material choice as a kit-order option with the enclosure/ventilation qualification question | Blocked on Joe's confirmations | parts list § 6, § 8, § 9 · [`sales/packages.md`](sales/packages.md) |
-| **Goggles tier per school** — N3 default, Goggles 3 for the RPIC; VO rule in the flight-day guidance | Decided; write into one-pager | parts list § 8 |
+| **Kit one-pager for sales** — Base ~$280 / Video ~$460 per aircraft; Solder vs Pre-soldered SKU (+$25–40); class items (radios, chargers, N3 goggles $230, smoke stoppers); class-of-10 landed examples (~$3.7k Base / ~$5.9k Video vs PCS $26k, DroneBlocks $10–13k); material choice as a kit-order option with the enclosure/ventilation qualification question | Blocked on Joe's frame/battery picks | parts list v2 § 3, § 5 · v1 § 8, § 9 · [`sales/packages.md`](sales/packages.md) |
+| **Pre-soldered SKU design** — who solders the ESC + motor harness (us vs vendor), minutes per kit, price, QA (motor order/direction test before shipping), practice-board lab for the soldering leaf | Not started | parts list v2 § 3 |
+| **Goggles tier per school** — N3 default, Goggles 3 for the RPIC; teacher view = N3 phone mirror to the room display; VO rule in the flight-day guidance | Decided; write into one-pager | parts list v1 § 8 |
 | **Frontend: step-clip video pattern** — Units 6–8 want several 1–2 min clips per leaf; course UI renders one `video_url` per node today. Decide: one node per step vs content-block gallery | Not started | [`tech/frontend-data.md`](tech/frontend-data.md) · `drone/src/app/ui/components/unit.tsx` |
-| **Confirm HSRID model that ships** from Amazon B0CGTTNJXL against the FAA DOC list before first purchase | Open | parts list § 5 |
+| **Confirm BeeID V1.1 on the FAA DOC list (RID000001995) and its serial format** at first purchase | Open | parts list v2 § 1 |
 
 ---
 
@@ -339,4 +342,4 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 2. Link the **source doc** (not a chat thread).
 3. When done, move to [`TODO_COMPLETED.md`](TODO_COMPLETED.md) with the ship date and delete the row here.
 
-*Last reviewed: Sep 8 2026 — added the Drone-building course section (Joe confirmations, drafting items, ops/sales/frontend).*
+*Last reviewed: Sep 9 2026 — Drone-building course section updated to parts list v2 (BeeID, F722 stack, Solder/Pre-soldered SKUs, frame/battery/receiver picks owed by Joe).*
