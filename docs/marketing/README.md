@@ -8,6 +8,7 @@ Growth, SEO/GEO, brand, and content strategy.
 | [seo-geo-strategy.md](seo-geo-strategy.md) | SEO + Generative Engine Optimization plan |
 | [paid-acquisition.md](paid-acquisition.md) | Paid media: readiness gates, funnel shapes, VSL/group funnel fit, proof, 70/20/10 |
 | [brand-assets.md](brand-assets.md) | Logo, social, mockups, fonts index |
+| [merch.md](merch.md) | Tees: designs, print files, blanks, local shops, event vs store plan |
 | [article-inventory.md](article-inventory.md) | Repo vs prod CMS status |
 | [../TODO.md](../TODO.md) | Open items backlog (marketing + cross-team) |
 
