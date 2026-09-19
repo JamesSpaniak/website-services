@@ -8,6 +8,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 |------|------------|----------------|
 | Run app locally | [`docs/tech/local-dev.md`](tech/local-dev.md) | `docker compose`, `backend/`, `drone/` |
 | Deploy to AWS | [`workflows/tech/deploy.md`](../workflows/tech/deploy.md) | `./pipeline.sh --env dev` |
+| Deploy from a cloud session / phone | [`workflows/tech/deploy-from-cloud.md`](../workflows/tech/deploy-from-cloud.md) | `scripts/deploy-preflight.sh`, `scripts/cloud-setup.sh` |
 | Understand deployed infra | [`docs/tech/architecture.md`](tech/architecture.md) | `terraform/` |
 | Understand API surface | [`docs/tech/backend-data.md`](tech/backend-data.md) | `backend/src/` |
 | Understand frontend data flow | [`docs/tech/frontend-data.md`](tech/frontend-data.md) | `drone/src/app/lib/` |
