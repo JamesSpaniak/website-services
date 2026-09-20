@@ -41,6 +41,9 @@ Scripts stay in this flat directory. See [`docs/SKILLS.md`](../docs/SKILLS.md) f
 | `bulk-upload-videos.sh` | S3 raw video bulk upload |
 | `upload-faa-107-videos.sh` | Upload reviewed FAA 107 filename→unit mappings with canonical keys and optional MediaConvert verification |
 | `reconcile-state.sh` | Terraform state reconciliation (sourced by pipeline) |
+| `deploy-preflight.sh` | Read-only pre-deploy gate: toolchain, AWS identity, state freshness, `--plan` destroy check (see [`workflows/tech/deploy-from-cloud.md`](../workflows/tech/deploy-from-cloud.md)) |
+| `cloud-setup.sh` | Source of truth for the Claude Code cloud environment **Setup script** field (installs AWS CLI + Terraform); not run from the repo |
+| `cloud-session-start.sh` | SessionStart hook (`.claude/settings.json`) — starts `dockerd` in cloud sessions, no-ops locally |
 | `generate-api-types.sh` | Regenerate frontend types from OpenAPI |
 | `prod-db-clone.sh` (+ `prod-db-clone-restore.ts`) | **Migration rehearsal.** `dump`: one ephemeral Fargate task (current prod task definition, read-only SELECTs, PII scrubbed in flight) → CloudWatch → `/tmp/proddump/tables/*.json`. `restore`: local Postgres 17 with prod's schema + data, then runs every migration pending in this checkout and the nightly analytics job, printing reconciliation. Creates nothing in AWS. See [`workflows/tech/prod-db-clone.md`](../workflows/tech/prod-db-clone.md) |
 

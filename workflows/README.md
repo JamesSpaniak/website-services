@@ -6,7 +6,7 @@ Operational runbooks — **do this, then that**. Reference docs (facts, strategy
 |--------|--------|-------------|
 | Sales | [`sales/`](sales/) | Outreach, email, pipeline from contact → call → quote |
 | Marketing | [`marketing/`](marketing/) | Articles, SEO cadence, news publish pipeline |
-| Tech | [`tech/`](tech/) | Deploy, course/content builds, infra tasks |
+| Tech | [`tech/`](tech/) | Deploy ([from a laptop](tech/deploy.md) · [from a cloud session](tech/deploy-from-cloud.md)), course/content builds, infra tasks |
 
 **Agent guide:** [`AGENTS.md`](AGENTS.md)
 

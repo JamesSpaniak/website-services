@@ -10,6 +10,8 @@ Deploy backend and/or frontend to AWS (production stack today).
 - `terraform/env/dev.tfvars` present (this is **live prod** until environment split — see [`docs/tech/environment-split-plan.md`](../../docs/tech/environment-split-plan.md))
 - **If the deploy carries new migrations** (`backend/migrations/`, `backend/src/migrations/`): rehearse them on a prod clone first — [`prod-db-clone.md`](prod-db-clone.md). The backend runs pending migrations on boot (`migrationsRun: true`); a failing one crash-loops the API task.
 
+Check all of the above at once with `./scripts/deploy-preflight.sh --plan` (read-only). Deploying from a Claude Code cloud session or phone instead of this machine: [`deploy-from-cloud.md`](deploy-from-cloud.md).
+
 ## Standard deploy (both services)
 
 From repo root:
@@ -68,5 +70,6 @@ NAT replace + image deploy in one shot (SMTP timeouts live in the API image):
 
 ## Related
 
+- [`deploy-from-cloud.md`](deploy-from-cloud.md) — running this deploy from a cloud session / phone
 - [`docs/tech/environment-split-plan.md`](../../docs/tech/environment-split-plan.md)
-- `pipeline.sh`, `terraform/`
+- `pipeline.sh`, `terraform/`, `scripts/deploy-preflight.sh`

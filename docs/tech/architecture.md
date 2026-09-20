@@ -536,6 +536,8 @@ git push → pipeline.sh
 
 Images: Node 20. Terraform: local state file (`terraform/terraform.tfstate`). See [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md).
 
+**State has no remote backend.** `terraform/providers.tf` declares no `backend` block, so state is that local file — committed to git, with no locking. Whoever deploys must be holding the newest state and must commit what the run writes back; only one machine deploys at a time. This is what makes deploys from anywhere other than the laptop a manual handoff — see [`workflows/tech/deploy-from-cloud.md`](../../workflows/tech/deploy-from-cloud.md), and `scripts/deploy-preflight.sh` for the read-only check that catches a stale snapshot before an apply does. Moving to an S3 backend + DynamoDB lock is tracked in [`../TODO.md`](../TODO.md).
+
 ---
 
 ## Resource ownership (Terraform-first)
