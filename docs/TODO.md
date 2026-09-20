@@ -32,6 +32,21 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 ---
 
+## P0 — Terraform state to S3 (security + multi-machine deploys)
+
+**`terraform/terraform.tfstate` was tracked in git and is in pushed history.** Untracked Sep 20 2026 (commit `6055706`); the `*.tfstate` pattern had been in `.gitignore` since the start but gitignore does not apply to already-tracked files.
+
+| Item | Detail |
+|------|--------|
+| **Exposure** | 128 resources; the file contains 276 `secret`, 39 `password`, 10 `private_key`, 4 `token` matches. On `origin/main` across **7 commits, first `cdbaf20` 2026-02-17** |
+| **Rotate** | Treat every credential in that state as compromised — DB passwords, Stripe keys, CloudFront signing material, any provider tokens. Rotation is required *regardless* of the history rewrite, because the blobs have been on the remote since February |
+| **Backend** | No `backend` block exists — Terraform is using **local state**, which is why it landed in the repo. Move to S3 + DynamoDB lock so deploys work from more than one machine |
+| **Migrate** | Add the `backend "s3"` block, then `terraform init -migrate-state`. Do this from the machine holding the current good state. **Touches prod — do not run unasked** |
+| **Also tracked** | `terraform/env/{dev,prod}.tfvars` (dev holds `test_user_password`, noted weak in-file), `terraform/secrets_stripe.tf`. Review whether these belong in git once the backend moves |
+| **History** | A `git filter-repo` pass to strip the state blobs is prepared but **not run** — see the assets/Drive plan. It rewrites shared history and needs a force-push |
+
+---
+
 ## P1 — Drone-building course (draft, not in catalog)
 
 *Outline is v3.4 and drafting is unblocked. Canonical: [`assets/courses/drone-building/outlines/drone-building-course-outline-v3.md`](../assets/courses/drone-building/outlines/drone-building-course-outline-v3.md) (draft from this) · [`…/outlines/drone-building-course-review-v2.md`](../assets/courses/drone-building/outlines/drone-building-course-review-v2.md) (rationale) · [`…/reference/parts-list-draft-v4.md`](../assets/courses/drone-building/reference/parts-list-draft-v4.md) (parts, costs, SKUs; v3/v2/v1 alongside keep split-ESC desk check / market note / materials/goggles). No payload, questions, or homepage track until Part 107 P0 is published. Joe owns hardware facts on `branch-joe`; we fold and bump.*
