@@ -141,13 +141,11 @@ resource "aws_ecs_task_definition" "frontend" {
     }
   ])
 
-  # Pipeline updates image via var; we ignore container_definitions changes so Terraform
-  # does not overwrite. To push new env vars (e.g. NEXT_PUBLIC_DEBUG_LOGGING), taint once:
-  #   terraform taint aws_ecs_task_definition.frontend
-  # then apply so the task definition is recreated with the new definition.
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
+  # Terraform owns the container definition (env, secrets, logging); pipeline.sh
+  # passes the freshly built image as var.frontend_image_uri, so every deploy
+  # registers a revision that matches this file, and the pipeline then points
+  # the service at the newest ACTIVE revision of the family (the service itself
+  # ignores task_definition so an apply never rolls a deploy back).
 }
 
 resource "aws_ecs_service" "frontend" {

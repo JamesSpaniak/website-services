@@ -161,11 +161,11 @@ SEO is an acquisition engine here (see marketing docs). Teams that pick React Na
 
 Part 107 is US-only, so consumer volume sits in the storefronts where link-out policy currently matters most.
 
-| Payment route | Platform fee | On a $29 course | Status |
+| Payment route | Platform fee | On a **$129** course | Status |
 |---------------|--------------|-----------------|--------|
 | External link to Stripe web checkout (US App Store) | **0%** today | $0 | Contempt remedy in *Epic v. Apple*; Apple barred from collecting commission on qualifying external-link purchases until a court-approved "reasonable" rate (or SCOTUS outcome). Cert granted Jul 2026; expect further change. |
-| Apple IAP, Small Business Program | 15% | ~$4.35 | Under $1M/yr proceeds |
-| Apple IAP, standard | 30% | ~$8.70 | Default |
+| Apple IAP, Small Business Program | 15% | **~$19.35** | Under $1M/yr proceeds |
+| Apple IAP, standard | 30% | **~$38.70** | Default |
 | Google Play external content links (US) | **0%** currently assessed | $0 | *Epic v. Google* injunction; Google not currently assessing link-out fees — re-verify before launch |
 
 **Stripe** still takes ~2.9% + $0.30 regardless.

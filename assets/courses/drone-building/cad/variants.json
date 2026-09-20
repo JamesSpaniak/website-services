@@ -1,0 +1,158 @@
+{
+  "_comment": "Frame layouts to model before anything is printed or bought. Motor positions are (x, y) from the frame center in mm; x forward, y left. Each variant is generated on a 1 mm voxel grid by scripts/build_drone_model.py and as exact B-rep by scripts/build_drone_cad.py. 'front' / 'rear' are the front-right and rear-right motors; the left side mirrors. Wheelbase = front-right to rear-left distance. standoff_h 24 (not 20): on a 150 mm 3.5-inch frame the battery plate overhangs the prop discs, so the top plate must clear the blade tips and the guard ring (found by the CAD intersection check, Sep 11). motor_pad_r 12 keeps the guard spokes outside the 1404's Ø20.5 base flange. Video standoff_h 30 (Sep 12): the CAD found the O4's top coax plug (2.5 mm) through a 27 mm-standoff top plate and the O4 board 0.2 mm into the FC's USB-C; O4 now sits 4 mm above the FC.",
+  "defaults": {
+    "arm_width": 12,
+    "arm_thickness": 4,
+    "plate_thickness": 3,
+    "center_plate": 46,
+    "standoff_h": 24,
+    "motor_pad_r": 12,
+    "guards": true,
+    "guard_gap": 1.5,
+    "guard_ring": 2,
+    "guard_h": 5,
+    "guard_material": "TPU",
+    "hole_clearance": 0.2,
+    "battery_mount": "top",
+    "camera": false,
+    "material": "PETG"
+  },
+  "variants": {
+    "base-x": {
+      "kit": "base",
+      "title": "Base kit — true-X, student-printed PETG unibody",
+      "style": "x",
+      "front": [
+        53,
+        53
+      ],
+      "rear": [
+        -53,
+        53
+      ],
+      "notes": "Reference layout for the Unit 5 stock frame. 150 mm wheelbase, 2 mm TPU guards, top battery, BeeID pocket at the rear of the top plate."
+    },
+    "base-x-lowbat": {
+      "kit": "base",
+      "title": "Base kit — true-X, battery slung under the bottom plate",
+      "style": "x",
+      "front": [
+        53,
+        53
+      ],
+      "rear": [
+        -53,
+        53
+      ],
+      "battery_mount": "bottom",
+      "notes": "Same frame as base-x with the pack underneath. Compare CG height, inertia, and hover behaviour before deciding the tray."
+    },
+    "base-stretch-x": {
+      "kit": "base",
+      "title": "Base kit — stretched X (longer pitch axis)",
+      "style": "x",
+      "front": [
+        66,
+        50
+      ],
+      "rear": [
+        -66,
+        50
+      ],
+      "notes": "More pitch damping, narrower roll arms. Left-right prop spacing 100 mm is the minimum with guards; wheelbase ≈ 166 mm (slightly over the 150–160 target)."
+    },
+    "base-h": {
+      "kit": "base",
+      "title": "Base kit — H frame (two printed rails + center plates)",
+      "style": "h",
+      "front": [
+        55,
+        50
+      ],
+      "rear": [
+        -55,
+        50
+      ],
+      "arm_width": 10,
+      "notes": "Straight rails print flat on any bed and the battery bay is wide. More frame mass than X; compare in the report."
+    },
+    "base-truss": {
+      "kit": "base",
+      "title": "Base kit — truss-arm X with lattice keel (Fusion-frame ideas, parametric)",
+      "style": "x",
+      "front": [
+        53,
+        53
+      ],
+      "rear": [
+        -53,
+        53
+      ],
+      "notes": "Vertical Warren-truss arms (6 wide x 10 tall, 3 mm chords, 2 mm diagonals) + lattice side walls, borrowed from the 20260911 Fusion frame and rebuilt parametrically so the kit's 20x20 stack, 12x12 motors, guards and BeeID pocket still fit. Compare FEA SF and first mode against base-x.",
+      "arm_style": "truss",
+      "truss_chord": 3.0,
+      "truss_web": 2.0,
+      "plate_cutouts": true,
+      "keel": true,
+      "arm_width": 6,
+      "truss_height": 10
+    },
+    "video-x": {
+      "kit": "video",
+      "title": "Video kit — true-X CF stand-in + O4 Air Unit",
+      "style": "x",
+      "front": [
+        53,
+        53
+      ],
+      "rear": [
+        -53,
+        53
+      ],
+      "material": "CF",
+      "arm_thickness": 4,
+      "arm_width": 10,
+      "plate_thickness": 2,
+      "standoff_h": 30,
+      "camera": true,
+      "notes": "Geometry stand-in for the open 3.5\" CF frame (parts list v2 §4): 20×20 stack, 12×12 motors, standard-O4 camera plates, top battery, ≤ 65 g. O4 board stacks above the FC so the standoffs grow to 27 mm."
+    },
+    "video-deadcat": {
+      "kit": "video",
+      "title": "Video kit — deadcat CF stand-in (props out of the camera view)",
+      "style": "x",
+      "front": [
+        58,
+        62
+      ],
+      "rear": [
+        -52,
+        50
+      ],
+      "material": "CF",
+      "arm_thickness": 4,
+      "arm_width": 10,
+      "plate_thickness": 2,
+      "standoff_h": 30,
+      "camera": true,
+      "notes": "Front arms wider and further forward so the front props leave the O4 camera's field of view. Asymmetric inertia — see the sim."
+    },
+    "reference-fusion": {
+      "kit": "base",
+      "title": "Base kit parts on the Fusion reference frame (20260911 print, imported STL)",
+      "style": "x",
+      "frame_stl": "reference/fusion-frame-20260911.stl",
+      "frame_rotate_z_deg": -90,
+      "front": [
+        51,
+        65
+      ],
+      "rear": [
+        -51,
+        65
+      ],
+      "root_fillet": 0,
+      "notes": "The frame body is the third-party mesh itself (plates, truss arms, six posts, top deck), re-centred on its 30.5 mm stack pattern and rotated so its long deck runs fore-aft. Our stack sits on a printed 30.5->20x20 adapter; the 12x12 motor holes are checked against pad material (drill). front/rear here are only for the voxel script's bookkeeping - the CAD uses the detected motor positions."
+    }
+  }
+}

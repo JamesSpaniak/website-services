@@ -12,6 +12,10 @@ import { CourseUnitService } from './course-unit.service';
 import { FINAL_EXAM_STANDARD } from 'src/questions/exam-generator.service';
 import { normalizeAndFlattenUnits } from './course-unit.util';
 import { assertCourseExists, stripCourseForPublic } from './course-access.util';
+import {
+  EntitlementService,
+  entitlementsAuthoritative,
+} from 'src/commerce/entitlement.service';
 
 @Injectable()
 export class CourseService {
@@ -28,6 +32,7 @@ export class CourseService {
     private readonly organizationService: OrganizationService,
     private readonly courseUnitService: CourseUnitService,
     private readonly dataSource: DataSource,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   async getCourseByTitle(title: string): Promise<Course | undefined> {
@@ -43,6 +48,26 @@ export class CourseService {
   ): Promise<boolean> {
     if (userFromJwt.role === Role.Admin) {
       return true;
+    }
+
+    // PD22: once the ledger has reconciled clean, flip ENTITLEMENTS_AUTHORITATIVE
+    // and purchases + Pro are read from `entitlements` (one indexed EXISTS)
+    // instead of the user→purchased_courses join + role/expiry columns. Org
+    // seats are relational either way. Flip back by unsetting the env var.
+    if (entitlementsAuthoritative()) {
+      const user = await this.userRepository.findOne({
+        where: { id: userFromJwt.userId },
+        select: ['id', 'role'],
+      });
+      if (!user) return false;
+      if (user.role === Role.Admin) return true;
+      if (await this.entitlements.hasLiveAccess(userFromJwt.userId, courseId)) {
+        return true;
+      }
+      return this.organizationService.hasOrgCourseAccess(
+        userFromJwt.userId,
+        courseId,
+      );
     }
 
     const user = await this.userRepository.findOne({

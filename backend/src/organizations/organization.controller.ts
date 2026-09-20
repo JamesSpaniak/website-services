@@ -9,8 +9,10 @@ import {
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -42,13 +44,22 @@ import {
   OrgCourseResponse,
   MemberCourseProgressSummary,
   MemberCourseDetailedProgress,
+  OrgEngagementResponse,
+  OrgUtilizationResponse,
+  MemberTimelineEvent,
 } from './types/organization.dto';
+import { OrgInsightsService } from './org-insights.service';
+import { ProductEventsService } from '../product-events/product-events.service';
 
 @ApiTags('Organizations')
 @ApiBearerAuth()
 @Controller('organizations')
 export class OrganizationController {
-  constructor(private readonly orgService: OrganizationService) {}
+  constructor(
+    private readonly orgService: OrganizationService,
+    private readonly insights: OrgInsightsService,
+    private readonly productEvents: ProductEventsService,
+  ) {}
 
   // ── Authenticated user endpoints (must be above :id routes) ──
 
@@ -314,6 +325,36 @@ export class OrganizationController {
     );
   }
 
+  // Literal segment must be declared before `:id/progress/:courseId`.
+  @ApiOperation({ summary: 'CSV export of member × course progress' })
+  @Get(':id/progress/export.csv')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async exportOrgProgress(
+    @Request() req,
+    @Param('id', ParseIntPipe) orgId: number,
+    @Res() res: Response,
+    @Query('classId') classId?: string,
+  ): Promise<void> {
+    const parsedClassId = classId ? parseInt(classId, 10) : undefined;
+    const rows = await this.orgService.getOrgProgressSummary(
+      orgId,
+      Number.isNaN(parsedClassId as number) ? undefined : parsedClassId,
+    );
+    void this.productEvents.record({
+      userId: req.user.userId,
+      organizationId: orgId,
+      event: 'org_progress_exported',
+      properties: { class_id: parsedClassId ?? null, rows: rows.length },
+    });
+    const stamp = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="org-${orgId}-progress-${stamp}.csv"`,
+    );
+    res.send(this.insights.toCsv(rows));
+  }
+
   @ApiOperation({
     summary: 'Get detailed progress for all org members on a specific course',
   })
@@ -329,6 +370,61 @@ export class OrganizationController {
       orgId,
       courseId,
       Number.isNaN(parsedClassId as number) ? undefined : parsedClassId,
+    );
+  }
+
+  // ── Engagement endpoints (MP5–MP7) ──
+
+  @ApiOperation({
+    summary:
+      'Per-member engagement (minutes, lessons, videos) over the last N days',
+  })
+  @Get(':id/engagement')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async getOrgEngagement(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Query('days') days?: string,
+    @Query('classId') classId?: string,
+  ): Promise<OrgEngagementResponse> {
+    const parsedClassId = classId ? parseInt(classId, 10) : undefined;
+    return this.insights.getEngagement(
+      orgId,
+      days ? parseInt(days, 10) || 7 : 7,
+      Number.isNaN(parsedClassId as number) ? undefined : parsedClassId,
+    );
+  }
+
+  @ApiOperation({ summary: 'Seat utilization panel for the org (live)' })
+  @Get(':id/utilization')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async getOrgUtilization(
+    @Param('id', ParseIntPipe) orgId: number,
+  ): Promise<OrgUtilizationResponse> {
+    return this.insights.getUtilization(orgId);
+  }
+
+  @ApiOperation({ summary: "One member's quiz/exam gradebook and attempt history" })
+  @Get(':id/members/:userId/exams')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async getMemberExams(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.insights.getMemberQuizHistory(orgId, userId);
+  }
+
+  @ApiOperation({ summary: "One member's recent learning timeline (30 days)" })
+  @Get(':id/members/:userId/timeline')
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  async getMemberTimeline(
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('limit') limit?: string,
+  ): Promise<MemberTimelineEvent[]> {
+    return this.insights.getMemberTimeline(
+      orgId,
+      userId,
+      limit ? parseInt(limit, 10) || 200 : 200,
     );
   }
 }

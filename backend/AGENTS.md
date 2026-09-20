@@ -26,6 +26,8 @@ NestJS API in `backend/src/`. Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AG
 | Endpoints, entities, guards | [`docs/tech/backend-data.md`](../docs/tech/backend-data.md) |
 | Questions, exams, import | [`docs/tech/exam-generator-and-course-linking.md`](../docs/tech/exam-generator-and-course-linking.md) |
 | Unit refs / `course_units` | [`docs/tech/unit-refs-migration.md`](../docs/tech/unit-refs-migration.md) |
+| Analytics tables / views / `reporting` routes (`commerce/`, `product-events/`, `reporting/`, migrations `1765…`) | [`docs/tech/analytics-queries.md`](../docs/tech/analytics-queries.md) (schema + SQL), [`docs/tech/backend-data.md`](../docs/tech/backend-data.md) § routes |
+| Stripe webhook / orders / entitlements | [`docs/tech/purchase-flows.md`](../docs/tech/purchase-flows.md) |
 | Frontend contract (if response shape changes) | [`docs/tech/frontend-data.md`](../docs/tech/frontend-data.md) |
 | Open engineering items | [`docs/TODO.md`](../docs/TODO.md) |
 

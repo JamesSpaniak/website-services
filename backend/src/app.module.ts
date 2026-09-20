@@ -20,9 +20,15 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { AuditModule } from './audit/audit.module';
 import { CommentModule } from './comments/comment.module';
 import { QuestionModule } from './questions/question.module';
+import { ProductEventsModule } from './product-events/product-events.module';
+import { CommerceModule } from './commerce/commerce.module';
+import { ReportingModule } from './reporting/reporting.module';
 
 @Module({
   imports: [
+    ProductEventsModule,
+    CommerceModule,
+    ReportingModule,
     AnalyticsModule,
     ArticleModule,
     AuditModule,

@@ -54,6 +54,9 @@ Author intake for a future build/assembly course. **No payload, questions, or ho
 | File | Purpose |
 |------|---------|
 | `README.md` | Folder status and version table |
-| `outlines/drone-building-course-outline-v3.md` | **v3.1 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
-| `reference/parts-list-draft-v1.md` | Reference parts list (Base/Video), frame material call, RID sharing, cost framing; source quote PDF alongside |
+| `outlines/drone-building-course-outline-v3.md` | **v3.4 — draft from this.** Terms, locked decisions, tree, per-unit content, kits, open items |
+| `reference/parts-list-draft-v4.md` | Current reference parts list (Joe Sep 12, verified): matched F722 Mini V2 stack, Explorer LiHV pack, XR2 |
+| `reference/parts-list-draft-v3.md` | Superseded for parts; Sep 11 split FC/ESC desk check |
+| `reference/parts-list-draft-v2.md` | Superseded for parts; Solder/Pre-soldered market note |
+| `reference/parts-list-draft-v1.md` | Superseded for parts; keeps material table, module rules, goggles options; source quote PDF alongside |
 | `outlines/drone-building-course-review-v2.md` | Review, technical value, verified facts, Betaflight/sensor options, readiness |

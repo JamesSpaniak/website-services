@@ -1204,17 +1204,20 @@ describe('API (e2e)', () => {
       expect(response.body.user.email_verified).toBe(false);
     });
 
-    it('blocks unverified users from create-payment-intent', async () => {
+    it('allows unverified users to create-payment-intent', async () => {
       await createUnverifiedUser('unverified2', 'unverified2@example.com');
       const course = await createCourse('Paid Course');
       const token = await loginAndGetToken('unverified2');
 
-      await request(app.getHttpServer())
+      // Without Stripe keys in test, expect 5xx from Stripe or 201 if mocked —
+      // the gate we care about is that EMAIL_NOT_VERIFIED is not returned.
+      const res = await request(app.getHttpServer())
         .post('/purchases/create-payment-intent')
         .set('Authorization', `Bearer ${token}`)
-        .send({ courseId: course.id })
-        .expect(403)
-        .then((res) => expect(res.body.message).toBe('EMAIL_NOT_VERIFIED'));
+        .send({ courseId: course.id });
+
+      expect(res.status).not.toBe(403);
+      expect(res.body.message).not.toBe('EMAIL_NOT_VERIFIED');
     });
 
     it('resends verification email for unverified users', async () => {

@@ -1,6 +1,6 @@
 # Drone building — reference parts list, draft v1
 
-**Status:** Draft, Sep 8 2026. Source is Joe's GetFPV quote ([`getfpv-quote-2026-09-08.pdf`](getfpv-quote-2026-09-08.pdf)) plus his notes: "reasonable list of parts; need more research to confirm compatibility and add hardware. GPS isn't strictly necessary and the O4 unit could be removed for the non-photo version. Doesn't include monitor/goggles, a controller, or RID module."
+**Status:** Draft, Sep 8 2026 — **superseded for parts by [`parts-list-draft-v2.md`](parts-list-draft-v2.md) (Sep 9)**. Still current here: §3 material table, §5 Part 107 module rules, §8 goggles options, §9 material choice, and the §7.1 desk check of the v1 parts. Source is Joe's GetFPV quote ([`getfpv-quote-2026-09-08.pdf`](getfpv-quote-2026-09-08.pdf)) plus his notes: "reasonable list of parts; need more research to confirm compatibility and add hardware. GPS isn't strictly necessary and the O4 unit could be removed for the non-photo version. Doesn't include monitor/goggles, a controller, or RID module."
 
 This is a **reference list, not a SKU**. Prices are GetFPV list prices on the quote date, before tax and shipping. Joe owns compatibility; we own the kit split, safety notes, and cost framing. Items marked *verify* are unconfirmed.
 

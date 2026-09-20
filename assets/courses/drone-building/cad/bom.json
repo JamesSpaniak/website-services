@@ -1,0 +1,212 @@
+{
+  "_comment": "Component geometry + mass for scripts/build_drone_model.py. Source of truth for parts is reference/parts-list-draft-v4.md; every number here is either 'verified' (from that desk check) or 'estimate' (our fill-in until Joe weighs/measures). Units: mm, g. Axes: x forward (nose), y left, z up. Betaflight motor order: 1 rear-right, 2 front-right, 3 rear-left, 4 front-left. generated/ was last built from v2 — regenerate after this patch.",
+  "version": "bom v4 → cad 0.2 patch (Sep 12 2026)",
+  "components": {
+    "stack_esc": {
+      "part": "Flywoo GOKU G45M 45A AM32 4-in-1 ESC (matched F722 Mini V2 stack)",
+      "kit": "both",
+      "shape": "box",
+      "dims": [33, 30, 6],
+      "mount": {"pattern": "20x20", "screw": "M2", "hole_d": 2.2},
+      "mass_g": 7,
+      "mass_source": "estimate — assembled stack ~17 g minus FC 9.9 g (parts list v4); board ~33 × 30 mm",
+      "color": "#2f6f4e",
+      "code": "S",
+      "pads": {
+        "M1": [-12, -12], "M2": [12, -12], "M3": [-12, 12], "M4": [12, 12],
+        "BAT+": [-14, 4], "BAT-": [-14, -4], "CAP+": [-14, 8], "CAP-": [-14, -8]
+      },
+      "pads_note": "Pad positions are a layout stand-in (corners = motor pads, rear edge = battery + capacitor). Confirm against the G45M (parts list v4 §3).",
+      "sources": ["https://flywoo.net/products/goku-g45m-32bit-128k-2-6s-45a-esc"]
+    },
+    "stack_fc": {
+      "part": "Flywoo GOKU F722 Pro Mini V2 flight controller (top board; ICM42688, DPS310 baro, AT7456E OSD)",
+      "kit": "both",
+      "shape": "box",
+      "dims": [30, 30, 4],
+      "mount": {"pattern": "20x20", "screw": "M2", "hole_d": 2.2},
+      "mass_g": 9.9,
+      "mass_source": "verified — Flywoo 9.9 g (parts list v4)",
+      "color": "#3d8b5f",
+      "code": "F",
+      "sockets": {
+        "RX (UART2, 4-pin)": [0, -14],
+        "GPS (UART5, 4-pin)": [-14, 0],
+        "DJI (UART3, 6-pin)": [14, 0],
+        "ESC (8-pin ribbon)": [0, 14]
+      },
+      "sockets_note": "Socket edges are a layout stand-in; verified facts are the UART assignments and pin counts (parts list v4 §1).",
+      "assembled_stack_height_mm": 15.7,
+      "sources": ["https://flywoo.net/products/goku-f722-pro-mini-v2-flight-controller"]
+    },
+    "motor": {
+      "part": "XILO Stealth 1404 4500KV",
+      "kit": "both",
+      "qty": 4,
+      "shape": "cylinder",
+      "dims": [18.5, 18.5, 14.5],
+      "dims_source": "estimate — 1404 bell ≈ Ø18.5 × 14.5 mm; verified: 12×12 mm 4× M2 mount, T-mount shaft, 9.2 g, 24 AWG × 150 mm leads",
+      "mount": {"pattern": "12x12", "screw": "M2", "hole_d": 2.2},
+      "mass_g": 9.2,
+      "mass_source": "verified",
+      "lead_length_mm": 150,
+      "color": "#444c56",
+      "code": "M",
+      "sources": ["https://www.getfpv.com/xilo-stealth-1404-motor-4500kv.html"]
+    },
+    "prop": {
+      "part": "Gemfan 3525 Hurricane 3-blade 1.5 mm T-mount",
+      "kit": "both",
+      "qty": 4,
+      "shape": "disc",
+      "diameter_mm": 88.9,
+      "hub_h_mm": 5,
+      "mass_g": 1.8,
+      "mass_source": "verified",
+      "color": "#a0a8b3",
+      "code": "P",
+      "sources": ["https://www.gemfanhobby.com/3525-hurricane-pc-3-blade-t-mount.html"]
+    },
+    "beeid": {
+      "part": "NewBeeDrone BeeID V1.1 M10Q (GPS + Remote ID, FAA DOC RID000001995)",
+      "kit": "both",
+      "shape": "box",
+      "dims": [22, 16, 8],
+      "mass_g": 5.2,
+      "mass_source": "verified (22 × 15.6 × 8 mm, 5.2 g)",
+      "needs_sky_view": true,
+      "connects_to": "stack_fc:GPS (UART5, 4-pin)",
+      "color": "#d9a441",
+      "code": "I",
+      "sources": ["https://newbeedrone.com/products/newbeedrone-beeid-v1-1-m10q-gps-module-with-remoteid-drone-tracker"]
+    },
+    "rx": {
+      "part": "RadioMaster XR2 Nano ELRS 2.4 GHz (integrated tower antenna)",
+      "kit": "both",
+      "shape": "box",
+      "dims": [16, 12, 6],
+      "dims_source": "verified — 16 × 12 × 6 mm",
+      "mass_g": 0.8,
+      "mass_source": "verified",
+      "antenna": {"type": "tower", "keep_clear_of_carbon": true},
+      "connects_to": "stack_fc:RX (UART2, 4-pin)",
+      "color": "#c0553f",
+      "code": "R"
+    },
+    "battery": {
+      "part": "Flywoo Explorer 1000 mAh 3S LiHV 80C XT30UP",
+      "kit": "both",
+      "shape": "box",
+      "dims": [58, 25, 24],
+      "dims_source": "verified — 58 × 24.5 × 23.5 mm (parts list v4 §1)",
+      "mass_g": 66,
+      "mass_source": "verified",
+      "capacity_mah": 1000,
+      "cells": 3,
+      "chemistry": "LiHV",
+      "connector": "XT30",
+      "color": "#3b5bdb",
+      "code": "B"
+    },
+    "wiring": {
+      "part": "XT30 pigtail, low-ESR capacitor, motor leads, RX/GPS harnesses",
+      "kit": "both",
+      "shape": "distributed",
+      "mass_g": 12,
+      "mass_source": "estimate — parts list v4 §6 (wiring/cap/XT30 ≈ 12 g)",
+      "capacitor": {"shape": "cylinder", "dims": [8, 8, 12]},
+      "xt30": {"shape": "box", "dims": [12, 8, 12]},
+      "color": "#e0b03b",
+      "code": "W"
+    },
+    "o4_air_unit": {
+      "part": "DJI O4 Air Unit (board + camera + antenna)",
+      "kit": "video",
+      "shape": "box",
+      "dims": [30, 30, 6],
+      "mount": {"pattern": "25.5x25.5", "screw": "M2", "hole_d": 2.2},
+      "mass_g": 5.2,
+      "mass_source": "estimate — 8.2 g verified with camera; board 5.2 + camera 3.0",
+      "connects_to": "stack_fc:DJI (UART3, 6-pin)",
+      "color": "#6b4fbb",
+      "code": "O",
+      "sources": ["https://www.dji.com/o4-air-unit"]
+    },
+    "o4_camera": {
+      "part": "DJI O4 camera (standard, 14 mm wide, 16 mm hole spacing)",
+      "kit": "video",
+      "shape": "box",
+      "dims": [12, 14, 14],
+      "mass_g": 3.0,
+      "mass_source": "estimate — see o4_air_unit",
+      "tilt_deg": 20,
+      "color": "#8f7ad6",
+      "code": "C"
+    },
+    "hardware": {
+      "part": "M2 nylon standoffs, bolts, nuts, zip ties",
+      "kit": "both",
+      "shape": "standoffs",
+      "standoff_d_mm": 4,
+      "mass_g": 6,
+      "mass_source": "estimate — hardware pack",
+      "color": "#8c8c8c",
+      "code": "T"
+    },
+    "strap": {
+      "part": "Battery strap 12 mm",
+      "kit": "both",
+      "shape": "strap",
+      "mass_g": 3,
+      "mass_source": "estimate",
+      "color": "#222222",
+      "code": "K"
+    }
+  },
+  "materials": {
+    "_comment": "density g/cm³, E GPa (Young's), yield/tensile MPa, glass transition °C. Density + Tg from parts list v1 §3; E and strength are typical FDM datasheet values (estimates for a beam check, not FEA). layer_factor = strength retained when the bending load pulls layers apart (printed standing).",
+    "PLA":  {"density": 1.24, "E_gpa": 3.5, "strength_mpa": 50, "tg_c": 60,  "layer_factor": 0.5, "print_solidity": 0.9},
+    "PETG": {"density": 1.27, "E_gpa": 2.1, "strength_mpa": 50, "tg_c": 80,  "layer_factor": 0.6, "print_solidity": 0.9},
+    "ASA":  {"density": 1.07, "E_gpa": 2.0, "strength_mpa": 40, "tg_c": 100, "layer_factor": 0.55, "print_solidity": 0.9},
+    "Nylon":{"density": 1.10, "E_gpa": 1.5, "strength_mpa": 45, "tg_c": 70,  "layer_factor": 0.7, "print_solidity": 0.9},
+    "TPU":  {"density": 1.21, "E_gpa": 0.03, "strength_mpa": 25, "tg_c": -30, "layer_factor": 0.8, "print_solidity": 0.85},
+    "CF":   {"density": 1.60, "E_gpa": 60.0, "strength_mpa": 500, "tg_c": 150, "layer_factor": 1.0, "print_solidity": 1.0}
+  },
+  "propulsion": {
+    "_comment": "First-principles estimate: T = Ct·ρ·n²·D⁴, P = Cp·ρ·n³·D⁵. No thrust table exists for the XILO 1404 (parts list v2 §1); sibling FlyFish 1404 4500KV ≈ 16.5 A/motor on 3S tri-blade. Override max_thrust_g_per_motor / max_current_a_per_motor with thrust-stand data when Joe has it.",
+    "kv": 4500,
+    "cells": 3,
+    "v_cell_nominal": 3.8,
+    "prop_diameter_in": 3.5,
+    "prop_pitch_in": 2.5,
+    "blades": 3,
+    "ct": 0.11,
+    "cp": 0.055,
+    "rpm_load_factor": 0.78,
+    "drive_efficiency": 0.72,
+    "motor_max_power_w": 225,
+    "sibling_3s_current_a": 16.5,
+    "max_thrust_g_per_motor_override": null,
+    "max_current_a_per_motor_override": null,
+    "usable_capacity": 0.8,
+    "idle_w_base": 1.5,
+    "idle_w_video": 6.5,
+    "air_density": 1.225,
+    "esc_continuous_a": 45
+  },
+  "wiring": {
+    "_comment": "Connection list = the wiring diagram in data form. Solder joints per parts list v4 §3: motors 12 + pigtail 2 + capacitor 2 = 16 on the ESC; XR2 4 at the RX.",
+    "connections": [
+      {"from": "motor1", "to": "stack_esc:M1", "type": "solder", "joints": 3, "kit": "both"},
+      {"from": "motor2", "to": "stack_esc:M2", "type": "solder", "joints": 3, "kit": "both"},
+      {"from": "motor3", "to": "stack_esc:M3", "type": "solder", "joints": 3, "kit": "both"},
+      {"from": "motor4", "to": "stack_esc:M4", "type": "solder", "joints": 3, "kit": "both"},
+      {"from": "battery", "to": "stack_esc:BAT", "type": "solder", "joints": 2, "kit": "both", "via": "XT30 pigtail"},
+      {"from": "capacitor", "to": "stack_esc:CAP", "type": "solder", "joints": 2, "kit": "both"},
+      {"from": "stack_esc", "to": "stack_fc:ESC (8-pin ribbon)", "type": "plug", "joints": 0, "kit": "both"},
+      {"from": "rx", "to": "stack_fc:RX (UART2, 4-pin)", "type": "solder", "joints": 4, "kit": "both", "note": "XR2 castellated pads + CRSF wire; FC end is the 4-pin plug"},
+      {"from": "beeid", "to": "stack_fc:GPS (UART5, 4-pin)", "type": "plug", "joints": 0, "kit": "both", "note": "0 if the BeeID harness pitch matches (in-person check)"},
+      {"from": "o4_air_unit", "to": "stack_fc:DJI (UART3, 6-pin)", "type": "plug", "joints": 0, "kit": "video"}
+    ]
+  }
+}

@@ -1,0 +1,1421 @@
+[
+  {
+    "id": "DJI_20260808114422_0030_D",
+    "day": "2026-08-08",
+    "duration_s": 238.2,
+    "frames_sampled": 1110,
+    "full_clip": {
+      "dur": 238.2,
+      "avg_motion_dps": 8.035,
+      "p50_motion_dps": 2.0,
+      "p95_motion_dps": 31.78,
+      "avg_jerk": 11.619,
+      "alt_range_m": 95.9,
+      "yaw_travel_deg": 58.6,
+      "pitch_travel_deg": 13.7,
+      "grade": "D",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.91,
+        "avg_motion_dps": 1.012,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 2.575,
+        "avg_jerk": 2.129,
+        "alt_range_m": 0.8,
+        "yaw_travel_deg": 9.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 207.34,
+        "end": 219.25,
+        "win": 12
+      },
+      {
+        "dur": 19.82,
+        "avg_motion_dps": 0.553,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 2.575,
+        "avg_jerk": 0.0,
+        "alt_range_m": 3.4,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 194.79,
+        "end": 214.61,
+        "win": 20
+      },
+      {
+        "dur": 30.0,
+        "avg_motion_dps": 1.279,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 6.867,
+        "avg_jerk": 2.823,
+        "alt_range_m": 3.4,
+        "yaw_travel_deg": 26.9,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 190.59,
+        "end": 220.59,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      370.0
+    ],
+    "shutter_range": [
+      500.0,
+      6400.0
+    ],
+    "alt_range_m": [
+      -84.2,
+      11.7
+    ],
+    "video": "videos/2026-08-08/DJI_20260808114422_0030_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808114422_0030_D.SRT"
+  },
+  {
+    "id": "DJI_20260808114212_0029_D",
+    "day": "2026-08-08",
+    "duration_s": 126.79,
+    "frames_sampled": 600,
+    "full_clip": {
+      "dur": 126.79,
+      "avg_motion_dps": 11.039,
+      "p50_motion_dps": 6.0,
+      "p95_motion_dps": 55.224,
+      "avg_jerk": 13.856,
+      "alt_range_m": 75.1,
+      "yaw_travel_deg": 31.3,
+      "pitch_travel_deg": 30.0,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.98,
+        "avg_motion_dps": 0.051,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 0.427,
+        "avg_jerk": 0.0,
+        "alt_range_m": 0.1,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 40.17,
+        "end": 52.15,
+        "win": 12
+      },
+      {
+        "dur": 19.82,
+        "avg_motion_dps": 0.723,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 5.15,
+        "avg_jerk": 0.0,
+        "alt_range_m": 6.5,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 33.87,
+        "end": 53.69,
+        "win": 20
+      },
+      {
+        "dur": 29.83,
+        "avg_motion_dps": 2.288,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 0.858,
+        "avg_jerk": 2.877,
+        "alt_range_m": 0.1,
+        "yaw_travel_deg": 62.1,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 35.94,
+        "end": 65.77,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      310.0
+    ],
+    "shutter_range": [
+      400.0,
+      4000.0
+    ],
+    "alt_range_m": [
+      4.9,
+      80.0
+    ],
+    "video": "videos/2026-08-08/DJI_20260808114212_0029_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808114212_0029_D.SRT"
+  },
+  {
+    "id": "DJI_20260807162042_0012_D",
+    "day": "2026-08-07",
+    "duration_s": 112.28,
+    "frames_sampled": 531,
+    "full_clip": {
+      "dur": 112.28,
+      "avg_motion_dps": 6.034,
+      "p50_motion_dps": 0.0,
+      "p95_motion_dps": 36.325,
+      "avg_jerk": 11.916,
+      "alt_range_m": 26.7,
+      "yaw_travel_deg": 21.4,
+      "pitch_travel_deg": 0.0,
+      "grade": "D",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.81,
+        "avg_motion_dps": 1.114,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 6.965,
+        "avg_jerk": 0.0,
+        "alt_range_m": 6.6,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 44.44,
+        "end": 56.26,
+        "win": 12
+      },
+      {
+        "dur": 19.89,
+        "avg_motion_dps": 1.768,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 3.98,
+        "avg_jerk": 2.945,
+        "alt_range_m": 1.8,
+        "yaw_travel_deg": 30.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 80.48,
+        "end": 100.37,
+        "win": 20
+      },
+      {
+        "dur": 29.96,
+        "avg_motion_dps": 0.444,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 0.5,
+        "avg_jerk": 1.188,
+        "alt_range_m": 1.8,
+        "yaw_travel_deg": 9.3,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 70.0,
+        "end": 99.97,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      110.0,
+      250.0
+    ],
+    "shutter_range": [
+      5000.0,
+      10000.0
+    ],
+    "alt_range_m": [
+      3.4,
+      30.1
+    ],
+    "video": "videos/2026-08-07/DJI_20260807162042_0012_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807162042_0012_D.SRT"
+  },
+  {
+    "id": "DJI_20260808072627_0025_D",
+    "day": "2026-08-08",
+    "duration_s": 110.61,
+    "frames_sampled": 523,
+    "full_clip": {
+      "dur": 110.61,
+      "avg_motion_dps": 13.792,
+      "p50_motion_dps": 7.296,
+      "p95_motion_dps": 68.67,
+      "avg_jerk": 19.487,
+      "alt_range_m": 72.9,
+      "yaw_travel_deg": 172.4,
+      "pitch_travel_deg": 11.1,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.81,
+        "avg_motion_dps": 1.159,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 5.0,
+        "avg_jerk": 4.788,
+        "alt_range_m": 0.9,
+        "yaw_travel_deg": 8.2,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 59.46,
+        "end": 71.27,
+        "win": 12
+      },
+      {
+        "dur": 19.95,
+        "avg_motion_dps": 4.529,
+        "p50_motion_dps": 2.985,
+        "p95_motion_dps": 10.5,
+        "avg_jerk": 0.0,
+        "alt_range_m": 44.0,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.1,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 19.95,
+        "win": 20
+      },
+      {
+        "dur": 29.86,
+        "avg_motion_dps": 5.54,
+        "p50_motion_dps": 5.0,
+        "p95_motion_dps": 13.93,
+        "avg_jerk": 0.161,
+        "alt_range_m": 72.6,
+        "yaw_travel_deg": 1.8,
+        "pitch_travel_deg": 11.3,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 29.86,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      420.0
+    ],
+    "shutter_range": [
+      240.0,
+      6400.0
+    ],
+    "alt_range_m": [
+      46.9,
+      119.8
+    ],
+    "video": "videos/2026-08-08/DJI_20260808072627_0025_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808072627_0025_D.SRT"
+  },
+  {
+    "id": "DJI_20260807154212_0011_D",
+    "day": "2026-08-07",
+    "duration_s": 93.43,
+    "frames_sampled": 441,
+    "full_clip": {
+      "dur": 93.43,
+      "avg_motion_dps": 28.564,
+      "p50_motion_dps": 0.858,
+      "p95_motion_dps": 129.607,
+      "avg_jerk": 83.504,
+      "alt_range_m": 13.0,
+      "yaw_travel_deg": 28.1,
+      "pitch_travel_deg": 135.3,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.98,
+        "avg_motion_dps": 0.507,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 2.575,
+        "avg_jerk": 0.0,
+        "alt_range_m": 2.7,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 23.16,
+        "end": 35.13,
+        "win": 12
+      },
+      {
+        "dur": 19.89,
+        "avg_motion_dps": 1.194,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 2.0,
+        "avg_jerk": 3.926,
+        "alt_range_m": 1.3,
+        "yaw_travel_deg": 16.6,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 53.05,
+        "end": 72.94,
+        "win": 20
+      },
+      {
+        "dur": 29.86,
+        "avg_motion_dps": 1.766,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 5.0,
+        "avg_jerk": 3.74,
+        "alt_range_m": 4.1,
+        "yaw_travel_deg": 33.6,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 21.02,
+        "end": 50.88,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      460.0
+    ],
+    "shutter_range": [
+      30.0,
+      8000.0
+    ],
+    "alt_range_m": [
+      -6.3,
+      6.7
+    ],
+    "video": "videos/2026-08-07/DJI_20260807154212_0011_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807154212_0011_D.SRT"
+  },
+  {
+    "id": "DJI_20260807162238_0013_D",
+    "day": "2026-08-07",
+    "duration_s": 92.16,
+    "frames_sampled": 435,
+    "full_clip": {
+      "dur": 92.16,
+      "avg_motion_dps": 7.111,
+      "p50_motion_dps": 0.0,
+      "p95_motion_dps": 49.0,
+      "avg_jerk": 12.366,
+      "alt_range_m": 28.8,
+      "yaw_travel_deg": 15.4,
+      "pitch_travel_deg": 0.0,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 2.391,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 1.0,
+        "avg_jerk": 6.557,
+        "alt_range_m": 0.2,
+        "yaw_travel_deg": 28.7,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      },
+      {
+        "dur": 19.95,
+        "avg_motion_dps": 1.005,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 5.0,
+        "avg_jerk": 0.0,
+        "alt_range_m": 5.6,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 50.88,
+        "end": 70.84,
+        "win": 20
+      },
+      {
+        "dur": 29.9,
+        "avg_motion_dps": 2.751,
+        "p50_motion_dps": 1.0,
+        "p95_motion_dps": 7.725,
+        "avg_jerk": 0.034,
+        "alt_range_m": 25.8,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 46.58,
+        "end": 76.48,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      240.0
+    ],
+    "shutter_range": [
+      5000.0,
+      12800.0
+    ],
+    "alt_range_m": [
+      2.8,
+      31.6
+    ],
+    "video": "videos/2026-08-07/DJI_20260807162238_0013_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807162238_0013_D.SRT"
+  },
+  {
+    "id": "DJI_20260807153945_0010_D",
+    "day": "2026-08-07",
+    "duration_s": 90.96,
+    "frames_sampled": 429,
+    "full_clip": {
+      "dur": 90.96,
+      "avg_motion_dps": 7.079,
+      "p50_motion_dps": 0.858,
+      "p95_motion_dps": 31.197,
+      "avg_jerk": 13.225,
+      "alt_range_m": 5.9,
+      "yaw_travel_deg": 11.4,
+      "pitch_travel_deg": 13.4,
+      "grade": "D",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.88,
+        "avg_motion_dps": 0.607,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 1.5,
+        "avg_jerk": 2.668,
+        "alt_range_m": 0.3,
+        "yaw_travel_deg": 6.3,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 14.71,
+        "end": 26.59,
+        "win": 12
+      },
+      {
+        "dur": 19.79,
+        "avg_motion_dps": 0.526,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 1.5,
+        "avg_jerk": 1.583,
+        "alt_range_m": 0.5,
+        "yaw_travel_deg": 6.3,
+        "pitch_travel_deg": 1.9,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 12.58,
+        "end": 32.37,
+        "win": 20
+      },
+      {
+        "dur": 29.96,
+        "avg_motion_dps": 3.049,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 15.0,
+        "avg_jerk": 1.036,
+        "alt_range_m": 0.5,
+        "yaw_travel_deg": 6.3,
+        "pitch_travel_deg": 5.4,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 2.0,
+        "end": 31.96,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      320.0
+    ],
+    "shutter_range": [
+      1000.0,
+      5000.0
+    ],
+    "alt_range_m": [
+      -1.4,
+      4.5
+    ],
+    "video": "videos/2026-08-07/DJI_20260807153945_0010_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807153945_0010_D.SRT"
+  },
+  {
+    "id": "DJI_20260807141500_0008_D",
+    "day": "2026-08-07",
+    "duration_s": 78.14,
+    "frames_sampled": 368,
+    "full_clip": {
+      "dur": 78.14,
+      "avg_motion_dps": 11.273,
+      "p50_motion_dps": 4.478,
+      "p95_motion_dps": 36.325,
+      "avg_jerk": 10.603,
+      "alt_range_m": 24.6,
+      "yaw_travel_deg": 108.2,
+      "pitch_travel_deg": 24.6,
+      "grade": "D",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.88,
+        "avg_motion_dps": 2.346,
+        "p50_motion_dps": 0.5,
+        "p95_motion_dps": 4.313,
+        "avg_jerk": 4.569,
+        "alt_range_m": 0.1,
+        "yaw_travel_deg": 14.0,
+        "pitch_travel_deg": 6.1,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 4.14,
+        "end": 16.02,
+        "win": 12
+      },
+      {
+        "dur": 19.92,
+        "avg_motion_dps": 2.523,
+        "p50_motion_dps": 2.5,
+        "p95_motion_dps": 6.024,
+        "avg_jerk": 0.891,
+        "alt_range_m": 0.1,
+        "yaw_travel_deg": 9.9,
+        "pitch_travel_deg": 3.7,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 6.24,
+        "end": 26.16,
+        "win": 20
+      },
+      {
+        "dur": 29.93,
+        "avg_motion_dps": 3.088,
+        "p50_motion_dps": 3.5,
+        "p95_motion_dps": 5.579,
+        "avg_jerk": 1.179,
+        "alt_range_m": 0.1,
+        "yaw_travel_deg": 51.9,
+        "pitch_travel_deg": 3.7,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 6.24,
+        "end": 36.17,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      390.0
+    ],
+    "shutter_range": [
+      1250.0,
+      8000.0
+    ],
+    "alt_range_m": [
+      -39.7,
+      -15.1
+    ],
+    "video": "videos/2026-08-07/DJI_20260807141500_0008_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807141500_0008_D.SRT"
+  },
+  {
+    "id": "DJI_20260807182429_0017_D",
+    "day": "2026-08-07",
+    "duration_s": 66.8,
+    "frames_sampled": 314,
+    "full_clip": {
+      "dur": 66.8,
+      "avg_motion_dps": 6.18,
+      "p50_motion_dps": 1.0,
+      "p95_motion_dps": 15.451,
+      "avg_jerk": 5.247,
+      "alt_range_m": 31.1,
+      "yaw_travel_deg": 48.0,
+      "pitch_travel_deg": 24.5,
+      "grade": "C",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.98,
+        "avg_motion_dps": 0.454,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 2.0,
+        "avg_jerk": 0.0,
+        "alt_range_m": 2.2,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 6.24,
+        "end": 18.22,
+        "win": 12
+      },
+      {
+        "dur": 19.82,
+        "avg_motion_dps": 0.479,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 3.433,
+        "avg_jerk": 0.584,
+        "alt_range_m": 0.4,
+        "yaw_travel_deg": 7.4,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 8.27,
+        "end": 28.09,
+        "win": 20
+      },
+      {
+        "dur": 29.96,
+        "avg_motion_dps": 1.972,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 11.0,
+        "avg_jerk": 0.48,
+        "alt_range_m": 23.0,
+        "yaw_travel_deg": 5.6,
+        "pitch_travel_deg": 1.2,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 2.0,
+        "end": 31.96,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      130.0,
+      440.0
+    ],
+    "shutter_range": [
+      80.0,
+      640.0
+    ],
+    "alt_range_m": [
+      87.6,
+      118.7
+    ],
+    "video": "videos/2026-08-07/DJI_20260807182429_0017_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807182429_0017_D.SRT"
+  },
+  {
+    "id": "DJI_20260808072126_0019_D",
+    "day": "2026-08-08",
+    "duration_s": 40.81,
+    "frames_sampled": 192,
+    "full_clip": {
+      "dur": 40.81,
+      "avg_motion_dps": 5.33,
+      "p50_motion_dps": 3.98,
+      "p95_motion_dps": 12.876,
+      "avg_jerk": 1.288,
+      "alt_range_m": 42.1,
+      "yaw_travel_deg": 132.2,
+      "pitch_travel_deg": 0.0,
+      "grade": "B",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.81,
+        "avg_motion_dps": 0.75,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 3.0,
+        "avg_jerk": 0.0,
+        "alt_range_m": 4.4,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 18.89,
+        "end": 30.7,
+        "win": 12
+      },
+      {
+        "dur": 19.82,
+        "avg_motion_dps": 3.45,
+        "p50_motion_dps": 1.99,
+        "p95_motion_dps": 10.0,
+        "avg_jerk": 0.0,
+        "alt_range_m": 33.9,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 18.89,
+        "end": 38.7,
+        "win": 20
+      },
+      {
+        "dur": 26.09,
+        "avg_motion_dps": 4.201,
+        "p50_motion_dps": 2.564,
+        "p95_motion_dps": 12.876,
+        "avg_jerk": 0.763,
+        "alt_range_m": 42.1,
+        "yaw_travel_deg": 24.9,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 14.71,
+        "end": 40.81,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      130.0,
+      400.0
+    ],
+    "shutter_range": [
+      1000.0,
+      2500.0
+    ],
+    "alt_range_m": [
+      46.7,
+      88.8
+    ],
+    "video": "videos/2026-08-08/DJI_20260808072126_0019_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808072126_0019_D.SRT"
+  },
+  {
+    "id": "DJI_20260807182131_0014_D",
+    "day": "2026-08-07",
+    "duration_s": 37.44,
+    "frames_sampled": 176,
+    "full_clip": {
+      "dur": 37.44,
+      "avg_motion_dps": 2.834,
+      "p50_motion_dps": 2.575,
+      "p95_motion_dps": 6.5,
+      "avg_jerk": 0.022,
+      "alt_range_m": 27.1,
+      "yaw_travel_deg": 0.1,
+      "pitch_travel_deg": 51.9,
+      "grade": "A",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 0.613,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 3.433,
+        "avg_jerk": 0.069,
+        "alt_range_m": 1.2,
+        "yaw_travel_deg": 0.1,
+        "pitch_travel_deg": 4.9,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      },
+      {
+        "dur": 19.95,
+        "avg_motion_dps": 1.453,
+        "p50_motion_dps": 1.0,
+        "p95_motion_dps": 3.5,
+        "avg_jerk": 0.041,
+        "alt_range_m": 7.8,
+        "yaw_travel_deg": 0.1,
+        "pitch_travel_deg": 13.4,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 19.95,
+        "win": 20
+      },
+      {
+        "dur": 29.86,
+        "avg_motion_dps": 2.694,
+        "p50_motion_dps": 2.575,
+        "p95_motion_dps": 5.97,
+        "avg_jerk": 0.028,
+        "alt_range_m": 19.9,
+        "yaw_travel_deg": 0.1,
+        "pitch_travel_deg": 40.8,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 29.86,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      150.0,
+      230.0
+    ],
+    "shutter_range": [
+      100.0,
+      100.0
+    ],
+    "alt_range_m": [
+      4.5,
+      31.6
+    ],
+    "video": "videos/2026-08-07/DJI_20260807182131_0014_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807182131_0014_D.SRT"
+  },
+  {
+    "id": "DJI_20260807140916_0006_D",
+    "day": "2026-08-07",
+    "duration_s": 21.02,
+    "frames_sampled": 99,
+    "full_clip": {
+      "dur": 21.02,
+      "avg_motion_dps": 5.92,
+      "p50_motion_dps": 6.009,
+      "p95_motion_dps": 7.265,
+      "avg_jerk": 1.749,
+      "alt_range_m": 2.8,
+      "yaw_travel_deg": 118.5,
+      "pitch_travel_deg": 2.5,
+      "grade": "A",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 5.668,
+        "p50_motion_dps": 6.0,
+        "p95_motion_dps": 7.31,
+        "avg_jerk": 1.897,
+        "alt_range_m": 1.9,
+        "yaw_travel_deg": 63.6,
+        "pitch_travel_deg": 1.2,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      },
+      {
+        "dur": 19.95,
+        "avg_motion_dps": 5.9,
+        "p50_motion_dps": 6.009,
+        "p95_motion_dps": 7.265,
+        "avg_jerk": 1.755,
+        "alt_range_m": 2.7,
+        "yaw_travel_deg": 112.0,
+        "pitch_travel_deg": 2.3,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 19.95,
+        "win": 20
+      }
+    ],
+    "iso_range": [
+      150.0,
+      260.0
+    ],
+    "shutter_range": [
+      4000.0,
+      6400.0
+    ],
+    "alt_range_m": [
+      16.8,
+      19.6
+    ],
+    "video": "videos/2026-08-07/DJI_20260807140916_0006_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807140916_0006_D.SRT"
+  },
+  {
+    "id": "DJI_20260808114020_0027_D",
+    "day": "2026-08-08",
+    "duration_s": 18.65,
+    "frames_sampled": 88,
+    "full_clip": {
+      "dur": 18.65,
+      "avg_motion_dps": 4.442,
+      "p50_motion_dps": 0.995,
+      "p95_motion_dps": 14.592,
+      "avg_jerk": 11.559,
+      "alt_range_m": 7.1,
+      "yaw_travel_deg": 3.2,
+      "pitch_travel_deg": 3.6,
+      "grade": "B",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 1.458,
+        "p50_motion_dps": 0.0,
+        "p95_motion_dps": 6.009,
+        "avg_jerk": 0.0,
+        "alt_range_m": 5.4,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      },
+      {
+        "dur": 18.65,
+        "avg_motion_dps": 4.442,
+        "p50_motion_dps": 0.995,
+        "p95_motion_dps": 14.592,
+        "avg_jerk": 11.559,
+        "alt_range_m": 7.1,
+        "yaw_travel_deg": 3.2,
+        "pitch_travel_deg": 3.6,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 18.65,
+        "win": 20
+      }
+    ],
+    "iso_range": [
+      170.0,
+      230.0
+    ],
+    "shutter_range": [
+      1600.0,
+      2500.0
+    ],
+    "alt_range_m": [
+      6.3,
+      13.4
+    ],
+    "video": "videos/2026-08-08/DJI_20260808114020_0027_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808114020_0027_D.SRT"
+  },
+  {
+    "id": "DJI_20260807141646_0009_D",
+    "day": "2026-08-07",
+    "duration_s": 16.02,
+    "frames_sampled": 76,
+    "full_clip": {
+      "dur": 16.02,
+      "avg_motion_dps": 4.317,
+      "p50_motion_dps": 4.0,
+      "p95_motion_dps": 8.458,
+      "avg_jerk": 1.59,
+      "alt_range_m": 14.7,
+      "yaw_travel_deg": 39.4,
+      "pitch_travel_deg": 0.0,
+      "grade": "B",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 3.368,
+        "p50_motion_dps": 3.863,
+        "p95_motion_dps": 6.5,
+        "avg_jerk": 1.527,
+        "alt_range_m": 5.7,
+        "yaw_travel_deg": 28.5,
+        "pitch_travel_deg": 0.0,
+        "grade": "A",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      }
+    ],
+    "iso_range": [
+      120.0,
+      170.0
+    ],
+    "shutter_range": [
+      5000.0,
+      5000.0
+    ],
+    "alt_range_m": [
+      -8.4,
+      6.3
+    ],
+    "video": "videos/2026-08-07/DJI_20260807141646_0009_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807141646_0009_D.SRT"
+  },
+  {
+    "id": "DJI_20260807140752_0005_D",
+    "day": "2026-08-07",
+    "duration_s": 9.34,
+    "frames_sampled": 45,
+    "full_clip": {
+      "dur": 9.34,
+      "avg_motion_dps": 1.926,
+      "p50_motion_dps": 2.488,
+      "p95_motion_dps": 2.991,
+      "avg_jerk": 0.0,
+      "alt_range_m": 0.2,
+      "yaw_travel_deg": 0.0,
+      "pitch_travel_deg": 16.6,
+      "grade": "A",
+      "mostly_static": false
+    },
+    "best_windows": [],
+    "iso_range": [
+      100.0,
+      270.0
+    ],
+    "shutter_range": [
+      1600.0,
+      6400.0
+    ],
+    "alt_range_m": [
+      17.4,
+      17.6
+    ],
+    "video": "videos/2026-08-07/DJI_20260807140752_0005_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807140752_0005_D.SRT"
+  },
+  {
+    "id": "DJI_20260807141253_0007_D",
+    "day": "2026-08-07",
+    "duration_s": 8.71,
+    "frames_sampled": 42,
+    "full_clip": {
+      "dur": 8.71,
+      "avg_motion_dps": 2.395,
+      "p50_motion_dps": 2.488,
+      "p95_motion_dps": 3.863,
+      "avg_jerk": 0.845,
+      "alt_range_m": 8.1,
+      "yaw_travel_deg": 0.0,
+      "pitch_travel_deg": 1.1,
+      "grade": "A",
+      "mostly_static": false
+    },
+    "best_windows": [],
+    "iso_range": [
+      140.0,
+      170.0
+    ],
+    "shutter_range": [
+      4000.0,
+      5000.0
+    ],
+    "alt_range_m": [
+      0.9,
+      9.0
+    ],
+    "video": "videos/2026-08-07/DJI_20260807141253_0007_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807141253_0007_D.SRT"
+  },
+  {
+    "id": "DJI_20260808072235_0020_D",
+    "day": "2026-08-08",
+    "duration_s": 69.14,
+    "frames_sampled": 325,
+    "full_clip": {
+      "dur": 69.14,
+      "avg_motion_dps": 12.09,
+      "p50_motion_dps": 9.0,
+      "p95_motion_dps": 47.009,
+      "avg_jerk": 8.9,
+      "alt_range_m": 40.1,
+      "yaw_travel_deg": 150.3,
+      "pitch_travel_deg": 52.4,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.88,
+        "avg_motion_dps": 6.129,
+        "p50_motion_dps": 6.965,
+        "p95_motion_dps": 9.442,
+        "avg_jerk": 0.0,
+        "alt_range_m": 36.4,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 8.27,
+        "end": 20.15,
+        "win": 12
+      },
+      {
+        "dur": 19.82,
+        "avg_motion_dps": 6.813,
+        "p50_motion_dps": 7.0,
+        "p95_motion_dps": 9.442,
+        "avg_jerk": 0.999,
+        "alt_range_m": 38.1,
+        "yaw_travel_deg": 58.5,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 8.27,
+        "end": 28.09,
+        "win": 20
+      },
+      {
+        "dur": 29.93,
+        "avg_motion_dps": 7.779,
+        "p50_motion_dps": 8.155,
+        "p95_motion_dps": 11.588,
+        "avg_jerk": 1.734,
+        "alt_range_m": 38.1,
+        "yaw_travel_deg": 155.9,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 4.14,
+        "end": 34.07,
+        "win": 30
+      }
+    ],
+    "iso_range": [
+      100.0,
+      410.0
+    ],
+    "shutter_range": [
+      160.0,
+      6400.0
+    ],
+    "alt_range_m": [
+      79.5,
+      119.6
+    ],
+    "video": "videos/2026-08-08/DJI_20260808072235_0020_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808072235_0020_D.SRT"
+  },
+  {
+    "id": "DJI_20260808072840_0026_D",
+    "day": "2026-08-08",
+    "duration_s": 18.65,
+    "frames_sampled": 88,
+    "full_clip": {
+      "dur": 18.65,
+      "avg_motion_dps": 17.483,
+      "p50_motion_dps": 1.0,
+      "p95_motion_dps": 114.253,
+      "avg_jerk": 17.892,
+      "alt_range_m": 19.6,
+      "yaw_travel_deg": 130.3,
+      "pitch_travel_deg": 154.0,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 3.349,
+        "p50_motion_dps": 2.0,
+        "p95_motion_dps": 8.584,
+        "avg_jerk": 0.0,
+        "alt_range_m": 19.5,
+        "yaw_travel_deg": 0.0,
+        "pitch_travel_deg": 0.0,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      },
+      {
+        "dur": 18.65,
+        "avg_motion_dps": 17.483,
+        "p50_motion_dps": 1.0,
+        "p95_motion_dps": 114.253,
+        "avg_jerk": 17.892,
+        "alt_range_m": 19.6,
+        "yaw_travel_deg": 130.3,
+        "pitch_travel_deg": 154.0,
+        "grade": "F",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 18.65,
+        "win": 20
+      }
+    ],
+    "iso_range": [
+      100.0,
+      180.0
+    ],
+    "shutter_range": [
+      100.0,
+      2000.0
+    ],
+    "alt_range_m": [
+      -1.2,
+      18.4
+    ],
+    "video": "videos/2026-08-08/DJI_20260808072840_0026_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808072840_0026_D.SRT"
+  },
+  {
+    "id": "DJI_20260808114110_0028_D",
+    "day": "2026-08-08",
+    "duration_s": 15.58,
+    "frames_sampled": 74,
+    "full_clip": {
+      "dur": 15.58,
+      "avg_motion_dps": 7.302,
+      "p50_motion_dps": 7.725,
+      "p95_motion_dps": 9.0,
+      "avg_jerk": 2.08,
+      "alt_range_m": 2.4,
+      "yaw_travel_deg": 108.5,
+      "pitch_travel_deg": 1.4,
+      "grade": "B",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 7.083,
+        "p50_motion_dps": 7.96,
+        "p95_motion_dps": 8.584,
+        "avg_jerk": 2.121,
+        "alt_range_m": 1.7,
+        "yaw_travel_deg": 80.7,
+        "pitch_travel_deg": 0.8,
+        "grade": "B",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      }
+    ],
+    "iso_range": [
+      200.0,
+      240.0
+    ],
+    "shutter_range": [
+      2000.0,
+      2500.0
+    ],
+    "alt_range_m": [
+      17.8,
+      20.2
+    ],
+    "video": "videos/2026-08-08/DJI_20260808114110_0028_D.MP4",
+    "srt": "srt/2026-08-08/DJI_20260808114110_0028_D.SRT"
+  },
+  {
+    "id": "DJI_20260807182246_0015_D",
+    "day": "2026-08-07",
+    "duration_s": 13.25,
+    "frames_sampled": 63,
+    "full_clip": {
+      "dur": 13.25,
+      "avg_motion_dps": 6.795,
+      "p50_motion_dps": 2.985,
+      "p95_motion_dps": 20.601,
+      "avg_jerk": 0.128,
+      "alt_range_m": 10.2,
+      "yaw_travel_deg": 0.2,
+      "pitch_travel_deg": 18.0,
+      "grade": "C",
+      "mostly_static": false
+    },
+    "best_windows": [
+      {
+        "dur": 11.94,
+        "avg_motion_dps": 5.465,
+        "p50_motion_dps": 1.5,
+        "p95_motion_dps": 19.313,
+        "avg_jerk": 0.141,
+        "alt_range_m": 6.2,
+        "yaw_travel_deg": 0.2,
+        "pitch_travel_deg": 1.2,
+        "grade": "C",
+        "mostly_static": false,
+        "start": 0.0,
+        "end": 11.94,
+        "win": 12
+      }
+    ],
+    "iso_range": [
+      160.0,
+      230.0
+    ],
+    "shutter_range": [
+      100.0,
+      100.0
+    ],
+    "alt_range_m": [
+      7.7,
+      17.9
+    ],
+    "video": "videos/2026-08-07/DJI_20260807182246_0015_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807182246_0015_D.SRT"
+  },
+  {
+    "id": "DJI_20260807182348_0016_D",
+    "day": "2026-08-07",
+    "duration_s": 10.01,
+    "frames_sampled": 48,
+    "full_clip": {
+      "dur": 10.01,
+      "avg_motion_dps": 26.775,
+      "p50_motion_dps": 29.0,
+      "p95_motion_dps": 52.0,
+      "avg_jerk": 12.403,
+      "alt_range_m": 0.2,
+      "yaw_travel_deg": 98.2,
+      "pitch_travel_deg": 0.0,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [],
+    "iso_range": [
+      120.0,
+      400.0
+    ],
+    "shutter_range": [
+      120.0,
+      640.0
+    ],
+    "alt_range_m": [
+      95.0,
+      95.2
+    ],
+    "video": "videos/2026-08-07/DJI_20260807182348_0016_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807182348_0016_D.SRT"
+  },
+  {
+    "id": "DJI_20260807182630_0018_D",
+    "day": "2026-08-07",
+    "duration_s": 7.87,
+    "frames_sampled": 38,
+    "full_clip": {
+      "dur": 7.87,
+      "avg_motion_dps": 21.565,
+      "p50_motion_dps": 1.0,
+      "p95_motion_dps": 110.854,
+      "avg_jerk": 20.091,
+      "alt_range_m": 1.3,
+      "yaw_travel_deg": 0.7,
+      "pitch_travel_deg": 134.5,
+      "grade": "F",
+      "mostly_static": false
+    },
+    "best_windows": [],
+    "iso_range": [
+      100.0,
+      150.0
+    ],
+    "shutter_range": [
+      100.0,
+      1000.0
+    ],
+    "alt_range_m": [
+      -0.2,
+      1.1
+    ],
+    "video": "videos/2026-08-07/DJI_20260807182630_0018_D.MP4",
+    "srt": "srt/2026-08-07/DJI_20260807182630_0018_D.SRT"
+  }
+]

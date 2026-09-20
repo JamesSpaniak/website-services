@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 /** Keep in sync with §10 of Sales Agreement and docs/tech/legal-and-privacy-site-sync.md */
-const PRIVACY_LAST_UPDATED = '2026-04-21';
+const PRIVACY_LAST_UPDATED = '2026-09-12';
 
 export default function PrivacyPage() {
   return (
@@ -94,6 +94,11 @@ export default function PrivacyPage() {
             direction for use limited to educational purposes that benefit the school and not for unrelated commercial
             purposes, consistent with the Sales Agreement.
           </p>
+          <p className="mt-3">
+            If you access courses through a school or organization, that organization&apos;s designated administrators
+            and teachers can see your enrollment, lesson progress, video completion, exam results, and recent activity in
+            the courses they provide. We do not use organization members&apos; activity for marketing.
+          </p>
         </section>
 
         <section>
@@ -112,8 +117,22 @@ export default function PrivacyPage() {
             6. Cookies and analytics
           </h2>
           <p>
-            We may use cookies and similar technologies for session management, preferences, and aggregated analytics. You
-            can control cookies through your browser settings.
+            We use cookies and similar technologies for session management (sign-in) and preferences. You can control
+            cookies through your browser settings; blocking the session cookie will prevent sign-in.
+          </p>
+          <p className="mt-3">
+            <strong className="text-[var(--brand-foreground)]">First-party analytics.</strong> We measure how the website
+            and courses are used with our own analytics, stored on our servers. To understand which pages lead visitors to
+            create an account, we store a random identifier in your browser&apos;s local storage (it is not derived from
+            your device, name, or email). Before you sign in it is linked only to page views of articles, course
+            overviews, and pricing. If you later create an account, that identifier is associated with your account so we
+            can see the path that led to sign-up. It is not created for members of school or organization programs, is
+            never sold or shared with advertisers, and is removed when you clear your browser&apos;s site data.
+          </p>
+          <p className="mt-3">
+            We do not currently use third-party advertising pixels or cross-site tracking. If that changes, we will update
+            this Notice and, where required, ask for your consent first. We also collect aggregate, non-identifying
+            operational metrics (request counts, response times, error rates) to keep the service running.
           </p>
         </section>
 
@@ -121,7 +140,10 @@ export default function PrivacyPage() {
           <h2 className="text-base font-display font-semibold text-[var(--brand-foreground)] mb-3">7. Retention</h2>
           <p>
             We retain information for as long as needed to provide the service, meet legal obligations, resolve disputes,
-            and enforce our agreements.
+            and enforce our agreements. Account and course-progress records are kept while your account exists. Detailed
+            activity records (individual page views, video heartbeats, and similar events) are kept in our active systems
+            for approximately 12 months, after which only aggregated summaries remain available in the product. When an
+            account is deleted at your request, its progress, exam, and activity records are deleted with it.
           </p>
         </section>
 

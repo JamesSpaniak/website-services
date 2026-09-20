@@ -11,9 +11,22 @@ type AuthMode = 'login' | 'signup';
 
 // Define validation schemas using Zod
 const loginSchema = z.object({
-    username: z.string().min(1, "Username is required."),
+    username: z.string().min(1, "Username or email is required."),
     password: z.string().min(1, "Password is required."),
 });
+
+function loginErrorMessage(err: unknown): string {
+    const raw = err instanceof Error ? err.message : '';
+    const lower = raw.toLowerCase();
+    if (lower.includes('too many requests') || lower.includes('throttler')) {
+        return 'Too many sign-in attempts from this network. Wait a minute and try again.';
+    }
+    if (lower === 'forbidden' || lower.includes('403')) {
+        return 'This network is sending too many requests. Wait a minute and try again.';
+    }
+    if (raw) return raw;
+    return 'Sign-in failed. Check your username or email, then your password.';
+}
 
 const signupSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -64,11 +77,7 @@ export default function LoginComponent({ redirectPath }: { redirectPath?: string
             await login(formData.username, formData.password);
             // On success, the AuthProvider will update the state and this component will be unmounted.
         } catch (err) {
-            if (err instanceof Error) {
-                setError(`Login failed: ${err.message}`);
-            } else {
-                setError('An unknown error occurred during login.');
-            }
+            setError(loginErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -143,8 +152,25 @@ export default function LoginComponent({ redirectPath }: { redirectPath?: string
                 )}
 
                 <div className="mb-4">
-                    <label className="block mb-1.5 text-xs font-medium tracking-wide text-[var(--brand-muted)]" htmlFor="username">Username</label>
-                    <input id="username" name="username" type="text" value={formData.username} onChange={handleChange} className={inputClass(!!validationErrors?.username)} style={{ borderRadius: 'var(--radius-sm)' }} required />
+                    <label className="block mb-1.5 text-xs font-medium tracking-wide text-[var(--brand-muted)]" htmlFor="username">
+                        {mode === 'login' ? 'Username or email' : 'Username'}
+                    </label>
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        autoComplete="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className={inputClass(!!validationErrors?.username)}
+                        style={{ borderRadius: 'var(--radius-sm)' }}
+                        required
+                    />
+                    {mode === 'login' && (
+                        <p className="text-xs text-[var(--brand-muted)] mt-1">
+                            Use the username you signed up with, or your email.
+                        </p>
+                    )}
                     {validationErrors?.username && <p className="text-xs text-red-400 mt-1">{validationErrors.username._errors[0]}</p>}
                 </div>
                 <div className="mb-6">

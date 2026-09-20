@@ -6,6 +6,7 @@ import {
   JoinColumn,
   Unique,
   UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/types/user.entity';
 import { Course } from '../../courses/types/course.entity';
@@ -67,6 +68,25 @@ export class Progress {
    */
   @Column({ type: 'jsonb', nullable: true })
   exam_scores: ExamScoreSnapshot[] | null;
+
+  /** Per-unit completion timestamps keyed by unit ref (ISO strings). */
+  @Column({ type: 'jsonb', default: () => "'{}'" })
+  unit_completed_at: Record<string, string>;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  created_at: Date;
+
+  /** Set when course status first becomes COMPLETED; cleared if reverted. */
+  @Column({ type: 'timestamptz', nullable: true })
+  completed_at: Date | null;
+
+  /**
+   * Bumped by every progress write and (throttled) by learning events —
+   * heartbeats, video pings — so a learner who reads without clicking still
+   * reads as active. Feeds "last active" in the manager dashboard.
+   */
+  @Column({ type: 'timestamptz', nullable: true })
+  last_activity_at: Date | null;
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;

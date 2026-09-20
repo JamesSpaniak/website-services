@@ -13,6 +13,7 @@ import { Course } from '../courses/types/course.entity';
 import { EmailService } from '../email/email.service';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
+import { EntitlementService } from '../commerce/entitlement.service';
 import {
   CreateSignupLinkDto,
   SignupLinkInfo,
@@ -40,6 +41,7 @@ export class SignupLinkService {
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   async create(
@@ -196,6 +198,16 @@ export class SignupLinkService {
                      VALUES ($1, $2, 'signup_link', $3)
                      ON CONFLICT ("usersId", "coursesId") DO NOTHING`,
           [userId, courseId, link.id],
+        );
+        await this.entitlements.grantCourse(
+          userId,
+          courseId,
+          {
+            source: 'signup_link',
+            signupLinkId: link.id,
+            grantedByUserId: link.createdByUserId ?? null,
+          },
+          manager,
         );
       }
 

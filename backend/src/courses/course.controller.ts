@@ -36,6 +36,8 @@ import {
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { SignedUrlService } from 'src/media/signed-url.service';
 import { isUnitPreviewAccessible } from './course-access.util';
+import { ProductEventsService } from 'src/product-events/product-events.service';
+import type { VideoResume } from 'src/product-events/types/product-event.dto';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -47,6 +49,7 @@ export class CourseController {
     private readonly courseService: CourseService,
     private readonly progressService: ProgressService,
     private readonly signedUrlService: SignedUrlService,
+    private readonly productEvents: ProductEventsService,
   ) {}
 
   /**
@@ -236,7 +239,7 @@ export class CourseController {
     @Param('courseId', ParseIntPipe) courseId: number,
     @Param('unitId') unitId: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ video_url?: string }> {
+  ): Promise<{ video_url?: string; resume: VideoResume | null }> {
     const course = await this.courseService.getCourseById(courseId);
     if (!course) {
       throw new NotFoundException(`Course with ID ${courseId} not found`);
@@ -253,6 +256,15 @@ export class CourseController {
       throw new NotFoundException(`Unit with ID ${unitId} not found`);
     }
 
+    // Resume point rides the request the player already makes (plan § 4.5).
+    const resume = hasAccess
+      ? await this.productEvents.getVideoResume(
+          req.user.userId,
+          courseId,
+          String(unit.id),
+        )
+      : null;
+
     if (this.signedUrlService.isProtectedHlsUrl(unit.video_url)) {
       const cookies = this.signedUrlService.signedVideoCookies();
       if (cookies) {
@@ -263,11 +275,13 @@ export class CourseController {
       }
       return {
         video_url: this.signedUrlService.toAbsoluteMediaUrl(unit.video_url),
+        resume,
       };
     }
 
     return {
       video_url: this.signedUrlService.signVideoUrl(unit.video_url),
+      resume,
     };
   }
 

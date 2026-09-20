@@ -11,8 +11,8 @@ Internal review of brand positioning, outreach, content, and rep readiness from 
 
 | Area | Status | Priority fix |
 |------|--------|--------------|
-| **Brand positioning** | Strong on `/schools`; vision is clear | Align all outbound copy with **Part 107 live** / other tracks roadmap |
-| **Email outreach** | Templates + cadence exist | Fix three-track overclaim in [`email-drafts.md`](../../workflows/sales/email-drafts.md); add Part 107–first variants |
+| **Brand positioning** | Strong on `/schools`; vision is clear | Align outbound with **107 live + building standing up**; Video/AI later |
+| **Email outreach** | Templates + cadence exist | Fix leftover three-track-as-available copy in [`email-drafts.md`](../../workflows/sales/email-drafts.md) |
 | **Phone outreach** | **Missing** | Use [`phone-scripts.md`](../../workflows/sales/phone-scripts.md) |
 | **Discovery → quote** | Qualification + quote template ready | Leadership must approve B2B dollar bands in [`packages.md`](packages.md) |
 | **Quote → delivery** | Checklist in outreach; no runbook | Use [`delivery-runbook.md`](../../workflows/sales/delivery-runbook.md) |
@@ -25,7 +25,7 @@ Internal review of brand positioning, outreach, content, and rep readiness from 
 
 ### What we are (approved)
 
-**One-liner:** Part 107–aligned drone education for CTE classrooms and serious self-paced pilots — structured paths, teacher visibility, and practice exams in the browser.
+**One-liner:** FAA Part 107 plus drone building for CTE — certificate in the browser, then a real aircraft. Video and AI come later on that foundation.
 
 **Pillars for schools:**
 
@@ -37,7 +37,7 @@ Internal review of brand positioning, outreach, content, and rep readiness from 
 
 **Pillars for individuals (marketing, not rep-led):**
 
-1. Credible Part 107 prep — structured course, Unit 1 free, $29 unlock  
+1. Credible Part 107 prep — structured course, Unit 1 free, **$129** unlock
 2. Self-paced — no flight-school pricing  
 3. From the drone community — safety and field craft, not checkbox cert  
 
@@ -55,11 +55,11 @@ All decks, PDFs, and email headers must use the official kit ([`docs/marketing/b
 
 | Surface | Says | Truth today |
 |---------|------|-------------|
-| `/schools/curriculum` | Three tracks (Safety, Creative, STEM) | **Part 107 (Safety) live**; Video/AI coming soon |
-| `email-drafts.md` templates | All three tracks available | Same — **rep must lead Part 107** |
+| `/schools/curriculum` | Three tracks (Safety, Creative, STEM) | **Part 107 live**; **drone building standing up** (not catalog); Video/AI later |
+| `email-drafts.md` templates | All three tracks available | Same — **rep leads 107 + building** |
 | Competitor decks | Pass rates, "used by N districts" | **Prohibited** until documented |
 
-**Rule for all outbound:** Lead with **FAA Part 107 pathway + teacher dashboard**. Mention Creative/STEM as **roadmap / full pathway vision** only when the buyer asks about media or CS. Never sell Video or AI as shippable SKUs.
+**Rule for all outbound:** Lead with **FAA Part 107 (live) + drone building (year-1 applied course, kits quoteable)**. Video/AI and extra tracks are **later, built on that pair**. Never sell Video, AI, or building as a live LMS course today. If they only want a keyed trainer and crew flying with no certificate, they are not the ICP — see [`competitor-analysis.md`](competitor-analysis.md) §12.
 
 ---
 
@@ -202,7 +202,7 @@ Priority order in [`outreach-content-calendar.md`](../../workflows/marketing/out
 4. **"Drone program vs kit-only STEM"** — answers "we already bought drones" objection  
 5. **Case study / pilot story** — after first school win (placeholder until then)  
 
-B2C articles (Part 107 study guide, $29 vs alternatives) support marketing and give reps a **student-facing proof point** when teachers ask "what will my kids see?"
+B2C articles (Part 107 study guide, **$129** vs alternatives) support marketing and give reps a **student-facing proof point** when teachers ask "what will my kids see?" Draft article C still uses the old $29 slug — rewrite before publish ([`../marketing/article-inventory.md`](../marketing/article-inventory.md)).
 
 ---
 

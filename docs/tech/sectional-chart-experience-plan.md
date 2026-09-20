@@ -40,6 +40,8 @@ Implications:
 
 Author picks a few teaching areas on the Jacksonville sectional; we generate high-quality PNG crops at native 300 dpi and attach them to units via the existing `images_url` pipeline. No frontend work, ships immediately.
 
+**Status Sep 14 2026 — pipeline proven:** [`scripts/sectional_crop.py`](../../scripts/sectional_crop.py) (lat/long bbox → PNG, with red ellipse/rect callouts) produced the first three shipped figures from the on-disk Jacksonville GeoTIFF: A-293 alert area (u335), W-137E/W-138E warning areas (u333), Contiguous U.S. ADIZ (u348). See [`unit-2-3-image-quality-review.md`](../../assets/courses/faa-107/images/unit-2-3-image-quality-review.md) § Retake plan for the remaining crops and chart downloads needed.
+
 Why static-first for learning UX:
 
 - **The FAA knowledge test is static.** Exam questions reference fixed figures from the Airman Knowledge Testing Supplement — no panning or zooming. Practicing on fixed excerpts is the most faithful rehearsal; an interactive map inside a *question* would train an interaction the exam doesn't allow.

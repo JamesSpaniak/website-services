@@ -1,6 +1,6 @@
 # Sales rep handoff — schools (B2B)
 
-Day-one guide for a **schools-only** sales rep. Marketing covers B2C separately; **do not** lead with individual $29 retail unless the prospect is a single teacher buying personally.
+Day-one guide for a **schools-only** sales rep. Marketing covers B2C separately; **do not** lead with individual **$129** retail unless the prospect is a single teacher buying personally.
 
 ---
 
@@ -41,7 +41,7 @@ Optional (individual retail — rarely for your ICP): https://thedroneedge.com/c
 ## 15-minute demo script (screen share)
 
 1. **`/schools`** — Value props: structured paths, teacher visibility, async delivery. Point to feature list (600+ questions, manager dashboard).
-2. **`/schools/curriculum`** — Three tracks; **only Part 107 is live**. Sample questions and teacher-resource framing.
+2. **`/schools/curriculum`** — Year-1 story: **Part 107 (live) + drone building (standing up)**. Video/AI are later. Sample questions and teacher-resource framing.
 3. **`/schools/funding`** — PA SMART / Perkins language; **never promise eligibility**.
 4. **Live product (needs admin/demo login)** — Log in as demo student: course units, progress, practice exam.
 5. **`/manager`** (manager role) — Cohort progress, member activity — **this closes most school deals**.
@@ -55,7 +55,7 @@ If you lack demo credentials, stop at public pages and schedule a product walkth
 
 **Program**
 
-- Part 107, media, AI/STEM, or mixed pathway?
+- Part 107 + building, 107-only, or they want a no-build flight trainer (not us)?
 - High school, CC, workforce, adult?
 - How many students year one? How many sections?
 - Target start semester?

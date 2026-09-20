@@ -30,31 +30,33 @@ Order of operations: **finish the product → instrument the funnel → run a sm
 
 Paid acquisition math differs sharply between the two motions, and this determines everything else in this doc.
 
-| | B2C — $29 course ladder | B2B — schools / CTE |
+**Price note (Sep 17 2026):** retail is **$129** per course ([`../sales/packages.md`](../sales/packages.md)). The Jul 2026 draft of this section used a **$29** ladder and a **$69** bundle — leftover from an earlier price point. Do not reuse those figures in ads, decks, or CAC targets.
+
+| | B2C — $129 course ladder | B2B — schools / CTE |
 |---|---|---|
-| Order value | $29 per course, three courses planned (Part 107, Video & Photography, AI & Drones) | Thousands, multi-year renewal potential |
-| Realistic paid CPA | Paid social rarely lands a $29 impulse purchase under $29 directly; optimize on the free signup instead | Cost per qualified consultation can justifiably run $100–400 |
-| Sales cycle | Minutes | Months, committee-based, budget-cycle dependent |
+| Order value | **$129** per course; three courses planned (Part 107, Video & Photography, AI & Drones) | Thousands, multi-year renewal potential |
+| Realistic paid CPA | $129 is consideration, not impulse — still optimize on the free signup; purchase is a nurture / retarget conversion | Cost per qualified consultation can justifiably run $100–400 |
+| Sales cycle | Minutes to days | Months, committee-based, budget-cycle dependent |
 | Optimize for | Free-preview signup (enough volume to train a bidder), not purchase | Cost per *qualified* consultation, not raw form fills |
 
-### The three-course ladder changes the B2C math
+### Digital-only LTV (course attach, no hardware)
 
-With one $29 course there was no honest way to pay more than ~$28 for a customer. Three courses give a backend to sell into. **Modelled below — these are assumptions to validate with real data, not facts:**
+Three courses give a backend to sell into. **Modelled below — assumptions to validate with real data (D12), not facts.** Hardware (kits, parts) must **not** be added to this LTV at list price — contribution margin is much thinner ([`../tech/product-analytics.md`](../tech/product-analytics.md) § 9.2, [`../sales/money-model.md`](../sales/money-model.md) § 7b).
 
 | Input | Assumption | Note |
 |-------|-----------|------|
-| First purchase | $29 | Part 107 is the entry product |
-| Course 2 attach | 20% | Unvalidated — measure it before trusting it |
+| First purchase | **$129** | Part 107 is the entry product |
+| Course 2 attach | 20% | Unvalidated — likely *lower* at $129 than it would have been at $29 |
 | Course 3 attach | 10% | Unvalidated |
-| Gross LTV | ~$38 | `29 + 0.20×29 + 0.10×29` |
-| Stripe fees | ~$1.70 across ~1.3 transactions | 2.9% + $0.30 each |
-| **Net LTV** | **~$36** | Break-even CAC |
-| **Target CAC** | **~$18** | Break-even ÷ 2, leaves margin for content cost and refunds |
-| **Target cost per free signup** | **~$5** | At an assumed 15% signup→purchase rate; the number Meta actually optimizes toward |
+| Gross LTV | **~$168** | `129 + 0.20×129 + 0.10×129` |
+| Stripe fees | **~$5.50** across ~1.3 transactions | 2.9% + $0.30 each |
+| **Net LTV (digital-only)** | **~$162** | Break-even CAC if no refunds / content cost |
+| **Target CAC** | **~$80** | Break-even ÷ 2, leaves margin for content cost and refunds |
+| **Target cost per free signup** | **~$12** | At an assumed 15% signup→purchase. **15% is a $29-era guess** — measure before trusting; if conversion is 8%, the same CAC needs ~$6.50/signup |
 
 Two consequences:
 
-1. **A bundle SKU is the highest-leverage economic change available, and it is a Stripe change, not a content change.** A three-course bundle at $69 raises AOV immediately, converts the attach-rate assumption into a known number at checkout time, and roughly doubles the CAC you can afford. The `PRO_UPGRADE` path already exists in the backend as admin-comp only — productizing it is a small amount of work with a large effect on every number above. Do this before scaling spend.
+1. **A bundle SKU is still the highest-leverage *digital* change, and it is a Stripe change, not a content change.** The bundle price is **TBD (D10 / MM1)** and **must sit above $129** (a $69–79 bundle was the $29-era leftover and would undercut the live SKU). Checkout + Pro already exist in code (**T17** partial — needs a live Price ID). Do this before scaling spend.
 2. **B2B optimizes on a proxy, not a sale.** A school deal that closes four months later cannot train an ad algorithm. Feed the platform the consultation request and judge the sale offline. See offline conversion import in [`analytics-and-attribution.md`](../tech/analytics-and-attribution.md).
 
 ---
@@ -81,9 +83,9 @@ Non-obvious risk: education keywords attract clicks from students, hobbyists, an
 
 ### 3. Direct-response B2C (deferred)
 
-`Ad → landing page → free Unit 1 → email nurture → $29`
+`Ad → landing page → free Unit 1 → email nurture → $129`
 
-Standard direct-response. Deferred until the economics above change. When it does open up, optimize the ad platform toward the *free unit signup*, and treat the $29 as a nurture-sequence conversion rather than an ad conversion.
+Standard direct-response. Deferred until the economics above change. When it does open up, optimize the ad platform toward the *free unit signup*, and treat the **$129** as a nurture-sequence conversion rather than an ad conversion.
 
 ### 4. Group funnel — **decided against for now**
 
@@ -98,9 +100,9 @@ A **VSL (video sales letter)** is a single video that carries the whole persuasi
 | VSL element | Verdict | Reasoning |
 |-------------|---------|-----------|
 | One video doing the persuasion, on `/schools` | **Adopt** | A CTE director cannot bring a rep into a committee meeting, but they can forward a 5–8 minute chaptered walkthrough. This is the single highest-leverage video asset available. |
-| Short product demo (60–90s) on the B2C offer page | **Adopt** | At $29 the objection is "is this real and will it get me through the exam," which a screen recording answers faster than any script. |
+| Short product demo (60–90s) on the B2C offer page | **Adopt** | At $129 the objection is still "is this real and will it get me through the exam," which a screen recording answers faster than any script. |
 | Structured script (hook / problem / mechanism / proof / offer) | **Adopt the structure** | The skeleton is just good persuasive ordering. Use it; drop the hype register. |
-| 20+ minute long-form VSL | **Skip** | Long VSLs earn their length at $200–2,000 price points where you must dismantle price resistance. A $29 impulse purchase does not have that resistance. |
+| 20+ minute long-form VSL | **Skip** | Long VSLs earn their length at $500–2,000+ where you must dismantle price resistance. $129 is consideration, not that fight — Unit 1 is the proof. |
 | Autoplay popup / modal on page load | **Reject** | Autoplaying media over 3 seconds is a WCAG 1.4.2 failure, it damages LCP on a site whose entire strategy is organic search, and it directly contradicts "practitioner, not marketer" in [`content-vision.md`](content-vision.md). |
 | Hidden buy button / forced watch time | **Reject** | A dark pattern. Also poisons B2B — institutional buyers treat it as a credibility signal against you. |
 
@@ -206,8 +208,8 @@ Two underpowered simultaneous tests produce two unreadable results. Run them bac
 
 | Phase | Weeks | Spend | What happens |
 |-------|-------|-------|--------------|
-| **0 — Build** | 1–4 | **$0** | Accounts, instrumentation, consent, pixel/CAPI. Film and edit creative. Finish P0 course video. Ship the bundle SKU. |
-| **1 — Meta test** | 5–10 | **~$900** (~$21/day) | B2C. Optimize `signup_completed` on the free unit. Target ~$5/signup. |
+| **0 — Build** | 1–4 | **$0** | Accounts, instrumentation, consent, pixel/CAPI. Film and edit creative. Finish P0 course video. Bundle SKU only after **D10 / MM1** (price > $129). |
+| **1 — Meta test** | 5–10 | **~$900** (~$21/day) | B2C. Optimize `signup_completed` on the free unit. Target **~$12/signup** (was ~$5 on the $29 ladder). |
 | **2 — Google Search test** | 11–16 | **~$900** (~$21/day) | B2B. Exact/phrase match CTE keywords → `/schools/funding`, `/schools/curriculum`. Optimize `consultation_submitted`. |
 | **3 — Scale the winner** | 17+ | **~$500** | Whichever channel produced a readable, affordable conversion. |
 | Reserve | — | **~$200** | Production sundries (lav mic, music licensing) and overage. |
@@ -219,7 +221,7 @@ Why not spend it all: keep enough back to run the winner for a second cycle. A t
 ### Kill conditions specific to this budget
 
 - Meta test reaches $400 with zero signups → stop, the offer or the landing page is wrong, not the targeting.
-- Cost per signup stabilizes above ~$15 → the B2C economics do not close even with the bundle. Move remaining budget to B2B search.
+- Cost per signup stabilizes above **~$25** (or whatever number is `target CAC × measured signup→purchase`) → the B2C economics do not close even with a correctly priced bundle. Move remaining budget to B2B search. The old ~$15 kill line assumed the $29 ladder.
 - Either test cannot be measured in `audit_logs` → stop and fix the tracking before spending more.
 
 ---
@@ -271,7 +273,7 @@ Everything in [`positioning.md`](../sales/positioning.md) § Claims, plus these 
 
 - **Blended CAC from first-party data**, not the sum of platform-reported conversions — platforms each claim overlapping credit and the sum always exceeds reality.
 - **Cost per qualified consultation** (rep-qualified, not raw form fill) for B2B.
-- **Paid share of total acquisition** — if paid ever exceeds organic for B2C at a $29 price point, something is wrong with the economics, not right with the ads.
+- **Paid share of total acquisition** — if paid ever exceeds organic for B2C at a **$129** price point with no measured attach or Pro take-up, something is wrong with the economics, not right with the ads.
 - **Creative throughput** — number of 70-bucket variants shipped per month. Low throughput is the usual root cause of rising CPA.
 
 ---
@@ -280,6 +282,7 @@ Everything in [`positioning.md`](../sales/positioning.md) § Claims, plus these 
 
 - [`docs/sales/positioning.md`](../sales/positioning.md) — ICP, messaging pillars, approved/prohibited claims
 - [`docs/sales/packages.md`](../sales/packages.md) — offer ladder and price bands
+- [`docs/sales/money-model.md`](../sales/money-model.md) — attraction / upsell / downsell / continuity design that the CAC math depends on
 - [`content-vision.md`](content-vision.md) — truth and voice rules; apply to ad copy
 - [`seo-geo-strategy.md`](seo-geo-strategy.md) — the organic engine paid sits on top of
 - [`docs/tech/analytics-and-attribution.md`](../tech/analytics-and-attribution.md) — pixels, conversion APIs, event taxonomy, platform accounts

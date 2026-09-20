@@ -1,0 +1,219 @@
+{
+ "file": "../assets/courses/drone-building/cad/reference/fusion-frame-20260911.stl",
+ "stats": {
+  "triangles": 7682,
+  "bbox_min": [
+   -47.78904724121094,
+   -105.0,
+   -5.0
+  ],
+  "bbox_max": [
+   97.78902435302734,
+   40.0,
+   29.292394638061523
+  ],
+  "size_mm": [
+   145.57807159423828,
+   145.0,
+   34.29239463806152
+  ],
+  "volume_mm3": 36984.0951119952,
+  "area_mm2": 35913.228247506995,
+  "watertight": true,
+  "non_manifold_edges": 0,
+  "shells": 2,
+  "z_plateaus": [
+   0.0,
+   3.0,
+   26.3,
+   29.3
+  ],
+  "plateau_area_mm2": {
+   "0.0": 5716,
+   "3.0": 5832,
+   "26.3": 3820,
+   "29.3": 4048
+  },
+  "base_plate_top_z": 3.0
+ },
+ "material": "PETG",
+ "mass_g_solid": 46.969800792233904,
+ "mass_g_printed": 42.27282071301052,
+ "holes": {
+  "count": 24,
+  "diameters": [
+   2.81,
+   3.48,
+   4.68
+  ]
+ },
+ "stack_patterns": {
+  "16": [],
+  "20": [],
+  "25.5": [],
+  "30.5": [
+   [
+    25.0,
+    -35.0
+   ]
+  ]
+ },
+ "motor_patterns": {
+  "9": [],
+  "12": [],
+  "16": [],
+  "19": [],
+  "\u00d89 bolt circle (diamond)": [
+   [
+    -40.3,
+    -86.1
+   ],
+   [
+    90.3,
+    -86.1
+   ],
+   [
+    90.3,
+    16.1
+   ],
+   [
+    -40.3,
+    16.1
+   ]
+  ],
+  "\u00d812 bolt circle (diamond)": []
+ },
+ "motor_pattern_found": "\u00d89 bolt circle (diamond)",
+ "motors_xy": [
+  [
+   -40.3,
+   -86.1
+  ],
+  [
+   90.3,
+   -86.1
+  ],
+  [
+   90.3,
+   16.1
+  ],
+  [
+   -40.3,
+   16.1
+  ]
+ ],
+ "wheelbase_mm": 165.8348576144352,
+ "motor_spacing_mm": [
+  102.19999999999999,
+  102.19999999999999,
+  130.6,
+  130.6
+ ],
+ "stack_clear_mm": 23.3,
+ "checks": [
+  {
+   "check": "stack mount 20\u00d720 present",
+   "pass": false,
+   "detail": "found: 30.5"
+  },
+  {
+   "check": "motor mount 12\u00d712 present",
+   "pass": false,
+   "detail": "found: \u00d89 bolt circle (diamond)"
+  },
+  {
+   "check": "wheelbase 145\u2013168 mm (parts list \u00a74 target 150\u2013160)",
+   "pass": true,
+   "detail": "165.8 mm"
+  },
+  {
+   "check": "prop tip gap \u2265 8 mm with 89 mm props",
+   "pass": true,
+   "detail": "13.3 mm"
+  },
+  {
+   "check": "room for the kit's prop guards",
+   "pass": true,
+   "detail": "6.3 mm between rings"
+  },
+  {
+   "check": "stack clear height \u2265 16 mm",
+   "pass": true,
+   "detail": "23.3 mm from bottom-plate top (z 3.0) to top-plate underside (z 26.3)"
+  },
+  {
+   "check": "frame mass \u2264 65 g in PETG",
+   "pass": true,
+   "detail": "42 g printed (47 g solid)"
+  },
+  {
+   "check": "watertight mesh (printable)",
+   "pass": true,
+   "detail": "2 shells, 0 bad edges"
+  },
+  {
+   "check": "BeeID footprint on a top surface",
+   "pass": null,
+   "detail": "needs a 22\u00d716 mm clear top area with sky view \u2014 verify manually"
+  }
+ ],
+ "overhangs": {
+  "overhang_area_mm2": 10132.56112902552,
+  "surface_area_mm2": 35913.228247506995,
+  "pct": 28.214008106411033
+ },
+ "fea": {
+  "nodes": 69945,
+  "elements": 34621,
+  "dof_free": 198789,
+  "mesh_size_mm": 3.0,
+  "strength_mpa": 50,
+  "fixed_nodes": 3682,
+  "cases": [
+   {
+    "case": "max thrust on all motors",
+    "max_von_mises_mpa": 294.50609895530573,
+    "safety_factor": 0.1697757709513106,
+    "max_displacement_mm": 4.55468775273969,
+    "hotspot_mm": [
+     89.0,
+     11.2,
+     0.1
+    ],
+    "p99_von_mises_mpa": 12.114732756532542
+   },
+   {
+    "case": "10 g vertical crash on one arm tip",
+    "max_von_mises_mpa": 201.2976879810456,
+    "safety_factor": 0.24838834713644625,
+    "max_displacement_mm": 25.98041036736261,
+    "hotspot_mm": [
+     25.7,
+     -103.7,
+     2.8
+    ],
+    "p99_von_mises_mpa": 58.1826313697461
+   },
+   {
+    "case": "10 g lateral crash on one arm tip",
+    "max_von_mises_mpa": 35.7474659816291,
+    "safety_factor": 1.3987005407794608,
+    "max_displacement_mm": 1.2110128154353972,
+    "hotspot_mm": [
+     25.7,
+     -103.7,
+     2.8
+    ],
+    "p99_von_mises_mpa": 9.885080799981164
+   }
+  ],
+  "modes_hz": [
+   44.203612281031305,
+   45.40385900250832,
+   47.541565172658345
+  ],
+  "seconds": 71.46153712272644,
+  "note": "Linear elastic tet10; clamped at the stack footprint; loads spread over pad top nodes; lumped masses for modes. Layer adhesion not modelled \u2014 multiply SF by the material's layer_factor for standing prints."
+ },
+ "seconds": 71.87194228172302
+}

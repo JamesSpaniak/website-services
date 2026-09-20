@@ -12,13 +12,15 @@ import CourseImageStrip from './course-image-strip';
 import CourseUnitVideo from './course-unit-video';
 import ExamPlayer from './exam-player';
 import { PROSE_COMPACT } from '@/app/lib/prose-classes';
-import { findUnitInTree } from '@/app/lib/course-tree';
+import { findUnitInTree, nextUnitLink } from '@/app/lib/course-tree';
 import { hasScopedQuestions } from './unit';
 import { unitPath } from '@/app/lib/auth-redirect';
+import MarkCompleteBar from './mark-complete-bar';
 
 interface SectionProps {
   section: UnitData;
   courseId: number;
+  courseUnits?: UnitData[];
   rootUnitId: string;
   onStatusUpdate: (unitId: string, newStatus: ProgressStatus) => Promise<void>;
   level?: number;
@@ -31,6 +33,7 @@ interface SectionProps {
 export default function SectionComponent({
   section,
   courseId,
+  courseUnits,
   rootUnitId,
   onStatusUpdate,
   level = 0,
@@ -59,6 +62,7 @@ export default function SectionComponent({
 
   const subUnitScopeRef = String(id);
   const isLeaf = !sub_units || sub_units.length === 0;
+  const next = isLeaf ? nextUnitLink(courseId, courseUnits, String(id)) : null;
   const handleToggle = () => {
     const nextExpanded = !isExpanded;
     setIsExpanded(nextExpanded);
@@ -148,6 +152,7 @@ export default function SectionComponent({
                     key={subUnit.id}
                     section={subUnit}
                     courseId={courseId}
+                    courseUnits={courseUnits}
                     rootUnitId={rootUnitId}
                     onStatusUpdate={onStatusUpdate}
                     level={level + 1}
@@ -163,6 +168,20 @@ export default function SectionComponent({
                     scopeRef={subUnitScopeRef}
                     label={title}
                     questionCount={15}
+                    onSubmitted={(res) => {
+                      if (res && res.score >= 70) {
+                        void onStatusUpdate(id, ProgressStatus.COMPLETED);
+                      }
+                    }}
+                  />
+                )}
+
+                {isLeaf && (
+                  <MarkCompleteBar
+                    status={status}
+                    onComplete={() => onStatusUpdate(id, ProgressStatus.COMPLETED)}
+                    nextHref={next?.href}
+                    nextTitle={next?.title}
                   />
                 )}
               </div>

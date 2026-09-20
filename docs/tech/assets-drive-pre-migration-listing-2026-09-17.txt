@@ -1,0 +1,230 @@
+# Pre-migration listing of rclone remote gdrive:
+# root_folder_id 1-H-Hk6XO0BeV5WI6uBqdnQT7Te1FcRyG
+# Captured 2026-09-17 before Drive folder moves (plan step 0).
+# Size -1 = native Google Doc (exported as docx in the zip).
+# Zip (gitignored): .snapshots/2026-09-17-pre-migration-gdrive.zip
+
+   530771 james to fix.docx
+       -1 Notes for Drone Edge To fix.docx
+  2258455 Photo & Video Course/jake 1.png
+246477538 Media Content not for course/DJI_20260906151639_0057_D.MP4
+203708076 Media Content not for course/DJI_20260906151514_0056_D.MP4
+269249446 Media Content not for course/DJI_20260906145943_0047_D.MP4
+205908639 Media Content not for course/DJI_20260418151307_0004_D.MP4
+238284397 Media Content not for course/DJI_20260418152523_0039_D.MP4
+ 79402443 Media Content not for course/DJI_20260418152217_0037_D.MP4
+  7020544 Media Content not for course/DJI_20260418151851_0029_D.JPG
+ 10256384 Media Content not for course/DJI_20260404162902_0007_D.JPG
+ 11378688 Media Content not for course/DJI_20260404162837_0006_D.JPG
+   292047 Documents/Cengage Core Online Sales Terms.pdf
+    10781 FAA 107 Course/logins 2026.xlsx
+810059731 Drone Edge Assets/Presentation/VisualIdentityDroneEdge.pdf
+   557195 Drone Edge Assets/Colors/Colors.pdf
+       -1 Drone Edge Assets/Fonts/Font Links.docx
+    71113 FAA 107 Course/Course Materials/Compiled Question Bank Sorted.xlsx
+    10436 FAA 107 Course/Course Materials/compiled question totals.xlsx
+       -1 FAA 107 Course/Course Materials/Directions for test bank.docx
+    15963 FAA 107 Course/Course Materials/Activity Descriptions for website.docx
+ 11683509 FAA 107 Course/Course Materials/Additional Airspace Maps.docx
+ 11892756 FAA 107 Course/Course Materials/Additional Airspace Maps -Key.docx
+    29268 FAA 107 Course/Course Materials/Copy of part 107 regulations quiz.docx
+    28359 FAA 107 Course/Course Materials/Copy of MC questions for Part 107 regulations Power Point.docx
+  1783935 FAA 107 Course/Course Materials/Copy of extra maps longitude and Latitude.docx
+    29862 FAA 107 Course/Course Materials/Copy of part 107 regulations quiz -Key.docx
+    28989 FAA 107 Course/Course Materials/Copy of MC Questions for Part 107 KEY - regulations Power Point.docx
+    22040 FAA 107 Course/Course Materials/Copy of Compiled questions Part 107.xlsx
+  1784589 FAA 107 Course/Course Materials/Copy of extra maps longitude and Latitude- Key.docx
+       -1 Drone Edge Assets/Prompt Guide/Prompt Guide.docx
+   263649 Photo & Video Course/powerpoints photo and video/Copyright & Creative Commons.pptx
+   353235 Photo & Video Course/powerpoints photo and video/File Formats test audio.pptx
+   425289 Photo & Video Course/powerpoints photo and video/Camera.pptx
+   236650 Photo & Video Course/powerpoints photo and video/Overview Drone Camera Considerations
+   587469 Photo & Video Course/powerpoints photo and video/File Formats.pptx
+   443062 Photo & Video Course/powerpoints photo and video/Best Practices - 2027.pptx
+   975213 Photo & Video Course/powerpoints photo and video/flight stuff dE.pptx
+   978626 Photo & Video Course/powerpoints photo and video/LM Powerpoint.pptx
+   456828 Photo & Video Course/powerpoints photo and video/Drone Privacy Powerpoint.pptx
+    26280 Photo & Video Course/notes for powerpoint development/Best practices outline from chat.docx
+   587218 Photo & Video Course/powerpoints photo and video/Shot types.pptx
+    50721 Photo & Video Course/notes for powerpoint development/Outline Photo and Video.docx
+   519614 Photo & Video Course/powerpoints photo and video/Planning.pptx
+  6466850 Photo & Video Course/powerpoints photo and video/Introduction to Google v1.pptx
+ 12657893 Photo & Video Course/powerpoints photo and video/john google.pptx
+       -1 Photo & Video Course/notes for powerpoint development/Outline for Photo and video class.docx
+    17723 Photo & Video Course/notes for powerpoint development/Outline for Photo and video class.docx
+  1389703 Photo & Video Course/powerpoints photo and video/Introduction to Lighting v2.pptx
+  1389703 Photo & Video Course/powerpoints photo and video/Introduction to Lighting v2.pptx
+  1409837 Photo & Video Course/powerpoints photo and video/Introduction to Exposure v2.pptx
+   596344 Photo & Video Course/powerpoints photo and video/outline to fill in.pptx
+    46951 Photo & Video Course/notes for powerpoint development/LM Copy and Paste stuff.docx
+    56684 Photo & Video Course/notes for powerpoint development/drone 2 outline.docx
+    14033 Photo & Video Course/notes for powerpoint development/Laanc Review.docx
+ 59457923 FAA 107 Course/Course Videos/section 2/#2 sectional and terminal charts 3.mp4
+ 20764857 FAA 107 Course/Course Videos/section 2/#2 airports and charts 2.mp4
+ 69755732 FAA 107 Course/Course Videos/section 2/#2 airports, lat & long 1.mp4
+ 23252374 FAA 107 Course/Course Videos/section 5 weather/#5 Taf 4.mp4
+  9865236 FAA 107 Course/Course Videos/section 5 weather/#5 weather forecasts 3.mp4
+ 41006950 FAA 107 Course/Course Videos/section 5 weather/5 METAR 2.mp4
+ 10454960 FAA 107 Course/Course Videos/section 5 weather/#5 weather 1.mp4
+ 12138176 FAA 107 Course/Course Videos/Section 1 videos/#1 fly at night 18.mp4
+ 14560092 FAA 107 Course/Course Videos/Section 1 videos/#1 categories over ppl, obj #17.mp4
+  8782197 FAA 107 Course/Course Videos/Section 1 videos/#1 Means & declaration of compliance #16.mp4
+  8502835 FAA 107 Course/Course Videos/Section 1 videos/#1 FAA recognized ID areas 15.mp4
+  6847268 FAA 107 Course/Course Videos/Section 1 videos/#1 remote ID broadcast module 14.mp4
+  8454170 FAA 107 Course/Course Videos/Section 1 videos/#1 stardard remote ID 13-13.mp4
+  6207271 FAA 107 Course/Course Videos/Section 1 videos/#1 remote ID intro 12-13.mp4
+ 15460230 FAA 107 Course/Course Videos/Section 1 videos/#1 waivers 11-13.mp4
+ 17439662 FAA 107 Course/Course Videos/Section 1 videos/#1 preflight familiarization 10-13.mp4
+  9312925 FAA 107 Course/Course Videos/Section 1 videos/#1 registration 3-13.mp4
+  8040067 FAA 107 Course/Course Videos/Section 1 videos/#1 night ops 7-13.mp4
+  9892999 FAA 107 Course/Course Videos/Section 1 videos/#1 multiple flights 9-13.mp4
+  6986573 FAA 107 Course/Course Videos/Section 1 videos/#1 VLOS 8-13 good.mp4
+  9079381 FAA 107 Course/Course Videos/Section 1 videos/#1 over people 6-13.mp4
+ 11013473 FAA 107 Course/Course Videos/Section 1 videos/#1 medical, alchol 5-13.mp4
+  9827191 FAA 107 Course/Course Videos/Section 1 videos/#1 falsification, accident reports 4-13.mp4
+ 33363528 FAA 107 Course/Course Videos/Section 1 videos/#1 roles, 2-13.mp4
+ 10901339 FAA 107 Course/Course Videos/Section 1 videos/#1 applicability, 1-13.mp4
+  4326117 FAA 107 Course/Course Videos/section 4 airport operations/#4 wildlife hazards 6.mp4
+  9260526 FAA 107 Course/Course Videos/section 4 airport operations/#4 airport signs and markings 5.mp4
+ 17194331 FAA 107 Course/Course Videos/section 4 airport operations/#4 runway questions 4.mp4
+ 13507121 FAA 107 Course/Course Videos/section 4 airport operations/#4 traffic patterns 3.mp4
+  9068679 FAA 107 Course/Course Videos/section 4 airport operations/#4 runway orientation 2.mp4
+ 11410790 FAA 107 Course/Course Videos/section 4 airport operations/#4 airport overview 1.mp4
+ 45724198 FAA 107 Course/Course Videos/Section 3/#3 Others.mp4
+ 35517819 FAA 107 Course/Course Videos/Section 3/#3 special use airport.mp4
+ 56156388 FAA 107 Course/Course Videos/Section 3/#3 E and G 5.mp4
+ 19795097 FAA 107 Course/Course Videos/Section 3/#3 class D airspace.mp4
+ 23441479 FAA 107 Course/Course Videos/Section 3/#3 class c 3.mp4
+ 26678998 FAA 107 Course/Course Videos/Section 3/#3 clas A & B airspace 2.mp4
+ 12373638 FAA 107 Course/Course Videos/Section 3/#3 airpace intro 1.mp4
+  1832339 Drone Edge Assets/Assets/Social/Social - 4.png
+  1945583 Drone Edge Assets/Assets/Social/Social - 3.png
+  1429856 Drone Edge Assets/Assets/Social/Social - 2.png
+  1245442 Drone Edge Assets/Assets/Social/Social - 1.png
+     3280 Drone Edge Assets/Logo/PNG/Logo/LogoWhite.png
+     3536 Drone Edge Assets/Logo/PNG/Logo/LogoBlack.png
+  1452755 FAA 107 Course/Course Materials/Outlines／Powerpoints/9 -Aeronautical decision making 2026.pptx
+  3084136 FAA 107 Course/Course Materials/Outlines／Powerpoints/10 - Radio Communication Procedures 2026.pptx
+  4907948 FAA 107 Course/Course Materials/Outlines／Powerpoints/1 -Part 107 Regulations- 2026.pptx
+  2159470 FAA 107 Course/Course Materials/Outlines／Powerpoints/7- Loading & Performance 2026.pptx
+  4654928 FAA 107 Course/Course Materials/Outlines／Powerpoints/5. Drone Weather - 2026 Part 1.pptx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/To be added to course under Registration.docx
+   506327 FAA 107 Course/Course Materials/Outlines／Powerpoints/intro to DE 2.pptx
+ 39099332 FAA 107 Course/Course Materials/Outlines／Powerpoints/3 - Airspace class 3 2026.pptx
+ 28533777 FAA 107 Course/Course Materials/Outlines／Powerpoints/2 -Airports 2026.pptx
+  4065609 FAA 107 Course/Course Materials/Outlines／Powerpoints/4- Airport Operations 2026 .pptx
+   365071 FAA 107 Course/Course Materials/Outlines／Powerpoints/8 -Emergency Procedures 2026.pptx
+ 14391208 FAA 107 Course/Course Materials/Outlines／Powerpoints/6 -Drone Weather - Part 2A - 2026.pptx
+   441334 FAA 107 Course/Course Materials/Pictures for Airports/VFR CheckPoint High Volume.png
+   302910 FAA 107 Course/Course Materials/Pictures for Airports/Manmade obstacles.png
+    63238 FAA 107 Course/Course Materials/ADM/Types of Maintenance and Inspection.png
+   409791 FAA 107 Course/Course Materials/ADM/Sample Chart Suppliment.png
+    25573 FAA 107 Course/Course Materials/ADM/IMSAFE 2.png
+    35360 FAA 107 Course/Course Materials/ADM/IMSAFE 1.png
+    19258 FAA 107 Course/Course Materials/ADM/Attitude and Antidote Table.png
+    66097 FAA 107 Course/Course Materials/ADM/Risk Assessment Matrix.png
+    41577 FAA 107 Course/Course Materials/ADM/Key Performance Degradations.png
+   128504 FAA 107 Course/Course Materials/ADM/Load Factor Chart.png
+   110329 FAA 107 Course/Course Materials/ADM/Load Factor Turns.png
+   286122 FAA 107 Course/Course Materials/weather/Thunderstorm Life Cycle.png
+    34051 FAA 107 Course/Course Materials/weather/Unstable and Stable Air.png
+    40506 FAA 107 Course/Course Materials/weather/Athmospheric Pressure.png
+   152540 FAA 107 Course/Course Materials/weather/Pressure.png
+    35970 FAA 107 Course/Course Materials/weather/Lift Thrust Weight.png
+    65285 FAA 107 Course/Course Materials/weather/Effect on Air Density.png
+    59826 FAA 107 Course/Course Materials/weather/TAF Ex Part 5.png
+    51405 FAA 107 Course/Course Materials/weather/TAF Ex Part 4.png
+    54572 FAA 107 Course/Course Materials/weather/TAF Ex Part 3.png
+    46521 FAA 107 Course/Course Materials/weather/TAF Ex Part 2.png
+    49982 FAA 107 Course/Course Materials/weather/TAF Ex Part 1.png
+   138615 FAA 107 Course/Course Materials/weather/5 METARS.png
+    71801 FAA 107 Course/Course Materials/weather/SPECI METAR KMDW.png
+    62955 FAA 107 Course/Course Materials/weather/METAR KLAX.png
+    55066 FAA 107 Course/Course Materials/weather/Sky Cover.png
+   277164 FAA 107 Course/Course Materials/weather/Qualifies and Weather Phenomena.png
+  1119861 FAA 107 Course/Course Materials/Pictures for Airports/Figure 2 L & L pic Quiz.png
+   593816 FAA 107 Course/Course Materials/Pictures for Airports/Figure 1 L & L pic Quiz.png
+   151884 FAA 107 Course/Course Materials/Pictures for Airports/Longitude and Latitude Points A - D.png
+   224186 FAA 107 Course/Course Materials/Pictures for Airports/Latitude and Longitude Extra Practice Key.docx
+    23202 FAA 107 Course/Course Materials/airport operations pics/Runway 15 with Runway 33.png
+    12286 FAA 107 Course/Course Materials/airport operations pics/Runway Holding Position.png
+     2581 FAA 107 Course/Course Materials/airport operations pics/Direction And Destination Signs.png
+    67687 FAA 107 Course/Course Materials/airport operations pics/Mandatory Instruction Signs.png
+    44132 FAA 107 Course/Course Materials/airport operations pics/Runway 18.png
+    43991 FAA 107 Course/Course Materials/airport operations pics/Runway 24.png
+    44018 FAA 107 Course/Course Materials/airport operations pics/Runway 12.png
+    45081 FAA 107 Course/Course Materials/airport operations pics/Runway 4.png
+    45622 FAA 107 Course/Course Materials/airport operations pics/Runway 13.png
+    93286 FAA 107 Course/Course Materials/airport operations pics/Traffic Pattern.png
+    72264 FAA 107 Course/Course Materials/airport operations pics/Right Pattern.png
+    35061 FAA 107 Course/Course Materials/airport operations pics/Parallel Runways.png
+    32867 FAA 107 Course/Course Materials/airport operations pics/Runway Orientation Compass.png
+  2067509 FAA 107 Course/Course Materials/Pictures for Airports/Reading L & L lines.png
+   196606 FAA 107 Course/Course Materials/Pictures for Airports/Air Defense Identificatioin Zones ADIZ.png
+   261604 FAA 107 Course/Course Materials/Pictures for Airports/National Security Areas NSAS.png
+   781220 FAA 107 Course/Course Materials/Pictures for Airports/Terminal Radar Service Areas TRSA.png
+   512908 FAA 107 Course/Course Materials/Pictures for Airports/VFR Routes.png
+   745669 FAA 107 Course/Course Materials/Pictures for Airports/Parachute Jumps Ex.png
+   691993 FAA 107 Course/Course Materials/Pictures for Airports/TFR Ex Washington DC.png
+   597856 FAA 107 Course/Course Materials/Pictures for Airports/MTR Ex.png
+   268379 FAA 107 Course/Course Materials/Pictures for Airports/Alert Area Ex.png
+   417191 FAA 107 Course/Course Materials/Pictures for Airports/MOA Ex  Gamecock.png
+   330204 FAA 107 Course/Course Materials/Pictures for Airports/Warning Area Ex.png
+   404467 FAA 107 Course/Course Materials/Pictures for Airports/Prohibeted Area Ex.png
+   230948 FAA 107 Course/Course Materials/Pictures for Airports/Restricted Area Ex.png
+   435120 FAA 107 Course/Course Materials/Pictures for Airports/Special Use airspace Ex 2.png
+   190513 FAA 107 Course/Course Materials/Pictures for Airports/Special Use airspace Ex1.png
+   137463 FAA 107 Course/Course Materials/Pictures for Airports/Special Use Airspace on Seatle Secional Chart.png
+    96425 FAA 107 Course/Course Materials/Pictures for Airports/Special Use Airspace.png
+   802144 FAA 107 Course/Course Materials/Pictures for Airports/Class E Ext to Class C Surface Area.png
+   595935 FAA 107 Course/Course Materials/Pictures for Airports/Bethel Alaska PABE Class E2.png
+   665691 FAA 107 Course/Course Materials/Pictures for Airports/Class E4.png
+   736513 FAA 107 Course/Course Materials/Pictures for Airports/Class E3 Ex intersecting Class C.png
+   787585 FAA 107 Course/Course Materials/Pictures for Airports/Class E Monrose Rgnl MTJ.png
+   579314 FAA 107 Course/Course Materials/Pictures for Airports/Class E Pauling NW Atlanta PUJ.png
+   608322 FAA 107 Course/Course Materials/Pictures for Airports/Class E Floor 1200 ft or greater abuts G.png
+   342483 FAA 107 Course/Course Materials/Pictures for Airports/Class E Ex Shelby Cleveland KEHO.png
+    39388 FAA 107 Course/Course Materials/Pictures for Airports/Class E airspace markings.png
+   932875 FAA 107 Course/Course Materials/Pictures for Airports/3D Model Savanah.png
+   694362 FAA 107 Course/Course Materials/Pictures for Airports/Class D with Ext Concord Padgett JQF.png
+   765616 FAA 107 Course/Course Materials/Pictures for Airports/Class D Ex Cincinnati KLUK.png
+   851463 FAA 107 Course/Course Materials/Pictures for Airports/Class C Ex Anchorage Alaska.png
+   806552 FAA 107 Course/Course Materials/Pictures for Airports/Class C Ex-TOL.png
+  1028782 FAA 107 Course/Course Materials/Pictures for Airports/Class B Ex Baltimore-Wash.png
+   974959 FAA 107 Course/Course Materials/Pictures for Airports/Class B Ex ATL-GA.png
+    42329 FAA 107 Course/Course Materials/Pictures for Airports/Airport & Airspace info chart 2.png
+    90283 FAA 107 Course/Course Materials/Pictures for Airports/Airport & Airspace info chart 1.png
+   248078 FAA 107 Course/Course Materials/Pictures for Airports/All Airspace Classifications .png
+   942625 FAA 107 Course/Course Materials/Pictures for Airports/MEF.png
+   262092 FAA 107 Course/Course Materials/Pictures for Airports/Communications Boxes.png
+   561941 FAA 107 Course/Course Materials/Pictures for Airports/Ex Airport data 2.png
+   624484 FAA 107 Course/Course Materials/Pictures for Airports/Ex Airport data 1.png
+   233687 FAA 107 Course/Course Materials/Pictures for Airports/Aeronautical chart 2 slide 44.png
+   161828 FAA 107 Course/Course Materials/Pictures for Airports/Aeronautical chart 1 slide 44.png
+   500050 FAA 107 Course/Course Materials/Pictures for Airports/Using Aeronautical charts flag.png
+   317910 FAA 107 Course/Course Materials/Pictures for Airports/Testing Supplement Book.png
+   475935 FAA 107 Course/Course Materials/Pictures for Airports/Sectional Aeronautical Chart.png
+  1095394 FAA 107 Course/Course Materials/Pictures for Airports/Terminal chart Miami.png
+  1121649 FAA 107 Course/Course Materials/Pictures for Airports/North Little Rock on Memphis sectional.png
+  1659413 FAA 107 Course/Course Materials/Pictures for Airports/New Orleans Sectional Chart.png
+   404897 FAA 107 Course/Course Materials/Pictures for Airports/Sectional Charts.png
+   437573 FAA 107 Course/Course Materials/Pictures for Airports/Ex chart supplement.png
+   221088 FAA 107 Course/Course Materials/Pictures for Airports/sample L & L 2 no map.png
+   221245 FAA 107 Course/Course Materials/Pictures for Airports/sample L & L 1 no map.png
+   739381 FAA 107 Course/Course Materials/Pictures for Airports/L & L Lines.png
+   414036 FAA 107 Course/Course Materials/Pictures for Airports/Latitude and Longitude Globe.png
+   132956 FAA 107 Course/Course Materials/Pictures for Airports/Air Traffic by Numbers 2.png
+   510024 FAA 107 Course/Course Materials/Pictures for Airports/Air Traffic by Numbers 1.png
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#2 -airports 2026 outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/regulations powerpoint in an outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#9- Aeronautical decision making 2026 outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#8 Emergency Procedures Outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#6 -Drone Weather - Part 2A - 2026 outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#5 Drone Weather 2026 outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#4 Airport operations 2026 outline.docx
+       -1 FAA 107 Course/Course Materials/Outlines／Powerpoints/#3 airspace class 3 2026 outline.docx
+      942 Drone Edge Assets/Logo/SVG/Icon/IconWhite.svg
+      841 Drone Edge Assets/Logo/SVG/Icon/IconBlack.svg
+Total objects: 223
+Total size: 2.808 GiB (3015009946 Byte)
+Total objects with unknown size: 14 (14)

@@ -29,17 +29,21 @@ JWT payload is validated in `JwtStrategy`; **`token_version`** on `users` must m
 
 | Area | Variables (typical) |
 |------|---------------------|
-| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| Stripe | `STRIPE_SECRET_KEY`; `STRIPE_WEBHOOK_SECRET` only when Terraform `stripe_webhook_enabled = true` (unset in prod today → webhook handler returns 400; one-time course purchases still complete via `POST /purchases/confirm-payment`, which retrieves the PaymentIntent server-side, records the order and grants the entitlement) |
 | Email | SMTP / provider settings used by `EmailModule` |
 | Media / CloudFront | `CLOUDFRONT_MEDIA_DOMAIN`, signing keys for video URLs |
 | OpenTelemetry | `OTEL_EXPORTER_OTLP_*`, `OTEL_SERVICE_NAME` — optional; loaded via `telemetry.ts` before Nest bootstrap |
+| Analytics archive | `ANALYTICS_ARCHIVE_BUCKET` (S3 bucket for `product_events` partitions older than `ANALYTICS_RETENTION_MONTHS`, default 12). Unset → archival step is a no-op. Bucket `droneedge-dev-analytics-archive` + task-role `s3:PutObject` + env live since 2026-09-12 (PA35). |
+| Access ledger | `ENTITLEMENTS_AUTHORITATIVE=true` (live in prod since 2026-09-12) makes `CourseService.hasAccess` read `entitlements` (`EntitlementService.hasLiveAccess`) instead of `user_courses_purchased` + `users.role/pro_membership_expires_at`; org seats stay relational (`hasOrgCourseAccess`). Set `false` to roll back. While authoritative, `grantCourse`/`syncPro` **rethrow** on failure (a missing row would mean no access) — revokes never throw (an expired Pro row is already dead; a missed course revoke surfaces in `access_diff`). Every ledger write failure increments `entitlements.write_failures{op}`. `purchaseCourse` and `grantCourseAccess` treat "legacy row present, ledger row missing" as a repair, not a duplicate. Note the legacy `pro_membership_expires_at` is `timestamp without time zone` (TZ-dependent in Node); ledger `starts_at`/`ends_at` are `timestamptz` and compared in SQL. `GET /reporting/health` reports the flag. |
 
 ### Cross-cutting behavior
 
-- **Throttling:** `@nestjs/throttler` (e.g. stricter limits on `forgot-password` / `reset-password`).
+- **Throttling:** `@nestjs/throttler` via `UserThrottlerGuard` — tracker is the JWT `sub` when a valid access token is present (cookie or Bearer), else client IP. Global 30/min; stricter on `forgot-password` / `reset-password`; `POST /analytics/event` 120/min; `POST /logs` 10/min. Authenticated classroom traffic is per-user (**PA32**); **login / register / `/logs` before a JWT still share one IP bucket** (school NAT, coffee shop). Edge WAF is a separate 20 000 req/IP / 5 min cap on CloudFront. Shared-IP policy: [`TODO.md`](../TODO.md) classroom rate limits.
 - **Request ID:** `RequestIdMiddleware` (correlation in logs).
 - **HTTP logging:** `LoggingInterceptor` logs `METHOD url duration` (health checks excluded).
 - **Errors:** `HttpExceptionFilter` — 5xx and unhandled exceptions log **stack traces**; some DB constraint errors mapped to friendly messages.
+- **Analytics never blocks business flows.** `ProductEventsService.record` (server events) and every `EntitlementService` write catch + log and return; `PurchaseService.recordCourseOrder` swallows an order-insert failure so the Stripe webhook still grants access (and Stripe is not asked to retry). The safety net is the nightly reconciliation (`paid_grant_without_order` flags such grants; `POST /purchases/admin/backfill-order` repairs them from Stripe) plus bounded-label OTel metrics: `product_events.accepted{source}`, `product_events.dropped{reason}`, `product_events.failures{stage}`, `orders.record_failures`, `analytics.maintenance.step_ms{step,status}`, `analytics.maintenance.failures{step}`, `analytics.maintenance.lock_skipped`, and the gauge `analytics.reconcile.mismatches{check}`. Alert on any `failures`, any `orders.record_failures`, `accepted` flat-lining in school hours, and `reconcile.mismatches > 0` on a gate check.
+- **Nightly job is cluster-exclusive:** `AnalyticsMaintenanceService.runAll` takes `pg_try_advisory_lock` for the run, so a second API task's 00:30 tick is a logged no-op rather than a colliding `REFRESH … CONCURRENTLY`.
 - **Stripe webhook:** Raw body middleware **only** for `POST /purchases/webhook` (signature verification).
 
 ---
@@ -81,6 +85,7 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 - Per user + course: **`userId`**, **`courseId`** (unique pair).
 - `unit_statuses` (JSONB): map of unit `ref` → `ProgressStatus` (replaced the old full-payload copy).
 - `status`, `units_completed`, `units_total`, `exam_scores` (JSONB snapshots keyed by scope_refs/pool), `latest_exam_score` (final exams only), `updated_at`.
+- Analytics timestamps (migration `1765000000000`): `created_at` (= course started), `completed_at`, `last_activity_at` (bumped by progress writes and, throttled to once a minute, by learning events), `unit_completed_at` JSONB (unit `ref` → ISO time of first completion).
 
 ### `articles`
 
@@ -118,9 +123,23 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 - Comments: `articleId`, `userId`, `parentId` (threading), `body`, `upvote_count`, timestamps.
 - Votes: separate entity for per-user upvotes (see `comment-vote.entity.ts`).
 
-### Analytics metrics
+### Analytics metrics (OTel)
 
-- **Not** stored as relational rows for page views. `AnalyticsService` increments **OpenTelemetry metrics** (counters) exported via OTLP when configured.
+- Marketing views (`page_view`, `article_view`, `course_view`) still increment **OpenTelemetry counters** via `AnalyticsService` for Grafana; they are *also* stored as `product_events` rows when the caller is authenticated.
+
+### Product analytics & commerce (migrations `1765000001000`–`1765000003000`)
+
+Full column reference and query cookbook: [`analytics-queries.md`](analytics-queries.md) § 1. Design: [`analytics-implementation-plan.md`](analytics-implementation-plan.md).
+
+- **`products`** — catalog by `sku` (`product_type` course · bundle · pro_monthly · pro_yearly · seats · hardware, `grants` JSONB, `stripe_price_id`, `list_price_cents`, `related_course_id`). `COURSE_{id}` rows are created on demand by `OrderService.ensureCourseProduct`.
+- **`orders`** / **`order_items`** — one row per payment (user *or* organization; Stripe PI / invoice / event ids for idempotency; `payment_method` card · invoice · po · comp; money columns in cents; `payment_status`) and its lines (`sku`, `product_type`, `course_id`, `quantity`, `unit_price_cents`, `unit_cost_cents`, `discount_cents`, `refunded_amount_cents`, `fulfillment_source`, `placement`, `offer_id`). Written by the Stripe webhook and `POST /orders/manual`.
+- **`entitlements`** — the access ledger: `user_id`, `course_id` (NULL = Pro / all courses), `source` (purchase · bundle · pro · admin_grant · signup_link · trial), `product_sku`, `order_item_id`, `allocated_price_cents`, `starts_at`, `ends_at`, `revoked_at`, `revoke_reason`. Partial unique indexes keep one live row per (user, course, source) and one live Pro row per user. **Dual-written** next to `user_courses_purchased` / `users.pro_membership_expires_at` by `EntitlementService`; `hasAccess` still reads the legacy tables until 14 clean reconciliation nights (**PD22**). Org seats are derived, not stored here.
+- **`product_events`** — behavioural stream, RANGE-partitioned by month on `occurred_at` (`product_events_YYYY_MM` + default partition; `ensure_product_events_partition(date)`). Columns: `user_id` / `anonymous_id`, `session_id`, `organization_id`, `class_id`, `event_name`, `course_id`, `unit_ref`, `entitlement_source`, `properties` JSONB, `event_id` (dedupe). Allow-listed names live in `product-events/types/product-event.dto.ts`. Always filter by `occurred_at` so partitions prune.
+- **`product_events_daily`** — nightly rollup per user × course × day (`minutes_engaged` = heartbeats × 0.5, `lessons_viewed`, `videos_completed`, `units_completed`, `exams_submitted`). Survives partition archival — this is the long-term history.
+- **`video_progress`** — per user × course × unit: `position_seconds`, `max_position_seconds`, `watched_ranges` JSONB, `duration_seconds`, `percent_watched` (union of ranges ÷ duration), `completed` (≥ 90 %), `play_count`, first/last played.
+- **`exam_attempt_history`** — append-only submissions (`attempt_no`, `score`, `section_breakdown`, `scope`, `exam_pool`); `exam_attempts` still holds the latest.
+- **`analytics_reconciliation`** — nightly check results (`check_name`, `mismatches`, `detail`) plus a `views_refreshed` marker. Checks: `ucp_without_entitlement`, `entitlement_without_ucp`, `pro_user_without_entitlement`, `pro_entitlement_without_user`, `access_diff` (user × course pairs where the legacy access rule and `hasLiveAccess` disagree — the PD22 gate proper), `paid_grant_without_order` (webhook granted but no `orders` row), and the informational `legacy_purchase_without_order` (migration backfill awaiting the Stripe backfill; excluded from "clean nights"). `AnalyticsMaintenanceService.GATE_CHECKS` lists the gating ones.
+- **Materialized views** — `v_user_entitlements` → `v_user_course_usage` → `v_entitlement_utilization` → `v_user_revenue`, `v_org_utilization`, `v_course_funnel`, `v_cohort_retention`. Refreshed `CONCURRENTLY` by `AnalyticsMaintenanceService` (cron `30 0 * * *`: partitions ahead → rollup → expire Pro entitlements → refresh → reconcile → archive). `POST /reporting/refresh` runs the same pipeline on demand.
 
 ---
 
@@ -175,7 +194,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
-| POST | `/auth/login` | Public | Returns tokens + user (+ org summary if any). |
+| POST | `/auth/login` | Public | Username **or** email (case-insensitive). 401 `No account found with that username or email.` vs `Incorrect password.` Returns tokens + user (+ org summary if any). |
 | POST | `/auth/register` | Public | Sends verification email. Optional `invite_code` (org) and `signup_code` (promo link — validated before account creation, consumed after). |
 | POST | `/auth/verify-email` | Public | |
 | POST | `/auth/refresh` | Public | Body: refresh token. |
@@ -201,7 +220,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | PATCH | `/users/me` | JWT | Update self only. |
 | POST | `/users/:id/courses` | JWT + **Admin** | Gift course access (`source='admin_grant'`); bumps target `token_version`. |
 | DELETE | `/users/:id/courses/:courseId` | JWT + **Admin** | Revoke course access (any source). |
-| DELETE | `/users/:id` | JWT + **Admin** | Hardened: refuses self-delete + admin targets; cleans `exam_attempts` (no FK) before delete. |
+| DELETE | `/users/:id` | JWT + **Admin** | Hardened: refuses self-delete + admin targets; cleans `exam_attempts`, `product_events`, `product_events_daily`, `exam_attempt_history` (all FK-less) in one transaction before delete — privacy notice § 7. |
 
 ### Courses — `/courses`
 
@@ -272,8 +291,13 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | GET | `/organizations/:id/courses` | JWT + **Org manager** | |
 | POST | `/organizations/:id/courses` | JWT + **Admin** | Assign courses to org. |
 | DELETE | `/organizations/:id/courses/:courseId` | JWT + **Admin** | |
-| GET | `/organizations/:id/progress` | JWT + **Org manager** | Summary; optional `?classId=` filter. |
-| GET | `/organizations/:id/progress/:courseId` | JWT + **Org manager** | Detailed; optional `?classId=` filter. |
+| GET | `/organizations/:id/progress` | JWT + **Org manager** | Summary per member × course incl. `started_at`, `completed_at`, `last_activity_at`, `minutes_7d`, `videos_completed/total`, `exams_taken`, `best_exam_score`, `quizzes_passed/attempted`, `effort` (`passing` · `trying` · `struggling` · `stopped` · `browsing` · `not_trying`); optional `?classId=`. |
+| GET | `/organizations/:id/progress/export.csv` | JWT + **Org manager** | Same rows as CSV (`text/csv`, attachment). Emits `org_progress_exported`. Declared before the `:courseId` route. |
+| GET | `/organizations/:id/progress/:courseId` | JWT + **Org manager** | Detailed: course skeleton with each member's unit statuses, `unit_completed_at`, `videos` (per-unit %, completed, position), `quizzes` (per-unit best/latest/attempts/passed), `last_activity_at`; optional `?classId=`. |
+| GET | `/organizations/:id/engagement?days=&classId=` | JWT + **Org manager** | `{ days, members[], series[] }` — per member minutes, lessons, videos, units, exams, active days, last activity (rollup + live today). |
+| GET | `/organizations/:id/utilization` | JWT + **Org manager** | Live seat utilization (`OrgUtilizationResponse`: seats, invites, activated, engaged 7/30 d, hours, `stalled_member_ids`). |
+| GET | `/organizations/:id/members/:userId/exams` | JWT + **Org manager** | Quiz gradebook: per-lesson summaries (first/best/latest, tries) + attempt log with section breakdown; `effort` plus 30d start vs submit counts. |
+| GET | `/organizations/:id/members/:userId/timeline?limit=` | JWT + **Org manager** | Member's learning events, last 30 d, heartbeats excluded. |
 
 ### Media — `/media`
 
@@ -292,9 +316,47 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | POST | `/purchases/course` | JWT + **Admin** | Manual grant (no payment). |
-| POST | `/purchases/create-payment-intent` | JWT | Stripe PaymentIntent. |
-| POST | `/purchases/webhook` | Public | Stripe signature; **not** in Swagger. |
+| POST | `/purchases/create-payment-intent` | JWT | Stripe PaymentIntent — **one course**, lifetime. Logged-in only; **email verification not required**. Rejects if already owned or active Pro. |
+| POST | `/purchases/create-pro-checkout` | JWT | Stripe Checkout **subscription** for Pro (all courses while active). Needs `STRIPE_PRO_PRICE_ID_MONTHLY` (or yearly). Email verification **not** required. |
+| POST | `/purchases/billing-portal` | JWT | Stripe Customer Portal (manage/cancel Pro). Requires `stripe_customer_id`. |
+| POST | `/purchases/confirm-payment` | JWT | Idempotent reconcile after PaymentIntent success when webhook lag. |
+| POST | `/purchases/webhook` | Public | Stripe signature; `payment_intent.succeeded` (order + entitlement + `purchase_completed`), `invoice.paid` / `invoice.payment_failed` (Pro orders + lifecycle events), `charge.refunded` (refund → revoke), subscription lifecycle. **Not** in Swagger. |
 | POST | `/purchases/pro-membership` | JWT + **Admin** | Pro comp / testing (no Stripe subscription). |
+| POST | `/purchases/admin/backfill-order` | JWT + **Admin** | Repairs course entitlements with no `orders` row from Stripe: body `{ paymentIntentId }`, `{ userId, courseId }` (PI found by metadata search), or `{}` for every flagged entitlement. Records the order idempotently (`backfill_<pi>`), links `order_item_id`, sets the real amount. Returns `{ repaired[], unmatched[] }`. |
+
+Flow map + permission pitfalls: [`purchase-flows.md`](purchase-flows.md).
+
+### Orders & entitlements — `/orders`, `/users/me/entitlements` (`backend/src/commerce/`)
+
+| Method | Path | Auth | Notes |
+|--------|------|------|--------|
+| GET | `/orders?userId=&organizationId=&limit=&offset=` | JWT + **Admin** | Orders with items. |
+| GET | `/orders/products` | JWT + **Admin** | Catalog (`products`). |
+| GET | `/orders/:id` | JWT + **Admin** | One order with items. |
+| POST | `/orders/manual` | JWT + **Admin** | Record a PO / invoice / comp order (`CreateManualOrderDto`: `userId` or `organizationId`, `paymentMethod`, `items[{sku, quantity, unitPriceCents?, unitCostCents?, discountCents?}]`, `notes`). Grants entitlements (courses, bundle allocation, Pro), audits `ORDER_RECORDED`, emits `order_recorded`. |
+| GET | `/users/me/entitlements` | JWT | Caller's entitlement rows (live and revoked). |
+
+### Reporting — `/reporting` (`backend/src/reporting/`, all JWT + **Admin**)
+
+Every route reads the materialized views (+ a few live tables); SQL equivalents are in [`analytics-queries.md`](analytics-queries.md).
+
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/reporting/overview` | Five headline numbers + activity pulse + `by_source[]`. |
+| GET | `/reporting/activation?days=` | Weekly activation by source. |
+| GET | `/reporting/utilization` | `{ buckets[], by_course[] }`. |
+| GET | `/reporting/revenue?months=` | `{ monthly[], totals, by_sku[], payment_methods[] }`. |
+| GET | `/reporting/pro?months=` | Active / MRR / failed / cancel-scheduled, `monthly[]`, `cohorts[]`. |
+| GET | `/reporting/organizations` · `/reporting/organizations/:id` | `v_org_utilization` rows; detail adds 8-week series, per-course table, orders. |
+| GET | `/reporting/courses/:id/funnel` | `{ summary, units[], exams[] }` from `v_course_funnel`. Each unit includes live `quiz_passed` (distinct users scoring ≥70 on a quiz scoped to that ref). Each exam includes `title` (joined from `scope_refs` → `course_units`), `last_submitted_at`, `first_try_avg`. |
+| GET | `/reporting/courses/:id/exams/:examId/attempts` | Attempt history for one exam: user, score, attempt_no, submitted_at, passed, section_breakdown. |
+| GET | `/reporting/cohorts` | `v_cohort_retention`. |
+| GET | `/reporting/users/:id` | User 360: entitlements, usage, revenue, orders, events, logins. |
+| GET | `/reporting/signals` | Six offer queues (stalled paid, completed-not-upsold, Pro at risk, low-utilization orgs, engaged free, hot streak). |
+| GET | `/reporting/health` | Freshness, event volume, partition count, reconciliation, clean nights. |
+| POST | `/reporting/refresh` | Runs `AnalyticsMaintenanceService.runAll()` now; returns the step report. |
+| GET | `/reporting/export/:report.csv?courseId=` | CSV of `utilization` · `organizations` · `cohorts` · `revenue` · `usage` · `orders` · `funnel`. |
+
 
 ### Audit — `/audit`
 
@@ -316,7 +378,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
-| POST | `/analytics/event` | Public | Page/article/course view metrics (OTLP counters). |
+| POST | `/analytics/event` | Public (`OptionalJwtAuthGuard`), 120/min per user | Single `AnalyticsEventDto` or `{ events: [...], anonymousId? }` (≤ 50). Marketing events → OTLP counters; every allow-listed event → `product_events` via `ProductEventsService.recordBatch`. Anonymous visitors: rows are stored only when an anonymous id is present (body `anonymousId` or `x-anonymous-id` header) **and** the event is an intent event (`article_view`, `course_view`, `pricing_viewed`, `signup_started`, `checkout_started`, offer events) — anonymous `page_view` stays OTel-only. Course-scoped events are dropped when the user cannot access the course; `video_*` / heartbeat payloads upsert `video_progress` and bump `progress.last_activity_at`. The authenticated `identified` event (`properties.anonymous_id`) is the only row carrying both `user_id` and `anonymous_id` — the identity stitch — and is dropped for org members. Ingest failures are swallowed (204 regardless) and counted. |
 
 ### Logging — `/logs`
 
