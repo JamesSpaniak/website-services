@@ -1,6 +1,6 @@
 # Drone building — reference parts list, draft v2
 
-**Status:** Draft, Sep 9 2026. Source is Joe's second list (Sep 9, in conversation) plus his notes: plug-and-play parts only exist for ≤ 2" drones, so minimal-solder on a 3–3.5" build "is just not working"; soldering is acceptable if it keeps the drone viable; power and motors should be the only solder; the F722 stack is pricey and slow to ship so he will shop around; goggles = cheapest in production, or a monitor so the teacher sees too; PETG final print, PLA prototypes.
+**Status:** Draft, Sep 9 2026 — **superseded for parts by [`parts-list-draft-v4.md`](parts-list-draft-v4.md) (Sep 12)**; v3 in between was the split-FC/ESC detour. Kept for the v2 desk check and the Solder/Pre-soldered market note (§3). Source is Joe's second list (Sep 9, in conversation) plus his notes: plug-and-play parts only exist for ≤ 2" drones, so minimal-solder on a 3–3.5" build "is just not working"; soldering is acceptable if it keeps the drone viable; power and motors should be the only solder; the F722 stack is pricey and slow to ship so he will shop around; goggles = cheapest in production, or a monitor so the teacher sees too; PETG final print, PLA prototypes.
 
 Every line below was desk-checked Sep 9 against manufacturer pages, Flywoo's wiring PDF, the FAA DOC list, and the Betaflight config repo (sources §9). v1 ([`parts-list-draft-v1.md`](parts-list-draft-v1.md)) keeps the material table (§3), goggles options (§8), material-choice mechanism (§9), and the first desk check; this file supersedes it for **parts**.
 
