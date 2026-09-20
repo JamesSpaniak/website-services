@@ -85,7 +85,7 @@ From the internal comparison matrix, programs differ sharply on:
 
 ## 4. Competitor landscape — feature patterns (illustrative)
 
-The following **does not** enumerate every vendor; it summarizes **patterns** seen in the market and in the internal comparison matrix (Appendix A). Named examples include **Iconic Drone, USI, Drone Legends, PaTTAN, Drone Cadet, Drone Launch Academy, Drone Darts / DARTdrones**, etc. Individual deep-dives: **DARTdrones** [§5], **Drone Launch Academy** [§6], **Iconic Drone** [§7], **USI** [§8], **Drone Legends** [§9], **PaTTAN** [§10], **Drone Cadet** [§11]. Synthesis and "best of" analysis in [§12].
+The following **does not** enumerate every vendor; it summarizes **patterns** seen in the market and in the internal comparison matrix (Appendix A). Named examples include **Iconic Drone, USI, Drone Legends, PaTTAN, Drone Cadet, Drone Launch Academy, Drone Darts / DARTdrones, PCS Edventures (Drone Pathways)**, etc. Individual deep-dives: **DARTdrones** [§5], **Drone Launch Academy** [§6], **Iconic Drone** [§7], **USI** [§8], **Drone Legends** [§9], **PaTTAN** [§10], **Drone Cadet** [§11], **PCS Edventures Drone Pathways** [§12]. Synthesis and "best of" analysis in [§13].
 
 | Dimension | Low end / gap risk | Mid / blended | Premium / comprehensive |
 |-----------|---------------------|---------------|-------------------------|
@@ -316,9 +316,121 @@ Internal spreadsheet rows that cite **“Drone Darts”** at **high all-in curri
 
 ---
 
-## 12. Synthesis: sectors, "best of," and conflicts
+## 12. Snapshot: PCS Edventures — Drone Pathways / FLEX UAV
 
-### 12.1 The market is NOT one segment — it's three distinct buyer types
+*Primary audience: US high-school CTE (grades 10–12). Product: turnkey **hardware kit + web curriculum + branded flight simulator**. Source: 16-page curriculum **sample** dated 05/27/26 at [`assets/Drone_Pathways_Curriculum_Sample_compressed.pdf`](../../assets/Drone_Pathways_Curriculum_Sample_compressed.pdf) (extracted from a ~160-page teacher book; not the full course). Public sites: [edventures.com](https://edventures.com), [dronepathways.com](https://dronepathways.com/). Pricing and claims below are from that sample — re-verify before quoting against them.*
+
+This is the closest **hardware + classroom-ops** competitor to our **drone-building** track, not to Part 107. They sell a semester-shaped *flight operations intro*. We sell *credential + engineering*. Same buyer title (CTE director); different job-to-be-done.
+
+### 12.1 What the sample actually is
+
+**Product:** *Drone Pathways — Foundations of Flight Operations.* Twenty **45-minute** lessons, linear **Build → Simulate → Fly**, plus a Capstone Mission. Web content on Chromebooks / Windows / Mac. Hardware is their modular **FLEX UAV** (no-solder keyed connectors, GPS, optical-flow/LIDAR, landing gear) flown on a **RadioMaster Pocket** (EdgeTX) with instructor trainer modes. Software includes a **FLEX UAV Flight Simulator** and Google Earth for mission planning.
+
+**Published packages (sample cover):**
+
+| Package | Drones | List (as printed) |
+|---------|--------|-------------------|
+| CTE Starter | 2 | $3,995 |
+| CTE Base | 5 | $8,995 |
+| CTE Plus | 10 | $16,995 |
+| CTE Pro | 10 | $22,995 |
+
+Per-aircraft **package** list at the 10-pack is roughly **$1,700–$2,300** all-in (drones + curriculum + sim + teacher materials; radios/class gear are inside that SKU). That is **not** comparable to our **~$275 Base BOM** (materials only, [`parts-list-draft-v4.md`](../../assets/courses/drone-building/reference/parts-list-draft-v4.md)). A school-facing Base kit at **$1,000–$1,500** sell still undercuts their 10-pack on hardware-shaped spend while leaving room for print/QA/pre-solder labor and curriculum seats. Compare **quoted kit price + seats** to **their package**, never BOM to list.
+
+### 12.1a What “trainer” means — and they *do* build
+
+**Trainer** is aviation/RC jargon, not “toy.” A trainer airframe is built to teach *piloting*: stable, crash-tolerant, **assisted flight modes** (their Pocket: Angle, altitude hold, position hold, return-to-home), indoor-capable sensors (optical flow + LIDAR on the FLEX parts list), landing gear. The student is learning stick-and-rudder and crew procedure. Contrast with our Base kit: a **3.5" FPV-class stack** (Betaflight, ELRS, student-printed frame) whose first-flight mode is Angle, but the aircraft is a real custom quad, not a GPS/optical-flow school trainer.
+
+**It is not a ready-to-fly box.** Students assemble the modular FLEX UAV. Lesson 1 is inventory (plates, arms, standoffs, motors, FC, ESC, GPS, RX, optical-flow/LIDAR, landing gear). A sample objective is “install landing gear on the FLEX UAV.” Their copy: students “don’t just open a box”; they learn mechanical assembly of subsystems so they can fix a crash. Connectors are **keyed / no-solder** (same family as RubiQ). There is no soldering, no CAD, no firmware flash, no motor-KV matching, no failsafe-in-Betaflight gate. Assembly is **Ikea-with-a-checklist**, then sim, then crew flying.
+
+So: **pre-packaged kit, student-assembled, not student-engineered.** The course time after assembly is CRM, mission planning, sim hours, TRUST/airspace, and live VLOS flight — workforce *operations*, not engineering CTE.
+
+**Engineering in this contrast** means: choose/design the structure, match powertrain, join electrical systems (solder or pre-soldered harness), flash and configure the FC, prove failsafe, register a homebuilt with RID. FLEX students identify those parts and bolt them in the vendor’s geometry. Both are “building.” Only one produces an aircraft the student specified.
+
+**Instructional approach (their words, condensed):**
+
+- Scenario-based missions (downed power line, wetlands) framed as **thought experiments**, not industry qualification. They say this out loud — a honesty we should copy.
+- Classroom crews of **3–5** (RPIC, Visual Observer, Data Manager/Safety) instead of the field’s Pilot + VO, so nobody sits idle.
+- Soft skills labeled **Crew Resource Management**: closed-loop comms, role rotation, assertiveness, accountability.
+- Safety as a gate: LiPo in a fireproof container, **props off**, sim proficiency (figure-eight) **before live equipment**.
+- Recreational **TRUST** + “FAA Part 107 vs Recreational” awareness in the live-flight section — **not** ACS knowledge-test prep.
+- Each lesson: objectives, 45-min schedule, materials, key terms, step-by-step, formative + summative assessment, Extensions for early finishers / large classes.
+
+**Sample pages included:** Lesson 1 parts inventory; full Lesson 12 (mission planning + Google Earth + sim practice + Pilot Log); RadioMaster Pocket switch map and trainer modes; FAA educational-user airspace check via Aloft AirAware.
+
+### 12.2 Alignment with Drone Edge
+
+| Layer | Overlap | Split |
+|-------|---------|-------|
+| **Buyer** | CTE / grades 10–12 classroom | They are kit-first. We are credential-first (Part 107 live; building is draft). |
+| **Arc** | Safety → identify parts → assemble → fly under rules | Their middle is **sim**. Ours is **physics + CAD + Betaflight**. |
+| **Radio** | RadioMaster Pocket | Same radio family we already specify for class TX. |
+| **Regs language** | RPIC, VO, VLOS, LiPo, airspace check | They stop at TRUST + recreational vs 107 *awareness*. We fly the **Part 107 path** (register every aircraft, BeeID per airframe, RPIC on every flight day). |
+| **Mission planning** | Google Earth, hazards, contingencies | Their Lesson 12 is a finished 45-min script. Our Unit 3 is builder-scoped regs; we have no GIS lesson yet. |
+| **Hardware philosophy** | “They built it, so they can fix it” | Their FLEX is a **keyed modular trainer** (assemble, don’t design; optical flow / LIDAR / GPS assists). Ours is a **3.5" FPV stack** students design the frame for. |
+| **Teacher lift** | Slide deck + minute-by-minute plan | We have org dashboards and (planned) pacing; we do **not** yet have 45-min teacher scripts for building. |
+
+They sit in the same box as the no-solder school kits already researched in [`parts-list-draft-v2.md`](../../assets/courses/drone-building/reference/parts-list-draft-v2.md) (PCS RubiQ / FLEX, DroneBlocks, Pitsco). This sample is the **curriculum half** of that box.
+
+### 12.3 What they do better
+
+1. **Classroom operations.** The 3–5 person crew plus CRM is a solved answer to “one student flies, twelve watch.” Our Unit 8 currently queues on RPIC count; we have not scripted non-pilot roles for the rest of the period.
+2. **Teacher-ready 45-minute lessons.** Prep list, timed blocks, key terms, formative/summative, extensions. A non-pilot CTE teacher can run Lesson 12 from the page. Our building outline is still author-facing, not teacher-facing.
+3. **Simulation as a gate, not a toy.** Figure-eight / checklist proficiency in their branded sim **before** live FLEX. We have CAD hover sims for frame design (`assets/courses/drone-building/cad/`) and **no student piloting sim** in the course tree. Path to add one (commercial stick-time gate vs Betaflight SITL of our plant; Isaac Lab is not the Unit 8 brain): [`cad-sim-extensions.md`](../../assets/courses/drone-building/reference/cad-sim-extensions.md) § 5–6.
+4. **Turnkey SKU.** One PO: drones + radios + sim + slides + logs. Procurement likes that. Their ~$1,700–$2,300 per aircraft is a **bundled sell price**; our ~$275 is **parts cost**. A $1,000–$1,500 Base kit plus seats is the fair fight, and it can still win on engineering depth.
+5. **Trainer-mode radio.** Pocket switch map with teacher override is how a class of novices flies without a crash every period.
+6. **Honest scenario labeling.** Power-line inspection is explicitly *imagined*; they tell students not to attempt it. Matches our claims rules better than most vendors.
+7. **Differentiation inside the hour.** Extensions (GIS career, LAANC research, LULC change in Google Earth) keep early finishers busy while others are on the sim — the “larger class” problem we will hit immediately.
+
+### 12.4 What we do better
+
+1. **Credential outcome.** Part 107 ACS prep, 600+ practice items, unit/course exams, org progress. They are not in that product. A CTE director who needs an **industry-based certification** still needs us (or DARTdrones / Iconic / USI).
+2. **Engineering depth.** Physics (thrust, heat, materials), student-printed **whole frame**, Onshape, Betaflight 2026.6, ELRS, failsafe gate, smoke stopper, Remote ID as a *module you install and register*. FLEX assembly is mechanical inventory + keyed connectors — real, but not a custom-build CTE course.
+3. **Regulatory honesty at flight time.** We do not pretend TRUST covers a class fleet. RPIC, per-aircraft registration, BeeID serial on the registration, VO for FPV.
+4. **Platform.** Browser LMS, assignments, manager dashboard, Stripe, articles. Their content is web-based slides + a separate sim + paper Pilot Logs. Accountability for *who completed what* is our native advantage.
+5. **Price of hardware at CTE-engineering quality.** Base **BOM ~$275**; school sell **$1,000–$1,500** is in range and still below their bundled 10-pack per-aircraft list, with a Pre-soldered SKU (~+$25–40 our cost) that opens no-solder rooms without a proprietary airframe.
+6. **Pathway, not a 20-lesson island.** Part 107 → Building → Video/AI, plus year-2 repair proposal. Their extensions (CAD landing gear, GIS) are optional add-ons to a closed 20-lesson product.
+7. **B2C existence.** They have no $129 self-serve adult product. We do.
+
+### 12.5 Differentiators (one line each)
+
+| | Differentiator |
+|--|----------------|
+| **Theirs** | A **turnkey CTE flight-ops lab**: keyed modular trainer students assemble (not design) + branded sim + 20 teacher-scripted lessons + CRM crews. Lowest teacher-expertise requirement in the hardware category. |
+| **Ours** | A **credential + engineering platform**: FAA Part 107 in the browser, then a 3.5" stack students design, flash, failsafe, and register — kit sell in the $1k–$1.5k band on a ~$275 BOM, with teacher visibility. |
+
+Do not try to beat FLEX at being FLEX. Do not let a CTE director confuse their 20 lessons with 107 readiness. The clean sentence for a rep: *They teach a class to crew and fly a school trainer they bolted together. We teach the certificate and how to design and legally operate the aircraft they specified.*
+
+### 12.6 What to learn (steal the classroom mechanics, not the airframe)
+
+Safe to copy into **drone-building Unit 8** and the school one-pager; none of this is their proprietary FLEX design.
+
+| Borrow | Where it lands | Why |
+|--------|----------------|-----|
+| **Sim proficiency gate before maiden** (hover / figure-eight / checklist) | Building Unit 8, before the bench-to-maiden gate | Matches our safety culture; cuts first-crash rate; we still need to **pick a sim** (Velocidrone / Liftoff / RealFlight / open) — FLEX sim is locked to their model |
+| **3–5 person crew roles** (RPIC, VO, safety/data, logger) + closed-loop comms | Unit 8 ops + any live-flight day; optional CRM leaf in Unit 1 | Solves idle students; workforce language CTE directors already know |
+| **45-minute teacher script** (objectives, timed blocks, materials, key terms, extensions) | School edition of building; Part 107 classroom mode later | Biggest teacher-lift gap vs this sample |
+| **Pilot Log** (paper or in-app) | Progress / manager dashboard | Simple accountability artifact; maps to `lesson_heartbeat` later |
+| **Google Earth mission-planning hour** | New leaf after Unit 3 or inside Unit 8 weather/site brief | Cheap, Chromebook-native, GIS career hook they already use |
+| **RadioMaster Pocket trainer mode** | Class radio SOP | We already specify Pocket; document the teacher-override switch |
+| **“Thought experiment, not a job qualification”** disclaimer on scenarios | Content-vision / lesson templates | We already prohibit invented ops claims; write it on the page the way they did |
+| **TRUST vs Part 107 labeled as two paths** | Building Unit 3 (we chose 107); Part 107 course already owns ACS | Steal the *clarity*, keep our path |
+
+**Do not borrow:** keyed proprietary airframe, optical-flow indoor trainer as the course aircraft, TRUST as the program’s credential, or their list prices as our kit prices.
+
+### 12.7 Implication for the offer ladder
+
+PCS is the vendor a CTE director finds when they search “drone curriculum kit.” If we only sell Part 107 seats, we lose that search to them. If we only sell a $275 BOM with no teacher script and no sim gate, we lose on **teacher confidence**.
+
+The complementary package (already sketched in [`money-model.md`](money-model.md)): **seats (107 + building) + Base kits quoted in the $1,000–$1,500 band (BOM ~$275) + optional third-party sim + a 45-min teacher edition.** That can undercut a $17k–$23k 10-pack **if** the quote includes curriculum seats and teacher scripts — and Unit 8 is runnable by a non-pilot. Until then they win “I am not a pilot / I need a flight lab”; we win “I need Part 107 + students who designed a real aircraft.” Qualify on **credential + engineering vs operations-on-a-trainer**.
+
+Open product questions (not decided here): which third-party sim, whether Pocket trainer cables ship in the class pack, and whether CRM/crew roles are a graded Unit 8 requirement.
+
+---
+
+## 13. Synthesis: sectors, "best of," and conflicts
+
+### 13.1 The market is NOT one segment — it's three distinct buyer types
 
 | Segment | Primary buyer | Job to be done | Price sensitivity | Speed need | Hardware dependency |
 |---------|--------------|----------------|-------------------|------------|---------------------|
@@ -328,7 +440,7 @@ Internal spreadsheet rows that cite **“Drone Darts”** at **high all-in curri
 
 Drone Edge's current architecture (orgs, progress, purchase, LMS-style) can serve all three, but the **content, UX, and marketing** must be tuned per segment. **You cannot use the same landing page, price point, or study guide for all three.**
 
-### 12.2 What you CAN borrow from each (segment-compatible wins)
+### 13.2 What you CAN borrow from each (segment-compatible wins)
 
 These features work **across segments** or can be selectively enabled per tier:
 
@@ -349,9 +461,9 @@ These features work **across segments** or can be selectively enabled per tier:
 | **Stackable credential narrative** | USI | B | Product/marketing |
 | **Educator PD track** | PaTTAN | B | Content + platform |
 | **Business / entrepreneurship add-on** | Drone Launch Academy | A | Content module |
-| **Mission / community impact framing** | Drone Cadet | All | Marketing copy |
+| **Teacher-scripted 45-min lessons + crew roles + sim gate** | PCS Edventures Drone Pathways | B (CTE flight lab) | Content + pick a third-party sim |
 
-### 12.3 What CONFLICTS across segments (cannot copy everything)
+### 13.3 What CONFLICTS across segments (cannot copy everything)
 
 | Tension | Adult switcher wants | School wants | Resolution |
 |---------|---------------------|-------------|------------|
@@ -363,7 +475,7 @@ These features work **across segments** or can be selectively enabled per tier:
 | **Business content** | Drone business mini-courses | Entrepreneurship as a separate add-on elective | Modular add-on; not in base 107 course |
 | **Guarantee mechanics** | Individual pass guarantee | Classroom-level outcome SLA | Separate terms per buyer type |
 
-### 12.4 Priority roadmap — what to build next (ranked by cross-segment value)
+### 13.4 Priority roadmap — what to build next (ranked by cross-segment value)
 
 1. **Question bank + domain tagging** — Every strong competitor leads with item count. Grow to 600+ ACS-aligned items with weak-area drill mode. *High impact, all segments.*
 2. **Structured study guide (downloadable PDF)** — Companion artifact that signals "real course." Low cost, high perceived value, works for both quick learners and classrooms.
@@ -378,7 +490,7 @@ These features work **across segments** or can be selectively enabled per tier:
 
 ---
 
-## 13. Curriculum comparison summary (for internal strategy)
+## 14. Curriculum comparison summary (for internal strategy)
 
 | Criterion | Question to answer |
 |-----------|-------------------|
@@ -442,7 +554,7 @@ Early worksheet rows compared packages without consistent vendor labels. Recurri
 
 ---
 
-## 14. Sources
+## 15. Sources
 
 - Internal curriculum comparison worksheet (captured in Appendix A; formerly `assets/competitor.txt`).
 - DARTdrones: [dartdrones.com/part-107-commercial-license](https://www.dartdrones.com/part-107-commercial-license/).
@@ -452,8 +564,9 @@ Early worksheet rows compared packages without consistent vendor labels. Recurri
 - Drone Legends: [dronelegends.com/product-page/faa-part-107...](https://www.dronelegends.com/product-page/faa-part-107-remote-pilot-certification-test-prep-classroom-curriculum).
 - PaTTAN: [pattan.net/…/Drone-Pilot-Curriculum](https://www.pattan.net/Evidence-Based-Practices/STEM/computer-science/CS-Educator-Toolkit/Lesson-Resources/Drone-Pilot-Curriculum).
 - Drone Cadets: community program research, Apr 2026.
+- PCS Edventures Drone Pathways sample (May 2026): [`assets/Drone_Pathways_Curriculum_Sample_compressed.pdf`](../../assets/Drone_Pathways_Curriculum_Sample_compressed.pdf); [edventures.com](https://edventures.com); [dronepathways.com](https://dronepathways.com/). Snapshot §12.
 - For live competitor pricing and regulatory claims, re-validate on vendor sites and FAA ACS references at release time.
 
 ---
 
-*Last updated: Appendix A captures former `competitor.txt` spreadsheet (Jul 2026). Full vendor snapshots + synthesis Apr 2026.*
+*Last updated: Sep 16 2026 — added PCS Edventures Drone Pathways snapshot from curriculum sample. Appendix A still Apr/Jul 2026.*

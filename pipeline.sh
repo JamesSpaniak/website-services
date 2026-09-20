@@ -300,13 +300,28 @@ fi
 # ─── ECS deploy + wait ──────────────────────────────────────────────────────────
 
 ecs_force_deploy() {
-  local cluster="$1" service="$2" image="$3" container_name="$4"
-  local current_td_arn td_json register_input new_td_arn
+  local cluster="$1" service="$2" image="$3" container_name="$4" family="$5"
+  local base_td_arn base_image td_json register_input new_td_arn
 
-  current_td_arn="$(aws ecs describe-services --cluster "${cluster}" --services "${service}" \
-    --region "${AWS_REGION}" --query 'services[0].taskDefinition' --output text)"
+  # Base the rollout on the newest ACTIVE revision of the family — that is the
+  # one terraform apply just registered from ecs_*.tf (env vars, secrets,
+  # logging). Cloning the service's *current* revision (the old behaviour)
+  # silently dropped every env var added in terraform.
+  base_td_arn="$(aws ecs describe-task-definition --task-definition "${family}" \
+    --region "${AWS_REGION}" --query 'taskDefinition.taskDefinitionArn' --output text)"
+  base_image="$(aws ecs describe-task-definition --task-definition "${base_td_arn}" \
+    --region "${AWS_REGION}" --query "taskDefinition.containerDefinitions[?name=='${container_name}'].image | [0]" --output text)"
 
-  td_json="$(aws ecs describe-task-definition --task-definition "${current_td_arn}" \
+  if [[ "${base_image}" == "${image}" ]]; then
+    # terraform already registered exactly what we want to run — no clone needed.
+    aws ecs update-service --cluster "${cluster}" --service "${service}" \
+      --task-definition "${base_td_arn}" --force-new-deployment \
+      --region "${AWS_REGION}" >/dev/null
+    echo "Deploy triggered: ${service} with ${image} (${base_td_arn}, terraform revision)"
+    return
+  fi
+
+  td_json="$(aws ecs describe-task-definition --task-definition "${base_td_arn}" \
     --region "${AWS_REGION}" --query 'taskDefinition' --output json)"
 
   register_input="$(mktemp)"
@@ -418,8 +433,8 @@ warn_if_service_stale() {
 }
 
 if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
-  [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"  "${BACKEND_CONTAINER_NAME}"
-  [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}"
+  [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"  "${BACKEND_CONTAINER_NAME}"  "${BACKEND_TASK_FAMILY}"
+  [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}" "${FRONTEND_TASK_FAMILY}"
   [[ "${BUILD_BACKEND}" == "true" ]]  && wait_for_service_stable "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && wait_for_service_stable "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}"
 

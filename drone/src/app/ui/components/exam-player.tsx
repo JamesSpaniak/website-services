@@ -23,7 +23,7 @@ interface ExamPlayerProps {
     variant?: 'inline' | 'page';
     /** Hide retake on results (assigned class exams). */
     hideRetake?: boolean;
-    onSubmitted?: () => void;
+    onSubmitted?: (result?: ExamAttemptResult) => void;
 }
 
 type Phase = 'idle' | 'generating' | 'taking' | 'submitting' | 'results';
@@ -280,7 +280,10 @@ export default function ExamPlayer({
             }
             setExam(generated);
             setPhase('taking');
-            sendExamEvent('exam_start', courseId, examPool, scope);
+            sendExamEvent('exam_start', courseId, examPool, scope, {
+                examId: generated.id,
+                unitRef: scopeRef,
+            });
         } catch (e) {
             setError(e instanceof Error ? e.message : examId != null ? 'Failed to load exam' : 'Failed to generate exam');
             setPhase('idle');
@@ -313,8 +316,7 @@ export default function ExamPlayer({
             clearDraft(exam.id);
             setResult(res);
             setPhase('results');
-            sendExamEvent('exam_submit', courseId, examPool, scope, res.score);
-            onSubmitted?.();
+            onSubmitted?.(res);
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Failed to submit exam');
             setPhase('taking');

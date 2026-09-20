@@ -15,6 +15,7 @@ import type { ExamPool } from '../questions/types/exam.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
 import { Trace } from 'src/common/tracing.decorator';
+import { ProductEventsService } from '../product-events/product-events.service';
 
 /**
  * Single owner of user course progress (merged from the former
@@ -35,6 +36,7 @@ export class ProgressService {
     @InjectRepository(CourseUnit)
     private courseUnitRepository: Repository<CourseUnit>,
     private auditService: AuditService,
+    private productEvents: ProductEventsService,
   ) {}
 
   // ── Row lifecycle ────────────────────────────────────────────────────────
@@ -63,12 +65,20 @@ export class ProgressService {
         userId,
         courseId,
         unit_statuses: {},
+        unit_completed_at: {},
         status: ProgressStatus.NOT_STARTED,
         units_total: unitsTotal,
         units_completed: 0,
+        last_activity_at: new Date(),
+        completed_at: null,
       });
       await this.progressRepository.save(progress);
       this.auditService.log(userId, AuditAction.COURSE_STARTED, { courseId });
+      void this.productEvents.record({
+        userId,
+        event: 'course_started',
+        courseId,
+      });
     }
     return progress;
   }
@@ -147,11 +157,18 @@ export class ProgressService {
     status: ProgressStatus,
   ): Promise<{ status: ProgressStatus }> {
     const progress = await this.getOrCreateProgress(userId, courseId);
+    const wasCompleted = progress.status === ProgressStatus.COMPLETED;
     progress.status = status;
     await this.saveWithSummary(progress);
 
-    if (status === ProgressStatus.COMPLETED) {
+    if (status === ProgressStatus.COMPLETED && !wasCompleted) {
       this.auditService.log(userId, AuditAction.COURSE_COMPLETED, { courseId });
+      void this.productEvents.record({
+        userId,
+        event: 'course_completed',
+        courseId,
+        properties: { units_total: progress.units_total },
+      });
     }
     return { status };
   }
@@ -173,21 +190,41 @@ export class ProgressService {
 
     const progress = await this.getOrCreateProgress(userId, courseId);
     const statuses = { ...(progress.unit_statuses ?? {}) };
+    const completedAt = { ...(progress.unit_completed_at ?? {}) };
+    const previous = statuses[unitRef];
     if (status === ProgressStatus.NOT_STARTED) {
       delete statuses[unitRef];
+      delete completedAt[unitRef];
     } else {
       statuses[unitRef] = status;
+      if (status === ProgressStatus.COMPLETED) {
+        completedAt[unitRef] ??= new Date().toISOString();
+      } else {
+        delete completedAt[unitRef];
+      }
     }
     progress.unit_statuses = statuses;
+    progress.unit_completed_at = completedAt;
     if (progress.status === ProgressStatus.NOT_STARTED) {
       progress.status = ProgressStatus.IN_PROGRESS;
     }
     await this.saveWithSummary(progress);
 
-    if (status === ProgressStatus.COMPLETED) {
+    if (status === ProgressStatus.COMPLETED && previous !== status) {
       this.auditService.log(userId, AuditAction.UNIT_COMPLETED, {
         courseId,
         unitId: unitRef,
+      });
+      void this.productEvents.record({
+        userId,
+        event: unit.depth === 0 ? 'unit_completed' : 'lesson_completed',
+        courseId,
+        unitRef,
+        properties: {
+          depth: unit.depth,
+          units_completed: progress.units_completed,
+          units_total: progress.units_total,
+        },
       });
     }
     return { id: unitRef, title: unit.title, status } as UnitData;
@@ -258,6 +295,13 @@ export class ProgressService {
       ([ref, status]) =>
         validRefs.has(ref) && status === ProgressStatus.COMPLETED,
     ).length;
+
+    progress.last_activity_at = new Date();
+    if (progress.status === ProgressStatus.COMPLETED) {
+      progress.completed_at ??= new Date();
+    } else {
+      progress.completed_at = null;
+    }
 
     await this.progressRepository.save(progress);
   }

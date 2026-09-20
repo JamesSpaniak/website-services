@@ -1,4 +1,5 @@
 import type { UnitData } from '@/app/lib/types/course';
+import { unitPath } from '@/app/lib/auth-redirect';
 
 export interface FlatUnitNode {
     id: string;
@@ -98,6 +99,20 @@ export function unitNavNeighbors(
     return {
         prev: idx > 0 ? sequence[idx - 1] : null,
         next: idx < sequence.length - 1 ? sequence[idx + 1] : null,
+    };
+}
+
+/** Canonical href + title for the next node in depth-first order. */
+export function nextUnitLink(
+    courseId: number,
+    units: UnitData[] | undefined,
+    currentId: string,
+): { href: string; title: string } | null {
+    const next = unitNavNeighbors(units, currentId).next;
+    if (!next) return null;
+    return {
+        href: unitPath(courseId, next.rootUnitId, next.depth > 0 ? next.id : null),
+        title: next.title,
     };
 }
 

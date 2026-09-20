@@ -13,6 +13,8 @@ Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AGENTS.md).
 | [`visuals/`](visuals/) | Brand kit | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 | [`media/`](media/) | Marketing flight masters + snips (gitignored binaries; tracked manifests) | [`media/README.md`](media/README.md), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 
+Long-term Drive + git layout (canonical `courses/` + `marketing/` + `images/inbox`, merge map, rclone rules): [`docs/tech/assets-and-drive-storage-plan.md`](../docs/tech/assets-and-drive-storage-plan.md). Do not rearrange Drive or `assets/` until executing a named step in that plan.
+
 Course lesson video sources live inside the course folder (`courses/<course>/videos/`, gitignored) — there is no separate top-level `videos/` folder. New course material lands in the matching `courses/<course>/` subfolder: question CSVs → `questions/`, unit figures / hero art → `images/`, maps · sectionals · symbol legends → `reference/`, recordings → `videos/`.
 
 ## Before editing course content
@@ -30,6 +32,8 @@ Course lesson video sources live inside the course folder (`courses/<course>/vid
 | Course tree, units, exam pools | [`docs/tech/course-content-restructure-plan.md`](../docs/tech/course-content-restructure-plan.md) |
 | Question import stats, gaps, scripts | [`docs/tech/exam-generator-and-course-linking.md`](../docs/tech/exam-generator-and-course-linking.md), `assets/courses/README.md` |
 | Brand files or folder layout | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+| Merch art, tee blanks, or print-shop notes | [`docs/marketing/merch.md`](../docs/marketing/merch.md), `assets/visuals/Assets/Merch/README.md` |
+| Drive ↔ `assets/` tree, rclone remotes, dual-store rules | [`docs/tech/assets-and-drive-storage-plan.md`](../docs/tech/assets-and-drive-storage-plan.md) |
 | Marketing flight cuts / media layout | [`media/README.md`](media/README.md), [`media/manifests/`](media/manifests/), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 | Article/news inventory | [`docs/marketing/article-inventory.md`](../docs/marketing/article-inventory.md) |
 | Deployed to prod | [`docs/TODO.md`](../docs/TODO.md) → [`docs/TODO_COMPLETED.md`](../docs/TODO_COMPLETED.md) with date |

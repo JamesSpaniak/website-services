@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CourseData } from '@/app/lib/types/course';
-import { confirmCoursePurchase, createPaymentIntent, getCourseById, resendVerificationEmail } from '@/app/lib/api-client';
+import { confirmCoursePurchase, createPaymentIntent, createProCheckout, getCourseById } from '@/app/lib/api-client';
 import ImageComponent from './image';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import Link from 'next/link';
@@ -75,7 +75,6 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
     }, [redirectPath, course.id]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
     const [pendingPaymentIntentId, setPendingPaymentIntentId] = useState<string | null>(null);
     const [reconciling, setReconciling] = useState(false);
 
@@ -144,12 +143,8 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
             onPurchaseSuccess();
         } catch (err) {
             const message = err instanceof Error ? err.message : 'An unknown error occurred.';
-            if (message.includes('EMAIL_NOT_VERIFIED')) {
-                setError('Verify your email before purchasing.');
-            } else {
-                logger.error(err as Error, { context: 'Stripe Purchase Flow' });
-                setError(`Purchase failed: ${message}`);
-            }
+            logger.error(err as Error, { context: 'Stripe Purchase Flow' });
+            setError(`Purchase failed: ${message}`);
         } finally {
             setIsLoading(false);
         }
@@ -183,7 +178,7 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
                     <h2 className="text-2xl font-bold text-[var(--brand-foreground)]">Account required</h2>
                     <p className="mt-2 text-[var(--brand-muted)]">
                         Checkout is tied to your account so access survives sign-out and device changes.
-                        Create an account first, verify your email, then return here to pay.
+                        Create an account first, then return here to pay.
                     </p>
                     <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                         <Link href={registerHrefForCourse} className="inline-block px-6 py-2.5 font-semibold text-[var(--brand-black)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
@@ -199,43 +194,6 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
                 </div>
             </div>
         )
-    }
-
-    const needsVerification = user.email_verified === false;
-
-    const handleResendVerification = async () => {
-        setResendStatus('sending');
-        setError(null);
-        try {
-            await resendVerificationEmail();
-            setResendStatus('sent');
-        } catch (e) {
-            setError(e instanceof Error ? e.message : 'Could not send verification email.');
-            setResendStatus('idle');
-        }
-    };
-
-    if (needsVerification) {
-        return (
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-lg p-8 text-center">
-                    <h1 className="text-2xl font-bold text-[var(--brand-foreground)]">Verify your email to continue</h1>
-                    <p className="mt-3 text-[var(--brand-muted)]">
-                        We sent a verification link to <span className="font-medium text-[var(--brand-foreground)]">{user.email}</span>.
-                        Confirm your email before checkout — it keeps your purchase tied to the right account.
-                    </p>
-                    <button
-                        type="button"
-                        onClick={handleResendVerification}
-                        disabled={resendStatus === 'sending'}
-                        className="mt-6 inline-flex items-center justify-center px-6 py-2.5 font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
-                    >
-                        {resendStatus === 'sending' ? 'Sending…' : resendStatus === 'sent' ? 'Link sent — check your inbox' : 'Resend verification email'}
-                    </button>
-                    {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-                </div>
-            </div>
-        );
     }
 
     return (
@@ -262,7 +220,50 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
                 </div>
 
                 <div className="mt-8">
-                    <h2 className="text-xl font-semibold text-[var(--brand-foreground)]">Payment Information</h2>
+                    <h2 className="text-xl font-semibold text-[var(--brand-foreground)]">Choose access</h2>
+                    <p className="mt-1 text-sm text-[var(--brand-muted)]">
+                        Buy this course once for lifetime access, or subscribe to Pro for all courses month-to-month.
+                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="p-4 border border-[var(--brand-primary)] bg-[var(--brand-primary)]/5 rounded-lg">
+                            <p className="text-sm font-semibold text-[var(--brand-foreground)]">This course — one-time</p>
+                            <p className="mt-1 text-2xl font-bold text-[var(--brand-foreground)]">${course.price}</p>
+                            <p className="mt-1 text-xs text-[var(--brand-muted)]">Lifetime access to {course.title} only.</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                setIsLoading(true);
+                                setError(null);
+                                try {
+                                    const { url } = await createProCheckout({
+                                        duration: 'monthly',
+                                        successPath: `/courses/${course.id}?pro=success`,
+                                        cancelPath: `/courses/${course.id}?purchase=1`,
+                                    });
+                                    window.location.href = url;
+                                } catch (err) {
+                                    const message = err instanceof Error ? err.message : 'Could not start Pro checkout.';
+                                    if (message.includes('not configured')) {
+                                        setError('Pro membership is not available yet. Purchase this course below, or try again later.');
+                                    } else {
+                                        setError(message);
+                                    }
+                                    setIsLoading(false);
+                                }
+                            }}
+                            disabled={isLoading}
+                            className="p-4 border border-[var(--surface-border)] bg-[var(--comment-secondary-bg)] rounded-lg text-left hover:border-[var(--brand-primary)]/50 transition-colors disabled:opacity-50"
+                        >
+                            <p className="text-sm font-semibold text-[var(--brand-foreground)]">Pro — monthly</p>
+                            <p className="mt-1 text-sm text-[var(--brand-muted)]">All courses while subscribed. Manage or cancel anytime from your profile.</p>
+                            <span className="mt-2 inline-block text-xs font-medium text-[var(--brand-primary)]">Continue to Stripe Checkout →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="mt-8">
+                    <h2 className="text-xl font-semibold text-[var(--brand-foreground)]">Pay for this course</h2>
                     <div className="mt-4 p-4 border border-[var(--surface-border)] rounded-lg bg-[var(--comment-secondary-bg)]">
                         {/* This is the Stripe Card Element for securely collecting card details */}
                         <CardElement options={{ style: cardStyle }} />
@@ -270,7 +271,7 @@ export default function PurchaseFlow({ course, onPurchaseSuccess, redirectPath }
                 </div>
 
                 <div className="mt-8 text-center">
-                    <p className="text-sm text-[var(--brand-muted)]">This is a one-time payment for lifetime access.</p>
+                    <p className="text-sm text-[var(--brand-muted)]">One-time payment unlocks lifetime access to this course only.</p>
                     {pendingPaymentIntentId && (
                         <p className="mt-3 text-sm text-[var(--brand-muted)]">
                             Already charged?{' '}

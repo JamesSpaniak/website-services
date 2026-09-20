@@ -4,6 +4,8 @@ Source content and brand files for TheDroneEdge. Nothing here is served directly
 
 ```
 assets/
+├── Drone_Pathways_Curriculum_Sample_compressed.pdf
+│                       Competitor sample (PCS Edventures) — not our curriculum
 ├── courses/            One folder per course
 │   ├── faa-107/        Live Part 107 payload, questions, outlines, images
 │   │   ├── faa_107_course.json
@@ -27,8 +29,12 @@ assets/
 |--------|----------------|
 | [`courses/`](courses/) | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) · [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) |
 | [`articles/`](articles/) | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
-| [`visuals/`](visuals/) | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+| [`visuals/`](visuals/) | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) · merch: [`docs/marketing/merch.md`](../docs/marketing/merch.md) |
 | [`media/`](media/) | [`media/README.md`](media/README.md) · [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
+
+**Competitor curriculum samples** (not product content): `Drone_Pathways_Curriculum_Sample_compressed.pdf` — PCS Edventures FLEX UAV / Drone Pathways. Analysis: [`docs/sales/competitor-analysis.md`](../docs/sales/competitor-analysis.md) §12.
+
+**Drive + git storage plan:** [`docs/tech/assets-and-drive-storage-plan.md`](../docs/tech/assets-and-drive-storage-plan.md)
 
 **Agent guide:** [`AGENTS.md`](AGENTS.md)
 

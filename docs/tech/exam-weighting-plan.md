@@ -357,6 +357,79 @@ only the partition key differs. Not proposed for v1 because:
 - If desired later, a sensible default is "proportional to section leaf count" rather
   than hand-set percentages — that can be computed, not configured.
 
+## 6.1 Designated unit-test questions — weighting cannot replace priority
+
+**Aug 8 2026 tester feedback:** the Regulations unit quiz "pulls from multiple spots"
+(sheet lines 53, 108, 142). Scoping is correct — every question in a Unit 1 quiz is
+`unit_ref = u1`. The gap is *within* the unit.
+
+The author's sheet has three Regulations zones that the import flattens into one
+`priority: 2` pool:
+
+| Zone | Source rows | What the author meant | Imported |
+|---|---|---|---|
+| Mixed compiled bank | 2–242 (Regs rows interleaved with other categories) | Practice / section material | ~53 → u1 |
+| END OF EACH SECTION | 244–279 | Leaf-quiz candidates | 32 → u1 |
+| END OF UNIT QUIZ/TEST | 281–308 | *The* Unit 1 test — should always appear | 23 → u1 (3 more rows in this block are categorized Weather/Operations and went to u5/u9) |
+
+The unit quiz asks for 25 random questions from the 108 equally-ranked u1 rows, so by
+proportion it is mostly zone-1 and zone-2. There is no guarantee any designated test
+question appears. Only one u1 row is genuinely missing from the bank (row 294, broken
+answer D / 3 choices); 8 more were dropped as text-duplicates of earlier copies
+(including the first three test-block questions at 281/282/285, which already exist
+at 170–172).
+
+### Weighting vs priority
+
+| Mechanism | Controls | Can express "these exact questions must appear"? |
+|---|---|---|
+| **Blueprint weighting** (§2–3) | Proportions *between groups* ("23 of 60 from Operations") | No — still random *within* a bucket |
+| **Priority 1 / 2 / 3** | Guaranteed membership — P1 fills first, then P2, then P3 | Yes — that is the existing fill-order |
+
+The coworker's ask is a **membership** requirement ("all questions labeled test/quiz
+should be used, plus section questions so they see them more than once"). Weighting is
+the wrong tool. A v2 unit-scope bucket containing exactly the 27 test questions with
+`target_count = 27` would only guarantee full inclusion while supply equals target; the
+moment the author adds a 28th test question it degrades to random sampling inside the
+bucket. Priority expresses the intent directly and does not have that fragility.
+
+**Fix (import + count, not a new generator feature):**
+
+1. Parse the sheet's block markers in `scripts/build_unit_level_questions.py` and tag
+   END OF UNIT QUIZ/TEST rows `priority: 1`. The generator already fills P1 first.
+2. When a duplicate is skipped, if the *dropped* copy was in a test block, upgrade the
+   kept row to priority 1 (otherwise 281/282/285 stay P2 and lose their guaranteed slot).
+3. Raise the unit quiz `question_count` (currently 25 in `unit.tsx`) to ~35–40 so all
+   ~27 designated test questions appear *and* section questions still rotate in.
+4. Keep bank-level text-dedup — one DB row per unique text. Repetition should come from
+   the same question appearing in multiple exam contexts, not duplicate rows.
+
+Author to confirm the three cross-category rows physically inside the regs test block
+(287 → u5 visibility, 290/295 → u9 preflight / night illusions).
+
+### How the two compose
+
+Once both exist, they are complementary, not alternatives:
+
+- A 60-question practice exam **apportions slots by category** (weighting fixes the
+  FAA-band problem).
+- Each category's slots **fill with that category's P1 test-block questions first**
+  (priority fixes the "author's curated questions" problem).
+
+Shared root cause of both bugs: the import throws away metadata. Weighting already has
+what it needs (`unit_ref`). Guaranteed test questions do not — everything imports as
+priority 2.
+
+**Side effect of tagging test blocks P1 globally:** priority is per-question, not per
+exam type. If every unit's test block is P1, those questions will also dominate the
+60-question practice exams. Across all units the test blocks likely total well over 60,
+so without weighting a practice exam would become *entirely* test-block questions. With
+weighting they still lead, but only up to each category's quota. Accept this in v1 —
+curated questions leading the practice exam matches how the author built the source
+tests. If we later need "always include on unit quizzes, fully random on practice,"
+priority alone cannot distinguish those cases; that would need a separate `block` tag
+the generator only honors for `scope = 'unit'`.
+
 ## 7. Rollout plan
 
 1. **Migration** `AddExamBlueprints` — create `exam_blueprint_buckets`, add
@@ -394,3 +467,6 @@ only the partition key differs. Not proposed for v1 because:
 5. **Students in multiple organizations** — `organization_members` allows it; pick the
    most recent membership (or the org the exam page was reached through) and record the
    chosen `organization_id` in `blueprint_snapshot`. Rare today; decide before v1 ships.
+6. **P1 on practice exams** — accept that tagging unit-test blocks P1 also leads
+   practice exams with those questions (recommended, §6.1), or add a `block` tag later
+   so unit quizzes can guarantee membership without affecting `full_course` draws.

@@ -13,14 +13,14 @@ Subject: Drone Edge — quote for [Organization Name]
 
 Hi [Name],
 
-Thanks again for speaking with us about [program summary — e.g. CTE Part 107 pathway, Fall 2026].
+Thanks again for speaking with us about [program summary — e.g. CTE Part 107 + drone building, Fall 2026].
 
 Attached below is a draft quote for [Pilot / Classroom / Program] access to the Drone Edge platform. Summary:
 
 - Organization: [Legal name]
 - Term: [Start date] – [End date]
 - Seats: [N] students
-- Courses: FAA Part 107 — [course title]
+- Courses: FAA Part 107 (live)[; drone building — standing up, not a live LMS course yet]
 - Manager accounts: [N]
 - Total: $[AMOUNT] [USD] — [payment terms]
 
@@ -62,19 +62,24 @@ Subscription term: [Start] – [End]
 Included:
 - Drone Edge platform access for up to [N] student seats
 - Course: FAA Part 107 — [title] (Course ID [id] if known)
+- Drone building: [seats / standing-up — not live catalog] [optional: Base kit line, $X × N aircraft]
 - [N] organization manager account(s) with progress dashboard
 - Invite-code or bulk enrollment for students
 - [Onboarding: 1× 60-min virtual session | as listed]
 
 Not included:
 - FAA knowledge test fees (paid by student/testing center)
-- Drone hardware or field flight instruction
+- Drone hardware or field flight instruction unless a kit line is listed above
 - Custom LMS integration (SSO/LTI not included unless separately agreed)
-- Video & Photography / AI & Drones tracks (not yet generally available)
+- Video & Photography / AI & Drones (later — built on 107 + building; not year-1 SKUs)
 
 PRICING
 Line item: [Package name] — [N] seats — $[AMOUNT]
-[Optional line items]
+[Optional — kit] Base kit: [N] aircraft × $[UNIT]  [Solder | Pre-soldered +$25–40]
+[Optional — lab] Soldering lab: [budget $1,200 | standard $2,000 | top-up]
+[Optional — protection] Kit protection plan: [N] aircraft × $[FEE]/yr  (MM3 — do not include until priced)
+[Optional — visit] Technical visit / activity: [build day | maiden flight | PD] + travel  (MM6)
+[Optional — 3-year] Multi-year: [2 | 3] years, annual billing, [−X%] vs year-1 list  (MM4)
 Total: $[AMOUNT] USD
 
 Payment terms: [Net 30 | Due on receipt | PO required: Yes/No]
@@ -114,6 +119,10 @@ Seat cap: [N] active students (hard cap | soft cap with true-up)
 Courses licensed: [List]
 Price year 1: $[AMOUNT]
 [Price year 2/3 if fixed escalation]
+[3-year lock: same unit price years 1–3 | −X% vs annual — MM4 unsigned]
+Seat guarantee: unused seats credited within 30 days of launch (see money-model § 4.2 — not measurable until utilization views are trusted)
+Satisfaction guarantee: fix session after first unit if unused; remaining-term credit if still unused. Conditional on student logins.
+Kit protection: [included add-on line | not purchased]
 
 Support: [Email | onboarding calls as listed]
 ```
@@ -137,5 +146,6 @@ Have legal review before first use with a district.
 ## Related
 
 - [`packages.md`](packages.md)
+- [`money-model.md`](money-model.md) — 3-year terms, guarantees, kit/protection/visit lines (optional; do not invent prices)
 - [`rep-handoff.md`](rep-handoff.md)
 - [`workflows/sales/outreach.md`](../../workflows/sales/outreach.md) § Sales package checklist

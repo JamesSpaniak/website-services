@@ -87,27 +87,36 @@ export class AuthController {
 
   @ApiOperation({
     summary: 'Log in a user',
-    description: 'Authenticates a user and returns tokens and user profile.',
+    description:
+      'Authenticates by username or email and returns tokens and user profile. 401 messages distinguish unknown identifier vs wrong password.',
   })
   @ApiResponse({ status: 200, description: 'Login successful.' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials.' })
+  @ApiResponse({
+    status: 401,
+    description:
+      'No account found with that username or email, or incorrect password.',
+  })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginCredentialsDto: LoginCredentialsDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateUser(
-      loginCredentialsDto.username,
-      loginCredentialsDto.password,
-    );
-    if (!user) {
-      this.analyticsService.recordLoginFailed(loginCredentialsDto.username);
-      throw new UnauthorizedException('Invalid credentials');
+    let user;
+    try {
+      user = await this.authService.validateUser(
+        loginCredentialsDto.username,
+        loginCredentialsDto.password,
+      );
+    } catch (err) {
+      if (err instanceof UnauthorizedException) {
+        this.analyticsService.recordLoginFailed();
+      }
+      throw err;
     }
     const tokens = await this.authService.login(user);
     this.setAuthCookies(res, tokens);
-    this.analyticsService.recordLogin(user.id, user.username);
+    this.analyticsService.recordLogin();
     const userFull = plainToInstance(UserFull, user, {
       excludeExtraneousValues: true,
     });
@@ -136,7 +145,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     const result = await this.authService.registerUser(registerDto);
-    this.analyticsService.recordRegistration(registerDto.username);
+    this.analyticsService.recordRegistration();
     return result;
   }
 

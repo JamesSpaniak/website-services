@@ -2,6 +2,8 @@
 
 How Drone Edge measures product usage, conversions, and ad performance — what exists today, what to add for paid media, and where the boundary sits between **marketing analytics** and **system telemetry (OpenTelemetry)**.
 
+**Scope:** this doc covers **marketing attribution** — where a stranger came from and what the click cost. For what a user *does after the account exists* (usage, entitlement utilization, revenue joins, upsell triggers), see [`product-analytics.md`](product-analytics.md). The two share an event pipeline and consent model but answer different questions.
+
 Strategy this serves: [`docs/marketing/paid-acquisition.md`](../marketing/paid-acquisition.md). Frontend data flow: [`frontend-data.md`](frontend-data.md). API surface: [`backend-data.md`](backend-data.md). Infra: [`architecture.md`](architecture.md). Mobile/app question: [`pwa-and-mobile-app.md`](pwa-and-mobile-app.md).
 
 **Decided stack (Jul 2026):** **GA4** for platform reporting and Google Ads integration · **Meta Pixel + Conversions API** as the first paid channel · **Postgres `audit_logs` as the ledger of record** · **OpenTelemetry for ops only**. Sequenced build items live in [`docs/TODO.md`](../TODO.md) § Paid acquisition.
@@ -12,8 +14,9 @@ Strategy this serves: [`docs/marketing/paid-acquisition.md`](../marketing/paid-a
 
 | Layer | What exists | Where |
 |-------|-------------|-------|
-| Client events | `page_view`, `article_view`, `course_view`, `exam_start`, `exam_submit` via `sendBeacon` → `POST /api/analytics/event` | `drone/src/app/lib/analytics.ts`, `ui/components/page-analytics.tsx` |
-| Event ingestion | `AnalyticsController` → `AnalyticsService` → OpenTelemetry **counters** | `backend/src/analytics/` |
+| Client events | Batched `track()` → `POST /api/analytics/event` (5 s / 20 events / `sendBeacon` on pagehide, retry queue in `sessionStorage`); marketing, learning, assessment, commerce, offer, lifecycle and B2B events — see [`product-analytics.md`](product-analytics.md) § 5 | `drone/src/app/lib/analytics.ts`, `ui/components/page-analytics.tsx` |
+| Event ingestion | `AnalyticsController` → OpenTelemetry **counters** (marketing events) **and** `ProductEventsService` → Postgres `product_events` (every allow-listed event for a known user) | `backend/src/analytics/`, `backend/src/product-events/` |
+| Anonymous id | First-party random UUID in `localStorage['de:anon']`, sent with every batch (`anonymousId`); server stores only **intent** events for it (course/article/pricing views, `signup_started`, `checkout_started`, offer events — never `page_view`, never course-scoped learning events). One authenticated `identified` event per user per browser stitches it to `user_id`; skipped for org members. Runs on legitimate interest (see § Consent) — it is not an ad identifier and is never sent to a platform. Disclosed in `privacy/page.tsx` § 6 since 2026-09-12 (PA40). | `analytics.ts` (`anonymousId`, `identifyUser`), `product-event.dto.ts` (`isAnonymousStoredEvent`) |
 | Telemetry export | OTLP → Grafana Cloud (traces + metrics), auto-instrumentation loaded via `--require ./dist/src/telemetry.js` | `backend/src/telemetry.ts`, `terraform/ecs_backend.tf` |
 | Durable product events | Postgres `audit_logs` — `REGISTER`, `LOGIN`, `COURSE_STARTED`, `UNIT_COMPLETED`, `COURSE_COMPLETED`, `COURSE_PURCHASED`, `PRO_UPGRADE` | `backend/src/audit/` |
 | Purchase truth | Stripe `payment_intent.succeeded` webhook → `PurchaseService.purchaseCourse` → audit `COURSE_PURCHASED` | `backend/src/purchases/purchase.service.ts` |
@@ -211,7 +214,7 @@ For B2B, the valuable upload is not the form fill — it is `consultation_qualif
 There is no consent banner today. One is required before any non-essential pixel ships.
 
 - **Default to denied.** Implement Google Consent Mode v2 with `ad_storage`, `ad_user_data`, `ad_personalization`, and `analytics_storage` denied until the user acts. This is a Google requirement for EEA/UK traffic, and the default-denied posture is the right one for a US-primary education business regardless.
-- **First-party product analytics can run on legitimate interest** as long as it stays non-identifying pre-login; ad pixels cannot.
+- **First-party product analytics can run on legitimate interest** as long as it stays non-identifying pre-login; ad pixels cannot. The shipped anonymous id keeps to this: random, first-party, intent events only, no cross-site use; the link to a person is made only after that person creates an account. Mention it in `privacy/page.tsx` at the next privacy copy sync ([`legal-and-privacy-site-sync.md`](legal-and-privacy-site-sync.md)).
 - **Schools are a sensitive buyer.** Districts ask about student data handling during procurement. Heavy third-party tracking on `/schools` and course pages is a procurement liability, not just a privacy one. Consider scoping ad pixels to marketing surfaces and keeping the authenticated learning experience pixel-free.
 - Update `drone/src/app/privacy/page.tsx` in the same session as any pixel change, and follow [`legal-and-privacy-site-sync.md`](legal-and-privacy-site-sync.md).
 - No targeting or profiling of minors. CTE reach goes through educators.

@@ -270,6 +270,28 @@ async function confirmCoursePurchase(paymentIntentId: string): Promise<{ granted
     });
 }
 
+async function createProCheckout(options?: {
+    duration?: 'monthly' | 'yearly';
+    successPath?: string;
+    cancelPath?: string;
+}): Promise<{ url: string }> {
+    return apiClient('purchases/create-pro-checkout', {
+        method: 'POST',
+        body: JSON.stringify({
+            duration: options?.duration ?? 'monthly',
+            successPath: options?.successPath ?? '/profile?pro=success',
+            cancelPath: options?.cancelPath ?? '/profile?pro=canceled',
+        }),
+    });
+}
+
+async function createBillingPortal(returnPath = '/profile'): Promise<{ url: string }> {
+    return apiClient('purchases/billing-portal', {
+        method: 'POST',
+        body: JSON.stringify({ successPath: returnPath }),
+    });
+}
+
 // --- Media Upload ---
 
 interface PresignedUrlRequest {
@@ -402,11 +424,30 @@ import type {
     OrgCourse,
     MemberCourseProgressSummary,
     MemberCourseDetailedProgress,
+    MemberQuizHistory,
     UserOrganization,
 } from './types/organization';
 
 import type { AuditLogEntry, UserActivityResponse, OverviewStats, DailyMetric } from './types/audit';
 import type { CommentData } from './types/comment';
+import type {
+    UnitMediaResponse,
+    OrgEngagementResponse,
+    OrgUtilizationResponse,
+    MemberTimelineEvent,
+    ReportingOverview,
+    ReportingRevenue,
+    ReportingPro,
+    ReportingSignals,
+    ReportingHealth,
+    ReportingUtilization,
+    ActivationWeekRow,
+    OrgUtilizationRow,
+    CourseFunnelResponse,
+    CourseFunnelExamAttempt,
+    CohortRow,
+    User360,
+} from './types/analytics';
 
 async function getMyOrganization(): Promise<UserOrganization | null> {
     return apiClient('organizations/my');
@@ -550,9 +591,95 @@ async function getOrgCourseProgress(orgId: number, courseId: number, classId?: n
     return apiClient(`organizations/${orgId}/progress/${courseId}${query}`);
 }
 
+async function getOrgEngagement(orgId: number, days = 30, classId?: number): Promise<OrgEngagementResponse> {
+    const params = new URLSearchParams({ days: String(days) });
+    if (classId !== undefined) params.set('classId', String(classId));
+    return apiClient(`organizations/${orgId}/engagement?${params}`);
+}
+
+async function getOrgUtilization(orgId: number): Promise<OrgUtilizationResponse> {
+    return apiClient(`organizations/${orgId}/utilization`);
+}
+
+async function getOrgMemberTimeline(orgId: number, userId: number, limit = 100): Promise<MemberTimelineEvent[]> {
+    return apiClient(`organizations/${orgId}/members/${userId}/timeline?limit=${limit}`);
+}
+
+async function getOrgMemberExams(orgId: number, userId: number): Promise<MemberQuizHistory> {
+    return apiClient(`organizations/${orgId}/members/${userId}/exams`);
+}
+
+/** Browser-download URL for the manager CSV export (same-origin proxy carries the auth cookie). */
+function orgProgressCsvUrl(orgId: number, classId?: number): string {
+    const query = classId !== undefined ? `?classId=${classId}` : '';
+    return `/api/organizations/${orgId}/progress/export.csv${query}`;
+}
+
+// ── Reporting (admin) ──
+
+async function getReportingOverview(): Promise<ReportingOverview> {
+    return apiClient('reporting/overview');
+}
+
+async function getReportingActivation(days = 90): Promise<ActivationWeekRow[]> {
+    return apiClient(`reporting/activation?days=${days}`);
+}
+
+async function getReportingUtilization(): Promise<ReportingUtilization> {
+    return apiClient('reporting/utilization');
+}
+
+async function getReportingRevenue(months = 12): Promise<ReportingRevenue> {
+    return apiClient(`reporting/revenue?months=${months}`);
+}
+
+async function getReportingPro(months = 12): Promise<ReportingPro> {
+    return apiClient(`reporting/pro?months=${months}`);
+}
+
+async function getReportingOrganizations(): Promise<OrgUtilizationRow[]> {
+    return apiClient('reporting/organizations');
+}
+
+async function getReportingCourseFunnel(courseId: number): Promise<CourseFunnelResponse> {
+    return apiClient(`reporting/courses/${courseId}/funnel`);
+}
+
+async function getReportingCourseExamAttempts(
+    courseId: number,
+    examId: number,
+): Promise<CourseFunnelExamAttempt[]> {
+    return apiClient(`reporting/courses/${courseId}/exams/${examId}/attempts`);
+}
+
+async function getReportingCohorts(): Promise<CohortRow[]> {
+    return apiClient('reporting/cohorts');
+}
+
+async function getReportingSignals(): Promise<ReportingSignals> {
+    return apiClient('reporting/signals');
+}
+
+async function getReportingHealth(): Promise<ReportingHealth> {
+    return apiClient('reporting/health');
+}
+
+async function getReportingUser360(userId: number): Promise<User360> {
+    return apiClient(`reporting/users/${userId}`);
+}
+
+async function refreshReporting(): Promise<Record<string, unknown>> {
+    return apiClient('reporting/refresh', { method: 'POST' });
+}
+
+function reportingCsvUrl(report: string, courseId?: number): string {
+    const query = courseId !== undefined ? `?courseId=${courseId}` : '';
+    return `/api/reporting/export/${report}.csv${query}`;
+}
+
 // ── Course Media (Signed URLs) ──
 
-async function getUnitMedia(courseId: number, unitId: string): Promise<{ video_url?: string }> {
+async function getUnitMedia(courseId: number, unitId: string): Promise<UnitMediaResponse> {
     return apiClient(`courses/${courseId}/units/${unitId}/media`);
 }
 
@@ -766,6 +893,8 @@ export {
     confirmCoursePurchase,
     logToServer,
     createPaymentIntent,
+    createProCheckout,
+    createBillingPortal,
     uploadMedia,
     deleteMedia,
     listMedia,
@@ -800,6 +929,26 @@ export {
     removeOrgCourse,
     getOrgProgress,
     getOrgCourseProgress,
+    getOrgEngagement,
+    getOrgUtilization,
+    getOrgMemberTimeline,
+    getOrgMemberExams,
+    orgProgressCsvUrl,
+    // Reporting (admin)
+    getReportingOverview,
+    getReportingActivation,
+    getReportingUtilization,
+    getReportingRevenue,
+    getReportingPro,
+    getReportingOrganizations,
+    getReportingCourseFunnel,
+    getReportingCourseExamAttempts,
+    getReportingCohorts,
+    getReportingSignals,
+    getReportingHealth,
+    getReportingUser360,
+    refreshReporting,
+    reportingCsvUrl,
     getMyActivity,
     getStudentActivity,
     getAnalyticsOverview,

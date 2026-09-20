@@ -1,6 +1,6 @@
 # Merch — tees, blanks, shops, artwork
 
-Working notes for Drone Edge shirts (events now, store later). Artwork lives in [`assets/visuals/Assets/Merch/`](../../assets/visuals/Assets/Merch/). Regenerator: [`scripts/build_merch_art.py`](../../scripts/build_merch_art.py).
+Working notes for Drone Edge shirts (events now, store later). Next dated event: [Action Space Boston, Oct 23–25 2026](action-space-hackathon-2026.md). Artwork lives in [`assets/visuals/Assets/Merch/`](../../assets/visuals/Assets/Merch/). Regenerator: [`scripts/build_merch_art.py`](../../scripts/build_merch_art.py).
 
 Source logo files (vector — send these, not article PNGs):
 

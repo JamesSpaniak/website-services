@@ -8,6 +8,7 @@ import { InviteCode } from './types/invite-code.entity';
 import { OrganizationController } from './organization.controller';
 import { OrganizationService } from './organization.service';
 import { OrgManagerGuard } from './org-manager.guard';
+import { OrgInsightsService } from './org-insights.service';
 import { Progress } from '../progress/types/progress.entity';
 import { Course } from '../courses/types/course.entity';
 import { CourseUnit } from '../courses/types/course-unit.entity';
@@ -30,7 +31,7 @@ import { EmailModule } from '../email/email.module';
     ConfigModule,
   ],
   controllers: [OrganizationController],
-  providers: [OrganizationService, OrgManagerGuard],
-  exports: [OrganizationService],
+  providers: [OrganizationService, OrgInsightsService, OrgManagerGuard],
+  exports: [OrganizationService, OrgInsightsService],
 })
 export class OrganizationModule {}
