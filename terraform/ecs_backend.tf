@@ -226,10 +226,6 @@ resource "aws_ecs_task_definition" "api_server" {
           valueFrom = aws_secretsmanager_secret.stripe_secret_key.arn
         },
         {
-          name      = "STRIPE_WEBHOOK_SECRET"
-          valueFrom = aws_secretsmanager_secret.stripe_webhook_secret.arn
-        },
-        {
           name      = "JWT_SECRET"
           valueFrom = aws_secretsmanager_secret.jwt_secret.arn
         },
@@ -250,6 +246,14 @@ resource "aws_ecs_task_definition" "api_server" {
           name      = "TEST_USER_PASSWORD"
           valueFrom = aws_secretsmanager_secret.test_user_password.arn
         }
+        ] : [], var.stripe_webhook_enabled ? [
+        {
+          # Secret shell always exists (secrets_stripe.tf); the value is only
+          # there once the Stripe webhook endpoint is configured. Referencing an
+          # empty secret makes every task fail with ResourceInitializationError.
+          name      = "STRIPE_WEBHOOK_SECRET"
+          valueFrom = aws_secretsmanager_secret.stripe_webhook_secret.arn
+        }
       ] : [])
       environment = concat([
         { name = "DB_HOST", value = aws_rds_cluster.aurora_cluster.endpoint },
@@ -269,13 +273,18 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "SUPPORT_EMAIL_FROM", value = var.support_email_from },
         { name = "ADMIN_EMAIL", value = var.admin_email },
         { name = "S3_MEDIA_BUCKET", value = aws_s3_bucket.media.bucket },
+        { name = "ANALYTICS_ARCHIVE_BUCKET", value = aws_s3_bucket.analytics_archive.bucket },
+        { name = "ANALYTICS_RETENTION_MONTHS", value = tostring(var.analytics_retention_months) },
+        { name = "ENTITLEMENTS_AUTHORITATIVE", value = tostring(var.entitlements_authoritative) },
         { name = "CLOUDFRONT_MEDIA_DOMAIN", value = "${var.media_subdomain}.${var.domain_name}" },
         { name = "OTEL_SERVICE_NAME", value = "droneedge" },
         { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "https://otlp-gateway-prod-us-east-2.grafana.net/otlp" },
         { name = "OTEL_EXPORTER_OTLP_PROTOCOL", value = "http/protobuf" },
         { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id },
         { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id },
-        { name = "SEED_TEST_DATA", value = tostring(var.seed_test_data) }
+        { name = "SEED_TEST_DATA", value = tostring(var.seed_test_data) },
+        { name = "STRIPE_PRO_PRICE_ID_MONTHLY", value = var.stripe_pro_price_id_monthly },
+        { name = "STRIPE_PRO_PRICE_ID_YEARLY", value = var.stripe_pro_price_id_yearly }
       ])
     }
   ])
@@ -284,9 +293,10 @@ resource "aws_ecs_task_definition" "api_server" {
   # when seeding) is registered/started.
   depends_on = [aws_secretsmanager_secret_version.test_user_password]
 
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
+  # No ignore_changes here on purpose: env vars added in this file must reach
+  # the task. pipeline.sh passes the new image URI as a var, applies (which
+  # registers a revision matching this file), then deploys the newest ACTIVE
+  # revision of the family. See workflows/tech/deploy.md § How it works.
 }
 
 resource "aws_ecs_service" "api_server" {
@@ -307,11 +317,10 @@ resource "aws_ecs_service" "api_server" {
     container_port   = 3000
   }
 
-  # pipeline.sh owns image rollouts: it registers new task definition revisions
-  # via the AWS CLI and points the service at them. Terraform's copy of the
-  # task definition is frozen (ignore_changes on container_definitions above),
-  # so without this rule every `terraform apply` would silently revert the
-  # service to the stale revision in state — rolling back deploys.
+  # pipeline.sh owns rollouts: after apply it points the service at the newest
+  # ACTIVE revision of the family. Without this rule an apply that touched the
+  # task definition would also re-point the service before the pipeline's
+  # health-checked rollout — keep terraform out of the service's revision.
   lifecycle {
     ignore_changes = [task_definition]
   }

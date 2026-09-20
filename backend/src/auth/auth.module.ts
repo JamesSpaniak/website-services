@@ -5,7 +5,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { UserThrottlerGuard } from 'src/common/user-throttler.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailModule } from 'src/email/email.module';
@@ -40,7 +41,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute
-        limit: 30, // 30 requests per minute for most routes
+        // 30 requests per minute per authenticated user (per IP for anonymous
+        // traffic) — see UserThrottlerGuard (PA32).
+        limit: 30,
       },
     ]),
   ],
@@ -49,7 +52,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     JwtStrategy,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: UserThrottlerGuard,
     },
   ],
   controllers: [AuthController],

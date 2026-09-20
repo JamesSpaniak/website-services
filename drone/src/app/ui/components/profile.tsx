@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { updateUser, getCoursesWithProgress, getMyActivity, uploadProfilePicture } from '@/app/lib/api-client';
+import { updateUser, getCoursesWithProgress, getMyActivity, uploadProfilePicture, createProCheckout, createBillingPortal, getProfile } from '@/app/lib/api-client';
 import { useAuth } from '@/app/lib/auth-context';
 import { CourseData } from '@/app/lib/types/course';
 import type { AuditLogEntry } from '@/app/lib/types/audit';
@@ -23,6 +23,8 @@ export default function ProfileComponent() {
     const [loginStreak, setLoginStreak] = useState(0);
     const [activityLoading, setActivityLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [billingBusy, setBillingBusy] = useState(false);
+    const [billingMessage, setBillingMessage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -91,6 +93,62 @@ export default function ProfileComponent() {
         fetchCourses();
         fetchActivity();
     }, [user]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const params = new URLSearchParams(window.location.search);
+        const pro = params.get('pro');
+        if (!pro) return;
+        (async () => {
+            try {
+                const refreshed = await getProfile();
+                setUser(refreshed);
+                if (pro === 'success') {
+                    setBillingMessage('Pro checkout completed. If access is not active yet, refresh in a moment or sign in again.');
+                } else if (pro === 'canceled') {
+                    setBillingMessage('Pro checkout was canceled. You can try again anytime.');
+                }
+            } catch {
+                setBillingMessage('Checkout finished — sign in again to refresh your membership status.');
+            }
+            window.history.replaceState({}, '', '/profile');
+        })();
+    }, [setUser]);
+
+    const isProActive =
+        user?.role === 'pro' &&
+        !!user.pro_membership_expires_at &&
+        new Date(user.pro_membership_expires_at) > new Date();
+
+    const handleUpgradeToPro = async () => {
+        setBillingBusy(true);
+        setBillingMessage(null);
+        setMessage(null);
+        try {
+            const { url } = await createProCheckout({ duration: 'monthly' });
+            window.location.href = url;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Could not start Pro checkout.';
+            setBillingMessage(
+                msg.includes('not configured')
+                    ? 'Pro membership is not configured in Stripe yet (price ID missing).'
+                    : msg,
+            );
+            setBillingBusy(false);
+        }
+    };
+
+    const handleManageBilling = async () => {
+        setBillingBusy(true);
+        setBillingMessage(null);
+        try {
+            const { url } = await createBillingPortal('/profile');
+            window.location.href = url;
+        } catch (err) {
+            setBillingMessage(err instanceof Error ? err.message : 'Could not open billing portal.');
+            setBillingBusy(false);
+        }
+    };
 
     const handleCourseReset = (courseId: number) => {
         setCourses(prevCourses => prevCourses.filter(c => c.id !== courseId));
@@ -263,10 +321,51 @@ export default function ProfileComponent() {
                     {/* Membership Type */}
                     <div>
                         <h4 className="text-sm font-medium text-[var(--brand-foreground)]">Membership</h4>
+                        <p className="mt-1 text-xs text-[var(--brand-muted)]">
+                            Buy courses individually for lifetime access, or subscribe to Pro for all courses while active.
+                            School / Enterprise plans are sold via consultation — not self-serve.
+                        </p>
+                        {billingMessage && (
+                            <p className="mt-2 text-sm text-[var(--brand-muted)]">{billingMessage}</p>
+                        )}
                         <div className="mt-2 flex flex-wrap gap-2">
-                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md bg-[var(--surface)] text-[var(--brand-muted)] cursor-not-allowed">Basic (Current)</button>
-                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90">Upgrade to Pro</button>
-                            <button type="button" className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90">Upgrade to Enterprise</button>
+                            <span className={`px-4 py-2 border border-[var(--surface-border)] rounded-md text-sm ${!isProActive ? 'bg-[var(--surface)] text-[var(--brand-muted)]' : 'bg-[var(--comment-secondary-bg)] text-[var(--brand-foreground)]'}`}>
+                                {isProActive ? 'Basic' : 'Basic (Current)'}
+                            </span>
+                            {isProActive ? (
+                                <>
+                                    <span className="px-4 py-2 border border-[var(--brand-primary)]/40 bg-[var(--brand-primary)]/10 rounded-md text-sm text-[var(--brand-foreground)]">
+                                        Pro (active
+                                        {user.pro_membership_expires_at
+                                            ? ` until ${new Date(user.pro_membership_expires_at).toLocaleDateString()}`
+                                            : ''}
+                                        )
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={handleManageBilling}
+                                        disabled={billingBusy}
+                                        className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90 disabled:opacity-50"
+                                    >
+                                        {billingBusy ? 'Opening…' : 'Manage billing'}
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleUpgradeToPro}
+                                    disabled={billingBusy || user.role === 'admin'}
+                                    className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90 disabled:opacity-50"
+                                >
+                                    {billingBusy ? 'Redirecting…' : 'Upgrade to Pro (monthly)'}
+                                </button>
+                            )}
+                            <a
+                                href="/consultation"
+                                className="px-4 py-2 border border-[var(--surface-border)] rounded-md text-[var(--brand-foreground)] bg-[var(--comment-secondary-bg)] hover:opacity-90"
+                            >
+                                Enterprise / schools → consult
+                            </a>
                         </div>
                     </div>
                 </div>

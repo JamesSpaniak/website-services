@@ -21,6 +21,10 @@ import { AuditAction } from '../audit/types/audit-action.enum';
 import { AnalyticsService } from '../analytics/analytics.service';
 import * as crypto from 'crypto';
 
+export const LOGIN_USER_NOT_FOUND =
+  'No account found with that username or email.';
+export const LOGIN_BAD_PASSWORD = 'Incorrect password.';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -37,15 +41,15 @@ export class AuthService {
     private analyticsService: AnalyticsService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    this.logger.debug(`validateUser called for username="${username}"`);
+  async validateUser(identifier: string, pass: string): Promise<User> {
+    this.logger.debug(`validateUser called for identifier="${identifier}"`);
 
-    const user = await this.usersService.getUserByUsername(username);
+    const user = await this.usersService.findForLogin(identifier);
     if (!user) {
       this.logger.warn(
-        `Login failed: no user found with username="${username}"`,
+        `Login failed: no user found with identifier="${identifier}"`,
       );
-      return null;
+      throw new UnauthorizedException(LOGIN_USER_NOT_FOUND);
     }
 
     this.logger.debug(
@@ -58,13 +62,13 @@ export class AuthService {
     );
     if (!passwordMatch) {
       this.logger.warn(
-        `Login failed: incorrect password for user="${username}" (id=${user.id})`,
+        `Login failed: incorrect password for user="${user.username}" (id=${user.id})`,
       );
-      return null;
+      throw new UnauthorizedException(LOGIN_BAD_PASSWORD);
     }
 
     this.logger.log(
-      `Login validated successfully for user="${username}" (id=${user.id})`,
+      `Login validated successfully for user="${user.username}" (id=${user.id})`,
     );
     this.auditService.log(user.id, AuditAction.LOGIN);
     return user;
@@ -344,7 +348,7 @@ export class AuthService {
     this.logger.debug(
       `Token refreshed for user="${user.username}" (id=${user.id})`,
     );
-    this.analyticsService.recordTokenRefresh(user.id);
+    this.analyticsService.recordTokenRefresh();
 
     const new_refresh_token = `${selector}:${new_verifier}`;
 

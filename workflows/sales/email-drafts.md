@@ -6,11 +6,13 @@ Use these as starting points only. Personalize the first line, send a real human
 
 ## Product truth (read first)
 
-**Live today:** Safety Track — FAA Part 107 structured course, 600+ practice questions, org accounts, manager dashboard.
+**Live today:** FAA Part 107 — structured course, 600+ practice questions, org accounts, manager dashboard.
 
-**Roadmap (do not sell as available):** Creative Track (video/photo), STEM Track (AI & drones).
+**Year-1 applied course (sell the story, do not demo as live LMS):** Drone building — outline and kits in progress; quote seats + kits; not in the catalog yet.
 
-For all outbound in 2026, **lead with Part 107 + teacher visibility**. Use three-track language only as *pathway vision* ("students can grow from Part 107 into media and applied STEM as we ship those tracks") — not as "three courses you can buy today."
+**Later (do not sell as available):** Video & Photography, AI & Drones — built on 107 + building.
+
+For all outbound, **lead with Part 107 + drone building**. Video/AI only if they ask, as later tracks.
 
 See [`docs/sales/positioning.md`](../../docs/sales/positioning.md) and [`docs/sales/go-to-market-review.md`](../../docs/sales/go-to-market-review.md).
 
@@ -19,25 +21,26 @@ See [`docs/sales/positioning.md`](../../docs/sales/positioning.md) and [`docs/sa
 - **Length target.** First-touch emails should stay under 100 words. Follow-ups should stay under 60. Busy school administrators skim on mobile.
 - **Structure.** One personalized line. One value line. One short ask. One link maximum.
 - **One ask per email.** Either ask for a reply, ask for a routing referral, or ask for a 15-minute call. Not all three.
-- **Pick one angle.** Safety, Creative, STEM, career pathway, or funding. Do not stack angles in a first email.
+- **Pick one angle.** Part 107, building/kits, career pathway, or funding. Do not lead with Video or AI.
 - **Send from a real person.** Always sign with a name. Never use "team" signatures for first-touch.
 
 ## Our Three Tracks (naming + status)
 
 Use track names consistently; always pair with status when describing the product:
 
-- **Safety Track** — **Live.** FAA Part 107 preparation, airspace awareness, safe flight habits, risk planning, and responsible operation.
-- **Creative Track** — **Coming soon.** Drone photography, videography, storytelling, mapping, and portfolio-quality aerial media projects.
-- **STEM Track** — **Coming soon.** Flight systems, electronics, weather, data, problem solving, and applied engineering habits.
+- **Safety / Part 107** — **Live.** FAA Part 107 preparation, airspace, exams, teacher dashboard.
+- **Drone building** — **Standing up.** Real 3.5" stack, student frame, kits quoteable. Not a live catalog course.
+- **Creative / Video** — **Later.** Built on 107 + building.
+- **STEM / AI** — **Later.** Built on 107 + building.
 
-First-touch emails should sell **Safety / Part 107**. Mention the full three-track vision in follow-ups or when the buyer asks about media or CS pathways.
+First-touch emails should sell **Part 107 + building**. Do not stack Video or AI in a first email.
 
 ## Strengths to Highlight
 
 Lead with these. They are real differentiators against generic drone bundles or one-off enrichment activities.
 
-- **Three named tracks** that map to how schools already think (safety, creative, STEM).
 - **FAA Part 107-aligned** content with structured units, sub-units, and practice.
+- **Drone building** as the applied year-1 half (kits, not a keyed trainer).
 - **Progress tracking and org accounts** so teachers and program leads can see student progress at the course and unit level.
 - **Flexible delivery** — runs as a teacher-led classroom course, a hybrid course, or fully self-paced online.
 - **Built by the drone community.** The course is written by people who care about safe, competent operators, not just a checkbox certificate.
@@ -109,7 +112,7 @@ Drone Edge
 
 ## Initial Outreach Templates
 
-Each template targets a specific role. All are kept short on purpose. **Update three-track lines to Part 107–first** until Creative and STEM ship (see Product truth above).
+Each template targets a specific role. All are kept short on purpose. **Lead 107 + building**; Video/AI only if they ask (see Product truth above).
 
 ### 1. General First-Touch (any role)
 

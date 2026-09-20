@@ -1,6 +1,6 @@
 # Brand & marketing assets
 
-Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to avoid breaking script paths.
+Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to avoid breaking script paths. Planned merge of `visuals/` / `articles/` / `media/` under `assets/marketing/` (same tree on Google Drive): [`docs/tech/assets-and-drive-storage-plan.md`](../tech/assets-and-drive-storage-plan.md).
 
 ## Brand identity
 
@@ -12,6 +12,7 @@ Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to a
 | [`assets/visuals/Assets/Gradients/`](../../assets/visuals/Assets/Gradients/) | Gradient backgrounds |
 | [`assets/visuals/Assets/Social/`](../../assets/visuals/Assets/Social/) | Social media template images |
 | [`assets/visuals/Assets/Mockups/`](../../assets/visuals/Assets/Mockups/) | Device and scene mockups |
+| [`assets/visuals/Assets/Merch/`](../../assets/visuals/Assets/Merch/) | T-shirt print files (true-size SVG + 300 DPI PNG, white on transparent) and tee mockups; regenerate with `scripts/build_merch_art.py`. Plan, blanks, shops: [`docs/marketing/merch.md`](merch.md) |
 | [`assets/visuals/Prompt Guide/`](../../assets/visuals/Prompt%20Guide/) | Image/content prompt guide (docx) |
 | [`assets/visuals/Presentation/`](../../assets/visuals/Presentation/) | Visual identity PDF |
 

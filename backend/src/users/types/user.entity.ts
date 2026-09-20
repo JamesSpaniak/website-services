@@ -64,6 +64,14 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   pro_membership_expires_at: Date | null;
 
+  /** Stripe Customer id for Checkout / Billing Portal (subscriptions). */
+  @Column({ type: 'varchar', nullable: true })
+  stripe_customer_id?: string | null;
+
+  /** Active Stripe Subscription id for monthly Pro (null when canceled / expired). */
+  @Column({ type: 'varchar', nullable: true })
+  stripe_subscription_id?: string | null;
+
   @ManyToMany(() => Course, (course) => course.purchased_by_users)
   @JoinTable({ name: 'user_courses_purchased' })
   purchased_courses: Course[];

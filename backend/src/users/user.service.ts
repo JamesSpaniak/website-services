@@ -24,6 +24,8 @@ import { Course } from '../courses/types/course.entity';
 import { OrganizationMember } from '../organizations/types/organization-member.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
+import { EntitlementService } from '../commerce/entitlement.service';
+import { ProductEventsService } from '../product-events/product-events.service';
 
 @Injectable()
 export class UsersService {
@@ -36,6 +38,8 @@ export class UsersService {
     private orgMemberRepository: Repository<OrganizationMember>,
     private dataSource: DataSource,
     private auditService: AuditService,
+    private entitlements: EntitlementService,
+    private productEvents: ProductEventsService,
   ) {}
   private readonly logger = new Logger(UsersService.name);
 
@@ -78,6 +82,46 @@ export class UsersService {
     return this.userRepository.findOne({
       where: { email: email },
     });
+  }
+
+  /**
+   * Resolve a login identifier to a user. Accepts username or email.
+   * Username match is case-insensitive when the exact spelling misses
+   * (classrooms type Michael.Atkinson vs michael.atkinson). Email is
+   * always compared case-insensitively. If the identifier contains `@`,
+   * email is tried first.
+   */
+  async findForLogin(identifier: string): Promise<User | undefined> {
+    const ident = identifier.trim();
+    if (!ident) return undefined;
+
+    const ci = ident.toLowerCase();
+    const looksLikeEmail = ident.includes('@');
+    const withCourses = () =>
+      this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.purchased_courses', 'purchased_courses');
+
+    const byUsernameExact = () => this.getUserByUsername(ident);
+    const byUsernameCi = () =>
+      withCourses().where('LOWER(user.username) = :ci', { ci }).getOne();
+    const byEmailCi = () =>
+      withCourses().where('LOWER(user.email) = :ci', { ci }).getOne();
+
+    if (looksLikeEmail) {
+      return (
+        (await byEmailCi()) ||
+        (await byUsernameExact()) ||
+        (await byUsernameCi()) ||
+        undefined
+      );
+    }
+    return (
+      (await byUsernameExact()) ||
+      (await byUsernameCi()) ||
+      (await byEmailCi()) ||
+      undefined
+    );
   }
 
   async getUserByVerificationToken(token: string): Promise<User | undefined> {
@@ -264,14 +308,28 @@ export class UsersService {
       [userId, courseId, adminUserId],
     );
     if (!result.length) {
-      throw new BadRequestException('User already has access to this course.');
+      // Legacy row already there. Refuse only if the ledger agrees; otherwise
+      // an earlier ledger write failed — fall through and repair it (matters
+      // once ENTITLEMENTS_AUTHORITATIVE reads the ledger).
+      if (await this.entitlements.hasLiveAccess(userId, courseId)) {
+        throw new BadRequestException(
+          'User already has access to this course.',
+        );
+      }
+      this.logger.warn(
+        `grantCourseAccess: user ${userId} has course ${courseId} in legacy table only — repairing ledger`,
+      );
+    } else {
+      await this.incrementTokenVersion(userId);
+      this.auditService.log(adminUserId, AuditAction.COURSE_GRANTED, {
+        targetUserId: userId,
+        courseId,
+        courseTitle: course.title,
+      });
     }
-
-    await this.incrementTokenVersion(userId);
-    this.auditService.log(adminUserId, AuditAction.COURSE_GRANTED, {
-      targetUserId: userId,
-      courseId,
-      courseTitle: course.title,
+    await this.entitlements.grantCourse(userId, courseId, {
+      source: 'admin_grant',
+      grantedByUserId: adminUserId,
     });
   }
 
@@ -294,6 +352,7 @@ export class UsersService {
       targetUserId: userId,
       courseId,
     });
+    await this.entitlements.revokeCourse(userId, courseId, 'admin');
   }
 
   /**
@@ -327,8 +386,23 @@ export class UsersService {
     );
   }
 
+  /**
+   * Deletes the account and everything keyed on it. FK cascades cover
+   * progress, entitlements, video_progress, memberships; the analytics tables
+   * below are partitioned / FK-less by design, so they are cleared explicitly
+   * (privacy notice § 7 promises this — the S3 archive is out of scope, PD23).
+   */
   async deleteUser(id: number): Promise<void> {
-    await this.userRepository.delete(id);
+    await this.userRepository.manager.transaction(async (tx) => {
+      await tx.query(`DELETE FROM product_events WHERE user_id = $1`, [id]);
+      await tx.query(`DELETE FROM product_events_daily WHERE user_id = $1`, [
+        id,
+      ]);
+      await tx.query(`DELETE FROM exam_attempt_history WHERE user_id = $1`, [
+        id,
+      ]);
+      await tx.getRepository(User).delete(id);
+    });
   }
 
   async incrementTokenVersion(userId: number): Promise<void> {
@@ -361,6 +435,14 @@ export class UsersService {
         user.token_version = (user.token_version || 0) + 1; // Invalidate tokens
       }
       await this.userRepository.save(expiredUsers);
+      for (const user of expiredUsers) {
+        await this.entitlements.revokePro(user.id, 'expired');
+        this.auditService.log(user.id, AuditAction.PRO_EXPIRED, {});
+        void this.productEvents.record({
+          userId: user.id,
+          event: 'pro_expired',
+        });
+      }
       this.logger.log(
         `Deactivated ${expiredUsers.length} expired Pro memberships.`,
       );

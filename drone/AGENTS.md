@@ -22,6 +22,7 @@ Next.js app in `drone/src/app/`. Monorepo-wide rules: [`docs/AGENTS.md`](../docs
 | Area | Canonical doc |
 |------|----------------|
 | Pages, components, client data | [`docs/tech/frontend-data.md`](../docs/tech/frontend-data.md) |
+| Product events (`lib/analytics.ts` `track()`, heartbeat, video tracking), manager / admin analytics screens | [`docs/tech/frontend-data.md`](../docs/tech/frontend-data.md) § 5, [`docs/tech/analytics-queries.md`](../docs/tech/analytics-queries.md) (what each number means); event names must exist in `backend/src/product-events/types/product-event.dto.ts` |
 | Exam/course UX tied to backend scopes | [`docs/tech/exam-generator-and-course-linking.md`](../docs/tech/exam-generator-and-course-linking.md) |
 | B2C conversion / schools copy | [`docs/sales/features.md`](../docs/sales/features.md), marketing workflows |
 | Open UX backlog (app-review IDs) | [`docs/TODO.md`](../docs/TODO.md) |

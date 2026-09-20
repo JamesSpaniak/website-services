@@ -54,4 +54,8 @@ export class CourseUnit {
 
   @Column({ type: 'varchar', length: 512 })
   title: string;
+
+  /** True when the payload node carries a `video_url` — powers "videos watched x / y". */
+  @Column({ type: 'boolean', default: false })
+  has_video: boolean;
 }

@@ -104,6 +104,9 @@ export class EmailService {
       from: this.defaultFrom,
       to: adminEmail,
       subject: `New Contact Message from ${sanitizedName}`,
+      // Always include a text part: HTML-only mail scores worse with spam
+      // filters (Proofpoint/Mimecast at org gateways especially).
+      text: `Name: ${sanitizedName}\nContact: ${sanitizedContact}\n\nMessage:\n${sanitizedMessage}`,
       html: `
         <p><strong>Name:</strong> ${sanitizedName}</p>
         <p><strong>Contact:</strong> ${sanitizedContact}</p>
@@ -131,6 +134,7 @@ export class EmailService {
       from: this.supportFrom,
       to: user.email,
       subject: 'Your Password Reset Request',
+      text: `Hello ${user.username},\n\nYou requested a password reset. Open the link below to reset your password. This link is valid for 15 minutes.\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
       html: `
         <p>Hello ${user.username},</p>
         <p>You requested a password reset. Please click the link below to reset your password. This link is valid for 15 minutes.</p>
@@ -150,6 +154,7 @@ export class EmailService {
       from: this.supportFrom,
       to: user.email,
       subject: 'Verify your email address',
+      text: `Hello ${user.username},\n\nPlease verify your email address by opening the link below:\n\n${verifyLink}\n\nIf you did not create this account, please ignore this email.`,
       html: `
         <p>Hello ${user.username},</p>
         <p>Please verify your email address by clicking the link below:</p>
@@ -180,6 +185,7 @@ export class EmailService {
       from: this.supportFrom,
       to: email,
       subject: `You've been invited to join ${orgLabel}`,
+      text: `Hello,\n\nYou've been invited to join ${orgLabel} as ${roleLabel} on Drone Edge.\n\nCreate your account here:\n${signUpLink}\n\nThis invite link is single-use and will expire in 30 days.\nIf you did not expect this invitation, you can safely ignore this email.`,
       html: `
         <p>Hello,</p>
         <p>You've been invited to join <strong>${orgLabel}</strong> as ${roleLabel} on Drone Edge.</p>
@@ -209,11 +215,15 @@ export class EmailService {
     const courseList = courseTitles
       .map((t) => `<li>${sanitize(t)}</li>`)
       .join('');
+    const courseListText = courseTitles
+      .map((t) => `  - ${sanitize(t)}`)
+      .join('\n');
 
     await this.transporter.sendMail({
       from: this.supportFrom,
       to: email,
       subject: "You've been given access to Drone Edge",
+      text: `Hello,\n\nYou've been given access to the following course${courseTitles.length === 1 ? '' : 's'} on Drone Edge:\n\n${courseListText}\n\nCreate your account here — your access is applied automatically:\n${registerUrl}\n\nThis link is single-use. If you did not expect this email, you can safely ignore it.`,
       html: `
         <p>Hello,</p>
         <p>You've been given access to the following course${courseTitles.length === 1 ? '' : 's'} on Drone Edge:</p>
@@ -247,6 +257,7 @@ export class EmailService {
         from: this.defaultFrom,
         to: adminEmail,
         subject: `Free Consultation Request — ${org} (${role})`,
+        text: `New Consultation Request\n\nName: ${name}\nEmail: ${email}\nOrganization / School: ${org}\nRole: ${role}\nEstimated students: ${count}\nPreferred time: ${time}\n\nWhat they'd like to discuss:\n${topics}`,
         html: `
           <h2>New Consultation Request</h2>
           <p><strong>Name:</strong> ${name}</p>
@@ -265,6 +276,7 @@ export class EmailService {
         from: this.supportFrom,
         to: email,
         subject: "Your Drone Edge consultation request — we'll be in touch",
+        text: `Hi ${name},\n\nThanks for reaching out! We've received your consultation request and will contact you within one business day to confirm a time that works for you.\n\nWhat you submitted:\n  - Organization: ${org}\n  - Role: ${role}\n  - Preferred time: ${time}\n\nIn the meantime, feel free to reply to this email with any questions.\n\n— The Drone Edge Team`,
         html: `
           <p>Hi ${name},</p>
           <p>Thanks for reaching out! We've received your consultation request and will contact you within one business day to confirm a time that works for you.</p>
@@ -302,11 +314,19 @@ export class EmailService {
     const users: User[] = [];
     const emails = users.map((user) => user.email).filter((email) => !!email);
 
+    // Derive a plain-text part from the admin-authored HTML so broadcasts
+    // aren't HTML-only (a spam-filter penalty).
+    const broadcastText = sanitizeHtml(broadcastDto.message, {
+      allowedTags: [],
+      allowedAttributes: {},
+    }).trim();
+
     for (const email of emails) {
       await this.transporter.sendMail({
         from: this.defaultFrom,
         to: email,
         subject: broadcastDto.subject,
+        text: broadcastText,
         html: broadcastDto.message,
       });
     }

@@ -9,6 +9,7 @@ import { User } from '../users/types/user.entity';
 import { Question } from '../questions/types/question.entity';
 import { MediaService } from '../media/media.service';
 import { OrganizationService } from '../organizations/organization.service';
+import { EntitlementService } from '../commerce/entitlement.service';
 import { CourseDetails } from './types/course.dto';
 
 describe('CourseService', () => {
@@ -68,6 +69,10 @@ describe('CourseService', () => {
         },
         { provide: CourseUnitService, useValue: courseUnitService },
         { provide: DataSource, useValue: dataSource },
+        {
+          provide: EntitlementService,
+          useValue: { hasLiveAccess: jest.fn(async () => false) },
+        },
       ],
     }).compile();
 

@@ -56,7 +56,17 @@ Optional for purchase testing:
 ```bash
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+# Recurring Price IDs from Stripe Dashboard (Product → Price). Required for Pro Checkout.
+STRIPE_PRO_PRICE_ID_MONTHLY=price_...
+# STRIPE_PRO_PRICE_ID_YEARLY=price_...
+FRONTEND_URL=http://localhost:8080
 ```
+
+Webhook locally: `stripe listen --forward-to localhost:3000/purchases/webhook` and use the printed `whsec_...`.
+
+Subscribe events: `payment_intent.succeeded`, `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
+
+See [`purchase-flows.md`](purchase-flows.md).
 
 Optional admin seed overrides (migration `1760500000000-seed-admin-user.ts`):
 
