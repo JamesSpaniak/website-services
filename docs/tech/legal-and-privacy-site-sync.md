@@ -87,6 +87,7 @@ These are easy to miss because they are not on the invoice:
 | **Sitemap** | `drone/src/app/sitemap.ts` — `/legal` and `/privacy` (URLs use `SITE_URL` = apex by default) |
 | **“Last updated” (Terms)** | `TERMS_LAST_UPDATED` in `drone/src/app/legal/page.tsx` |
 | **“Last updated” (Privacy)** | `PRIVACY_LAST_UPDATED` in `drone/src/app/privacy/page.tsx` |
+| **Privacy § 4, § 6, § 7 (2026-09-12, PA40)** | § 4 tells org members their administrators/teachers see progress, video completion, exam results and activity; § 6 describes first-party analytics, the random `localStorage` anonymous id (linked to the account at sign-up, never created for org members, no third-party pixels today — consent will be asked if that changes); § 7 states ~12-month raw-event retention and deletion-on-request. Backed by `UserService.deleteUser` clearing `product_events`, `product_events_daily`, `exam_attempt_history`. Re-sync § 10 of the Sales Agreement PDF to match. |
 
 The `/legal` page includes a **controlling-document disclaimer**: the signed quote, Appendix A (term, fees, user limits), and any executed agreement override the web copy if they differ.
 

@@ -18,7 +18,7 @@ We support the industry’s mission: **safe operations, credible certification, 
 
 ## One-liner
 
-> **Drone Edge is Part 107–aligned drone education for CTE classrooms and serious self-paced pilots — structured paths, teacher visibility, and practice exams in the browser.**
+> **Drone Edge is FAA Part 107 plus drone building for CTE classrooms — certificate in the browser, then a real aircraft students design and assemble. Video, AI, and other tracks come later on that foundation.**
 
 ---
 
@@ -26,7 +26,7 @@ We support the industry’s mission: **safe operations, credible certification, 
 
 | Priority | Who | Job to be done |
 |----------|-----|----------------|
-| **Primary (B2B)** | CTE directors, STEM coordinators, career academy leads, CC workforce leads | Run a cert-aligned drone pathway with accountability, hybrid delivery, and procurement-friendly framing |
+| **Primary (B2B)** | CTE directors, STEM coordinators, career academy leads, CC workforce leads | Run a cert-aligned **and** hands-on drone pathway (107 + build) with accountability |
 | **Secondary (B2C)** | Career changers, hobbyists going commercial, tech/creative learners | Pass Part 107 (or explore drone careers) on their own schedule without flight-school pricing |
 | **Not primary (yet)** | Middle-school exploratory STEM, non-US regulatory prep | Different product shape; do not oversell Part 107 readiness |
 
@@ -65,15 +65,20 @@ We support the industry’s mission: **safe operations, credible certification, 
 
 ---
 
-## Three-track product story
+## What we sell now vs later
 
-| Track | Status | Buyer message |
+**Sales sells two things.** Everything else is foundation for later — mention if asked, never as a SKU today.
+
+| Offer | Status | Buyer message |
 |-------|--------|---------------|
-| **FAA Part 107** | Live | Structured units, 600+ practice questions (verify live count), unit and course exams, org dashboards |
-| **Video & Photography** | Coming soon | Creative/production pipeline — do not sell as available |
-| **AI & Drones** | Coming soon | STEM/CS pathway — do not sell as available |
+| **FAA Part 107** | **Live** | Structured units, practice exams, org dashboards. Demo this. |
+| **Drone building** | **In development** (outline + kits; not in the catalog yet) | Year-1 applied course: safety → CAD → assemble a 3.5" stack → failsafe → registered flight. Quote seats + kits. Do not demo as a live LMS course. |
+| **Video & Photography** | Later | Built on 107 + building (Video kit feeds this). Do not sell as available. |
+| **AI & Drones** | Later | Built on 107 + building. Do not sell as available. |
 
-Lead with **Part 107** in all school conversations. Mention other tracks as roadmap only when the buyer asks about media or CS pathways.
+**School conversations:** lead with **Part 107 (live) + drone building (standing up with it)**. Kits are a quote line, not a surprise. If they only want a flight-lab trainer with no certificate and no engineering, they are a closer fit for a FLEX-style vendor ([`competitor-analysis.md`](competitor-analysis.md) §12).
+
+**B2C:** still Part 107 self-serve until building has a retail SKU.
 
 ---
 
@@ -86,6 +91,7 @@ Lead with **Part 107** in all school conversations. Mention other tracks as road
 3. **Teacher visibility** — Cohort progress, exam scores, per-student activity (manager role).
 4. **Honest preparation depth** — Growing question bank; ACS-aligned framing; no fake pass-rate claims.
 5. **Funding language** — Link [`/schools/funding`](https://thedroneedge.com/schools/funding); never guarantee grant eligibility.
+6. **Build is the applied half** — Certificate then aircraft; not a keyed trainer they only bolt together. Kits quoted separately; courseware not live yet.
 
 ### For individuals (B2C)
 
@@ -104,6 +110,7 @@ See [`competitor-analysis.md`](competitor-analysis.md) for detail.
 
 - Modern web delivery + org progress visibility
 - Honest Part 107 pathway + practice density
+- Applied building (real stack, student frame) rather than a keyed school trainer
 - Partner posture (consultation, implementation support)
 
 **We lose or defer when the buyer requires:**
@@ -134,7 +141,9 @@ See [`competitor-analysis.md`](competitor-analysis.md) for detail.
 - Grant eligibility guarantees
 - SSO, Google Classroom, LTI, roster sync (roadmap)
 - Full Video/AI tracks as shippable today
+- Drone-building course as a live catalog product (it is not — quote as standing-up; kits are draft)
 - FAA exam fee included in price
+- FLEX-style “no engineering, just fly” as what we sell
 
 ---
 

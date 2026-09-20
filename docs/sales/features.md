@@ -67,7 +67,7 @@ We want to **push this knowledge to a wider audience**: career switchers, CTE cl
 |------|------------|
 | **Stripe** | Create payment intent, client confirm card, webhook grants access |
 | **Manual grant** | Admin **`POST /purchases/course`** for comps / support |
-| **Pro** | Admin path for Pro membership assignment (testing / comp) |
+| **Pro** | Stripe Checkout subscription (self-serve) + admin comp path; Customer Portal to cancel |
 
 ### Content (articles)
 

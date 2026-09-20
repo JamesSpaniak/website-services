@@ -74,7 +74,10 @@ resource "aws_wafv2_web_acl" "frontend" {
 
     statement {
       rate_based_statement {
-        limit              = 1000
+        # 20k / 5 min ≈ 66 rps per IP. 1k was tripping Chichester-style
+        # classrooms behind one NAT (RSC + analytics + /logs + login).
+        # Shared-IP policy still open: docs/TODO.md classroom rate limits.
+        limit              = var.waf_ip_rate_limit
         aggregate_key_type = "IP"
       }
     }

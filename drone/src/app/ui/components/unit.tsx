@@ -9,11 +9,15 @@ import SectionComponent from './section';
 import CourseUnitVideo from './course-unit-video';
 import ExamPlayer from './exam-player';
 import { PROSE_BODY } from '@/app/lib/prose-classes';
-import { findUnitInTree } from '@/app/lib/course-tree';
+import { findUnitInTree, nextUnitLink } from '@/app/lib/course-tree';
+import { useLessonHeartbeat } from '@/app/lib/use-lesson-heartbeat';
+import MarkCompleteBar from './mark-complete-bar';
 
 interface UnitComponentProps {
     unitData: UnitData;
     courseId: number;
+    /** Full course tree — used to resolve next-lesson links for the complete CTA. */
+    courseUnits?: UnitData[];
     /** Section id to auto-expand and scroll to (e.g. from a leaf-node redirect). */
     focusUnitId?: string | null;
     /** Question-bank counts per ref — hides exam CTAs for empty scopes. */
@@ -28,11 +32,15 @@ export function hasScopedQuestions(
     return counts == null || (counts[ref] ?? 0) > 0;
 }
 
-export default function UnitComponent({ unitData, courseId, focusUnitId, questionCounts }: UnitComponentProps) {
+export default function UnitComponent({ unitData, courseId, courseUnits, focusUnitId, questionCounts }: UnitComponentProps) {
     const [unit, setUnit] = useState<UnitData>(unitData);
     const { id, title, sub_units, description, text_content, video_url, status } = unit;
     const progressTarget =
         (focusUnitId ? findUnitInTree([unit], focusUnitId) : undefined) ?? unit;
+
+    // lesson_viewed on open + 30 s engaged-time heartbeats (video position rides
+    // along). Guests are dropped server-side (course-scoped events need a user).
+    useLessonHeartbeat(courseId, String(id));
 
     useEffect(() => {
         let cancelled = false;
@@ -72,6 +80,7 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
     };
 
     const unitScopeRef = String(id);
+    const next = nextUnitLink(courseId, courseUnits, String(id));
 
     return (
         <div className="relative z-10">
@@ -106,6 +115,7 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
                                 key={sub_unit.id}
                                 section={sub_unit}
                                 courseId={courseId}
+                                courseUnits={courseUnits}
                                 rootUnitId={String(id)}
                                 onStatusUpdate={handleSubUnitStatusUpdate}
                                 focusUnitId={focusUnitId}
@@ -122,6 +132,20 @@ export default function UnitComponent({ unitData, courseId, focusUnitId, questio
                         scopeRef={unitScopeRef}
                         label={`Unit: ${title}`}
                         questionCount={25}
+                        onSubmitted={(res) => {
+                            if (res && res.score >= 70) {
+                                void handleStatusUpdate(ProgressStatus.COMPLETED);
+                            }
+                        }}
+                    />
+                )}
+
+                {(!sub_units || sub_units.length === 0) && (
+                    <MarkCompleteBar
+                        status={status}
+                        onComplete={() => handleStatusUpdate(ProgressStatus.COMPLETED)}
+                        nextHref={next?.href}
+                        nextTitle={next?.title}
                     />
                 )}
             </div>

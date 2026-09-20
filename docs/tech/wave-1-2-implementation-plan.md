@@ -91,7 +91,7 @@ verify banner. Unit 1 free preview needs nothing but a session.
 |------|--------|
 | Allow unverified login | Remove the `is_email_verified` rejection in `validateUser`. |
 | Claim in JWT + profile | Add `email_verified: boolean` to the access-token payload and `GET /auth/profile` (`UserDto`). Token refresh picks up the new value after verify (or re-login; acceptable). |
-| Gate purchases | In `PurchaseController.createPaymentIntent` (and `confirmPayment`), load user and throw 403 `EMAIL_NOT_VERIFIED` when unverified. Keeps Stripe metadata trustworthy. |
+| Gate purchases | **Superseded Sep 2026** — purchases no longer require verified email. Keep soft banner / recovery nudge only. See [`pricing-model.md`](../sales/pricing-model.md). |
 | Gate invite consumption | `validateAndConsumeInviteCode` at register already runs pre-verify — leave (invite implies known email); no change. |
 | Resend endpoint | `POST /auth/resend-verification` (JWT): regenerate token + expiry, `sendEmailVerification`. Throttle `3/hour`. Today there is **no** resend path — dead end if the email is lost. |
 | Tests | e2e: unverified login succeeds; unverified `create-payment-intent` → 403; verify → purchase succeeds; resend flow. |

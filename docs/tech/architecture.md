@@ -69,7 +69,7 @@ flowchart TB
 |------|-----------|--------|
 | 1 | Browser | `https://thedroneedge.com`, `www`, `app`, `app.dev` |
 | 2 | Route 53 | A/ALIAS → frontend CloudFront |
-| 3 | WAFv2 | Managed rules + 1000 req/IP rate limit |
+| 3 | WAFv2 | Managed rules + **20 000 req/IP / 5 min** rate limit (`waf_ip_rate_limit`; was 1000, which blocked classroom NATs) |
 | 4 | CloudFront (frontend) | Origin = public ALB (HTTP). Caches `/_next/static/*`, `/images/*`; forwards cookies/Authorization on default behavior |
 | 5 | Public ALB | Host-based rules → frontend target group :8080 |
 | 6 | Next.js (`drone-frontend`) | SSR/RSC + client bundles. `/api/*` proxied server-side to internal ALB |
@@ -128,7 +128,7 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 |----------|--------------|--------|
 | CloudFront | `thedroneedge.com`, `www`, `app`, `app.dev` | Public ALB |
 | CloudFront | `media.thedroneedge.com` | S3 media bucket (OAC) |
-| WAFv2 ACL | Attached to **frontend** distribution only | — |
+| WAFv2 ACL | Attached to **frontend** distribution only | Rate limit `waf_ip_rate_limit` (default 20 000 / 5 min / IP) |
 | ACM cert | SANs: apex, www, app, app.dev, api, media | DNS validation in Route 53 |
 | CloudFront public key + key group | Video signing | Backend signs with private key in Secrets Manager |
 
@@ -151,6 +151,7 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 | `droneedge-dev-media` | Article/course/profile media; HLS output; CloudFront origin |
 | `droneedge-dev-raw-video` | Staging uploads for transcode; **7-day lifecycle expiry** |
 | `droneedge-dev-logs-{account_id}` | CloudWatch Logs export destination (versioned); policy for Logs service |
+| `droneedge-dev-analytics-archive` | **Live since 2026-09-12 (PA35).** Nightly `product_events` partition archives (`product_events/<partition>.ndjson.gz`, non-org rows). Versioned, AES256, lifecycle → Glacier Instant Retrieval at day 0, never expired. `terraform/analytics_archive.tf`. |
 
 ### Serverless — video pipeline
 
@@ -186,6 +187,8 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 
 DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
 
+**Email deliverability (verified Sep 2026):** SPF, DKIM (2048-bit, signing confirmed ON in Google Admin → Gmail → Authenticate email), and DMARC all pass and align. Mail path: app → NAT EIP → `smtp-relay.gmail.com` (IP allowlist, no auth) → recipient, so receivers see Google IPs and SPF passes via `include:_spf.google.com`. Google Admin → Reports → Email Log Search shows per-message relay results; "Delivered" only means the recipient gateway accepted — org filters (e.g. Proofpoint at school districts) can still quarantine silently afterward. When a district reports missing invites, give their IT the Message-ID from Email Log Search and ask them to release it and allowlist `thedroneedge.com`. All templates in `backend/src/email/email.service.ts` send multipart (text + HTML) — keep the `text:` part when adding templates; HTML-only mail is penalized by org gateways. Future B2C bulk mail must go on a separate subdomain via an ESP with its own DKIM, plus List-Unsubscribe (RFC 8058) — never through the transactional relay.
+
 ### Secrets Manager
 
 | Secret | Injected into |
@@ -210,7 +213,7 @@ Secret **values** are split by sensitivity:
 | Role | Used by | Attachments |
 |------|---------|-------------|
 | `droneedge-dev-ecs-task-execution-role` | Both tasks | `AmazonECSTaskExecutionRolePolicy`, custom Secrets Manager read |
-| `droneedge-dev-ecs-task-role` | Both tasks (API uses it; frontend largely unused) | CloudWatch Logs write (API log group), S3 media + CF invalidation |
+| `droneedge-dev-ecs-task-role` | Both tasks (API uses it; frontend largely unused) | CloudWatch Logs write (API log group), S3 media + CF invalidation, `s3:PutObject` on `analytics-archive/product_events/*` (PA35) |
 
 Separate roles: MediaConvert, transcode Lambdas, VPC flow logs.
 
@@ -231,6 +234,20 @@ Separate roles: MediaConvert, transcode Lambdas, VPC flow logs.
 |---------|--------|--------|-----------------|
 | API | ECS CPU avg | 75% | 1 / 5 |
 | Frontend | ECS CPU avg | 75% | 1 / 3 |
+
+### Cost down at low traffic
+
+Measured **17 Sep 2026** during a 30-student class: API CPU **4.2%**, frontend **3%**, Aurora **0.5 ACU**, &lt;1 DB connection. The stack is already the small Fargate size (512 / 1024) and Aurora’s Serverless v2 floor. Shrinking compute further is optional and small next to NAT + Aurora idle:
+
+| Lever | Approx save | Risk |
+|-------|-------------|------|
+| Fargate **256 CPU / 512 MiB** on both tasks (today ~10–12% of 1 GiB) | ~$15–18/mo | Next.js SSR + image peak could OOM; try API-only first |
+| Aurora Serverless v2 **pause to 0 ACU** after idle | ~$40/mo nights/weekends | First request after pause is ~15 s; class-hour resume is fine, health checks may flap |
+| **NAT Gateway** (already one) | ~$33/mo if removed | API still needs egress for Stripe, Gmail SMTP, Grafana OTLP — keep NAT or put tasks in public subnets with tight SGs (tradeoff) |
+| Disable VPC flow logs (`enable_vpc_flow_logs = false`) | low $ | Lose forensics |
+| Do **not** drop to 0 ECS tasks | — | ALB health checks + CloudFront origin need a warm task |
+
+Reference only — not on the active backlog (deferred Sep 17 2026). Revisit after a classroom week at the **20k WAF** limit looks clean.
 
 ---
 
@@ -312,7 +329,7 @@ ECS Fargate tasks run **one container each**—there are **no sidecar containers
 
 #### Deploy note
 
-Task definition uses `lifecycle.ignore_changes` on `container_definitions`; image updates go through **pipeline ECS task-def registration** (see [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md)).
+Terraform owns the task definition's `container_definitions` (no `ignore_changes` since 2026-09-12); the pipeline passes the image URI as a var, applies, then points the service at the newest revision of the family. The **service** ignores `task_definition` so an apply never rolls a deploy back. Secret references that may be empty (`TEST_USER_PASSWORD`, `STRIPE_WEBHOOK_SECRET`) are conditional on `seed_test_data` / `stripe_webhook_enabled` — see [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md) § How env vars reach the task.
 
 ---
 
@@ -333,7 +350,7 @@ Task definition uses `lifecycle.ignore_changes` on `container_definitions`; imag
 |---------|--------|
 | `DB_PASSWORD` | `db-credentials` (json key `password`) |
 | `STRIPE_SECRET_KEY` | `stripe-secret-key` |
-| `STRIPE_WEBHOOK_SECRET` | `stripe-webhook-secret` |
+| `STRIPE_WEBHOOK_SECRET` | `stripe-webhook-secret` — **only injected when `var.stripe_webhook_enabled = true`** (default false; the secret has no value yet). Until then `/purchases/webhook` rejects every call with 400 and Pro checkout fulfilment / renewals / refunds via Stripe events do not happen; one-time course purchases are unaffected (`confirm-payment` path). |
 | `JWT_SECRET` | `jwt-secret` |
 | `ADMIN_SEED_PASSWORD` | `admin-seed-password` |
 | `OTEL_EXPORTER_OTLP_HEADERS` | `grafana-otel-headers` |
@@ -352,6 +369,8 @@ Task definition uses `lifecycle.ignore_changes` on `container_definitions`; imag
 | `EMAIL_*`, `ADMIN_EMAIL` | Nodemailer → Google SMTP relay |
 | `OTEL_*` | Grafana Cloud traces/metrics |
 | `AWS_REGION` | SDK default region |
+| `ANALYTICS_ARCHIVE_BUCKET`, `ANALYTICS_RETENTION_MONTHS` | `terraform/analytics_archive.tf` + `ecs_backend.tf` (`var.analytics_retention_months` = 12) — **live since 2026-09-12** (PA35). When set, the nightly `AnalyticsMaintenanceService` archives `product_events` partitions older than N months (default 12) to `s3://<bucket>/product_events/<partition>.ndjson.gz` and drops them; requires `s3:PutObject` on the bucket in the task role and a Glacier IR lifecycle rule. Unset → archival is skipped and partitions accumulate. |
+| `ENTITLEMENTS_AUTHORITATIVE` | Terraform `var.entitlements_authoritative` — **`true` in prod since 2026-09-12 12:37 UTC** (task def :24; PA36). `hasAccess` reads the `entitlements` ledger instead of the legacy purchase/Pro columns; org seats unchanged. Set `false` and redeploy to roll back; the nightly `access_diff` check reports any disagreement. |
 
 #### IAM task role permissions
 

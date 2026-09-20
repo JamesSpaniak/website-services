@@ -23,6 +23,7 @@ import {
 import { EmailService } from '../email/email.service';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import { OrgInsightsService } from './org-insights.service';
 import {
   OrganizationResponse,
   OrganizationMemberResponse,
@@ -64,6 +65,7 @@ export class OrganizationService {
     private dataSource: DataSource,
     private emailService: EmailService,
     private configService: ConfigService,
+    private insights: OrgInsightsService,
   ) {}
 
   // ── Admin CRUD ──
@@ -664,6 +666,9 @@ export class OrganizationService {
         'p.units_completed',
         'p.units_total',
         'p.latest_exam_score',
+        'p.created_at',
+        'p.completed_at',
+        'p.last_activity_at',
       ])
       .where('p.userId IN (:...userIds)', { userIds: memberUserIds })
       .getMany();
@@ -706,11 +711,23 @@ export class OrganizationService {
           units_total:
             progress?.units_total ?? (courseUnitCounts.get(course.id) || 0),
           latest_exam_score: progress?.latest_exam_score ?? null,
+          started_at: progress?.created_at ?? null,
+          completed_at: progress?.completed_at ?? null,
+          last_activity_at: progress?.last_activity_at ?? null,
+          minutes_7d: 0,
+          videos_completed: 0,
+          videos_total: 0,
+          exams_taken: 0,
+          best_exam_score: null,
+          first_exam_score: null,
+          quizzes_passed: 0,
+          quizzes_attempted: 0,
+          effort: 'not_trying',
         });
       }
     }
 
-    return results;
+    return this.insights.enrichSummary(results);
   }
 
   async getOrgCourseDetailedProgress(
@@ -760,6 +777,14 @@ export class OrganizationService {
     for (const p of allProgress) {
       progressMap.set(p.userId, p);
     }
+    const videoState = await this.insights.videoStateByUser(
+      memberUserIds,
+      courseId,
+    );
+    const quizState = await this.insights.quizStateByUser(
+      memberUserIds,
+      courseId,
+    );
 
     return members.map((member) => {
       const progress = progressMap.get(member.userId);
@@ -790,6 +815,10 @@ export class OrganizationService {
         first_name: member.user.first_name,
         last_name: member.user.last_name,
         progress: mergedPayload as unknown as Record<string, unknown>,
+        unit_completed_at: progress?.unit_completed_at ?? {},
+        videos: videoState.get(member.userId) ?? {},
+        quizzes: quizState.get(member.userId) ?? {},
+        last_activity_at: progress?.last_activity_at ?? null,
       };
     });
   }
@@ -1011,9 +1040,7 @@ export class OrganizationService {
       where: { id: classId, organizationId: orgId },
     });
     if (!cls) {
-      throw new BadRequestException(
-        'Class not found in this organization.',
-      );
+      throw new BadRequestException('Class not found in this organization.');
     }
     return cls;
   }

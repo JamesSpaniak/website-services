@@ -13,6 +13,7 @@ export interface FlatCourseUnit {
   depth: number;
   position: number;
   title: string;
+  hasVideo: boolean;
 }
 
 const MAX_REF_LENGTH = 64;
@@ -97,6 +98,7 @@ export function normalizeAndFlattenUnits(
         depth,
         position,
         title: unit.title ?? '',
+        hasVideo: !!(unit.video_url && String(unit.video_url).trim()),
       });
       walk(unit.sub_units, ref, path, depth + 1);
     });

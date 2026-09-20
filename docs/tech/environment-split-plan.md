@@ -262,7 +262,7 @@ When traffic or load requires it, adjust in **prod state only**:
 | Aurora | 0.5–2 ACU | Raise max to 4–16 ACU; add reader instance if read-heavy |
 | CloudFront | Default | Already edge-scaled; tune cache behaviors |
 | NAT Gateway | Single | Monitor bandwidth; split VPC endpoints already present |
-| WAF rate limit | 1000 req/IP | Tune per real traffic patterns |
+| WAF rate limit | 20 000 req/IP / 5 min (`waf_ip_rate_limit`) | Was 1000; classroom NATs tripped it (Sep 2026). Further IP-set / path rules: TODO classroom rate limits |
 | VPC Flow Logs | Enabled | Disable in prod if cost spikes (`enable_vpc_flow_logs = false`) |
 | Log retention | 7 days | Adjust `cloudwatch_log_retention_days` |
 

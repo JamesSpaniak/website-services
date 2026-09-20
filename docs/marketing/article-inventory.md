@@ -72,7 +72,7 @@ These exist in `assets/articles/import/` — confirm Published/Hidden and dates 
 |----|------|-------|-----------|--------|---------|-------|
 | A | `b2c-01-part-107-study-guide` | How to Pass the Part 107 Exam (2026) | `b2c-01-part-107-study-guide.json` | Draft (repo) | — | Expand to 1,500+ words |
 | B | `b2c-02-practice-questions-prep` | Part 107 Practice Questions: What Good Prep Looks Like | `b2c-02-practice-questions-prep.json` | Draft (repo) | — | Rep objection handler |
-| C | `b2c-03-twenty-nine-vs-ground-school` | $29 Part 107 vs Ground School | `b2c-03-twenty-nine-vs-ground-school.json` | Draft (repo) | — | Confirm $29 in course JSON |
+| C | `b2c-03-twenty-nine-vs-ground-school` | $29 Part 107 vs Ground School | `b2c-03-twenty-nine-vs-ground-school.json` | Draft (repo) — **stale** | — | **Rewrite at $129** before publish. Slug and title still say $29 (Jul 2026 price). Course JSON is $129. |
 | D | — | From hobbyist to commercial (90 days) | — | **Not started** | — | Defer; `story-11-drone-careers` covers most |
 
 ### Non-article assets

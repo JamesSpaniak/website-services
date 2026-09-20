@@ -22,6 +22,7 @@ import {
 } from '@/app/lib/api-client';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
+import User360Panel from '@/app/ui/components/user-360-panel';
 import {
     PlusIcon,
     TrashIcon,
@@ -223,6 +224,7 @@ function UserRow({
     refreshUsers: () => Promise<void>;
 }) {
     const [grantCourseId, setGrantCourseId] = useState<number | ''>('');
+    const [show360, setShow360] = useState(false);
 
     const grantableCourses = courses.filter((c) => !user.courses.some((uc) => uc.id === c.id));
     const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
@@ -390,6 +392,20 @@ function UserRow({
                                     )}
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="mt-5 border-t border-[var(--surface-border)] pt-4">
+                            <button
+                                onClick={() => setShow360((v) => !v)}
+                                className="text-sm font-semibold text-[var(--brand-primary)] hover:underline"
+                            >
+                                {show360 ? 'Hide' : 'Show'} learning &amp; revenue (user 360)
+                            </button>
+                            {show360 && (
+                                <div className="mt-3">
+                                    <User360Panel userId={user.id} />
+                                </div>
+                            )}
                         </div>
                     </td>
                 </tr>

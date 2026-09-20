@@ -261,6 +261,26 @@ export class MemberCourseProgressSummary {
   units_completed: number;
   units_total: number;
   latest_exam_score: number | null;
+  // ── engagement (MP2 / MP5) ──
+  started_at: Date | null;
+  completed_at: Date | null;
+  last_activity_at: Date | null;
+  /** Minutes of lesson time in the last 7 days (rollup + today, live). */
+  minutes_7d: number;
+  videos_completed: number;
+  videos_total: number;
+  exams_taken: number;
+  /** Best submitted quiz/exam score on this course (0–100). */
+  best_exam_score: number | null;
+  first_exam_score: number | null;
+  /** Distinct lesson quizzes with at least one pass (≥70). */
+  quizzes_passed: number;
+  quizzes_attempted: number;
+  /**
+   * Gradebook signal: passing | trying | struggling | stopped | browsing | not_trying.
+   * See OrgInsightsService.quizEffort.
+   */
+  effort: string;
 }
 
 export class MemberCourseDetailedProgress {
@@ -269,4 +289,114 @@ export class MemberCourseDetailedProgress {
   first_name?: string;
   last_name?: string;
   progress: Record<string, unknown> | null;
+  /** Per-unit completion timestamps (ISO) keyed by unit ref. */
+  unit_completed_at?: Record<string, string>;
+  /** Video state keyed by unit ref. */
+  videos?: Record<
+    string,
+    { percent_watched: number; completed: boolean; position_seconds: number }
+  >;
+  /** Best/latest quiz for this unit, keyed by unit ref (scope_refs[1]). */
+  quizzes?: Record<
+    string,
+    {
+      attempts: number;
+      best: number;
+      latest: number;
+      passed: boolean;
+      last_submitted_at: string | null;
+    }
+  >;
+  last_activity_at?: Date | null;
+}
+
+export class MemberEngagementRow {
+  user_id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  class_id: number | null;
+  minutes: number;
+  lessons_viewed: number;
+  videos_completed: number;
+  units_completed: number;
+  exams_submitted: number;
+  active_days: number;
+  last_activity_at: Date | null;
+}
+
+export class OrgEngagementResponse {
+  days: number;
+  members: MemberEngagementRow[];
+  /** Org-wide minutes per day for the sparkline. */
+  series: { day: string; minutes: number; active_members: number }[];
+}
+
+export class OrgUtilizationResponse {
+  organization_id: number;
+  seats_purchased: number;
+  members: number;
+  invites_sent: number;
+  invites_redeemed: number;
+  members_activated: number;
+  members_engaged_7d: number;
+  members_engaged_30d: number;
+  members_completed: number;
+  avg_pct_complete: number;
+  hours_engaged_total: number;
+  hours_engaged_30d: number;
+  utilization_pct_30d: number;
+  courses_assigned: number;
+  /** Members who have not been active in the last 14 days (ids). */
+  stalled_member_ids: number[];
+}
+
+export class MemberTimelineEvent {
+  occurred_at: Date;
+  event_name: string;
+  course_id: number | null;
+  course_title: string | null;
+  unit_ref: string | null;
+  unit_title: string | null;
+  properties: Record<string, unknown>;
+}
+
+export class MemberQuizAttempt {
+  id: number;
+  exam_id: number;
+  course_id: number;
+  course_title: string | null;
+  scope: string;
+  exam_pool: string | null;
+  scope_refs: string[];
+  title: string;
+  attempt_no: number;
+  score: number;
+  passed: boolean;
+  submitted_at: Date;
+  section_breakdown: Record<string, unknown>[] | null;
+}
+
+export class MemberQuizSummary {
+  course_id: number;
+  course_title: string | null;
+  scope: string;
+  exam_pool: string | null;
+  scope_ref: string;
+  title: string;
+  attempts: number;
+  best: number;
+  latest: number;
+  first: number;
+  passed: boolean;
+  last_submitted_at: Date;
+}
+
+export class MemberQuizHistory {
+  effort: string;
+  minutes_7d: number;
+  exam_starts_30d: number;
+  exam_submits_30d: number;
+  quizzes: MemberQuizSummary[];
+  attempts: MemberQuizAttempt[];
 }

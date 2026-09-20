@@ -14,9 +14,11 @@ import {
     EnvelopeIcon,
     AcademicCapIcon,
     ClipboardDocumentListIcon,
+    ChartBarSquareIcon,
 } from '@heroicons/react/24/solid';
 
 const MANAGER_TABS: DashboardTab[] = [
+    { href: '/manager/overview', label: 'Overview', icon: ChartBarSquareIcon },
     { href: '/manager/members', label: 'Members', icon: UserGroupIcon },
     { href: '/manager/invites', label: 'Invites', icon: EnvelopeIcon },
     { href: '/manager/progress', label: 'Course Progress', icon: AcademicCapIcon },

@@ -5,7 +5,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, DataSource } from 'typeorm';
+import { ProductEventsService } from '../product-events/product-events.service';
+import { ProgressService } from '../progress/progress.service';
+import { ProgressStatus } from '../courses/types/course.dto';
 import {
   ExamAttempt,
   AttemptAnswer,
@@ -47,6 +50,9 @@ export class ExamAttemptService {
     private memberRepository: Repository<OrganizationMember>,
     @InjectRepository(CourseUnit)
     private courseUnitRepository: Repository<CourseUnit>,
+    private dataSource: DataSource,
+    private productEvents: ProductEventsService,
+    private progressService: ProgressService,
   ) {}
 
   // ── Submission ─────────────────────────────────────────────────────────────
@@ -130,6 +136,15 @@ export class ExamAttemptService {
 
     // Denormalize latest score into progress.exam_scores
     await this.updateProgressExamScores(userId, exam, score, breakdown);
+
+    // Append-only history (PA9) — exam_attempts stays latest-only.
+    await this.appendHistory(userId, exam, score, breakdown);
+
+    // Passing a lesson quiz is the strongest "I finished this" signal we have.
+    // Full-course practice/finals stay independent of unit completion (MPD1).
+    if (score >= 70 && exam.scope !== 'full_course') {
+      await this.markScopedUnitsComplete(userId, exam);
+    }
 
     this.logger.log(`User ${userId} scored ${score}% on exam ${examId}`);
 
@@ -297,6 +312,101 @@ export class ExamAttemptService {
       score_percent: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
       failed_standards: Array.from(s.failed_standards),
     }));
+  }
+
+  /**
+   * Inserts an exam_attempt_history row with the next attempt_no and emits
+   * the exam_submitted product event (+ per-section category scores).
+   * Non-fatal: the attempt is already saved.
+   */
+  private async appendHistory(
+    userId: number,
+    exam: Exam,
+    score: number,
+    breakdown: SectionBreakdown[],
+  ): Promise<void> {
+    try {
+      const rows: { attempt_no: number }[] = await this.dataSource.query(
+        `INSERT INTO exam_attempt_history
+           (user_id, exam_id, course_id, scope, scope_refs, exam_pool, attempt_no, score, section_breakdown)
+         VALUES ($1, $2, $3, $4, $5, $6,
+                 COALESCE((SELECT MAX(attempt_no) FROM exam_attempt_history WHERE user_id = $1 AND exam_id = $2), 0) + 1,
+                 $7, $8::jsonb)
+         RETURNING attempt_no`,
+        [
+          userId,
+          exam.id,
+          exam.course_id,
+          exam.scope,
+          exam.scope_refs ?? [],
+          exam.exam_pool ?? null,
+          score,
+          JSON.stringify(breakdown ?? []),
+        ],
+      );
+      const attemptNo = rows[0]?.attempt_no ?? 1;
+      void this.productEvents.record({
+        userId,
+        event: 'exam_submitted',
+        courseId: exam.course_id,
+        unitRef: exam.scope_refs?.[0] ?? null,
+        properties: {
+          exam_id: exam.id,
+          scope: exam.scope,
+          exam_pool: exam.exam_pool ?? null,
+          score,
+          attempt_no: attemptNo,
+          passed: score >= 70,
+        },
+      });
+      for (const s of breakdown ?? []) {
+        void this.productEvents.record({
+          userId,
+          event: 'exam_category_scored',
+          courseId: exam.course_id,
+          unitRef: s.sub_unit_ref ?? s.unit_ref ?? null,
+          properties: {
+            exam_id: exam.id,
+            attempt_no: attemptNo,
+            unit_ref: s.unit_ref,
+            unit_title: s.unit_title ?? null,
+            correct: s.correct,
+            total: s.total,
+            score_percent: s.score_percent,
+          },
+        });
+      }
+    } catch (err) {
+      this.logger.error(
+        `Failed to append exam history for user ${userId}: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  /**
+   * Mark each scoped unit COMPLETED after a passing quiz. Non-fatal: the
+   * attempt already saved. Idempotent via ProgressService (no second audit
+   * if the unit was already complete).
+   */
+  private async markScopedUnitsComplete(
+    userId: number,
+    exam: Exam,
+  ): Promise<void> {
+    for (const ref of exam.scope_refs ?? []) {
+      if (!ref) continue;
+      try {
+        await this.progressService.updateUnitProgress(
+          userId,
+          exam.course_id,
+          ref,
+          ProgressStatus.COMPLETED,
+        );
+      } catch (err) {
+        this.logger.warn(
+          `Could not auto-complete ${ref} after exam ${exam.id}: ${(err as Error).message}`,
+        );
+      }
+    }
   }
 
   /**

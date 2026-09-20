@@ -10,8 +10,12 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
+  BackfillOrderDto,
   ConfirmPurchaseDto,
+  CreateProCheckoutDto,
+  ProMembershipDuration,
   PurchaseCourseDto,
+  StripeReturnUrlsDto,
   UpgradeToProDto,
 } from './types/purchase.dto';
 import { PurchaseService } from './purchase.service';
@@ -62,16 +66,12 @@ export class PurchaseController {
   }
 
   /**
-   * Creates a Stripe Payment Intent for purchasing a course.
-   * This is the first step in the payment flow.
-   * @param req The Express request object.
-   * @param purchaseDto DTO containing the courseId.
-   * @returns An object containing the clientSecret for the Payment Intent.
+   * Creates a Stripe Payment Intent for purchasing a course (one-time, lifetime).
    */
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Create a Stripe Payment Intent for a course purchase',
+    summary: 'Create a Stripe Payment Intent for a one-time course purchase',
   })
   @ApiResponse({
     status: 201,
@@ -82,10 +82,41 @@ export class PurchaseController {
     @Request() req,
     @Body() purchaseDto: PurchaseCourseDto,
   ) {
-    await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
     return this.purchasesService.createPaymentIntent(
       req.user.userId,
       purchaseDto.courseId,
+    );
+  }
+
+  /**
+   * Stripe Checkout (subscription mode) for monthly/yearly Pro — all courses while active.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create Stripe Checkout session for Pro membership (subscription)',
+  })
+  @Post('create-pro-checkout')
+  async createProCheckout(@Request() req, @Body() dto: CreateProCheckoutDto) {
+    return this.purchasesService.createProCheckoutSession(
+      req.user.userId,
+      dto.duration ?? ProMembershipDuration.Monthly,
+      dto.successPath,
+      dto.cancelPath,
+    );
+  }
+
+  /**
+   * Stripe Customer Portal — manage/cancel Pro subscription.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe Billing Portal session' })
+  @Post('billing-portal')
+  async billingPortal(@Request() req, @Body() dto: StripeReturnUrlsDto) {
+    return this.purchasesService.createBillingPortalSession(
+      req.user.userId,
+      dto.successPath ?? '/profile',
     );
   }
 
@@ -99,7 +130,6 @@ export class PurchaseController {
   })
   @Post('confirm-payment')
   async confirmPayment(@Request() req, @Body() dto: ConfirmPurchaseDto) {
-    await this.purchasesService.assertEmailVerifiedForPurchase(req.user.userId);
     return this.purchasesService.confirmPaymentFromIntent(
       req.user.userId,
       dto.paymentIntentId,
@@ -108,23 +138,19 @@ export class PurchaseController {
 
   /**
    * Handles incoming webhook events from Stripe.
-   * This endpoint is public but secured by Stripe's signature verification.
-   * @param signature The 'stripe-signature' header.
-   * @param req The raw Express request object containing the raw body buffer.
+   * Public but secured by Stripe signature verification.
    */
-  @ApiExcludeEndpoint() // Exclude from Swagger UI as it's not for public consumption
+  @ApiExcludeEndpoint()
   @Post('webhook')
   async handleStripeWebhook(
     @Headers('stripe-signature') signature: string,
     @Request() req,
   ) {
-    // The raw body is needed for signature verification
     return this.purchasesService.handleWebhookEvent(req.body, signature);
   }
 
   /**
    * Upgrades the current user to Pro without Stripe (admin comp / testing).
-   * For paid Pro, use Stripe Checkout or Billing + webhooks (not implemented here).
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
@@ -149,5 +175,21 @@ export class PurchaseController {
       upgradeDto.duration,
     );
     return plainToInstance(UserFull, updatedUser);
+  }
+
+  /**
+   * Repairs course entitlements that have no order row by looking the payment
+   * up in Stripe (reconciliation checks `paid_grant_without_order` and
+   * `legacy_purchase_without_order`). Empty body = repair everything flagged.
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Backfill orders for entitlements missing one, from Stripe (Admin only)',
+  })
+  @Post('admin/backfill-order')
+  backfillOrder(@Body() dto: BackfillOrderDto) {
+    return this.purchasesService.backfillOrders(dto ?? {});
   }
 }

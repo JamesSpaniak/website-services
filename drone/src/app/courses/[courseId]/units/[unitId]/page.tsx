@@ -177,6 +177,7 @@ function UnitPageContent() {
                             key={pageUnit.id}
                             unitData={pageUnit}
                             courseId={parsedCourseId}
+                            courseUnits={course.units}
                             focusUnitId={validFocusUnitId}
                             questionCounts={course.question_counts}
                         />

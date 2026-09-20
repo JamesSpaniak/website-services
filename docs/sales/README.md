@@ -6,6 +6,8 @@ Positioning, market research, and contact strategy for school and B2B sales.
 |----------|-------------|
 | [positioning.md](positioning.md) | Vision, ICP, messaging, approved claims (B2B primary / B2C secondary) |
 | [packages.md](packages.md) | Offer ladder — retail + school Pilot / Classroom / Program |
+| [pricing-model.md](pricing-model.md) | Target vs current pricing, Stripe tech state, gaps & finish steps |
+| [money-model.md](money-model.md) | Attraction / upsell / downsell / continuity ladders per segment (B2C, schools, sponsors), kits & parts, website surfaces, open decisions |
 | [rep-handoff.md](rep-handoff.md) | Day-one schools rep guide — demo, qualification, objections |
 | [quote-template.md](quote-template.md) | Copy-paste quote skeleton for B2B deals |
 | [go-to-market-review.md](go-to-market-review.md) | GTM review — positioning, outreach, content, rep readiness |

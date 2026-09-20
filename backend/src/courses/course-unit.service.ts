@@ -43,6 +43,7 @@ export class CourseUnitService {
         depth: f.depth,
         position: f.position,
         title: f.title.slice(0, 512),
+        has_video: f.hasVideo,
       }),
     );
     await repo.save(rows);
