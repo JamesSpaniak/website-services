@@ -10,7 +10,10 @@ assets/media/
 └── edits/
     ├── snips/                # per-shot exports (gitignored)
     ├── stills/               # still copies for ads (gitignored)
-    └── previews/             # combined sample previews (gitignored)
+    ├── previews/             # combined sample previews (gitignored)
+    └── review/               # shot-selection working files (gitignored)
+        ├── thumbs/           # one contact-sheet thumb per master
+        └── frames/           # candidate frames pulled from each snip
 ```
 
 ## What belongs here
@@ -34,3 +37,18 @@ Course lesson source destined for the MediaConvert pipeline goes under the cours
 ## Manifests
 
 Tracked cut lists live in [`manifests/`](manifests/). After new flights, update the manifest in the same session as the snips.
+
+Review output splits by whether it is text or binary: the edit plan and motion
+report are decisions worth diffing, so they are tracked in `manifests/`
+(`2026-08-flights-edit-plan.{md,json}`, `2026-08-flights-motion-report.json`);
+the thumbs and candidate frames they refer to are binaries and live in
+`edits/review/`, gitignored like the rest of `edits/`.
+
+## 2026-09-19 — iCloud copy retired
+
+A second copy of the Aug 2026 flights lived in the iCloud Obsidian vault
+(`life-personal/assets/`). All 48 files were verified byte-identical to
+`raw/flights/` here — edge hashes on every file, full SHA256 on the largest
+5.5 GB — and the iCloud copy was deleted, freeing 14 GB. The review artifacts,
+which existed only there, were moved in as described above. This closes a
+standing violation of the rule above: masters were in iCloud.

@@ -1,0 +1,332 @@
+[
+  {
+    "clip": "0030",
+    "day": "2026-08-08",
+    "dur": 238.2,
+    "subject": "Cliff/forest long flight",
+    "theme": "scenic",
+    "full_grade": "D",
+    "snip_grade": "A",
+    "snip": "195-215s (20s A)",
+    "ad_use": "Hero after snip",
+    "alt": [
+      -84.2,
+      11.7
+    ]
+  },
+  {
+    "clip": "0029",
+    "day": "2026-08-08",
+    "dur": 126.8,
+    "subject": "Cliff + forest (long, snip)",
+    "theme": "scenic",
+    "full_grade": "F",
+    "snip_grade": "A",
+    "snip": "34-54s (20s A)",
+    "ad_use": "Hero after snip",
+    "alt": [
+      4.9,
+      80.0
+    ]
+  },
+  {
+    "clip": "0012",
+    "day": "2026-08-07",
+    "dur": 112.3,
+    "subject": "Power plant over water",
+    "theme": "industrial",
+    "full_grade": "D",
+    "snip_grade": "A",
+    "snip": "80-100s (20s A)",
+    "ad_use": "Niche / article only",
+    "alt": [
+      3.4,
+      30.1
+    ]
+  },
+  {
+    "clip": "0025",
+    "day": "2026-08-08",
+    "dur": 110.6,
+    "subject": "Mist band on mountainside",
+    "theme": "scenic",
+    "full_grade": "F",
+    "snip_grade": "B",
+    "snip": "0-20s (20s B)",
+    "ad_use": "Hero / Meta feed",
+    "alt": [
+      46.9,
+      119.8
+    ]
+  },
+  {
+    "clip": "0011",
+    "day": "2026-08-07",
+    "dur": 93.4,
+    "subject": "Need visual confirm",
+    "theme": "?",
+    "full_grade": "F",
+    "snip_grade": "A",
+    "snip": "53-73s (20s A)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      -6.3,
+      6.7
+    ]
+  },
+  {
+    "clip": "0013",
+    "day": "2026-08-07",
+    "dur": 92.2,
+    "subject": "Need visual confirm",
+    "theme": "?",
+    "full_grade": "F",
+    "snip_grade": "A",
+    "snip": "51-71s (20s A)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      2.8,
+      31.6
+    ]
+  },
+  {
+    "clip": "0010",
+    "day": "2026-08-07",
+    "dur": 91.0,
+    "subject": "Through-trees / canopy peek",
+    "theme": "texture",
+    "full_grade": "D",
+    "snip_grade": "A",
+    "snip": "13-32s (20s A)",
+    "ad_use": "Texture B-roll",
+    "alt": [
+      -1.4,
+      4.5
+    ]
+  },
+  {
+    "clip": "0008",
+    "day": "2026-08-07",
+    "dur": 78.1,
+    "subject": "Need visual confirm",
+    "theme": "scenic?",
+    "full_grade": "D",
+    "snip_grade": "A",
+    "snip": "6-26s (20s A)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      -39.7,
+      -15.1
+    ]
+  },
+  {
+    "clip": "0017",
+    "day": "2026-08-07",
+    "dur": 66.8,
+    "subject": "High altitude scenic?",
+    "theme": "scenic?",
+    "full_grade": "C",
+    "snip_grade": "A",
+    "snip": "8-28s (20s A)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      87.6,
+      118.7
+    ]
+  },
+  {
+    "clip": "0019",
+    "day": "2026-08-08",
+    "dur": 40.8,
+    "subject": "Mountain / ridge establish",
+    "theme": "scenic",
+    "full_grade": "B",
+    "snip_grade": "B",
+    "snip": "19-39s (20s B)",
+    "ad_use": "Hero / Meta feed",
+    "alt": [
+      46.7,
+      88.8
+    ]
+  },
+  {
+    "clip": "0014",
+    "day": "2026-08-07",
+    "dur": 37.4,
+    "subject": "Mini-golf / people",
+    "theme": "lifestyle",
+    "full_grade": "A",
+    "snip_grade": "A",
+    "snip": "0-20s (20s A)",
+    "ad_use": "Low brand fit",
+    "alt": [
+      4.5,
+      31.6
+    ]
+  },
+  {
+    "clip": "0006",
+    "day": "2026-08-07",
+    "dur": 21.0,
+    "subject": "Need visual confirm",
+    "theme": "scenic?",
+    "full_grade": "A",
+    "snip_grade": "A",
+    "snip": "0-20s (20s A)",
+    "ad_use": "Likely usable",
+    "alt": [
+      16.8,
+      19.6
+    ]
+  },
+  {
+    "clip": "0027",
+    "day": "2026-08-08",
+    "dur": 18.6,
+    "subject": "Short scenic",
+    "theme": "scenic?",
+    "full_grade": "B",
+    "snip_grade": "B",
+    "snip": "0-19s (20s B)",
+    "ad_use": "Use as-is (short)",
+    "alt": [
+      6.3,
+      13.4
+    ]
+  },
+  {
+    "clip": "0009",
+    "day": "2026-08-07",
+    "dur": 16.0,
+    "subject": "Need visual confirm",
+    "theme": "scenic?",
+    "full_grade": "B",
+    "snip_grade": "A",
+    "snip": "0-12s (12s A)",
+    "ad_use": "Likely usable",
+    "alt": [
+      -8.4,
+      6.3
+    ]
+  },
+  {
+    "clip": "0005",
+    "day": "2026-08-07",
+    "dur": 9.3,
+    "subject": "Valley / river gorge",
+    "theme": "scenic",
+    "full_grade": "A",
+    "snip_grade": "A",
+    "snip": "use full",
+    "ad_use": "Hero / Meta feed",
+    "alt": [
+      17.4,
+      17.6
+    ]
+  },
+  {
+    "clip": "0007",
+    "day": "2026-08-07",
+    "dur": 8.7,
+    "subject": "Need visual confirm",
+    "theme": "scenic?",
+    "full_grade": "A",
+    "snip_grade": "A",
+    "snip": "use full",
+    "ad_use": "Likely usable",
+    "alt": [
+      0.9,
+      9.0
+    ]
+  },
+  {
+    "clip": "0020",
+    "day": "2026-08-08",
+    "dur": 69.1,
+    "subject": "High mountain (partially jerky)",
+    "theme": "scenic",
+    "full_grade": "F",
+    "snip_grade": "B",
+    "snip": "8-28s (20s B)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      79.5,
+      119.6
+    ]
+  },
+  {
+    "clip": "0026",
+    "day": "2026-08-08",
+    "dur": 18.6,
+    "subject": "Landing/takeoff? short",
+    "theme": "scenic?",
+    "full_grade": "F",
+    "snip_grade": "B",
+    "snip": "0-12s (12s B)",
+    "ad_use": "Usable after trim",
+    "alt": [
+      -1.2,
+      18.4
+    ]
+  },
+  {
+    "clip": "0028",
+    "day": "2026-08-08",
+    "dur": 15.6,
+    "subject": "Short scenic",
+    "theme": "scenic?",
+    "full_grade": "B",
+    "snip_grade": "B",
+    "snip": "0-12s (12s B)",
+    "ad_use": "Use as-is (short)",
+    "alt": [
+      17.8,
+      20.2
+    ]
+  },
+  {
+    "clip": "0015",
+    "day": "2026-08-07",
+    "dur": 13.2,
+    "subject": "Need visual confirm",
+    "theme": "?",
+    "full_grade": "C",
+    "snip_grade": "C",
+    "snip": "0-12s (12s C)",
+    "ad_use": "Probably skip",
+    "alt": [
+      7.7,
+      17.9
+    ]
+  },
+  {
+    "clip": "0016",
+    "day": "2026-08-07",
+    "dur": 10.0,
+    "subject": "Valley road (jerky clip)",
+    "theme": "scenic",
+    "full_grade": "F",
+    "snip_grade": "F",
+    "snip": "use full",
+    "ad_use": "Skip",
+    "alt": [
+      95.0,
+      95.2
+    ]
+  },
+  {
+    "clip": "0018",
+    "day": "2026-08-07",
+    "dur": 7.9,
+    "subject": "Near ground / jerky",
+    "theme": "?",
+    "full_grade": "F",
+    "snip_grade": "F",
+    "snip": "use full",
+    "ad_use": "Skip",
+    "alt": [
+      -0.2,
+      1.1
+    ]
+  }
+]
