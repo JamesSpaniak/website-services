@@ -1,0 +1,1352 @@
+{
+ "variant": "base-stretch-x",
+ "kit": "base",
+ "version": "0.3.0",
+ "arm_style": "solid",
+ "mass": {
+  "total_g": 218.48712618703328,
+  "cg_mm": [
+   -3.1869284906971433,
+   0.00013044613038034648,
+   22.711532956986527
+  ],
+  "inertia_kgm2": {
+   "Ixx": 0.00030841713084375175,
+   "Iyy": 0.0005157697611569491,
+   "Izz": 0.0007168161551875025,
+   "Ixy": 1.1100781456068581e-08,
+   "Ixz": 6.528983742025462e-07,
+   "Iyz": 1.8312148501289387e-08
+  },
+  "table": [
+   {
+    "component": "Frame bottom + arms",
+    "kind": "frame",
+    "mass_g": 24.32,
+    "volume_mm3": 21273.8,
+    "source": "21274 mm\u00b3 \u00d7 1.27 \u00d7 0.9"
+   },
+   {
+    "component": "Frame top plate",
+    "kind": "frame",
+    "mass_g": 14.38,
+    "volume_mm3": 12581.3,
+    "source": "12581 mm\u00b3 \u00d7 1.27 \u00d7 0.9"
+   },
+   {
+    "component": "ESC 45A 4-in-1",
+    "kind": "electronics",
+    "mass_g": 7,
+    "volume_mm3": 5810.8,
+    "source": "BOM"
+   },
+   {
+    "component": "FC F722",
+    "kind": "electronics",
+    "mass_g": 9.9,
+    "volume_mm3": 3513.9,
+    "source": "BOM"
+   },
+   {
+    "component": "Standoff 1",
+    "kind": "hardware",
+    "mass_g": 1.5,
+    "volume_mm3": 226.2,
+    "source": "BOM"
+   },
+   {
+    "component": "Standoff 2",
+    "kind": "hardware",
+    "mass_g": 1.5,
+    "volume_mm3": 226.2,
+    "source": "BOM"
+   },
+   {
+    "component": "Standoff 3",
+    "kind": "hardware",
+    "mass_g": 1.5,
+    "volume_mm3": 226.2,
+    "source": "BOM"
+   },
+   {
+    "component": "Standoff 4",
+    "kind": "hardware",
+    "mass_g": 1.5,
+    "volume_mm3": 226.2,
+    "source": "BOM"
+   },
+   {
+    "component": "Motor 1 XILO 1404 (CW)",
+    "kind": "electronics",
+    "mass_g": 9.2,
+    "volume_mm3": 4012.0,
+    "source": "BOM"
+   },
+   {
+    "component": "Prop 1 Gemfan 3525 (CW)",
+    "kind": "prop",
+    "mass_g": 1.8,
+    "volume_mm3": 1453.3,
+    "source": "BOM"
+   },
+   {
+    "component": "Motor 2 XILO 1404 (CCW)",
+    "kind": "electronics",
+    "mass_g": 9.2,
+    "volume_mm3": 4012.0,
+    "source": "BOM"
+   },
+   {
+    "component": "Prop 2 Gemfan 3525 (CCW)",
+    "kind": "prop",
+    "mass_g": 1.8,
+    "volume_mm3": 1453.3,
+    "source": "BOM"
+   },
+   {
+    "component": "Motor 3 XILO 1404 (CCW)",
+    "kind": "electronics",
+    "mass_g": 9.2,
+    "volume_mm3": 4012.0,
+    "source": "BOM"
+   },
+   {
+    "component": "Prop 3 Gemfan 3525 (CCW)",
+    "kind": "prop",
+    "mass_g": 1.8,
+    "volume_mm3": 1453.3,
+    "source": "BOM"
+   },
+   {
+    "component": "Motor 4 XILO 1404 (CW)",
+    "kind": "electronics",
+    "mass_g": 9.2,
+    "volume_mm3": 4012.0,
+    "source": "BOM"
+   },
+   {
+    "component": "Prop 4 Gemfan 3525 (CW)",
+    "kind": "prop",
+    "mass_g": 1.8,
+    "volume_mm3": 1453.3,
+    "source": "BOM"
+   },
+   {
+    "component": "Prop guard 1 (TPU)",
+    "kind": "guard",
+    "mass_g": 6.47,
+    "volume_mm3": 6293.3,
+    "source": "6293 mm\u00b3 \u00d7 1.21 \u00d7 0.85"
+   },
+   {
+    "component": "Prop guard 2 (TPU)",
+    "kind": "guard",
+    "mass_g": 6.47,
+    "volume_mm3": 6293.3,
+    "source": "6293 mm\u00b3 \u00d7 1.21 \u00d7 0.85"
+   },
+   {
+    "component": "Prop guard 3 (TPU)",
+    "kind": "guard",
+    "mass_g": 6.47,
+    "volume_mm3": 6293.3,
+    "source": "6293 mm\u00b3 \u00d7 1.21 \u00d7 0.85"
+   },
+   {
+    "component": "Prop guard 4 (TPU)",
+    "kind": "guard",
+    "mass_g": 6.47,
+    "volume_mm3": 6293.3,
+    "source": "6293 mm\u00b3 \u00d7 1.21 \u00d7 0.85"
+   },
+   {
+    "component": "Battery Flywoo Explorer 1000 mAh 3S LiHV 80C XT30UP (assumed)",
+    "kind": "battery",
+    "mass_g": 66,
+    "volume_mm3": 34443.3,
+    "source": "BOM"
+   },
+   {
+    "component": "Battery strap",
+    "kind": "hardware",
+    "mass_g": 3,
+    "volume_mm3": 1488.0,
+    "source": "BOM"
+   },
+   {
+    "component": "BeeID GPS + Remote ID",
+    "kind": "electronics",
+    "mass_g": 5.2,
+    "volume_mm3": 2816.0,
+    "source": "BOM"
+   },
+   {
+    "component": "ELRS RX",
+    "kind": "electronics",
+    "mass_g": 0.8,
+    "volume_mm3": 1152.0,
+    "source": "BOM"
+   },
+   {
+    "component": "Capacitor (low-ESR, on BAT pads)",
+    "kind": "hardware",
+    "mass_g": 3.0,
+    "volume_mm3": 603.2,
+    "source": "BOM"
+   },
+   {
+    "component": "Wire: Motor 1 leads (3\u00d7 22 AWG)",
+    "kind": "wire",
+    "mass_g": 0.57,
+    "volume_mm3": 358.2,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "Wire: Motor 2 leads (3\u00d7 22 AWG)",
+    "kind": "wire",
+    "mass_g": 0.57,
+    "volume_mm3": 358.1,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "Wire: Motor 3 leads (3\u00d7 22 AWG)",
+    "kind": "wire",
+    "mass_g": 0.57,
+    "volume_mm3": 358.1,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "Wire: Motor 4 leads (3\u00d7 22 AWG)",
+    "kind": "wire",
+    "mass_g": 0.57,
+    "volume_mm3": 358.2,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "Wire: Battery leads (2\u00d7 14 AWG)",
+    "kind": "wire",
+    "mass_g": 0.23,
+    "volume_mm3": 141.6,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "Wire: RX harness (4 wires)",
+    "kind": "wire",
+    "mass_g": 0.2,
+    "volume_mm3": 122.8,
+    "source": "swept volume \u00d7 1.6 g/cm\u00b3"
+   },
+   {
+    "component": "XT30 pigtail",
+    "kind": "hardware",
+    "mass_g": 6.28,
+    "volume_mm3": 1152.0,
+    "source": "BOM"
+   }
+  ],
+  "frame_and_guards_g": 64.58,
+  "by_kind_g": {
+   "frame": 38.7,
+   "electronics": 59.7,
+   "hardware": 18.3,
+   "prop": 7.2,
+   "guard": 26.0,
+   "battery": 66,
+   "wire": 2.8
+  }
+ },
+ "propulsion": {
+  "pack_v_nominal": 11.399999999999999,
+  "rpm_max_loaded": 40013.99999999999,
+  "max_thrust_g_per_motor": 381.58232090638523,
+  "max_thrust_N_per_motor": 3.743322568091639,
+  "max_current_a_per_motor": 13.51924341232346,
+  "max_electrical_w_per_motor": 154.11937490048743,
+  "motor_power_limit_w": 225,
+  "within_motor_power_limit": true,
+  "esc_headroom": "54 A total at WOT vs 45 A/motor ESC",
+  "thrust_to_weight": 6.985900314872305,
+  "hover_thrust_g_per_motor": 54.62178154675832,
+  "hover_throttle_est": 0.3783457047438529,
+  "hover_current_a_total": 3.0603053510647253,
+  "hover_power_w": 34.88748100213787,
+  "flight_time_min_1000mah": 15.684709365129232,
+  "flight_time_min_850mah": 13.332002960359848,
+  "disc_loading_g_per_dm2": 87.99793029568755,
+  "torque_per_thrust_m": 0.007074437220434747,
+  "sibling_3s_current_a": 16.5,
+  "note": "Ct/Cp model; swap in thrust-stand numbers via the override fields in bom.json"
+ },
+ "beam": {
+  "material": "PETG",
+  "arm_length_mm": 67.80096617793781,
+  "arm_style": "solid",
+  "sections": [
+   {
+    "station": 0.15,
+    "dist_from_root_mm": 8.4,
+    "area_mm2": 54.0,
+    "I_mm4": 70.0,
+    "c_mm": 2.0
+   },
+   {
+    "station": 0.5,
+    "dist_from_root_mm": 27.9,
+    "area_mm2": 48.0,
+    "I_mm4": 64.2,
+    "c_mm": 2.0
+   },
+   {
+    "station": 0.85,
+    "dist_from_root_mm": 47.4,
+    "area_mm2": 48.0,
+    "I_mm4": 64.2,
+    "c_mm": 2.0
+   }
+  ],
+  "worst_station": {
+   "station": 0.5,
+   "dist_from_root_mm": 27.9,
+   "area_mm2": 48.0,
+   "I_mm4": 64.2,
+   "c_mm": 2.0
+  },
+  "loads": [
+   {
+    "load": "max thrust",
+    "force_N": 3.743322568091639,
+    "stress_MPa": 4.653027638085227,
+    "SF_flat_print": 10.745691598895284,
+    "SF_standing_print": 6.447414959337171
+   },
+   {
+    "load": "crash 5 g on the arm tip",
+    "force_N": 10.716793539473983,
+    "stress_MPa": 13.321196777398562,
+    "SF_flat_print": 3.753416516212163,
+    "SF_standing_print": 2.2520499097272975
+   },
+   {
+    "load": "crash 10 g",
+    "force_N": 21.433587078947966,
+    "stress_MPa": 26.642393554797124,
+    "SF_flat_print": 1.8767082581060814,
+    "SF_standing_print": 1.1260249548636487
+   },
+   {
+    "load": "crash 20 g",
+    "force_N": 42.86717415789593,
+    "stress_MPa": 53.28478710959425,
+    "SF_flat_print": 0.9383541290530407,
+    "SF_standing_print": 0.5630124774318244
+   }
+  ],
+  "tip_deflection_mm_at_max_thrust": 2.645612971119105,
+  "first_bending_mode_hz": 54.8964524181865,
+  "prop_rev_hz_hover": 252.31875049367542,
+  "prop_rev_hz_max": 666.8999999999999,
+  "tg_c": 80,
+  "note": "Euler-Bernoulli with the exact section (min I/c over stations); FEA section gives the stress map."
+ },
+ "sim_fixed_gains": {
+  "hover_thrust_distribution_g": [
+   57.2591498279697,
+   51.984128257545485,
+   57.259434835971156,
+   51.984413265546955
+  ],
+  "hover_throttle_sim": 0.1431462730005943,
+  "altitude_overshoot_pct": 0.941333217968765,
+  "rise_time_90pct_s": 1.24,
+  "roll_step_peak_deg": 14.999998513233692,
+  "roll_return_settle_s": 0.40200000000000014,
+  "motor_saturation_pct_of_time": 0.0,
+  "energy_used_Wh": 0.07513421962475768,
+  "avg_power_w": 33.81039883114096,
+  "roll_authority_rad_s2": 1213.7175363158333,
+  "pitch_authority_rad_s2": 1004.2814074839044,
+  "yaw_authority_rad_s2": 73.8875660436917,
+  "note": "Rigid body, diagonal inertia from the voxel model, motor lag 20 ms, quadratic drag, cascaded PD controller with one fixed gain set for all variants (like flying one Betaflight profile on every frame); takeoff to 1 m then a 15\u00b0 roll step at t=3\u20134.5 s."
+ },
+ "sim_betaflight": {
+  "controller": "Betaflight 4.5 default PIDs (angle mode), 4 kHz loop, D-term LPF 100 Hz",
+  "hover_command": 0.3783457047438529,
+  "roll_step_peak_deg": 14.97749157249053,
+  "roll_return_settle_s": 0.5437500000000002,
+  "gust_m_s": 5.0,
+  "gust_roll_peak_deg": 0.11582929736245576,
+  "gust_lateral_drift_m": 2.483508503713451,
+  "gust_window_s": 2.5,
+  "gust_lever_mm": 19.288467043013483,
+  "CdA_m2": 0.0044,
+  "motor_saturation_pct": 0.0,
+  "energy_wh": 0.056349488515403834,
+  "note": "Rate PID in BF units (pidSum/1000 \u2192 motor fraction); thrust \u221d command\u00b2; 20 ms motor lag; side gust from the right at 3.5 s."
+ },
+ "thermal": {
+  "hover": {
+   "esc_loss_w": 1.0234136721043885,
+   "delta_t_c": 14.767874056340382,
+   "ok": true
+  },
+  "50 % throttle": {
+   "esc_loss_w": 1.114231214026032,
+   "delta_t_c": 16.07837249676814,
+   "ok": true
+  },
+  "enclosed": false,
+  "note": "Lumped estimate: Rds(on) 10 m\u03a9/leg + 0.25 W switching per channel; h = 35 W/m\u00b2K in prop wash, 15 W/m\u00b2K behind lattice keel walls. \u0394T < 60 \u00b0C keeps FETs under 100 \u00b0C at 40 \u00b0C ambient."
+ },
+ "fea": {
+  "nodes": 26256,
+  "elements": 13441,
+  "dof_free": 72351,
+  "mesh_size_mm": 4.0,
+  "strength_mpa": 50,
+  "fixed_nodes": 2139,
+  "cases": [
+   {
+    "case": "max thrust on all motors",
+    "max_von_mises_mpa": 31.534475630782797,
+    "safety_factor": 1.5855662413866758,
+    "max_displacement_mm": 3.2435717675213023,
+    "hotspot_mm": [
+     19.6,
+     -22.8,
+     2.6
+    ],
+    "p99_von_mises_mpa": 8.055811932584676
+   },
+   {
+    "case": "10 g vertical crash on one arm tip",
+    "max_von_mises_mpa": 178.52368632403036,
+    "safety_factor": 0.280074879863545,
+    "max_displacement_mm": 18.55989378982945,
+    "hotspot_mm": [
+     19.6,
+     -22.8,
+     2.6
+    ],
+    "p99_von_mises_mpa": 35.130048435885094
+   },
+   {
+    "case": "10 g lateral crash on one arm tip",
+    "max_von_mises_mpa": 98.982414636786,
+    "safety_factor": 0.5051402330754812,
+    "max_displacement_mm": 1.8309850309327147,
+    "hotspot_mm": [
+     19.6,
+     -22.8,
+     2.6
+    ],
+    "p99_von_mises_mpa": 8.779957811476669
+   }
+  ],
+  "modes_hz": [
+   42.85600336288558,
+   43.110356079566564,
+   43.236773585650255
+  ],
+  "seconds": 22.644716024398804,
+  "note": "Linear elastic tet10; clamped at the stack footprint; loads spread over pad top nodes; lumped masses for modes. Layer adhesion not modelled \u2014 multiply SF by the material's layer_factor for standing prints."
+ },
+ "print_checks": [
+  {
+   "part": "frame-bottom",
+   "volume_mm3": 21273.844308739826,
+   "solidity_est": 0.689614898971129,
+   "filament_g": 18.631865191997914,
+   "print_min_est": 71.19409520809116,
+   "layers": 20.0,
+   "height_mm": 4.0,
+   "sampled_layers": 5,
+   "thin_wall_area_mm2_per_layer": 7.548806024715305e-12,
+   "thin_wall_pct": 1.4001387691061565e-13,
+   "core_fraction": 0.7390121453068356,
+   "overhang_area_mm2": 0.0,
+   "surface_area_mm2": 15288.550270582837,
+   "pct": 0.0,
+   "small_holes": [],
+   "slicer": {
+    "filament_g": 19.68,
+    "time": "48m 37s",
+    "slicer": "OrcaSlicer",
+    "print_min": 48.6,
+    "profile": "Custom:MyKlipper 0.4 nozzle / 0.20mm Standard @MyKlipper / Generic PETG @System"
+   },
+   "flags": [],
+   "warnings": []
+  },
+  {
+   "part": "frame-top",
+   "volume_mm3": 12581.332727965204,
+   "solidity_est": 0.538206987387402,
+   "filament_g": 8.59962870474258,
+   "print_min_est": 34.577910403984184,
+   "layers": 35.0,
+   "height_mm": 7.0,
+   "sampled_layers": 5,
+   "thin_wall_area_mm2_per_layer": 0.0,
+   "thin_wall_pct": 0.0,
+   "core_fraction": 0.8551722455788852,
+   "overhang_area_mm2": 0.0,
+   "surface_area_mm2": 9833.547228275334,
+   "pct": 0.0,
+   "small_holes": [],
+   "slicer": {
+    "filament_g": 11.81,
+    "time": "24m 41s",
+    "slicer": "OrcaSlicer",
+    "print_min": 24.7,
+    "profile": "Custom:MyKlipper 0.4 nozzle / 0.20mm Standard @MyKlipper / Generic PETG @System"
+   },
+   "flags": [],
+   "warnings": []
+  },
+  {
+   "part": "guard",
+   "volume_mm3": 6293.30550172098,
+   "solidity_est": 0.9573842699399848,
+   "filament_g": 7.29038514886206,
+   "print_min_est": 35.524341396544905,
+   "layers": 102.50000000000003,
+   "height_mm": 20.500000000000007,
+   "sampled_layers": 5,
+   "thin_wall_area_mm2_per_layer": 1.1596057447604834e-12,
+   "thin_wall_pct": 3.990958316325639e-13,
+   "core_fraction": 0.06603344415950962,
+   "overhang_area_mm2": 209.6401339169833,
+   "surface_area_mm2": 6963.248461383263,
+   "pct": 3.010665712700102,
+   "small_holes": [],
+   "slicer": {
+    "filament_g": 7.46,
+    "time": "34m 45s",
+    "slicer": "OrcaSlicer",
+    "print_min": 34.8,
+    "profile": "Custom:MyKlipper 0.4 nozzle / 0.20mm Standard @MyKlipper / Generic TPU @System"
+   },
+   "flags": [],
+   "warnings": [
+    "print with supports under 210 mm\u00b2 of overhang (3.0 %)"
+   ]
+  }
+ ],
+ "interference": [
+  {
+   "a": "Capacitor (low-ESR, on BAT pads)",
+   "b": "Wire: Battery leads (2\u00d7 14 AWG)",
+   "kinds": [
+    "hardware",
+    "wire"
+   ],
+   "mm3": 100.9,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Wire: Motor 3 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "frame",
+    "wire"
+   ],
+   "mm3": 92.8,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Wire: Motor 1 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "frame",
+    "wire"
+   ],
+   "mm3": 92.7,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Wire: Motor 2 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "frame",
+    "wire"
+   ],
+   "mm3": 92.7,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Wire: Motor 4 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "frame",
+    "wire"
+   ],
+   "mm3": 92.5,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Standoff 1",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 48.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Standoff 2",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 48.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Standoff 3",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 48.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Standoff 4",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 48.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Capacitor (low-ESR, on BAT pads)",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 39.1,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Standoff 1",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 32.2,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Standoff 2",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 32.2,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Standoff 3",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 32.2,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Standoff 4",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 32.2,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: Motor 2 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 21.4,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: Motor 3 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 21.4,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: Motor 4 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 21.4,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: Motor 1 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 21.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 16.6,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 15.3,
+   "expected": true
+  },
+  {
+   "a": "ESC 45A 4-in-1",
+   "b": "Wire: Battery leads (2\u00d7 14 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 9.4,
+   "expected": true
+  },
+  {
+   "a": "FC F722 connector USB-C",
+   "b": "Standoff 4",
+   "kinds": [
+    "electronics",
+    "hardware"
+   ],
+   "mm3": 7.9,
+   "expected": true
+  },
+  {
+   "a": "ELRS RX",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 7.4,
+   "expected": true
+  },
+  {
+   "a": "Standoff 2",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "hardware",
+    "wire"
+   ],
+   "mm3": 3.8,
+   "expected": true
+  },
+  {
+   "a": "ELRS tower antenna",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 2.9,
+   "expected": true
+  },
+  {
+   "a": "Wire: Battery leads (2\u00d7 14 AWG)",
+   "b": "XT30 pigtail",
+   "kinds": [
+    "wire",
+    "hardware"
+   ],
+   "mm3": 2.7,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Standoff 1",
+   "kinds": [
+    "frame",
+    "hardware"
+   ],
+   "mm3": 2.3,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Standoff 2",
+   "kinds": [
+    "frame",
+    "hardware"
+   ],
+   "mm3": 2.3,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Standoff 3",
+   "kinds": [
+    "frame",
+    "hardware"
+   ],
+   "mm3": 2.3,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Standoff 4",
+   "kinds": [
+    "frame",
+    "hardware"
+   ],
+   "mm3": 2.3,
+   "expected": true
+  },
+  {
+   "a": "Frame bottom + arms",
+   "b": "Wire: RX harness (4 wires)",
+   "kinds": [
+    "frame",
+    "wire"
+   ],
+   "mm3": 2.2,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Wire: Motor 1 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 0.6,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Wire: Motor 2 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 0.6,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Wire: Motor 3 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 0.6,
+   "expected": true
+  },
+  {
+   "a": "FC F722",
+   "b": "Wire: Motor 4 leads (3\u00d7 22 AWG)",
+   "kinds": [
+    "electronics",
+    "wire"
+   ],
+   "mm3": 0.6,
+   "expected": true
+  }
+ ],
+ "wires": [
+  {
+   "name": "Motor 1 leads (3\u00d7 22 AWG)",
+   "length_mm": 79.2,
+   "radius_mm": 1.2,
+   "mass_g": 0.57
+  },
+  {
+   "name": "Motor 2 leads (3\u00d7 22 AWG)",
+   "length_mm": 79.2,
+   "radius_mm": 1.2,
+   "mass_g": 0.57
+  },
+  {
+   "name": "Motor 3 leads (3\u00d7 22 AWG)",
+   "length_mm": 79.2,
+   "radius_mm": 1.2,
+   "mass_g": 0.57
+  },
+  {
+   "name": "Motor 4 leads (3\u00d7 22 AWG)",
+   "length_mm": 79.2,
+   "radius_mm": 1.2,
+   "mass_g": 0.57
+  },
+  {
+   "name": "Battery leads (2\u00d7 14 AWG)",
+   "length_mm": 20.0,
+   "radius_mm": 1.5,
+   "mass_g": 0.23
+  },
+  {
+   "name": "RX harness (4 wires)",
+   "length_mm": 61.4,
+   "radius_mm": 0.8,
+   "mass_g": 0.2
+  }
+ ],
+ "checks": [
+  {
+   "check": "stack clear height \u2265 16 mm (+O4 + coax plug if video)",
+   "pass": true,
+   "detail": "clear 24 mm; needs 15.7; stack top z=20"
+  },
+  {
+   "check": "prop tip-to-tip gap \u2265 8 mm",
+   "pass": true,
+   "detail": "min 11.1 mm"
+  },
+  {
+   "check": "guard-to-guard gap \u2265 2 mm",
+   "pass": true,
+   "detail": "min 4.1 mm"
+  },
+  {
+   "check": "wheelbase 145\u2013168 mm (parts list \u00a74 target 150\u2013160)",
+   "pass": true,
+   "detail": "165.6 mm"
+  },
+  {
+   "check": "motor leads \u2264 150 mm (swept route)",
+   "pass": true,
+   "detail": "longest 79 mm"
+  },
+  {
+   "check": "no prop strike (exact intersection)",
+   "pass": true,
+   "detail": "0.0 mm\u00b3 of solids inside a prop"
+  },
+  {
+   "check": "no unexpected interference",
+   "pass": true,
+   "detail": "clean"
+  },
+  {
+   "check": "\u2265 3 mm clearance around every prop disc (incl. wires)",
+   "pass": true,
+   "detail": "clear"
+  },
+  {
+   "check": "RF keep-outs free (GPS sky view, RX antenna tip)",
+   "pass": true,
+   "detail": "clear"
+  },
+  {
+   "check": "AUW \u2264 250 g soft cap",
+   "pass": true,
+   "detail": "218 g"
+  },
+  {
+   "check": "arm SF \u2265 2 at max thrust (exact section)",
+   "pass": true,
+   "detail": "SF 10.7"
+  },
+  {
+   "check": "ESC \u0394T < 60 \u00b0C at 50 % throttle",
+   "pass": true,
+   "detail": "\u0394T 16 \u00b0C"
+  },
+  {
+   "check": "gust 5 m/s: roll excursion < 10\u00b0 with BF defaults",
+   "pass": true,
+   "detail": "0.1\u00b0, drift 2.48 m"
+  },
+  {
+   "check": "print/frame-bottom.stl prints cleanly",
+   "pass": true,
+   "detail": "19.7 g, 48m 37s (OrcaSlicer)"
+  },
+  {
+   "check": "print/frame-top.stl prints cleanly",
+   "pass": true,
+   "detail": "11.8 g, 24m 41s (OrcaSlicer)"
+  },
+  {
+   "check": "print/guard.stl prints cleanly",
+   "pass": true,
+   "detail": "7.5 g, 34m 45s (OrcaSlicer); print with supports under 210 mm\u00b2 of overhang (3.0 %)"
+  },
+  {
+   "check": "FEA SF \u2265 2 at max thrust (p99 basis)",
+   "pass": true,
+   "detail": "max 31.5 MPa (SF 1.6), p99 8.1 MPa"
+  },
+  {
+   "check": "first arm mode vs the idle\u2192hover motor band (FEA)",
+   "pass": true,
+   "detail": "43 Hz = 2571 rpm vs idle 80 Hz \u2013 hover 252 Hz"
+  }
+ ],
+ "prop_z": 21.5,
+ "wheelbase_mm": 165.60193235587562,
+ "camera_min_offaxis_deg": null,
+ "voxel": {
+  "variant": "base-stretch-x",
+  "kit": "base",
+  "mass": {
+   "total_g": 220.56278,
+   "cg_mm": [
+    -3.4658392635682445,
+    -7.455341062872214e-14,
+    22.802789743137645
+   ],
+   "inertia_kgm2": {
+    "Ixx": 0.00031403989641444767,
+    "Iyy": 0.0005262881907697474,
+    "Izz": 0.0007326306845726638,
+    "Ixy": -2.8177127298079085e-20,
+    "Ixz": -2.862075205928122e-07,
+    "Iyz": -3.279229665587025e-20
+   },
+   "table": [
+    {
+     "component": "Frame (PETG printed)",
+     "kind": "frame",
+     "mass_g": 39.9,
+     "voxels_mm3": 34884,
+     "source": "34884 mm\u00b3 \u00d7 1.27 g/cm\u00b3 \u00d7 0.9 solidity"
+    },
+    {
+     "component": "ESC 45A 4-in-1 (stack bottom)",
+     "kind": "electronics",
+     "mass_g": 7,
+     "voxels_mm3": 5664,
+     "source": "BOM"
+    },
+    {
+     "component": "FC F722 (stack top)",
+     "kind": "electronics",
+     "mass_g": 9.9,
+     "voxels_mm3": 3536,
+     "source": "BOM"
+    },
+    {
+     "component": "Standoffs + bolts (M2 nylon)",
+     "kind": "hardware",
+     "mass_g": 6,
+     "voxels_mm3": 832,
+     "source": "BOM"
+    },
+    {
+     "component": "Motor 1 XILO 1404 (CW)",
+     "kind": "electronics",
+     "mass_g": 9.2,
+     "voxels_mm3": 3752,
+     "source": "BOM"
+    },
+    {
+     "component": "Prop 1 Gemfan 3525 (CW)",
+     "kind": "prop",
+     "mass_g": 1.8,
+     "voxels_mm3": 6500,
+     "source": "BOM"
+    },
+    {
+     "component": "Motor 2 XILO 1404 (CCW)",
+     "kind": "electronics",
+     "mass_g": 9.2,
+     "voxels_mm3": 3752,
+     "source": "BOM"
+    },
+    {
+     "component": "Prop 2 Gemfan 3525 (CCW)",
+     "kind": "prop",
+     "mass_g": 1.8,
+     "voxels_mm3": 6500,
+     "source": "BOM"
+    },
+    {
+     "component": "Motor 3 XILO 1404 (CCW)",
+     "kind": "electronics",
+     "mass_g": 9.2,
+     "voxels_mm3": 3752,
+     "source": "BOM"
+    },
+    {
+     "component": "Prop 3 Gemfan 3525 (CCW)",
+     "kind": "prop",
+     "mass_g": 1.8,
+     "voxels_mm3": 6500,
+     "source": "BOM"
+    },
+    {
+     "component": "Motor 4 XILO 1404 (CW)",
+     "kind": "electronics",
+     "mass_g": 9.2,
+     "voxels_mm3": 3752,
+     "source": "BOM"
+    },
+    {
+     "component": "Prop 4 Gemfan 3525 (CW)",
+     "kind": "prop",
+     "mass_g": 1.8,
+     "voxels_mm3": 6500,
+     "source": "BOM"
+    },
+    {
+     "component": "Prop guards (TPU printed)",
+     "kind": "guard",
+     "mass_g": 26.8,
+     "voxels_mm3": 26048,
+     "source": "26048 mm\u00b3 \u00d7 1.21 g/cm\u00b3 \u00d7 0.85 solidity"
+    },
+    {
+     "component": "Battery Flywoo Explorer 1000 mAh 3S LiHV 80C XT30UP (assumed 58\u00d725\u00d724)",
+     "kind": "battery",
+     "mass_g": 66,
+     "voxels_mm3": 33408,
+     "source": "BOM"
+    },
+    {
+     "component": "Battery strap",
+     "kind": "hardware",
+     "mass_g": 3,
+     "voxels_mm3": 1488,
+     "source": "BOM"
+    },
+    {
+     "component": "BeeID GPS + Remote ID",
+     "kind": "electronics",
+     "mass_g": 5.2,
+     "voxels_mm3": 2816,
+     "source": "BOM"
+    },
+    {
+     "component": "ELRS Nano RX + T antenna",
+     "kind": "electronics",
+     "mass_g": 0.8,
+     "voxels_mm3": 1388,
+     "source": "BOM"
+    },
+    {
+     "component": "Wiring: XT60 pigtail + capacitor",
+     "kind": "hardware",
+     "mass_g": 12,
+     "voxels_mm3": 1752,
+     "source": "BOM"
+    }
+   ],
+   "frame_and_guards_g": 66.7
+  },
+  "propulsion": {
+   "pack_v_nominal": 11.399999999999999,
+   "rpm_max_loaded": 40013.99999999999,
+   "max_thrust_g_per_motor": 381.58232090638523,
+   "max_thrust_N_per_motor": 3.743322568091639,
+   "max_current_a_per_motor": 13.51924341232346,
+   "max_electrical_w_per_motor": 154.11937490048743,
+   "motor_power_limit_w": 225,
+   "within_motor_power_limit": true,
+   "esc_headroom": "54 A total at WOT vs 45 A/motor ESC",
+   "thrust_to_weight": 6.920157986880382,
+   "hover_thrust_g_per_motor": 55.140695,
+   "hover_throttle_est": 0.3801386212871568,
+   "hover_current_a_total": 3.102139192582054,
+   "hover_power_w": 35.364386795435415,
+   "flight_time_min_1000mah": 15.473193502979917,
+   "flight_time_min_850mah": 13.15221447753293,
+   "disc_loading_g_per_dm2": 88.83392115125433,
+   "torque_per_thrust_m": 0.007074437220434747,
+   "sibling_3s_current_a": 16.5,
+   "note": "Ct/Cp model; swap in thrust-stand numbers via the override fields in bom.json"
+  },
+  "beam": {
+   "material": "PETG",
+   "arm_length_mm": 65.8009661779378,
+   "arm_section_mm": [
+    12,
+    4
+   ],
+   "second_moment_m4": 6.4e-11,
+   "loads": [
+    {
+     "load": "max thrust",
+     "force_N": 3.743322568091639,
+     "stress_MPa": 7.697320053003413,
+     "SF_flat_print": 6.495767313259961,
+     "SF_standing_print": 3.897460387955977
+    },
+    {
+     "load": "crash 5 g on the arm tip",
+     "force_N": 10.818604359000002,
+     "stress_MPa": 22.246081859970293,
+     "SF_flat_print": 2.2475868026886228,
+     "SF_standing_print": 1.3485520816131735
+    },
+    {
+     "load": "crash 10 g",
+     "force_N": 21.637208718000004,
+     "stress_MPa": 44.492163719940585,
+     "SF_flat_print": 1.1237934013443114,
+     "SF_standing_print": 0.6742760408065868
+    },
+    {
+     "load": "crash 20 g",
+     "force_N": 43.27441743600001,
+     "stress_MPa": 88.98432743988117,
+     "SF_flat_print": 0.5618967006721557,
+     "SF_standing_print": 0.3371380204032934
+    }
+   ],
+   "tip_deflection_mm_at_max_thrust": 2.64504789747194,
+   "first_bending_mode_hz": 54.96320357608575,
+   "prop_rev_hz_hover": 253.51444653640482,
+   "prop_rev_hz_max": 666.8999999999999,
+   "tg_c": 80,
+   "note": "Euler-Bernoulli cantilever, rectangular section; SF < 1 means the arm yields. 'standing print' = layers across the arm (weak direction)."
+  },
+  "crash": {
+   "KE_J_at_5_m_s": 2.7570347500000003,
+   "KE_J_at_10_m_s": 11.028139000000001,
+   "KE_J_2_m_drop": 4.327441743600001,
+   "impact_speed_2_m_drop_m_s": 6.26418390534633
+  },
+  "sim": {
+   "hover_thrust_distribution_g": [
+    58.03628266290072,
+    52.245107337099455,
+    58.03628266290055,
+    52.24510733709929
+   ],
+   "hover_throttle_sim": 0.1445061809172338,
+   "altitude_overshoot_pct": 0.9417095575499745,
+   "rise_time_90pct_s": 1.24,
+   "roll_step_peak_deg": 15.000058096080823,
+   "roll_return_settle_s": 0.40000000000000036,
+   "motor_saturation_pct_of_time": 0.0,
+   "energy_used_Wh": 0.076220153728194,
+   "avg_power_w": 34.2990691776873,
+   "roll_authority_rad_s2": 1191.9894926826341,
+   "pitch_authority_rad_s2": 988.1773841302339,
+   "yaw_authority_rad_s2": 72.29263273144915,
+   "note": "Rigid body, diagonal inertia from the voxel model, motor lag 20 ms, quadratic drag, cascaded PD controller with one fixed gain set for all variants (like flying one Betaflight profile on every frame); takeoff to 1 m then a 15\u00b0 roll step at t=3\u20134.5 s."
+  },
+  "disc_blockage": {
+   "inflow_above_pct": 2.5080906148867315,
+   "outflow_below_pct": 16.885113268608414,
+   "per_motor": [
+    {
+     "motor": 1,
+     "above_pct": 4.967637540453074,
+     "below_pct": 17.006472491909385
+    },
+    {
+     "motor": 2,
+     "above_pct": 0.04854368932038835,
+     "below_pct": 16.763754045307444
+    },
+    {
+     "motor": 3,
+     "above_pct": 4.967637540453074,
+     "below_pct": 17.006472491909385
+    },
+    {
+     "motor": 4,
+     "above_pct": 0.04854368932038835,
+     "below_pct": 16.763754045307444
+    }
+   ]
+  },
+  "camera_min_offaxis_deg": null,
+  "prop_z": 22,
+  "checks": [
+   {
+    "check": "stack clear height \u2265 16 mm (+O4 if video)",
+    "pass": true,
+    "detail": "clear 24 mm between plates; stack needs 15.7 mm; modelled stack top at z=20"
+   },
+   {
+    "check": "BeeID sky view (nothing above the pocket)",
+    "pass": true,
+    "detail": "clear"
+   },
+   {
+    "check": "motor leads \u2264 150 mm",
+    "pass": true,
+    "detail": "longest routed lead \u2248 78 mm of 150 mm"
+   },
+   {
+    "check": "prop tip-to-tip gap \u2265 8 mm",
+    "pass": true,
+    "detail": "min 11.1 mm"
+   },
+   {
+    "check": "guard-to-guard gap \u2265 2 mm",
+    "pass": true,
+    "detail": "min 4.1 mm"
+   },
+   {
+    "check": "wheelbase 150\u2013160 mm (parts list \u00a74)",
+    "pass": true,
+    "detail": "165.6 mm"
+   },
+   {
+    "check": "no prop strike (voxel overlap)",
+    "pass": true,
+    "detail": "0 mm\u00b3 of overlap with prop discs"
+   },
+   {
+    "check": "prop inflow blockage \u2264 10 % of disc area",
+    "pass": true,
+    "detail": "2.5 % of disc area has parts above the prop plane; 16.9 % below (arms, motors, pack)"
+   },
+   {
+    "check": "AUW \u2264 250 g soft cap",
+    "pass": true,
+    "detail": "221 g"
+   },
+   {
+    "check": "arm SF \u2265 2 at max thrust",
+    "pass": true,
+    "detail": "SF 6.5"
+   }
+  ]
+ },
+ "files": {
+  "STEP assembly, coloured + labelled (Onshape / FreeCAD / Fusion)": "assembly.step",
+  "glTF for the browser viewer": "assembly.glb",
+  "rotate-in-browser viewer": "viewer.html",
+  "printable parts (+ frame-bottom.step for FEA)": "print/*.stl",
+  "everything below as data": "cad.json",
+  "fixed-gain hover sim": "sim-hover-cad.csv",
+  "Betaflight-PID sim with gust": "sim-betaflight-gust.csv"
+ },
+ "seconds": 49.28648900985718
+}
