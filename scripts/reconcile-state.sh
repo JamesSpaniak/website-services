@@ -80,8 +80,13 @@ none_guard() { [[ -n "$1" && "$1" != "None" ]]; }
 
 reconcile_secrets() {
   local pair suffix tf_addr secret_name
+  # Every secret SHELL declared in terraform. Note this reconciles the shells,
+  # not their values: only db_credentials and test_user_password have
+  # terraform-managed values, so a value changed out of band on any of the
+  # others is invisible to both this and `terraform plan`.
   local secrets=(
     "stripe-secret-key:aws_secretsmanager_secret.stripe_secret_key"
+    "stripe-webhook-secret:aws_secretsmanager_secret.stripe_webhook_secret"
     "jwt-secret:aws_secretsmanager_secret.jwt_secret"
     "admin-seed-password:aws_secretsmanager_secret.admin_seed_password"
     "test-user-password:aws_secretsmanager_secret.test_user_password"

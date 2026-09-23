@@ -44,7 +44,7 @@ Until 2026-09-12 the task definitions had `ignore_changes = [container_definitio
 ./pipeline.sh --env dev --replace aws_nat_gateway.nat  # recreate stuck NAT (keeps EIP)
 ```
 
-`--replace ADDR` is passed through to `terraform apply -replace=…`. Use it for resources that still exist in AWS/state but are dead (NAT gateway that reports `available` with zero `ConnectionAttemptCount`). Do **not** run `terraform apply` outside this script — that forks `terraform.tfstate` from the next pipeline run. Repeat `--replace` for multiple addresses. After one successful replace, later deploys omit the flag.
+`--replace ADDR` is passed through to `terraform apply -replace=…`. Use it for resources that still exist in AWS/state but are dead (NAT gateway that reports `available` with zero `ConnectionAttemptCount`). Do **not** run `terraform apply` outside this script — a bare apply uses the backend defaults in `providers.tf` (the dev key) regardless of which tfvars you pass, and skips the secret/CloudFront reconciliation the pipeline does first. Repeat `--replace` for multiple addresses. After one successful replace, later deploys omit the flag.
 
 NAT replace + image deploy in one shot (SMTP timeouts live in the API image):
 

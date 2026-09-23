@@ -60,6 +60,9 @@ Flags:
 Env overrides:
   AWS_REGION, PROJECT_NAME, TF_DIR, IMAGE_TAG, ENVIRONMENT, TFVARS_FILE, DOCKER_PROGRESS
   NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_FEATURED_COURSE_ID (default: 35 — home/login CTA course id)
+  TF_STATE_BUCKET, TF_STATE_KEY        — override the S3 backend (defaults:
+                                         droneedge-tfstate-<account-id> and
+                                         <project_name>/terraform.tfstate)
   REQUIRE_TFVARS (default: true)       — fail if tfvars missing
   AUTO_RECONCILE_STATE (default: true)  — auto-restore/import drifted secrets + CloudFront keys
   AUTO_SEED_CLOUDFRONT_PRIVATE_KEY_SECRET (default: true)
@@ -125,10 +128,18 @@ else
   fi
 fi
 
-# ─── Docker build + push ───────────────────────────────────────────────────────
+# ─── AWS identity + state backend ──────────────────────────────────────────────
 
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 ECR_URI="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+# Bootstrap the S3 backend before the image build so a backend problem fails in
+# seconds instead of after a multi-minute docker build.
+# shellcheck source=scripts/ensure-state-backend.sh
+source "${SCRIPT_DIR}/scripts/ensure-state-backend.sh"
+ensure_state_bucket
+
+# ─── Docker build + push ───────────────────────────────────────────────────────
 
 ensure_ecr_repo() {
   aws ecr describe-repositories --repository-names "$1" --region "${AWS_REGION}" >/dev/null 2>&1 \
@@ -208,7 +219,10 @@ log_service_state "pre-terraform" "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERV
 
 (
   cd "${TF_DIR}"
-  terraform init -input=false
+  # Binds to s3://<bucket>/<project_name>/terraform.tfstate, migrating a legacy
+  # local state file up on the first run. Refuses to apply when the state it
+  # would use disagrees with what is live in AWS.
+  terraform_init_backend
 
   TFVARS_ARGS=()
   VAR_ARGS=()
@@ -432,6 +446,51 @@ warn_if_service_stale() {
   fi
 }
 
+# After a successful apply the plan should be empty. Anything else means state
+# and AWS have diverged — which is how a stale local state silently accumulated
+# ten missing resources before Sep 2026. Warns rather than fails: adding a
+# resource to the .tf files is a legitimate create, and by this point the
+# rollout has already succeeded. Covers every managed resource, not a list.
+post_deploy_drift_check() {
+  local plan_out drift pem var_args=()
+  pem="$(cat "${TF_DIR}/keys/cloudfront-public-key.pem")"
+  plan_out="$(mktemp)"
+
+  if [[ -f "${TFVARS_FILE}" ]]; then
+    var_args+=("-var-file=${TFVARS_FILE}")
+  else
+    var_args+=(-var "aws_region=${AWS_REGION}" -var "project_name=${PROJECT_NAME}")
+  fi
+
+  echo "Checking for drift between terraform state and AWS..."
+  if ! ( cd "${TF_DIR}" && terraform plan -input=false -no-color -lock=false \
+      "${var_args[@]}" \
+      -var "api_server_image_uri=${BACKEND_IMAGE_URI}" \
+      -var "frontend_image_uri=${FRONTEND_IMAGE_URI}" \
+      -var "cloudfront_signing_public_key_pem=${pem}" ) > "${plan_out}" 2>&1; then
+    echo "Warning: post-deploy plan did not run; skipping drift check." >&2
+    rm -f "${plan_out}"
+    return 0
+  fi
+
+  # A new task-definition revision is registered on every apply by design.
+  drift="$(grep -E '^[[:space:]]+# .* (will be|must be) ' "${plan_out}" \
+    | grep -v 'aws_ecs_task_definition' || true)"
+
+  if [[ -n "${drift}" ]]; then
+    echo "############################################################################" >&2
+    echo "## DRIFT: terraform state does not match AWS after this apply." >&2
+    sed 's/^ */##   /' <<<"${drift}" | head -15 >&2
+    echo "## A create here usually means state lost a resource that already exists;" >&2
+    echo "## the next apply will fail on AlreadyExists. Import it before deploying" >&2
+    echo "## again — see workflows/tech/terraform-state.md § Repairing drift." >&2
+    echo "############################################################################" >&2
+  else
+    echo "No drift: terraform state matches AWS."
+  fi
+  rm -f "${plan_out}"
+}
+
 if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
   [[ "${BUILD_BACKEND}" == "true" ]]  && ecs_force_deploy "${BACKEND_ECS_CLUSTER}"  "${BACKEND_ECS_SERVICE}"  "${BACKEND_IMAGE_URI}"  "${BACKEND_CONTAINER_NAME}"  "${BACKEND_TASK_FAMILY}"
   [[ "${BUILD_FRONTEND}" == "true" ]] && ecs_force_deploy "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERVICE}" "${FRONTEND_IMAGE_URI}" "${FRONTEND_CONTAINER_NAME}" "${FRONTEND_TASK_FAMILY}"
@@ -457,4 +516,6 @@ if [[ "${TERRAFORM_APPLY}" == "true" ]]; then
       aws cloudfront create-invalidation --distribution-id "${FRONTEND_CF_ID}" --paths "/*" >/dev/null || true
     fi
   fi
+
+  post_deploy_drift_check
 fi

@@ -1,73 +1,82 @@
-name: Deploy to AWS
+name: Deploy
+
+# Manual only. This deploys the LIVE production stack — never wire it to push.
+#
+# It exists as the one-tap mobile deploy path: with Terraform state in S3 there
+# is no state handoff, so a phone can run the same ./pipeline.sh the laptop runs.
+#
+# Prerequisites (not yet provisioned — see docs/TODO.md):
+#   - an IAM role GitHub can assume via OIDC, scoped to what pipeline.sh calls
+#   - repository secret AWS_DEPLOY_ROLE_ARN holding that role's full ARN
+# Until both exist this workflow fails at the credentials step by design.
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: What to deploy
+        type: choice
+        options: [all, backend-only, frontend-only]
+        default: all
+      mode:
+        description: plan-only is a dry run (no deploy)
+        type: choice
+        options: [plan-only, deploy]
+        default: plan-only
+      confirm:
+        description: Type "deploy-production" to allow mode=deploy
+        type: string
+        default: ""
 
 env:
-  AWS_REGION: us-east-1 # Or your preferred region
-  ECR_API_REPO: personal-site-api-server
-  ECR_DRONE_REPO: personal-site-drone-frontend
+  AWS_REGION: us-east-1
+  TERRAFORM_VERSION: 1.13.3 # keep in sync with scripts/cloud-setup.sh
+
+# One deploy at a time. The S3 state lock would already reject a second writer;
+# this just turns that into a queued run instead of a failed one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Build, Push, and Deploy
+    name: ${{ inputs.mode }} (${{ inputs.scope }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Required for OIDC
+      id-token: write # OIDC
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Require explicit confirmation for a real deploy
+        if: inputs.mode == 'deploy' && inputs.confirm != 'deploy-production'
+        run: |
+          echo "mode=deploy needs confirm=deploy-production. Got: '${{ inputs.confirm }}'" >&2
+          exit 1
+
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole # Assumes you created an IAM role for GitHub Actions
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false # pipeline.sh parses terraform output directly
 
-      - name: Build, tag, and push api_server image to Amazon ECR
-        id: build-image-api
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Preflight
+        run: ./scripts/deploy-preflight.sh
+
+      # pipeline.sh resolves the S3 backend, migrates legacy local state if it
+      # finds any, and refuses to apply when the state disagrees with AWS.
+      - name: Run pipeline
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG -f backend/Dockerfile .
-          docker push $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG
-          echo "api_image=$ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Build, tag, and push drone image to Amazon ECR
-        id: build-image-drone
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG -f drone/Dockerfile .
-          docker push $ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG
-          echo "drone_image=$ECR_REGISTRY/$ECR_DRONE_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform
-
-      - name: Terraform Plan
-        run: terraform plan -var="api_server_image_uri=${{ steps.build-image-api.outputs.api_image }}"
-        working-directory: ./terraform
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="api_server_image_uri=${{ steps.build-image-api.outputs.api_image }}"
-        working-directory: ./terraform
-
-      # Optional: Add a step to run database migrations using an ECS task
-      # - name: Run Database Migrations
-      #   run: |
-      #     aws ecs run-task --cluster <your-cluster-name> --task-definition <your-migration-task-def> --launch-type FARGATE --network-configuration ...
+          ARGS=()
+          case "${{ inputs.scope }}" in
+            backend-only)  ARGS+=(--backend-only) ;;
+            frontend-only) ARGS+=(--frontend-only) ;;
+          esac
+          [[ "${{ inputs.mode }}" == "plan-only" ]] && ARGS+=(--plan-only)
+          ./pipeline.sh --env dev "${ARGS[@]}"

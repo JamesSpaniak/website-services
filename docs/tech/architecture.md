@@ -534,9 +534,9 @@ git push → pipeline.sh
   → CloudFront invalidation (frontend)
 ```
 
-Images: Node 20. Terraform: local state file (`terraform/terraform.tfstate`). See [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md).
+Images: Node 20. See [`workflows/tech/deploy.md`](../../workflows/tech/deploy.md).
 
-**State has no remote backend.** `terraform/providers.tf` declares no `backend` block, so state is that local file — committed to git, with no locking. Whoever deploys must be holding the newest state and must commit what the run writes back; only one machine deploys at a time. This is what makes deploys from anywhere other than the laptop a manual handoff — see [`workflows/tech/deploy-from-cloud.md`](../../workflows/tech/deploy-from-cloud.md), and `scripts/deploy-preflight.sh` for the read-only check that catches a stale snapshot before an apply does. Moving to an S3 backend + DynamoDB lock is tracked in [`../TODO.md`](../TODO.md).
+**State is remote.** `terraform/providers.tf` declares an S3 backend: `s3://droneedge-tfstate-<account-id>/<project_name>/terraform.tfstate`, versioned and encrypted, with S3 native locking (`use_lockfile`, Terraform ≥ 1.10 — no DynamoDB table). The key is derived from the `project_name` being applied, so `droneedge-dev` and `droneedge` are separate states. `pipeline.sh` bootstraps and binds the backend on every run via `scripts/ensure-state-backend.sh`, and refuses to apply when the state it would use disagrees with what is live in AWS. Any machine can deploy, and the lock stops two at once. See [`workflows/tech/terraform-state.md`](../../workflows/tech/terraform-state.md).
 
 ---
 

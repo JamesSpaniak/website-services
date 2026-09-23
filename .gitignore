@@ -171,6 +171,8 @@ vite.config.ts.timestamp-*
 terraform.tfstate.d/
 crash.log
 .terraform.lock.hcl
+# Local state moved aside by the S3 backend migration; never authoritative again
+terraform/.state-pre-s3-backup/
 
 # Pre-migration Drive/asset snapshots (local zip only; see docs/tech/assets-and-drive-storage-plan.md § step 0)
 .snapshots/

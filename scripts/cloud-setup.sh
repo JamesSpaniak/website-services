@@ -9,7 +9,7 @@
 #
 # Installs the two tools pipeline.sh needs that cloud sessions do not ship:
 #   - AWS CLI v2   (pipeline.sh calls aws for ECR/ECS/Secrets Manager/CloudFront)
-#   - Terraform    (pinned to the version recorded in terraform/terraform.tfstate)
+#   - Terraform    (pinned; the S3 backend's native state locking needs >= 1.10)
 #
 # Docker is pre-installed but dockerd is NOT running, and the environment cache
 # is a filesystem snapshot that does not keep running processes — so the daemon
@@ -25,7 +25,7 @@
 
 set -uo pipefail
 
-TERRAFORM_VERSION="1.13.3"   # keep in sync with terraform/terraform.tfstate
+TERRAFORM_VERSION="1.13.3"   # keep in sync with .github/workflows/deploy.yml
 TMP="$(mktemp -d)"
 
 install_awscli() {

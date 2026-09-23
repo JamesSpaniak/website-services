@@ -23,7 +23,7 @@ The hostname `app.dev.thedroneedge.com` is **not an isolated dev environment** t
 | Layer | Resource pattern | Notes |
 |-------|------------------|-------|
 | **Project prefix** | `droneedge-dev-*` | ECR, ECS, VPC, secrets, buckets, etc. |
-| **Terraform state** | Single local file `terraform/terraform.tfstate` | No S3 backend, no workspaces |
+| **Terraform state** | S3, key `<project_name>/terraform.tfstate` | Shared backend with locking; no workspaces — `dev` and `prod` are separate keys |
 | **DNS (Route53)** | Zone: `thedroneedge.com` | All records in one zone |
 | **Frontend hostnames** | `thedroneedge.com`, `www`, `app`, `app.dev` | All → one CloudFront distribution (`E18NQI6N952OXM`) |
 | **Media** | `media.thedroneedge.com` | Shared CloudFront + S3 (`droneedge-dev-media`) |
@@ -202,7 +202,7 @@ This confirms: **`prod` is not a second environment in your setup — it is a re
 
 ### Phase 0 — Prerequisites (do first, no user impact)
 
-- [ ] **Remote Terraform state:** S3 backend + DynamoDB lock (one state key per environment, e.g. `prod/terraform.tfstate`, `dev/terraform.tfstate`).
+- [x] **Remote Terraform state** (2026-09-22): S3 backend with native locking, one key per stack — `droneedge-dev/terraform.tfstate`, `droneedge/terraform.tfstate`. Keyed by `project_name` rather than `--env` so a `--tfvars` override cannot land prod in the dev state. No DynamoDB table; Terraform ≥ 1.10 locks through S3. See [`../../workflows/tech/terraform-state.md`](../../workflows/tech/terraform-state.md).
 - [ ] **Document live secrets:** Inventory all `droneedge-dev-*` Secrets Manager entries, Stripe webhook URLs, Grafana OTEL, CloudFront signing keys.
 - [ ] **Aurora snapshot:** Manual snapshot before any destructive change; verify restore procedure.
 - [ ] **S3 inventory:** `droneedge-dev-media`, `droneedge-dev-raw-video` — size and sync plan for dev if copying.
