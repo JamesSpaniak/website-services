@@ -1,6 +1,6 @@
 # Action Space — Boston C-UAS hackathon (Oct 23–25, 2026)
 
-Event-day brief for Drone Edge. Official hackathon is **Sat Oct 24 – Sun Oct 25, 2026** in Boston (venue TBD). Treat **Fri Oct 23** as travel / kit setup / last dry-run. Facts below are from [action-space.pages.dev](https://action-space.pages.dev/) and [Luma](https://luma.com/xl77cp4v) as of mid-September 2026 — re-check the week of the 17th (approvals close Oct 17).
+Event-day brief for Drone Edge. Official hackathon is **Sat Oct 24 – Sun Oct 25, 2026** at the **Microsoft NERD Center, 1 Memorial Drive, Cambridge MA** (Kendall Square; ~5 min walk from Kendall/MIT Red Line). Venue confirmed by Jaime, Sep 2026. Treat **Fri Oct 23** as travel / kit setup / last dry-run. Facts below are from [action-space.pages.dev](https://action-space.pages.dev/) and [Luma](https://luma.com/xl77cp4v) as of mid-September 2026 — re-check the week of the 17th (approvals close Oct 17).
 
 **Do not invent FAA pass rates, student counts, or product claims** if talking to organizers or teams. Product language: [`docs/sales/features.md`](../sales/features.md).
 
@@ -51,13 +51,17 @@ This is the audience the company already teaches: students and builders who want
 - Recap photo rights for a post.
 - Intro to Jaime / any school or lab contacts who ask about curriculum.
 
+**Catering plan (if we do the food block).** Meals we cover: **Sat breakfast** (set up by 9:30, before the 10:00 opening) and **Sat lunch** (13:00) only. Headcount: **~50 estimated** (plan for 55). Sizing: 1.5 bagels/person; 1 Box O' Joe per ~8–10 people; 3 slices/person (Costco pizza = 12 slices, large pizzeria pie = 8). Licensed kitchens only: MA residential-kitchen permits (105 CMR 590) don't cover hot dishes, so no Marketplace home cooks. Ask Jaime for headcount, dietary needs from registration, which meals are still uncovered, and the NERD building's outside-food and weekend-delivery rules. Label vegetarian / vegan / nuts on every dish.
+
 **If we only attend:** still useful. The room is Boston robotics + physical AI; organizer wants the community grown.
+
+**Fundraising from the stage** (ask for the school's drone program) is a **separate and larger request** than the one-sentence sponsor mention above — legal structure, what may and may not be said, and the script live in [`boston-fundraiser-keynote-2026.md`](boston-fundraiser-keynote-2026.md). Disclose that ask in the *same* email as the food-sponsorship offer (S3); do not spring it on stage.
 
 ---
 
 ## 3. Weekend clock
 
-Subject to change. Venue TBA — confirm housing / parking once Luma unlocks the address (after registration).
+Subject to change. Venue: **1 Memorial Dr, Cambridge (Microsoft NERD Center)**. Housing: stay walkable to Kendall. Jaime recommends Cambridge, East Cambridge, or East Somerville, and says to avoid Revere. Head of the Charles is Oct 16–18, the weekend before, so no regatta price spike.
 
 ### Friday Oct 23 — travel / prep (not official)
 
@@ -295,7 +299,8 @@ Same `observe() → act()` interface on all of them so a stranger paired at Sat 
 | S3 | **Food sponsorship** — email Jaime for a meal-block quote + logo placement? (Draft only until you say send.) |
 | S4 | Add batteries / dongles / compute as a second sponsor line? They asked for compute especially. |
 | S5 | Confirm with Jaime: pre-built Tello + Isaac Lab env allowed? |
-| S6 | Venue / housing once Luma shows the address. |
+| S6 | ~~Venue~~ (1 Memorial Dr, Cambridge — confirmed). **Housing:** book Fri + Sat nights (Sun optional) walkable to Kendall. |
+| S7 | **Ask for a closing stage slot + a fundraising ask for the school?** Decide by **Oct 10**; combine with S3's email. Legal structure and script: [`boston-fundraiser-keynote-2026.md`](boston-fundraiser-keynote-2026.md) § 7. |
 
 ---
 
@@ -309,3 +314,4 @@ Same `observe() → act()` interface on all of them so a stranger paired at Sat 
 | Inspired-by format | https://revolutehack.com/ |
 | DE product claims | [`docs/sales/features.md`](../sales/features.md) |
 | Event tees | [`docs/marketing/merch.md`](merch.md) |
+| Fundraiser legal + keynote script | [`boston-fundraiser-keynote-2026.md`](boston-fundraiser-keynote-2026.md) |

@@ -7,6 +7,7 @@ Initial **build / assembly** course intake. Not in the catalog. No `*_course.jso
 | File | Version | Purpose |
 |------|---------|---------|
 | [`outlines/drone-building-course-outline-v3.md`](outlines/drone-building-course-outline-v3.md) | **v3.4 — draft from this** | Terms, locked decisions, tree, per-unit stems/leaves/labs/gates, kits, assessments, open items |
+| [`outlines/drone-building-course-handbook-v3.4.docx`](outlines/) · [`.txt`](outlines/) | **handbook v3.4 — Drive copy, generated** | Reading copy for Drive: curriculum + build procedure + parts in one document, built from outline v3.4 / build v1 / parts v4 by [`scripts/build_drone_building_handbook.py`](../../../scripts/build_drone_building_handbook.py). **Drive edition rules:** locked decisions and the gates list excluded, terms moved to a reference part at the end. Do not edit the docx — edit the markdown and regenerate |
 | [`reference/parts-list-draft-v4.md`](reference/parts-list-draft-v4.md) | **parts v4 — current** | Joe's Sep 12 list: matched F722 Mini V2 45 A stack ($90); Explorer XT30 pack, XR2, M4AC, SpeedyBee smoke stopper; Tony 5 / Video SKU parked; costs recast |
 | [`reference/parts-list-draft-v3.md`](reference/parts-list-draft-v3.md) | parts v3 (superseded for parts) | Sep 11 split FC + HGLRC ESC desk check; Explorer pack and XR2 still stand |
 | [`reference/parts-list-draft-v2.md`](reference/parts-list-draft-v2.md) | parts v2 (superseded for parts) | Sep 9 desk check; Solder/Pre-soldered market note |

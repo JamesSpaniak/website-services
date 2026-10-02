@@ -10,6 +10,7 @@ Growth, SEO/GEO, brand, and content strategy.
 | [brand-assets.md](brand-assets.md) | Logo, social, mockups, fonts index |
 | [merch.md](merch.md) | Tees: designs, print files, blanks, local shops, event vs store plan |
 | [action-space-hackathon-2026.md](action-space-hackathon-2026.md) | Boston C-UAS hackathon (Oct 23–25, 2026): event-day brief, hardware, team shapes, Tello control, optional food sponsorship |
+| [boston-fundraiser-keynote-2026.md](boston-fundraiser-keynote-2026.md) | Stage ask for the school drone program at that hackathon: charitable-solicitation legal analysis, conflict-of-interest rules, story arc, keynote script |
 | [article-inventory.md](article-inventory.md) | Repo vs prod CMS status |
 | [../TODO.md](../TODO.md) | Open items backlog (marketing + cross-team) |
 

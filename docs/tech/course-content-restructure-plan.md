@@ -121,7 +121,7 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 - **(questions)** Right-of-Way Rules practice exam Q2 and Q3 are near-duplicates — merge/remove one.
 - **(questions)** Questions in wrong sections (e.g. a Category 1 over-people question filed under Remote ID); unit practice exam pulls off-topic questions. Both are resolved by moving to **unit-level scoping** + a dedupe/re-tag pass during the bulk-file rewrite.
 
-### Unit 2 — Airports, Airspace, and Data Sources (deck: `2 -airports 2026 outline.docx`)
+### Unit 2 — Airports, Airspace, and Data Sources (deck: `#2 -airports 2026 outline.docx`)
 
 - **(structure)** Duplicate intro: "Airports, Airspace, and Data Sources" vs "Introduction to Air Traffic and Airspace" say the same thing — keep one, titled **"Airports, Airspace, and Data Sources"**. (The repo JSON has only the correct title; verify the live payload.)
 - **(structure)** Rename "Four Essential Airport Data Sources" → **"Essential Airport Data Sources"** (delete "Four"); this stem is a video title slide ("Airports, charts and data sources").
@@ -140,13 +140,13 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 - **(images)** Needed: air-traffic-by-numbers pics; globe with yellow/red lat-long lines; slides 15–18; slide 23; slide 32 (sectional vs TAC samples); slides 34–35, 37, 39; slide 41 (VFR checkpoint); slide 43; slide 45 (example airport data); slide 47 (MEF grouping); slide 48 (communication boxes); slide 49 (MEF reporting format).
 - **(questions)** Many near-duplicate questions; questions filed in wrong leaves; MEF has only 1 question; NOTAM/data-source leaves have none (author to add 1–2 each); unit exam pulls from other topics. Resolved by unit-level scoping + dedupe pass.
 
-### Unit 3 — Airspace Classifications (deck: `3 airspace class 3 2026 outline.docx`)
+### Unit 3 — Airspace Classifications (deck: `#3 airspace class 3 2026 outline.docx`)
 
 - **(structure)** Combine "Introduction and Airspace Categories" with the controlled-airspace-classes intro into one leaf titled **"Introduction and Airspace Classifications"**; keep the individual class leaves (B, C, D, E, G) separate.
 - **(structure)** Special Use Airspace grouping (Restricted, Prohibited, Warning, MOAs, Alert, CFAs) and Other Airspace Areas grouping (LAA, MTRs, TFRs, Parachute Jump, Published VFR Routes, TRSA, NSA) — **already match the current tree**; no change.
 - Chart-example merges from the table above still apply.
 
-### Unit 4 — Airport Operations (deck: `4 Airport operations 2026 outline.docx`)
+### Unit 4 — Airport Operations (deck: `#4 Airport operations 2026 outline.docx`)
 
 - **(structure)** Move "Towered vs. Non-Towered Airport Procedures" into an **"Airport Classification and Control"** stem alongside "Airport Categories as Defined by Law" and "Towered and Non-Towered Airports" (this also gives unit 4 its stems).
 - **(content)** Traffic Patterns for Manned Aircraft: exam asks material not yet taught — add content from slides 29–35 to the leaf.
@@ -173,7 +173,7 @@ Raw notes from the course author, organized per unit. Slide numbers refer to the
 - **(questions)** Section quizzes exist where no questions do, and end-of-unit questions don't correlate to the leaves — resolved by unit-level scoping + removing the leaf `ExamPlayer`.
 - **(content, Aug 5 2026)** In `u715`, internal headings are **Load** and **Load Factors** (removed text after each hyphen). In `u718`, the bank-angle chart callout now says **"See how…"**; the chart image remains to be added. In `u723`, the stall-speed relationship spells out **square root** instead of using `√`.
 
-### Unit 8 — Emergency Procedures (deck: `8 Emergency Procedures Outline.docx`)
+### Unit 8 — Emergency Procedures (deck: `#8 Emergency Procedures Outline.docx`)
 
 - **Done (confirmed Aug 5 2026):** four source leaves consolidated into one `u81` section; text retained and artifacts removed. Unit-level scoping covers the prior question mismatch.
 

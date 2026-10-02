@@ -6,7 +6,7 @@ Related: [`assets/README.md`](../../assets/README.md) · [`assets/media/README.m
 
 ## Status
 
-**Steps 0–4 complete** (updated Sep 20 2026). **Drive matches the canonical tree and the first pull into `assets/` is done and verified.** What remains is **step 5** (prod: S3 upload + publish) and **step 6** (local folder rename), plus six manual items (M1–M6) listed in *Manual steps still required*.
+**Steps 0–4 complete; step 7 done for drone-building** (updated Sep 23 2026). **Drive matches the canonical tree and the first pull into `assets/` is done and verified.** What remains is **step 5** (prod: S3 upload + publish), **step 6** (local folder rename) and the rest of **step 7** (photo-video, blocked on M2), plus the manual items (M2–M6) listed in *Manual steps still required*.
 
 **Sep 19 verification.** `rclone ls gdrive:` re-run and diffed against the step-0 listing: **identical**, 221 file paths, only the header/trailer comments differ. Drive has not drifted since Sep 17, so the snapshot is a valid rollback point. Also confirmed: **0 shortcuts**, 14 native Google Docs (the `-1` sizes), and the same **2 duplicate objects** step 0 skipped.
 
@@ -21,6 +21,7 @@ Related: [`assets/README.md`](../../assets/README.md) · [`assets/media/README.m
 | Step 4 — rclone copy into `assets/` | **Done Sep 20 2026** — see *Step 4 — execution log* |
 | Step 5 — upload new lesson videos + JSON | **Not started — manual (prod)** |
 | Step 6 — local `assets/marketing/` rename | **Not started** — ~30 files reference the old paths; scoped but not run |
+| Step 7 — publish git-only outlines up to Drive | **drone-building done Sep 23 2026** — 2 md, 0 differences. The generated handbook (`.docx` + `.txt`) followed **Sep 24 2026** — 4 matching files, 0 differences. photo-video still needs a local folder (blocked on M2) |
 
 Rollback: unzip `.snapshots/2026-09-17-pre-migration-gdrive.zip` or copy that folder back to Drive. Tracked local files remain in git; do not zip all of `assets/` (~17 GB).
 
@@ -64,6 +65,7 @@ Execute in order. Steps 1–3 are **server-side rclone moves** (no download, no 
 | **4** | `rclone copy --dry-run`, then copy videos / images / outlines / new DJI footage into local `assets/` | **Done** 2026-09-20 — verified with `rclone check --one-way`, 0 differences |
 | **5** | Upload new lesson videos (`upload-faa-107-videos.sh`) and set `video_url` in `faa_107_course.json`; publish via admin UI. Start with `#1 VLOS 8-13 good.mp4`, then sections 2–5 | Not started |
 | **6** | Later: `assets/courses/photo-video/`; rename local `visuals` / `articles` / `media` → `assets/marketing/…`; drop or archive `assets/archive/` | Not started |
+| **7** | Publish git-only course outlines **up** to Drive so every course folder has `outlines/` on both sides | **drone-building done** 2026-09-23; photo-video blocked on M2 |
 
 ### Step 0 (done) — recreate if needed
 
@@ -369,6 +371,82 @@ Also update [`assets/AGENTS.md`](../../assets/AGENTS.md), [`assets/README.md`](.
 
 ---
 
+### Step 7 — publish git-only outlines to Drive (local → Drive)
+
+The only step that runs **upward**. Steps 1–4 assume Drive is the author's intake and git is
+downstream, but a course drafted in the repo (drone-building) has outlines Drive never saw. The
+dual-store table already says `outlines/` lives in **both** stores, so this closes that direction.
+
+**Rule: push only outlines Drive does not already hold.** Do not push a local copy of a file that
+exists on Drive as a native Google Doc. The exported `.docx` and its Drive original never match on
+hash, so `rclone copy` cannot tell them apart and will upload a same-name twin — which is exactly
+how the M2 duplicates were created. Check with `rclone ls` first, not with `rclone check`.
+
+```bash
+# verify the Drive side is empty / lacks the file before copying
+rclone ls gdrive:"courses/<course>/outlines"
+
+rclone copy assets/courses/<course>/outlines gdrive:"courses/<course>/outlines" --dry-run -v
+rclone copy assets/courses/<course>/outlines gdrive:"courses/<course>/outlines" -v
+rclone check assets/courses/<course>/outlines gdrive:"courses/<course>/outlines" --one-way
+```
+
+Never push course JSON, `*.bulk.json` or review CSVs — those stay git-only (see *Dual store*).
+
+#### Per-course state
+
+| Course | Outlines in git | Outlines on Drive | Action |
+|---|---|---|---|
+| `faa-107` | 12 (9 docx + 2 pptx.txt + 1 txt) | 12 PPTX + 9 Google Docs | **Nothing to push.** Drive is authoritative; the docx in git are exports of it |
+| `drone-building` | 2 md | 2 md | **Done Sep 23 2026** |
+| `photo-video` | none — no local folder | in `notes for powerpoint development/` | **Pull, not push.** Resolve M2 first, then `rclone copy` down into `assets/courses/photo-video/outlines/` |
+
+#### Step 7 — execution log (Sep 23 2026)
+
+`courses/drone-building` on Drive was **empty**, so there was no collision risk.
+
+```
+drone-building-course-outline-v3.md   27,269 B   Copied (new)
+drone-building-course-review-v2.md    40,045 B   Copied (new)
+```
+
+`rclone check --one-way`: **2 matching files, 0 differences.**
+
+Added to the same folder and **uploaded Sep 24 2026**:
+`drone-building-course-handbook-v3.4.docx` + `.txt` — a generated reading copy of the
+curriculum, build procedure and parts list ([`scripts/build_drone_building_handbook.py`](../../scripts/build_drone_building_handbook.py)).
+
+```
+drone-building-course-handbook-v3.4.docx   60,654 B   Copied (new)
+drone-building-course-handbook-v3.4.txt    51,736 B   Copied (new)
+```
+
+`rclone check --one-way`: **4 matching files, 0 differences** (the 2 md + the 2 handbook files).
+Regenerated, not authored, so re-running the copy after a version bump overwrites cleanly:
+
+```
+rclone copy assets/courses/drone-building/outlines \
+  gdrive:courses/drone-building/outlines --include '*.docx' --include '*.txt'
+```
+
+#### Cleanup done alongside (git side)
+
+The step-4 pull landed Drive's exports **beside** the pre-migration local copies instead of
+replacing them, leaving 7 duplicate pairs in `assets/courses/faa-107/outlines/` (~2.1 MB). The
+Drive exports carry a `#` prefix (`#2 -airports 2026 outline.docx`); the Sep 1 copies do not.
+All 7 pairs were verified equal on **extracted document text** and on embedded media (all 7
+contain zero images), so the unprefixed copies were removed and the `#` versions kept.
+
+Two files that look like duplicates but are **not** — keep both:
+
+- `7- Loading & Performance 2026.pptx.txt` and `10 - Radio Communication Procedures 2026.pptx.txt`
+  are the only outline form git has for chapters 7 and 10; Drive holds those two as PPTX only.
+- `regulations powerpoint in an outline.txt` shares ~89% of its lines with the `.docx` of the same
+  name but carries **52 lines the docx lacks** (medical conditions, accident reporting, preflight
+  familiarization). The content has diverged — do not collapse them without an author read.
+
+---
+
 ## Reference
 
 ### Dual store (who owns what)
@@ -393,7 +471,7 @@ Also update [`assets/AGENTS.md`](../../assets/AGENTS.md), [`assets/README.md`](.
 
 Company `docs/` and `workflows/` stay in git. Optional Drive shortcut to GitHub `docs/` under `marketing/documents/`. Course Word/PPT stays under `courses/`, not `docs/`.
 
-rclone: Drive → local for intake (videos, images, outlines, questions, footage). local → Drive for brand only if git is cleaner. Native Google Docs (`size -1`): `--drive-export-formats docx`.
+rclone: Drive → local for intake (videos, images, outlines, questions, footage). local → Drive for brand only if git is cleaner, and for **outlines Drive does not already have** (step 7 — repo-drafted courses; never re-upload an export of a Drive Google Doc). Native Google Docs (`size -1`): `--drive-export-formats docx`.
 
 ### Snapshot — Drive vs local (Sep 17 2026)
 

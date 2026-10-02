@@ -7,7 +7,7 @@
 |--------|------|-------|
 | Course JSON (canonical) | `faa_107_course.json` | String refs (`u{n}`); ship via admin PUT |
 | Unit 1 outline | `outlines/regulations powerpoint in an outline.txt` | Present |
-| Unit 2 outline | `outlines/2 -airports 2026 outline.docx` | Present |
+| Unit 2 outline | `outlines/#2 -airports 2026 outline.docx` | Present |
 | Image mapping (unit 2/3) | `pictures-for-airports_mapping.csv`, `pictures-for-airports_review.md` | Uploaded; Ch.2 figure↔text alignment shipped |
 | Broader restructure plan | [`docs/tech/course-content-restructure-plan.md`](../../docs/tech/course-content-restructure-plan.md) | Prior author intake; this file is the focused Ch.1–4 quality backlog |
 
@@ -22,14 +22,14 @@ Use this before trusting a unit as “done.” If either column is missing or th
 | Course unit | Outline in `outlines/` | JSON in restructured payload | Quality status |
 |-------------|------------------------|------------------------------|----------------|
 | 1 PART 107 REGULATIONS | Yes — `regulations powerpoint in an outline.txt` | Yes | **Done** (Ch.1 pass Jul 26 2026) — see § Chapter 1 |
-| 2 Airports, Airspace, and Data Sources | Yes — `2 -airports 2026 outline.docx` | Yes | **Done** (Ch.2 pass Jul 26 2026) — see § Chapter 2 |
-| 3 Airspace Classifications | Yes — `3 airspace class 3 2026 outline.docx` | Yes | **Done** (Ch.3 pass Jul 26 2026) — see § Chapter 3 |
-| 4 AIRPORT OPERATIONS | Yes — `4 Airport operations 2026 outline.docx` | Yes | **Done** (Ch.4 pass Jul 26 2026) — see § Chapter 4 |
-| 5 WEATHER | Yes — `5 Drone Weather 2026 outline.docx` | Yes | **Done** (Ch.5 pass Jul 26 2026; descriptions polished Jul 27 2026) — see § Chapter 5 |
-| 6 WEATHER EFFECTS… | Yes — `6 -Drone Weather - Part 2A - 2026 outline.docx` | Yes | **Partial** (content Jul 27 + stem regroup Aug 5 2026; images still open) — see § Chapter 6 |
+| 2 Airports, Airspace, and Data Sources | Yes — `#2 -airports 2026 outline.docx` | Yes | **Done** (Ch.2 pass Jul 26 2026) — see § Chapter 2 |
+| 3 Airspace Classifications | Yes — `#3 airspace class 3 2026 outline.docx` | Yes | **Done** (Ch.3 pass Jul 26 2026) — see § Chapter 3 |
+| 4 AIRPORT OPERATIONS | Yes — `#4 Airport operations 2026 outline.docx` | Yes | **Done** (Ch.4 pass Jul 26 2026) — see § Chapter 4 |
+| 5 WEATHER | Yes — `#5 Drone Weather 2026 outline.docx` | Yes | **Done** (Ch.5 pass Jul 26 2026; descriptions polished Jul 27 2026) — see § Chapter 5 |
+| 6 WEATHER EFFECTS… | Yes — `#6 -Drone Weather - Part 2A - 2026 outline.docx` | Yes | **Partial** (content Jul 27 + stem regroup Aug 5 2026; images still open) — see § Chapter 6 |
 | 7 LOADING AND PERFORMANCE | Yes — `7- Loading & Performance 2026.pptx.txt` | Yes | **Partial** (load-factor wording pass Aug 5 2026; images/content review continues) — see § Chapter 7 |
-| 8 EMERGENCY PROCEDURES | Yes — `8 Emergency Procedures Outline.docx` | Yes | **Done** (consolidated earlier; confirmed complete Aug 5 2026) — see § Chapter 8 |
-| 9 AERONAUTICAL DECISION MAKING | Yes — `9- Aeronautical decision making 2026 outline.docx` | Yes | **Partial** (overview/risk/CRM/physiology pass Aug 5 2026) — see § Chapter 9 |
+| 8 EMERGENCY PROCEDURES | Yes — `#8 Emergency Procedures Outline.docx` | Yes | **Done** (consolidated earlier; confirmed complete Aug 5 2026) — see § Chapter 8 |
+| 9 AERONAUTICAL DECISION MAKING | Yes — `#9- Aeronautical decision making 2026 outline.docx` | Yes | **Partial** (overview/risk/CRM/physiology pass Aug 5 2026) — see § Chapter 9 |
 | 10 RADIO COMMUNICATION PROCEDURES | Yes — `10 - Radio Communication Procedures 2026.pptx.txt` | Yes | **Partial** (11 → 3 leaf consolidation Aug 5 2026) — see § Chapter 10 |
 
 **Rule:** if an outline is missing for a future unit, or a leaf exists in the outline but not in JSON (or vice versa), add a row under **Open gaps** at the bottom and do not mark that leaf production-ready.
