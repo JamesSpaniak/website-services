@@ -6,7 +6,7 @@ Index under [`assets/visuals/`](../../assets/visuals/). Files stay in place to a
 
 | Path | Contents |
 |------|----------|
-| [`assets/visuals/Logo/`](../../assets/visuals/Logo/) | SVG, PNG, PDF — logo and icon (black/white) |
+| [`assets/visuals/Logo/`](../../assets/visuals/Logo/) | SVG, PNG, PDF — logo and icon (black/white). `PNG/Icon/IconBlackSquare512*.png` are exact 1:1 512×512 icons (white or transparent background) for services that reject the 310×311 original, e.g. Stripe Branding |
 | [`assets/visuals/Colors/`](../../assets/visuals/Colors/) | Brand color reference |
 | [`assets/visuals/Fonts/`](../../assets/visuals/Fonts/) | Font links / licensing notes |
 | [`assets/visuals/Assets/Gradients/`](../../assets/visuals/Assets/Gradients/) | Gradient backgrounds |

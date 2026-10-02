@@ -29,7 +29,7 @@ JWT payload is validated in `JwtStrategy`; **`token_version`** on `users` must m
 
 | Area | Variables (typical) |
 |------|---------------------|
-| Stripe | `STRIPE_SECRET_KEY`; `STRIPE_WEBHOOK_SECRET` only when Terraform `stripe_webhook_enabled = true` (unset in prod today → webhook handler returns 400; one-time course purchases still complete via `POST /purchases/confirm-payment`, which retrieves the PaymentIntent server-side, records the order and grants the entitlement) |
+| Stripe | `STRIPE_SECRET_KEY`; `STRIPE_WEBHOOK_SECRET` only when Terraform `stripe_webhook_enabled = true` (unset in prod today → webhook handler returns 400; course purchases still complete via the `confirm-checkout` / `confirm-payment` fallback, which retrieves the payment server-side, records the order and grants the entitlement). The webhook route gets a **raw** body (`main.ts`) for signature verification |
 | Email | SMTP / provider settings used by `EmailModule` |
 | Media / CloudFront | `CLOUDFRONT_MEDIA_DOMAIN`, signing keys for video URLs |
 | OpenTelemetry | `OTEL_EXPORTER_OTLP_*`, `OTEL_SERVICE_NAME` — optional; loaded via `telemetry.ts` before Nest bootstrap |
@@ -316,11 +316,13 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | POST | `/purchases/course` | JWT + **Admin** | Manual grant (no payment). |
-| POST | `/purchases/create-payment-intent` | JWT | Stripe PaymentIntent — **one course**, lifetime. Logged-in only; **email verification not required**. Rejects if already owned or active Pro. |
+| POST | `/purchases/create-course-checkout` | JWT | Body `{ courseId }` → `{ url }`. Hosted Stripe Checkout (`mode: payment`) — **one course**, lifetime, priced from `courses.price` (`price_data`). Course metadata copied to the PaymentIntent so `payment_intent.succeeded` fulfils. Returns to `/courses/:id?purchase=success&session_id=…` (cancel → `?purchase=1`). Logged-in only; **email verification not required**. Rejects if already owned or active Pro. |
+| POST | `/purchases/confirm-checkout` | JWT | Body `{ sessionId }`. Idempotent reconcile after the Checkout redirect when the webhook lags: session must be `mode=payment`, `paid`, and belong to the caller; then same path as `confirm-payment`. |
+| POST | `/purchases/create-payment-intent` | JWT | **Legacy** (Card Element) — superseded by `create-course-checkout`, kept one release. Same guards. |
 | POST | `/purchases/create-pro-checkout` | JWT | Stripe Checkout **subscription** for Pro (all courses while active). Needs `STRIPE_PRO_PRICE_ID_MONTHLY` (or yearly). Email verification **not** required. |
 | POST | `/purchases/billing-portal` | JWT | Stripe Customer Portal (manage/cancel Pro). Requires `stripe_customer_id`. |
-| POST | `/purchases/confirm-payment` | JWT | Idempotent reconcile after PaymentIntent success when webhook lag. |
-| POST | `/purchases/webhook` | Public | Stripe signature; `payment_intent.succeeded` (order + entitlement + `purchase_completed`), `invoice.paid` / `invoice.payment_failed` (Pro orders + lifecycle events), `charge.refunded` (refund → revoke), subscription lifecycle. **Not** in Swagger. |
+| POST | `/purchases/confirm-payment` | JWT | Idempotent reconcile from a succeeded course PaymentIntent (legacy client + `confirm-checkout` internals). |
+| POST | `/purchases/webhook` | Public | Stripe signature; `payment_intent.succeeded` (order + entitlement + `purchase_completed`), `invoice.paid` / `invoice.payment_failed` (Pro orders + lifecycle events), `charge.refunded` (refund → revoke; Pro invoice resolved via `invoicePayments` on API ≥ basil), subscription lifecycle. Payload samples + field map: [`stripe-webhook-payloads.md`](stripe-webhook-payloads.md). **Not** in Swagger. |
 | POST | `/purchases/pro-membership` | JWT + **Admin** | Pro comp / testing (no Stripe subscription). |
 | POST | `/purchases/admin/backfill-order` | JWT + **Admin** | Repairs course entitlements with no `orders` row from Stripe: body `{ paymentIntentId }`, `{ userId, courseId }` (PI found by metadata search), or `{}` for every flagged entitlement. Records the order idempotently (`backfill_<pi>`), links `order_item_id`, sets the real amount. Returns `{ repaired[], unmatched[] }`. |
 

@@ -350,14 +350,11 @@ export class PurchaseService {
     return saved;
   }
 
-  /**
-   * One-time course purchase (PaymentIntent + Card Element).
-   * Grants lifetime access to that course only.
-   */
-  async createPaymentIntent(
+  /** Guards shared by every self-serve course checkout path. */
+  private async assertCoursePurchasable(
     userId: number,
     courseId: number,
-  ): Promise<{ clientSecret: string }> {
+  ): Promise<{ course: Course; user: User }> {
     const course = await this.courseRepository.findOneBy({ id: courseId });
     if (!course || course.price == null || Number(course.price) <= 0) {
       throw new NotFoundException('Course not found or has no price.');
@@ -376,6 +373,18 @@ export class PurchaseService {
         'Active Pro membership already includes this course. Manage billing from your profile instead.',
       );
     }
+    return { course, user };
+  }
+
+  /**
+   * Legacy one-time course purchase (PaymentIntent + Card Element). Superseded
+   * by createCourseCheckoutSession; kept one release for open tabs / rollback.
+   */
+  async createPaymentIntent(
+    userId: number,
+    courseId: number,
+  ): Promise<{ clientSecret: string }> {
+    const { course } = await this.assertCoursePurchasable(userId, courseId);
 
     const amount = Math.round(Number(course.price) * 100);
     const paymentIntent = await this.stripe.paymentIntents.create({
@@ -389,6 +398,85 @@ export class PurchaseService {
     });
 
     return { clientSecret: paymentIntent.client_secret };
+  }
+
+  /**
+   * One-time course purchase via hosted Stripe Checkout (lifetime access to
+   * that course). The course metadata is copied onto the PaymentIntent, so the
+   * existing payment_intent.succeeded handler fulfils it unchanged.
+   */
+  async createCourseCheckoutSession(
+    userId: number,
+    courseId: number,
+  ): Promise<{ url: string }> {
+    const { course, user } = await this.assertCoursePurchasable(
+      userId,
+      courseId,
+    );
+
+    const customerId = await this.ensureStripeCustomer(user);
+    const frontend = this.frontendBaseUrl();
+    const metadata = {
+      userId: String(userId),
+      courseId: String(courseId),
+      productType: PRODUCT_COURSE,
+    };
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'payment',
+      customer: customerId,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: 'usd',
+            unit_amount: Math.round(Number(course.price) * 100),
+            product_data: { name: course.title },
+          },
+        },
+      ],
+      success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
+      client_reference_id: String(userId),
+      metadata,
+      payment_intent_data: { metadata },
+      billing_address_collection: 'auto',
+      allow_promotion_codes: false,
+    });
+
+    if (!session.url) {
+      throw new BadRequestException('Stripe did not return a Checkout URL.');
+    }
+    return { url: session.url };
+  }
+
+  /**
+   * Client fallback after the Checkout redirect when the webhook is slow:
+   * resolves the session's PaymentIntent and reuses the PI confirm path.
+   */
+  async confirmCheckoutSession(
+    userId: number,
+    sessionId: string,
+  ): Promise<{ granted: boolean; alreadyOwned: boolean }> {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    if (session.mode !== 'payment') {
+      throw new BadRequestException('Not a course checkout session.');
+    }
+    if (String(session.metadata?.userId) !== String(userId)) {
+      throw new ForbiddenException(
+        'This payment belongs to a different account.',
+      );
+    }
+    if (session.payment_status !== 'paid') {
+      throw new BadRequestException('Payment has not completed yet.');
+    }
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent?.id;
+    if (!paymentIntentId) {
+      throw new BadRequestException('Checkout session has no payment.');
+    }
+    return this.confirmPaymentFromIntent(userId, paymentIntentId);
   }
 
   /**
@@ -440,6 +528,8 @@ export class PurchaseService {
           duration,
         },
       },
+      billing_address_collection: 'auto',
+      allow_promotion_codes: false,
     });
 
     if (!session.url) {
@@ -532,11 +622,14 @@ export class PurchaseService {
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const productType = paymentIntent.metadata?.productType;
-        // Subscription invoices also create PIs — only fulfill one-time course buys here.
-        if (productType && productType !== PRODUCT_COURSE) {
+        const { userId, courseId } = paymentIntent.metadata ?? {};
+        // Subscription invoices also create PIs (no course metadata) — only fulfill one-time course buys here.
+        if (
+          (productType && productType !== PRODUCT_COURSE) ||
+          (!productType && !courseId)
+        ) {
           break;
         }
-        const { userId, courseId } = paymentIntent.metadata ?? {};
         if (!userId || !courseId) {
           this.logger.error(
             `payment_intent.succeeded missing metadata (pi=${paymentIntent.id})`,
@@ -857,13 +950,18 @@ export class PurchaseService {
       typeof charge.payment_intent === 'string'
         ? charge.payment_intent
         : (charge.payment_intent?.id ?? null);
-    const invoiceId =
+    let invoiceId =
       typeof (
         charge as Stripe.Charge & { invoice?: string | { id: string } | null }
       ).invoice === 'string'
         ? ((charge as Stripe.Charge & { invoice?: string }).invoice as string)
         : ((charge as Stripe.Charge & { invoice?: { id: string } | null })
             .invoice?.id ?? null);
+    // API versions from basil on drop charge.invoice; Pro orders are keyed by
+    // invoice id, so resolve it from the PaymentIntent.
+    if (!invoiceId && paymentIntentId) {
+      invoiceId = await this.invoiceIdForPaymentIntent(paymentIntentId);
+    }
     const result = await this.orders.applyRefund(
       paymentIntentId,
       invoiceId,
@@ -891,6 +989,25 @@ export class PurchaseService {
           full: charge.refunded === true,
         },
       });
+    }
+  }
+
+  /** Invoice paid by this PaymentIntent, if any (null for one-time course PIs). */
+  private async invoiceIdForPaymentIntent(
+    paymentIntentId: string,
+  ): Promise<string | null> {
+    try {
+      const res = await this.stripe.invoicePayments.list({
+        payment: { type: 'payment_intent', payment_intent: paymentIntentId },
+        limit: 1,
+      });
+      const invoice = res.data[0]?.invoice;
+      return typeof invoice === 'string' ? invoice : (invoice?.id ?? null);
+    } catch (err) {
+      this.logger.warn(
+        `invoice lookup failed for PI ${paymentIntentId}: ${(err as Error).message}`,
+      );
+      return null;
     }
   }
 
@@ -990,6 +1107,9 @@ export class PurchaseService {
   }
 
   private isAlreadyPurchasedBadRequest(e: unknown): boolean {
+    // Two deliveries of the same event racing: the loser hits the
+    // user_courses_purchased primary key after the winner granted access.
+    if ((e as { code?: string })?.code === '23505') return true;
     if (!(e instanceof BadRequestException)) return false;
     const r = e.getResponse();
     const msg =

@@ -94,14 +94,13 @@ Org roles (**manager** / **member**) are **not** in the JWT; `/manager` only req
 
 | Step | Location |
 |------|----------|
-| Load Stripe | `loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)` in `courses/[courseId]/page.tsx` |
-| Provider | `<Elements stripe={stripePromise}>` wraps `CourseComponent` |
-| Payment UI | `PurchaseFlow` — one-time Card Element **or** Pro monthly upsell → Stripe Checkout |
-| Create intent | **`POST /api/purchases/create-payment-intent`** via `createPaymentIntent(courseId)` → `{ clientSecret }` (logged-in; email verification **not** required) |
+| Stripe.js | Not loaded — both purchases redirect to **hosted** Stripe Checkout (no Elements provider, publishable key unused by the course page) |
+| Payment UI | `PurchaseFlow` — **Buy this course** → `createCourseCheckout(courseId)` **or** Pro monthly → `createProCheckout`; both `window.location.href = url` |
+| Course checkout | **`POST /api/purchases/create-course-checkout`** → `{ url }` (logged-in; email verification **not** required) |
 | Pro subscription | **`POST /api/purchases/create-pro-checkout`** → `{ url }` redirect; manage via **`POST /api/purchases/billing-portal`** |
-| Confirm | `stripe.confirmCardPayment` (course only); Pro fulfills via webhook after Checkout |
+| Return | Course page snapshots `?purchase=success&session_id=…` or `?pro=success`, cleans the URL, shows "unlocking…" and polls `getCourseById` (15 × 2 s) until `has_access`; `?purchase=1` (cancel) reopens `PurchaseFlow` |
 | Fulfillment | Server-side **`POST /purchases/webhook`** (Stripe signature); course PI + subscription events |
-| Reconcile | **`POST /api/purchases/confirm-payment`** for course PaymentIntents (sessionStorage stash) |
+| Reconcile | **`POST /api/purchases/confirm-checkout`** with the `session_id` after the 3rd poll if access is still off (`confirmCourseCheckout`) |
 
 Profile Membership wires Pro upgrade + billing portal (Enterprise → `/consultation`). Flow detail: [`purchase-flows.md`](purchase-flows.md).
 
@@ -127,7 +126,7 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 | Courses / progress | `courses`, `courses/:id`, `progress/courses`, `progress/courses/:id`, `progress/courses/:id/reset`, `progress/courses/:courseId/units/:unitId`, `courses/:courseId/units/:unitId/media` |
 | Articles (public + admin) | `articles`, `articles/:id`, `articles/admin/all`, `articles` POST, `articles/:id` PATCH/DELETE |
 | Comments | `articles/:articleId/comments`, `comments/:id` PATCH/DELETE, `comments/:id/upvote` |
-| Purchases | `purchases/create-payment-intent`, `purchases/confirm-payment`, `purchases/course` |
+| Purchases | `purchases/create-course-checkout`, `purchases/confirm-checkout`, `purchases/create-pro-checkout`, `purchases/billing-portal`, `purchases/course` (legacy `create-payment-intent` / `confirm-payment` still exported) |
 | Media | `media/presigned-url`, `media/profile-picture`, `media` GET/DELETE, `media?folder&subfolder` |
 | Organizations | `organizations/my`, `organizations/invite-info`, `organizations`, `organizations/:id`, members, classes, invite-codes, courses, progress |
 | Audit / analytics | `audit/my`, `audit/users/:userId`, `audit/analytics/overview`, `audit/analytics/daily` |
@@ -284,9 +283,9 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
-| **Permissions** | **`AuthGuard`** + **`Elements` (Stripe)**. Backend **`GET /courses/:id`** requires JWT and enforces access. **`?purchase=1`** auto-opens `PurchaseFlow` (`initialShowPurchase`) when the course is paid and not yet owned. |
-| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-payment-intent`**, then Stripe `confirmCardPayment`, poll `getCourseById`; reconcile via **`POST /purchases/confirm-payment`** (see §3). Logged-out state renders account-required CTAs instead of the card form. |
-| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, `Elements` + **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). **Hit targets:** unit preview cards are full-card links (status menu excluded); outline rows use a larger min-height link area (chevron alone expands). **`CourseImageStrip`:** unit galleries default to `fit="contain"` (`object-contain`, `max-h-[70vh]`, letterbox on `--surface`) so instructional charts are not cropped; course hero passes `fit="cover"` (16:9 `object-cover` + optional `image_focal_point`). Catalog cards and `/preview` also use cover and honor `image_focal_point`. Authoring sizes: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md). **Layout:** full-width (no `max-w` cap) with a fixed-width info/outline column on `lg+`; the info card (course `h1`) comes **first in DOM** (sane heading order, title-first on mobile) and is placed visually right via grid `col-start`. |
+| **Permissions** | **`AuthGuard`**. Backend **`GET /courses/:id`** requires JWT and enforces access. **`?purchase=1`** auto-opens `PurchaseFlow` (`initialShowPurchase`) when the course is paid and not yet owned. |
+| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-course-checkout`** / **`create-pro-checkout`** → redirect to Stripe. **Return:** page polls `getCourseById`, reconciles via **`POST /purchases/confirm-checkout`** (see §3). Logged-out state renders account-required CTAs. |
+| **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). **Hit targets:** unit preview cards are full-card links (status menu excluded); outline rows use a larger min-height link area (chevron alone expands). **`CourseImageStrip`:** unit galleries default to `fit="contain"` (`object-contain`, `max-h-[70vh]`, letterbox on `--surface`) so instructional charts are not cropped; course hero passes `fit="cover"` (16:9 `object-cover` + optional `image_focal_point`). Catalog cards and `/preview` also use cover and honor `image_focal_point`. Authoring sizes: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md). **Layout:** full-width (no `max-w` cap) with a fixed-width info/outline column on `lg+`; the info card (course `h1`) comes **first in DOM** (sane heading order, title-first on mobile) and is placed visually right via grid `col-start`. |
 
 ### `/courses/[courseId]/preview` — `app/courses/[courseId]/preview/page.tsx`
 
@@ -398,7 +397,7 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 | Redirect / purchase-intent helpers | `drone/src/app/lib/auth-redirect.ts` (sanitize, login/register hrefs, sessionStorage stash, `PURCHASE_QUERY`) |
 | Conversion CTAs | `drone/src/app/ui/components/login-conversion-panel.tsx`, `course-preview-actions.tsx`, `course-purchase-banner.tsx` |
 | Guards | `drone/src/app/lib/auth-guard.tsx`, `drone/src/app/ui/components/admin-guard.tsx`, `drone/src/app/ui/components/manager-guard.tsx` |
-| Stripe Elements + purchase | `drone/src/app/courses/[courseId]/page.tsx`, `drone/src/app/ui/components/purchase-flow.tsx` |
+| Hosted Checkout + return handling | `drone/src/app/courses/[courseId]/page.tsx`, `drone/src/app/ui/components/purchase-flow.tsx` |
 | Analytics beacon | `drone/src/app/lib/analytics.ts`, `drone/src/app/lib/use-page-analytics.ts` |
 
 Keep this file aligned with `api-client.tsx` and route-handler changes; mirror permission semantics with [`backend-data.md`](./backend-data.md).

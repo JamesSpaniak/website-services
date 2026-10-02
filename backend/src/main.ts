@@ -111,6 +111,13 @@ async function bootstrap() {
     bodyParser: false, // disable built-in so we can set a custom limit below
   });
 
+  // Stripe signature verification needs the exact raw bytes, so the webhook
+  // gets a Buffer body; the JSON parser below skips already-parsed requests.
+  app.use(
+    '/purchases/webhook',
+    bodyParser.raw({ type: 'application/json', limit: '1mb' }),
+  );
+
   // The default Express body-parser limit is 100 kb, which is too small for
   // large course payloads. Set to 10 mb; adjust if payloads grow further.
   app.use(bodyParser.json({ limit: '10mb' }));

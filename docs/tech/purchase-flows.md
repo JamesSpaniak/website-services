@@ -2,7 +2,7 @@
 
 How B2C checkout works in code, what each SKU grants, and permission pitfalls.
 
-Canonical pricing: [`docs/sales/packages.md`](../sales/packages.md) · target vs tech checklist: [`docs/sales/pricing-model.md`](../sales/pricing-model.md). API surface: [`backend-data.md`](backend-data.md). Frontend: [`frontend-data.md`](frontend-data.md).
+Canonical pricing: [`docs/sales/packages.md`](../sales/packages.md) · target vs tech checklist: [`docs/sales/pricing-model.md`](../sales/pricing-model.md) · sandbox build + test plan: [`stripe-sandbox-test-plan.md`](stripe-sandbox-test-plan.md). API surface: [`backend-data.md`](backend-data.md). Frontend: [`frontend-data.md`](frontend-data.md).
 
 ---
 
@@ -12,8 +12,10 @@ Canonical pricing: [`docs/sales/packages.md`](../sales/packages.md) · target vs
 
 ```
 Logged-in account (email verification **not** required)
-  → POST /purchases/create-payment-intent { courseId }
-  → Stripe.js confirmCardPayment
+  → POST /purchases/create-course-checkout { courseId }  → { url }
+  → Redirect to hosted Stripe Checkout (mode=payment, price_data from courses.price,
+    metadata {userId, courseId, productType=course} on session AND PaymentIntent)
+  → Return /courses/:id?purchase=success&session_id=…   (cancel → ?purchase=1)
   → Stripe webhook payment_intent.succeeded
   → recordCourseOrder() → orders + order_items (idempotent on PI / event id)
   → purchaseCourse() → user_courses_purchased + entitlements(source=purchase, order_item_id)
@@ -21,7 +23,7 @@ Logged-in account (email verification **not** required)
   → GET /courses/:id has_access=true
 ```
 
-Client also polls `has_access` and can call `POST /purchases/confirm-payment` if the webhook was slow (same order/entitlement path, idempotent).
+The course page polls `has_access` and calls `POST /purchases/confirm-checkout { sessionId }` if the webhook is slow (resolves the session's PaymentIntent → same order/entitlement path, idempotent). Legacy `create-payment-intent` + `confirm-payment` (Card Element) stay one release.
 
 **Refund:** `charge.refunded` → `OrderService.applyRefund` — `order_items.refunded_amount_cents`, `orders.payment_status = refunded | partially_refunded`; a **full** refund revokes that line's entitlements (`revoke_reason = refund`), deletes the legacy `user_courses_purchased` row, bumps `token_version`, audits `REFUND_ISSUED`, emits `refund_issued` (**PD18**). Partial refunds change only the money.
 
@@ -47,6 +49,28 @@ Not Stripe self-serve. Quote → admin creates org → seat/course assignment. P
 
 **Ledgers:** `user_courses_purchased` + `users.pro_membership_expires_at` remain the source of truth for `hasAccess`; `entitlements` is dual-written and reconciled nightly (`analytics_reconciliation`). Switch to `entitlements` after 14 clean nights (**PD22** / TODO **PA36**). Webhook events to enable in Stripe: `payment_intent.succeeded`, `checkout.session.completed`, `customer.subscription.*`, **`invoice.paid`, `invoice.payment_failed`, `charge.refunded`**.
 
+### Access model — every payment event → access
+
+Access rule: `has_access(course) = admin OR active Pro (role=pro AND expires_at > now) OR owns course OR org seat`. Verified against the sandbox Oct 1 2026 ([`stripe-webhook-payloads.md`](stripe-webhook-payloads.md) § 3).
+
+| Stripe event / action | Access effect | In line? |
+|-----------------------|---------------|----------|
+| Course paid (`payment_intent.succeeded`, course metadata) | Lifetime access to that course | ✅ |
+| Course **full** refund | Course access revoked (legacy row deleted, entitlement `refund`) | ✅ |
+| Course **partial** refund | Money only; access kept | ✅ by design (goodwill credit) |
+| Pro subscribed | All courses until `current_period_end` | ✅ |
+| Pro renewed (`invoice.paid`, `subscription_cycle`) | Expiry moves to the new period end | ✅ |
+| Renewal **fails** → `past_due` | **Access kept** during Stripe retries (expiry already moved to the new period end) | ✅ — bounded by the Dashboard rule "cancel after all retries fail" (plan U6). If that setting were "leave past_due", access would continue indefinitely |
+| Retries exhausted → Stripe cancels | `customer.subscription.deleted` → Pro revoked | ✅ |
+| Customer cancels in Portal (at period end) | Access until period end, then `deleted` → revoked; midnight expiry cron is the backstop | ✅ |
+| Admin cancels immediately | Revoked at once | ✅ |
+| Pro invoice refunded | Order marked refunded; **Pro stays active** (access follows the subscription) | ✅ by design — to fully reverse, also cancel the subscription (support procedure) |
+| Pro ends while user also bought a course | Bought course kept | ✅ |
+| Course buy while Pro active / second Pro checkout | Rejected (400) | ✅ |
+| Chargeback / dispute | **No effect — access kept** | ❌ gap → TODO **PA43** (manual until then) |
+| Duplicate webhook delivery | Orders / entitlements idempotent; **product events can double** | ⚠️ analytics only → TODO **PA42** |
+| Purchase completes | `token_version` bump → in-flight JWT refreshes (see callouts) | ✅ — confirm no forced logout in the browser run |
+
 ---
 
 ## Config
@@ -58,7 +82,7 @@ Not Stripe self-serve. Quote → admin creates org → seat/course assignment. P
 | `STRIPE_PRO_PRICE_ID_MONTHLY` | ECS env / `.env` | Recurring Price `price_…` for Pro |
 | `STRIPE_PRO_PRICE_ID_YEARLY` | ECS env / `.env` | Optional yearly Price |
 | `FRONTEND_URL` | ECS / `.env` | Checkout success/cancel + portal return |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Frontend build | Card Element (course path only) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Frontend build | Unused since hosted Checkout (kept until legacy Card Element code is deleted) |
 
 **Stripe Dashboard setup**
 
@@ -92,7 +116,7 @@ Not Stripe self-serve. Quote → admin creates org → seat/course assignment. P
 
 | Surface | Course one-time | Pro monthly | Enterprise |
 |---------|-----------------|-------------|------------|
-| `PurchaseFlow` | Card Element | Upsell → Checkout | — |
+| `PurchaseFlow` | Hosted Checkout | Upsell → Checkout | — |
 | `/profile` Membership | — | Upgrade / Manage billing | Consult link |
 | Admin API | `POST /purchases/course` | `POST /purchases/pro-membership` | Org admin UI |
 

@@ -62,9 +62,17 @@ STRIPE_PRO_PRICE_ID_MONTHLY=price_...
 FRONTEND_URL=http://localhost:8080
 ```
 
-Webhook locally: `stripe listen --forward-to localhost:3000/purchases/webhook` and use the printed `whsec_...`.
+Frontend (`drone/.env`): `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...` (only the legacy Card Element path uses it; hosted Checkout does not).
 
-Subscribe events: `payment_intent.succeeded`, `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
+Use the **Drone Edge sandbox** keys (`stripe login` → pick the sandbox). Webhook locally — the current CLI requires `--events`:
+
+```bash
+stripe listen \
+  --events payment_intent.succeeded,checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.paid,invoice.payment_failed,charge.refunded \
+  --forward-to localhost:3000/purchases/webhook
+```
+
+The signing secret is stable per machine (`stripe listen --print-secret`) → `STRIPE_WEBHOOK_SECRET`. Run **one** listener; two forward every event twice. Full sandbox test matrix: [`stripe-sandbox-test-plan.md`](stripe-sandbox-test-plan.md).
 
 See [`purchase-flows.md`](purchase-flows.md).
 

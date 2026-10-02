@@ -48,10 +48,10 @@ Enterprise / school “membership” on the profile is a **consultation CTA**, n
 | Capability | Status | Notes |
 |------------|--------|-------|
 | Course JSON price $129 | **Live in content** | `assets/courses/...` → DB on import |
-| One-time course PaymentIntent | **Code live** | Card Element → webhook → `user_courses_purchased` |
+| One-time course purchase | **Code ready (Oct 1 2026, not deployed)** | Hosted Checkout `mode: payment` → webhook → `user_courses_purchased` (replaces Card Element PaymentIntent) |
 | Confirm-payment reconcile | **Code live** | Client fallback if webhook lag |
 | Admin course / Pro comp | **Code live** | `POST /purchases/course`, `POST /purchases/pro-membership` |
-| Pro Checkout + portal + subscription webhooks | **Code live** | Needs Stripe Price ID + webhook events configured |
+| Pro Checkout + portal + subscription webhooks | **Code live; sandbox-tested Oct 1 2026** | Sandbox price **$35/mo** `price_1ULulr2Rw6cpyMyJcc0cCqmA` (Drone Edge sandbox). Needs the deployed webhook (PA41) and a live price. Plan: [`../tech/stripe-sandbox-test-plan.md`](../tech/stripe-sandbox-test-plan.md) |
 | Email verify gate on purchase | **Removed** | Unverified users can buy courses / start Pro Checkout |
 | Soft verify banner | **Live** | Nudge only — does not block checkout |
 | Bundle SKU | **Not built** | TODO T16 |

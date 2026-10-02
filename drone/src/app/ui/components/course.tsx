@@ -41,17 +41,9 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
         will_render_video: !!video_url,
     });
 
-    const handlePurchaseSuccess = () => {
-        setCourse((prev) => ({ ...prev, has_access: true }));
-        setShowPurchase(false);
-    };
-
     if (showPurchase && paidCourse && !fullAccess) {
         return (
-            <PurchaseFlow
-                course={course}
-                onPurchaseSuccess={handlePurchaseSuccess}
-            />
+            <PurchaseFlow course={course} />
         );
     }
 

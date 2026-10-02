@@ -270,6 +270,22 @@ async function confirmCoursePurchase(paymentIntentId: string): Promise<{ granted
     });
 }
 
+/** Hosted Stripe Checkout for one course; returns the URL to redirect to. */
+async function createCourseCheckout(courseId: number): Promise<{ url: string }> {
+    return apiClient('purchases/create-course-checkout', {
+        method: 'POST',
+        body: JSON.stringify({ courseId }),
+    });
+}
+
+/** Fallback after the Checkout redirect if the webhook has not granted access yet. */
+async function confirmCourseCheckout(sessionId: string): Promise<{ granted: boolean; alreadyOwned: boolean }> {
+    return apiClient('purchases/confirm-checkout', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId }),
+    });
+}
+
 async function createProCheckout(options?: {
     duration?: 'monthly' | 'yearly';
     successPath?: string;
@@ -891,6 +907,8 @@ export {
     resendVerificationEmail,
     purchaseCourse,
     confirmCoursePurchase,
+    createCourseCheckout,
+    confirmCourseCheckout,
     logToServer,
     createPaymentIntent,
     createProCheckout,

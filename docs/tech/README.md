@@ -10,6 +10,8 @@ Architecture, development, deployment, and product-engineering reference for The
 | [backend-data.md](backend-data.md) | API routes, entities, auth, media |
 | [frontend-data.md](frontend-data.md) | Next.js pages, client API, components |
 | [purchase-flows.md](purchase-flows.md) | Course one-time vs Pro monthly Stripe flows + permission gaps |
+| [stripe-webhook-payloads.md](stripe-webhook-payloads.md) | Real sandbox webhook payloads (fixtures), field → table map, Oct 1 2026 test log, bugs found |
+| [stripe-sandbox-test-plan.md](stripe-sandbox-test-plan.md) | **Build + test plan** to run every Stripe flow end to end in the sandbox: Dashboard (UI) steps vs code vs prod ops, course move to hosted Checkout, test matrix, test clocks |
 | [analytics-and-attribution.md](analytics-and-attribution.md) | Event taxonomy, platform accounts, pixels vs first-party vs OTel, click-ID capture, server-side conversions, consent |
 | [product-analytics.md](product-analytics.md) | User-level usage × entitlement × revenue; tooling choice, schema gaps, signal→offer map, student-data rules |
 | [analytics-implementation-plan.md](analytics-implementation-plan.md) | **Build plan** for product analytics + progress visibility: `products` → `orders` → `entitlements` → usage data model (many packages, one course), manager / company / learner APIs, admin + manager screens, phases, backfill, acceptance |

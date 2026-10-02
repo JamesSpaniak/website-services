@@ -11,6 +11,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
   BackfillOrderDto,
+  ConfirmCheckoutDto,
   ConfirmPurchaseDto,
   CreateProCheckoutDto,
   ProMembershipDuration,
@@ -40,7 +41,7 @@ export class PurchaseController {
 
   /**
    * Grants the current user access to a course without going through Stripe.
-   * Admin-only: used for support / manual comping. Normal purchases use create-payment-intent + webhook.
+   * Admin-only: used for support / manual comping. Normal purchases use create-course-checkout + webhook.
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
@@ -66,7 +67,42 @@ export class PurchaseController {
   }
 
   /**
-   * Creates a Stripe Payment Intent for purchasing a course (one-time, lifetime).
+   * Stripe Checkout (payment mode) for one course — lifetime access. Returns the hosted page URL.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create Stripe Checkout session for a one-time course purchase',
+  })
+  @Post('create-course-checkout')
+  async createCourseCheckout(
+    @Request() req,
+    @Body() purchaseDto: PurchaseCourseDto,
+  ) {
+    return this.purchasesService.createCourseCheckoutSession(
+      req.user.userId,
+      purchaseDto.courseId,
+    );
+  }
+
+  /**
+   * Reconcile access after the Checkout redirect when the webhook has not landed yet.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Confirm course access from a paid Checkout session',
+  })
+  @Post('confirm-checkout')
+  async confirmCheckout(@Request() req, @Body() dto: ConfirmCheckoutDto) {
+    return this.purchasesService.confirmCheckoutSession(
+      req.user.userId,
+      dto.sessionId,
+    );
+  }
+
+  /**
+   * Legacy: Stripe Payment Intent for a course (Card Element). Superseded by create-course-checkout.
    */
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

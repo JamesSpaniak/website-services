@@ -1,0 +1,175 @@
+{
+  "api_version": "2026-01-28.clover",
+  "context": "acct_1T1cg92Rw6cpyMyJ",
+  "created": 1790906359,
+  "data": {
+    "object": {
+      "account_country": "US",
+      "account_name": "Drone Edge sandbox",
+      "account_tax_ids": null,
+      "amount_due": 3500,
+      "amount_overpaid": 0,
+      "amount_paid": 3500,
+      "amount_remaining": 0,
+      "amount_shipping": 0,
+      "application": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_cycle",
+      "collection_method": "charge_automatically",
+      "created": 1793584704,
+      "currency": "usd",
+      "custom_fields": null,
+      "customer": "cus_VMf4Ec17aQglv1",
+      "customer_account": null,
+      "customer_address": null,
+      "customer_email": "REDACTED",
+      "customer_name": null,
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1793588304,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "REDACTED",
+      "id": "in_1ULvkh2Rw6cpyMyJBSWDJtFq",
+      "invoice_pdf": "REDACTED",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 3500,
+            "currency": "usd",
+            "description": "1 \u00d7 Drone Edge Pro (at $35.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1UXAVw2Rw6cpyMyJjHsCGs1m",
+            "invoice": "in_1ULvkh2Rw6cpyMyJBSWDJtFq",
+            "livemode": false,
+            "metadata": {
+              "duration": "monthly",
+              "productType": "pro_membership",
+              "userId": "4"
+            },
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "license_fee_subscription_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG",
+                "subscription_item": "si_VMf4AYWofrH7vV"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1796176704,
+              "start": 1793584704
+            },
+            "pretax_credit_amounts": [],
+            "pricing": {
+              "price_details": {
+                "price": "price_1ULulr2Rw6cpyMyJcc0cCqmA",
+                "product": "prod_VMe3HA5NfsWBxd"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "3500"
+            },
+            "quantity": 1,
+            "quantity_decimal": "1",
+            "subtotal": 3500,
+            "taxes": []
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "REDACTED"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "DDLRVALT-0002",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {
+            "duration": "monthly",
+            "productType": "pro_membership",
+            "userId": "4"
+          },
+          "subscription": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG"
+        },
+        "type": "subscription_details"
+      },
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": null,
+        "payment_method_types": null
+      },
+      "period_end": 1793584704,
+      "period_start": 1790906304,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "paid",
+      "status_transitions": {
+        "finalized_at": 1793588304,
+        "marked_uncollectible_at": null,
+        "paid_at": 1793588304,
+        "voided_at": null
+      },
+      "subtotal": 3500,
+      "subtotal_excluding_tax": 3500,
+      "test_clock": "clock_1ULvjw2Rw6cpyMyJBA9q448d",
+      "total": 3500,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 3500,
+      "total_pretax_credit_amounts": [],
+      "total_taxes": [],
+      "webhooks_delivered_at": 1793584704
+    }
+  },
+  "id": "evt_1ULvkq2Rw6cpyMyJpnd0QMlH",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 0,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.paid"
+}

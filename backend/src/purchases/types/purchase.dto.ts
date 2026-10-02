@@ -18,6 +18,12 @@ export class ConfirmPurchaseDto {
   paymentIntentId: string;
 }
 
+export class ConfirmCheckoutDto {
+  @IsString()
+  @IsNotEmpty()
+  sessionId: string;
+}
+
 export enum ProMembershipDuration {
   Monthly = 'monthly',
   Yearly = 'yearly',
