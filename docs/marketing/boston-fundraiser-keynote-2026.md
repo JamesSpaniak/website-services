@@ -319,6 +319,7 @@ Assume this is what you actually get. Rehearse it as the primary.
 
 | What | Where |
 |---|---|
+| Long-form vision talk (15–20 min, two gaps, Q&A prep) | [`keynote-vision-two-gaps.md`](keynote-vision-two-gaps.md) |
 | Event brief (schedule, hardware, sponsorship) | [`action-space-hackathon-2026.md`](action-space-hackathon-2026.md) |
 | Merch (sales-tax caution, §3.3) | [`merch.md`](merch.md) |
 | Product claim language | [`../sales/features.md`](../sales/features.md) |

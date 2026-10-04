@@ -2,7 +2,7 @@
   "slug": "advance-01-onboard-ml-computer-vision",
   "title": "Onboard AI and Computer Vision on Small Drones: From Obstacle Avoidance to Edge Inference",
   "sub_heading": "Why perception—not just motors—defines the next decade of UAS product roadmaps and FAA safety cases.",
-  "hero_image": "/images/articles/advance-01-hero-cv-targeting.png",
+  "hero_image": "https://media.thedroneedge.com/articles/advance-01-hero-cv-flight-088561b0.png",
   "seo_phrases": [
     "AI drone obstacle avoidance",
     "edge AI UAS",

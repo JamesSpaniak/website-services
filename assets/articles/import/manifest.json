@@ -11,12 +11,12 @@
   },
   {
     "slug": "story-03-dji-pentagon-lawsuit",
-    "title": "DJI, the Pentagon, and \u201cChinese Military Company\u201d Labels: Legal and Market Ripples",
+    "title": "DJI, the Pentagon, and “Chinese Military Company” Labels: Legal and Market Ripples",
     "hero_image": "/images/articles/hero-default.svg"
   },
   {
     "slug": "story-04-china-drone-export-controls",
-    "title": "China\u2019s Drone Export Controls: Global Supply Chains and Compliance",
+    "title": "China’s Drone Export Controls: Global Supply Chains and Compliance",
     "hero_image": "/images/articles/hero-default.svg"
   },
   {
@@ -52,7 +52,7 @@
   {
     "slug": "advance-01-onboard-ml-computer-vision",
     "title": "Onboard AI and Computer Vision on Small Drones: From Obstacle Avoidance to Edge Inference",
-    "hero_image": "/images/articles/advance-01-hero-cv-targeting.png"
+    "hero_image": "https://media.thedroneedge.com/articles/advance-01-hero-cv-flight-088561b0.png"
   },
   {
     "slug": "advance-02-swarm-coordination-autonomy",
@@ -76,7 +76,7 @@
   },
   {
     "slug": "advance-06-ukraine-mass-drone-production",
-    "title": "Ukraine\u2019s Drone Industrial Push: How a Country Scaled Small UAS Production",
+    "title": "Ukraine’s Drone Industrial Push: How a Country Scaled Small UAS Production",
     "hero_image": "/images/articles/hero-default.svg"
   },
   {
@@ -87,12 +87,12 @@
   {
     "slug": "school-01-part-107-cte-classroom",
     "title": "Part 107 in the High School CTE Classroom: Delivery Models and Teacher Visibility",
-    "hero_image": "/images/articles/school-01-part-107-cte-classroom-hero.png"
+    "hero_image": "https://media.thedroneedge.com/articles/school-01-part-107-cte-classroom-hero-7788149f.png"
   },
   {
     "slug": "school-02-funding-drone-programs",
     "title": "Funding Drone Programs in Schools: Language That Helps (Without Overpromising)",
-    "hero_image": "/images/articles/school-02-funding-drone-programs-hero.png"
+    "hero_image": "https://media.thedroneedge.com/articles/school-02-funding-drone-programs-hero-d35cfca8.png"
   },
   {
     "slug": "school-03-pilot-vs-full-year",
@@ -122,6 +122,21 @@
   {
     "slug": "b2c-03-twenty-nine-vs-ground-school",
     "title": "$29 Part 107 Course vs Flight School Ground School: Which Fits You?",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "gap-01-who-gets-to-build-drones",
+    "title": "Who Gets to Build Drones? Jobs, Hobbyists, and the Skills Gap Behind 480,000 Remote Pilots",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "gap-02-drone-education-every-level",
+    "title": "Drone Education in 2026: What Exists From Middle School to the Workforce, and Where the Gaps Are",
+    "hero_image": "/images/articles/hero-default.svg"
+  },
+  {
+    "slug": "gap-03-funding-school-drone-programs-2026",
+    "title": "Funding a School Drone Program in 2026: Pay for the Teacher, Not Just the Drone",
     "hero_image": "/images/articles/hero-default.svg"
   }
 ]
