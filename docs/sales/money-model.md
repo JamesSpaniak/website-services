@@ -94,6 +94,7 @@ Today Pro is "all courses while subscribed." One new course a year is not a reas
 | **Parts discount** (10–15 % on kits, spares, upgrades) and member-only spares pack | Ties the subscription to the hardware ladder — answers *"replacement parts with subscription upsell?"* | Store + coupon logic |
 | Monthly live Q&A / build clinic (recorded) | Community and access | Staffing — start quarterly |
 | Early access / member pricing on Course 2 and events | Anticipation | Policy |
+| Members section in the monthly newsletter (opt-in; newsletter itself is free for everyone) — decided NL-D8, 2026-10-04 | Monthly cadence | [`../marketing/newsletter-plan.md`](../marketing/newsletter-plan.md) § 7b, NL17 |
 
 Pricing shape: **monthly for the downsell path, yearly for the retention path** (two months free). Show Pro on the post-purchase page as "keep learning for $X/mo" rather than at first contact — the $129 buyer already trusts us; the stranger doesn't.
 

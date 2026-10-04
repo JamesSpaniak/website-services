@@ -13,6 +13,7 @@ import {
   BackfillOrderDto,
   ConfirmCheckoutDto,
   ConfirmPurchaseDto,
+  CreateCourseCheckoutDto,
   CreateProCheckoutDto,
   ProMembershipDuration,
   PurchaseCourseDto,
@@ -81,11 +82,12 @@ export class PurchaseController {
   @Post('create-course-checkout')
   async createCourseCheckout(
     @Request() req,
-    @Body() purchaseDto: PurchaseCourseDto,
+    @Body() dto: CreateCourseCheckoutDto,
   ) {
     return this.purchasesService.createCourseCheckoutSession(
       req.user.userId,
-      purchaseDto.courseId,
+      dto.courseId,
+      dto.promoCode,
     );
   }
 
@@ -160,6 +162,7 @@ export class PurchaseController {
       dto.duration ?? ProMembershipDuration.Monthly,
       dto.successPath,
       dto.cancelPath,
+      dto.promoCode,
     );
   }
 

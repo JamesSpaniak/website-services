@@ -108,6 +108,43 @@ Instead: when the caller is a native client, have the media endpoint also return
 
 ---
 
+## App Store compliance — account deletion and comments (audit Oct 4 2026)
+
+Two review guidelines block submission independently of the HLS work. Both are **web changes too** — the Capacitor build ships the same UI, and the privacy notice already promises deletion — so build them before the wrap.
+
+### Current state
+
+| Guideline | Requirement | Status |
+|-----------|-------------|--------|
+| **5.1.1(v)** account deletion | User can **initiate** deletion inside the app (email-only is rejected) | ❌ `UserService.deleteUser()` (full purge: `product_events`, `product_events_daily`, `exam_attempt_history`, then cascades) exists but **no route calls it**. Only admin `DELETE /users/:id` → `deleteUserAsAdmin`. Privacy notice § 9 routes deletion to email |
+| 5.1.1(v) | Deletion removes the account's data, not just deactivates | ⚠️ `deleteUserAsAdmin` skips the three analytics tables `deleteUser` clears — admin deletes leave rows behind, contradicting privacy notice § 7 |
+| **1.2** UGC | Users can remove their own content | ✅ `DELETE /comments/:id` (own or admin) |
+| 1.2 | Filter objectionable material | ❌ None on create/edit |
+| 1.2 | Report offensive content, with timely response | ❌ No endpoint, UI, or admin queue |
+| 1.2 | Block abusive users | ❌ None |
+| 1.2 | Published contact info | ✅ Privacy notice § 9 |
+
+### Build items
+
+| # | Item | Size |
+|---|------|------|
+| **AS1** | `DELETE /users/me` — `JwtAuthGuard`, require password re-entry (or recent login), call `deleteUser`, clear auth cookies + bump `token_version`, audit `USER_SELF_DELETED`. Refuse for admins | S |
+| **AS2** | "Delete account" in [`profile.tsx`](../../drone/src/app/ui/components/profile.tsx) — confirm dialog listing what is removed (progress, exam history, comments, purchases access), type-to-confirm, then sign out | S |
+| **AS3** | `deleteUserAsAdmin` → reuse `deleteUser` for the purge so both paths delete the same tables | XS |
+| **AS4** | Purge data held outside the `users` FK graph, inside the same flow: every `leads` row by email, newsletter included (or add to SES suppression) — see [`newsletter-plan.md`](../marketing/newsletter-plan.md) § 7c NL-A1; Stripe customer (`stripe.customers.del` on `stripe_customer_id`); `orders` email columns are **kept** (tax / dispute retention, privacy § 7; `user_id` already `SET NULL`); the `USER_DELETED` audit metadata **keeps the email**, but `audit_logs` rows cascade-delete with the actor, so the self-delete row is written with a null actor (migration: `audit_logs.user_id` is `NOT NULL` today; make it nullable, keep the cascade); an active Pro subscription is **cancelled immediately** before the Stripe customer is deleted. *Decided Oct 4 2026* | S |
+| **AS5** | **PD23 decided Oct 4 2026:** the archive job drops `user_id` and `anonymous_id` before writing to S3, so deletion never needs to reach the archive | XS |
+| **AS6** | Comment reports — `comment_reports` table (comment, reporter, reason, status), `POST /comments/:id/report`, "Report" in the comment menu, admin queue tab (dismiss / delete comment / delete user). Optional auto-hide at N reports. Email admin on new report so "timely response" is real | M |
+| **AS7** | User blocks — `user_blocks` (blocker, blocked; both `ON DELETE CASCADE`), `POST`/`DELETE /users/:id/block`, "Block user" in the comment menu, `getComments` hides blocked authors for the blocker | M |
+| **AS8** | Objectionable-content filter — word list checked on comment create/edit (reject or hold for review) | S |
+| **AS9** | Terms of Service: explicit no-objectionable-content / zero-tolerance clause; privacy notice § 9: mention in-app deletion | XS |
+| **AS10** | Review notes + App Privacy labels in App Store Connect: where deletion lives, how reporting/blocking works, demo account. Label Email Address for *Developer's Advertising or Marketing* (newsletter). If app signups ever feed Meta CAPI / Google, add the ATT prompt (5.1.2) — newsletter plan § 7c NL-A4 | XS |
+
+**Alternative for 1.2:** hide the comments UI in the app build (build flag, like Stripe Elements). AS6–AS8 then become optional for submission. AS1–AS5 are required either way.
+
+**Estimate:** AS1–AS4 ≈ 1 day · AS6–AS8 ≈ 2–3 days · AS9–AS10 ≈ ½ day. Re-check both guidelines at submit time.
+
+---
+
 ## What each change costs the website
 
 Nearly every mobile alignment change is **additive**. There is one thing you must not do, and one genuine tradeoff.
@@ -194,8 +231,9 @@ AI compresses code, not calendar. Budget wall-clock for enrollment, TestFlight, 
 ## Suggested sequence
 
 1. **PWA on the web (1–2 weeks)** — `manifest.ts`, Serwist SW (with media/`/api` exclusions), offline shell, web push. Measure installs and push engagement. Required for Capacitor anyway; nothing wasted if you stop.
-2. **Two additive backend changes (3–5 days)** — native-gated CloudFront cookie values in media JSON; session TTL scoped by client + fix 1-day vs 30-day mismatch; CORS origin for Capacitor if needed.
-3. **Capacitor wrap + submit (3–5 weeks)** — native tab bar/splash; **native video plugin**; offline lesson download; biometrics; APNs; strip in-app card entry → web checkout; TestFlight then submit with explicit reviewer notes on native features. Android is largely free once iOS works.
+2. **App Store compliance (3–5 days)** — self-serve account deletion and comment report/block/filter (**AS1–AS10**, § App Store compliance). Also closes a privacy-notice gap on the web, so worth doing even without an app.
+3. **Two additive backend changes (3–5 days)** — native-gated CloudFront cookie values in media JSON; session TTL scoped by client + fix 1-day vs 30-day mismatch; CORS origin for Capacitor if needed.
+4. **Capacitor wrap + submit (3–5 weeks)** — native tab bar/splash; **native video plugin**; offline lesson download; biometrics; APNs; strip in-app card entry → web checkout; TestFlight then submit with explicit reviewer notes on native features. Android is largely free once iOS works.
 
 ---
 

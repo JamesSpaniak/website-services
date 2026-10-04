@@ -29,6 +29,7 @@ import type {
 } from "./types/lead";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
+import { readPromoCode } from "./attribution";
 
 const getApiBaseUrl = () => {
     if (typeof window !== 'undefined') {
@@ -371,7 +372,7 @@ async function confirmCoursePurchase(paymentIntentId: string): Promise<{ granted
 async function createCourseCheckout(courseId: number): Promise<{ url: string }> {
     return apiClient('purchases/create-course-checkout', {
         method: 'POST',
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({ courseId, promoCode: readPromoCode() }),
     });
 }
 
@@ -402,6 +403,7 @@ async function createProCheckout(options?: {
             duration: options?.duration ?? 'monthly',
             successPath: options?.successPath ?? '/profile?pro=success',
             cancelPath: options?.cancelPath ?? '/profile?pro=canceled',
+            promoCode: readPromoCode(),
         }),
     });
 }

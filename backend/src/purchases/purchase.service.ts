@@ -421,6 +421,7 @@ export class PurchaseService {
   async createCourseCheckoutSession(
     userId: number,
     courseId: number,
+    promoCode?: string,
   ): Promise<{ url: string }> {
     const { course, user } = await this.assertCoursePurchasable(
       userId,
@@ -434,27 +435,29 @@ export class PurchaseService {
       courseId: String(courseId),
       productType: PRODUCT_COURSE,
     };
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'payment',
-      customer: customerId,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'usd',
-            unit_amount: Math.round(Number(course.price) * 100),
-            product_data: { name: course.title },
+    const session = await this.createCheckoutSessionWithPromo(
+      {
+        mode: 'payment',
+        customer: customerId,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: Math.round(Number(course.price) * 100),
+              product_data: { name: course.title },
+            },
           },
-        },
-      ],
-      success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
-      client_reference_id: String(userId),
-      metadata,
-      payment_intent_data: { metadata },
-      billing_address_collection: 'auto',
-      allow_promotion_codes: false,
-    });
+        ],
+        success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
+        client_reference_id: String(userId),
+        metadata,
+        payment_intent_data: { metadata },
+        billing_address_collection: 'auto',
+      },
+      promoCode,
+    );
 
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
@@ -542,6 +545,7 @@ export class PurchaseService {
     duration: ProMembershipDuration = ProMembershipDuration.Monthly,
     successPath = '/profile?pro=success',
     cancelPath = '/profile?pro=canceled',
+    promoCode?: string,
   ): Promise<{ url: string }> {
     const priceId = this.proPriceIdFor(duration);
     if (!priceId) {
@@ -564,34 +568,86 @@ export class PurchaseService {
     const customerId = await this.ensureStripeCustomer(user);
     const frontend = this.frontendBaseUrl();
     const success = this.sanitizePath(successPath);
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'subscription',
-      customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
-      // session_id lets the return page call confirm-pro-checkout if the webhook is late.
-      success_url: `${frontend}${success}${success.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontend}${this.sanitizePath(cancelPath)}`,
-      client_reference_id: String(userId),
-      metadata: {
-        userId: String(userId),
-        productType: PRODUCT_PRO,
-        duration,
-      },
-      subscription_data: {
+    const session = await this.createCheckoutSessionWithPromo(
+      {
+        mode: 'subscription',
+        customer: customerId,
+        line_items: [{ price: priceId, quantity: 1 }],
+        // session_id lets the return page call confirm-pro-checkout if the webhook is late.
+        success_url: `${frontend}${success}${success.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontend}${this.sanitizePath(cancelPath)}`,
+        client_reference_id: String(userId),
         metadata: {
           userId: String(userId),
           productType: PRODUCT_PRO,
           duration,
         },
+        subscription_data: {
+          metadata: {
+            userId: String(userId),
+            productType: PRODUCT_PRO,
+            duration,
+          },
+        },
+        billing_address_collection: 'auto',
       },
-      billing_address_collection: 'auto',
-      allow_promotion_codes: false,
-    });
+      promoCode,
+    );
 
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
     }
     return { url: session.url };
+  }
+
+  /**
+   * Launch promo codes (T21). A `?promo=` code that matches an active Stripe
+   * promotion code is pre-applied; otherwise Checkout shows its own "Add
+   * promotion code" field. Stripe rejects `discounts` together with
+   * `allow_promotion_codes`, so a session gets one or the other.
+   */
+  private async createCheckoutSessionWithPromo(
+    params: Stripe.Checkout.SessionCreateParams,
+    promoCode?: string,
+  ): Promise<Stripe.Checkout.Session> {
+    const promotionCodeId = promoCode
+      ? await this.findPromotionCodeId(promoCode)
+      : null;
+    if (promotionCodeId) {
+      try {
+        return await this.stripe.checkout.sessions.create({
+          ...params,
+          discounts: [{ promotion_code: promotionCodeId }],
+        });
+      } catch (err) {
+        // e.g. a Pro-only coupon on a course checkout: sell without it rather than fail.
+        if ((err as { type?: string }).type !== 'StripeInvalidRequestError') {
+          throw err;
+        }
+        this.logger.warn(
+          `Promo code ${promoCode} not applied: ${(err as Error).message}`,
+        );
+      }
+    }
+    return this.stripe.checkout.sessions.create({
+      ...params,
+      allow_promotion_codes: true,
+    });
+  }
+
+  /** Active promotion code id for a customer-facing code (Stripe matches case-insensitively). */
+  private async findPromotionCodeId(code: string): Promise<string | null> {
+    try {
+      const { data } = await this.stripe.promotionCodes.list({
+        code,
+        active: true,
+        limit: 1,
+      });
+      return data[0]?.id ?? null;
+    } catch (err) {
+      this.logger.warn(`Promo code lookup failed: ${(err as Error).message}`);
+      return null;
+    }
   }
 
   /** Stripe Customer Portal — cancel / update payment method for Pro. */

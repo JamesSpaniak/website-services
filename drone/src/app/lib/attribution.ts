@@ -23,6 +23,15 @@ export const ATTRIBUTION_PARAMS = [
 export const ATTRIBUTION_VALUE_MAX = 200;
 
 /**
+ * Launch promo code (T21) from a `?promo=CODE` link. Separate from `de_attr`
+ * because the latest code wins (a buyer may see several posts) and it is sent
+ * with checkout; the backend pre-applies it if Stripe knows it.
+ */
+export const PROMO_COOKIE = 'de_promo';
+export const PROMO_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+export const PROMO_CODE_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+
+/**
  * Parses the `de_attr` cookie in the browser. Returns string-valued fields only
  * (`utm_*`, `gclid`, `fbclid`, `ref`, `landing_path`, `ts`), or null when absent
  * or unreadable. Never throws.
@@ -72,4 +81,21 @@ export function pageViewAttributionFields(): Record<string, string> {
         if (attr[key]) out[key] = attr[key];
     }
     return out;
+}
+
+/** Promo code saved from a `?promo=` link, or undefined. Never throws. */
+export function readPromoCode(): string | undefined {
+    if (typeof document === 'undefined') return undefined;
+    const prefix = `${PROMO_COOKIE}=`;
+    const raw = document.cookie
+        .split(';')
+        .map((c) => c.trim())
+        .find((c) => c.startsWith(prefix));
+    if (!raw) return undefined;
+    try {
+        const code = decodeURIComponent(raw.slice(prefix.length));
+        return PROMO_CODE_PATTERN.test(code) ? code : undefined;
+    } catch {
+        return undefined;
+    }
 }

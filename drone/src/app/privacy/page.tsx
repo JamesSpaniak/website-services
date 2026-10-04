@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 /** Keep in sync with §10 of Sales Agreement and docs/tech/legal-and-privacy-site-sync.md */
-const PRIVACY_LAST_UPDATED = '2026-10-03';
+const PRIVACY_LAST_UPDATED = '2026-10-04';
 
 export default function PrivacyPage() {
   return (
@@ -145,7 +145,9 @@ export default function PrivacyPage() {
             link (for example one in an event announcement), we store the link&apos;s campaign tags (such as
             <code> utm_source</code> and <code>utm_campaign</code>) and the page you landed on in a first-party cookie
             named <code>de_attr</code> for 90 days. It contains no personal information. If you then join a waitlist or
-            sign in, those tags are saved with your signup so we know which announcement worked.
+            sign in, those tags are saved with your signup so we know which announcement worked. A link that carries a
+            discount code stores that code in a cookie named <code>de_promo</code> for 30 days so it can be applied at
+            checkout.
           </p>
           <p className="mt-3">
             We do not currently use third-party advertising pixels or cross-site tracking. If that changes, we will update

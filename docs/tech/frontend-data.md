@@ -29,6 +29,7 @@ The shared `apiClient` sets `Content-Type: application/json` and `X-Request-Id`;
 - **Refresh rotation:** each refresh rotates the refresh cookie. If a parallel refresh already rotated it, the backend returns only a new access cookie and leaves the refresh cookie alone (see [`backend-data.md`](backend-data.md) `/auth/refresh`).
 - **Logout:** `POST /api/auth/logout` invalidates the session and clears both cookies.
 - **`de_attr` (first-touch attribution, launch W5):** set by `middleware.ts` on the first request whose URL has any of `utm_source/medium/campaign/term/content`, `gclid`, `fbclid`, `ref` and no existing cookie (first touch wins, never overwritten). Value = URL-encoded JSON of those params (≤ 200 chars each) + `landing_path` + `ts`; `Path=/`, 90 days, `SameSite=Lax`, `Secure` in production, **not HttpOnly** — `lib/attribution.ts` `readAttribution()` reads it client-side for `POST /leads` and `page_view`. Skipped for `/api/*` and on the www→apex 301 (the apex request records it). No personal data; disclosed in Privacy § 6.
+- **`de_promo` (launch promo code, T21):** set by `middleware.ts` when a URL carries `?promo=CODE` (`[A-Za-z0-9_-]{1,64}`); latest code wins, 30 days, same flags as `de_attr`. `readPromoCode()` in `lib/attribution.ts` reads it and `createCourseCheckout` / `createProCheckout` send it as `promoCode`. Disclosed in Privacy § 6.
 
 ### Browser tests (Playwright)
 
@@ -264,6 +265,9 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | **Permissions** | **`AuthGuard`** — JWT session required (`GET /auth/profile` on app load). |
 | **API** | **`ProfileComponent`:** `PATCH /users/me` → `updateUser` (email); **`GET /progress/courses`** → `getCoursesWithProgress`; **`GET /audit/my`** → `getMyActivity`; **`media/profile-picture` + S3 PUT + `PATCH /users/me`** → `uploadProfilePicture`. **`CourseProgressPreview`:** `POST /progress/courses/:id/reset` → `resetCourseProgress`. |
 | **Components** | `AuthGuard`, `PageShell`, `ProfileComponent`, `CourseProgressPreview` (whole card is the course link; overflow menu stays separately clickable). |
+| **Membership card** | Sits directly under the name, above My Courses (hidden for admins; school accounts see it only to manage an existing Pro — no upsell in the student product). Not Pro: "Go Pro: every course for $35/month" + **Go Pro** → `createProCheckout` (monthly) + link to `/pricing`. Active Pro: status with expiry + **Manage billing** → `createBillingPortal`. The Settings section keeps only email and a "Book a consultation" link for schools. |
+
+`VerifyEmailBanner` (site-wide): hidden once `user.email_verified`. Dismiss (×) lasts for the browser tab session only (`sessionStorage`), so it returns in a new tab while still unverified. It re-fetches `getProfile` on tab focus, and `/verify-email` refreshes the auth user on success, so the banner clears without a reload.
 
 ### `/articles` — `app/articles/page.tsx`
 
@@ -427,7 +431,7 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 |---------|----------|
 | API wrapper, auth header, refresh | `drone/src/app/lib/api-client.tsx` |
 | Proxy to backend | `drone/src/app/api/[...path]/route.ts` |
-| Edge JWT gating + `de_attr` attribution cookie | `drone/src/middleware.ts` |
+| Edge JWT gating + `de_attr` attribution / `de_promo` promo-code cookies | `drone/src/middleware.ts` |
 | Attribution cookie reader | `drone/src/app/lib/attribution.ts` |
 | Waitlist form / lead types | `drone/src/app/ui/components/waitlist-form.tsx`, `drone/src/app/lib/types/lead.ts` |
 | Session / profile | `drone/src/app/lib/auth-context.tsx` |

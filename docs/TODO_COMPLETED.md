@@ -4,6 +4,13 @@ Items moved from [`TODO.md`](TODO.md) when shipped. **Each entry is dated** so y
 
 ---
 
+## 2026-10-04
+
+| Item | Notes |
+|------|--------|
+| **Funding page "optional video and AI tracks" claim** | Verified gone — removed with launch W1 (Oct 3 2026); `schools/funding/page.tsx` no longer mentions either track |
+| **Dead social links (S7)** | Verified — footer has no `#` hrefs and JSON-LD `sameAs` is `[]`. Add real profiles when M1/M3/O1/G5 exist |
+
 ## 2026-09-22
 
 | Item | Notes |

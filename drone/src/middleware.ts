@@ -4,6 +4,9 @@ import {
     ATTRIBUTION_MAX_AGE_SECONDS,
     ATTRIBUTION_PARAMS,
     ATTRIBUTION_VALUE_MAX,
+    PROMO_CODE_PATTERN,
+    PROMO_COOKIE,
+    PROMO_MAX_AGE_SECONDS,
 } from './app/lib/attribution';
 
 /** Apex host only (no scheme). www.{this} is 301-redirected here for a single canonical origin. */
@@ -52,6 +55,7 @@ const PROTECTED_ROUTES: RouteRule[] = [
  * encodeURIComponent(JSON).
  */
 function withAttribution(request: NextRequest, response: NextResponse): NextResponse {
+    withPromoCode(request, response);
     try {
         const { pathname, searchParams } = request.nextUrl;
         if (pathname.startsWith('/api/') || request.cookies.has(ATTRIBUTION_COOKIE)) return response;
@@ -76,6 +80,25 @@ function withAttribution(request: NextRequest, response: NextResponse): NextResp
         /* attribution must never break routing */
     }
     return response;
+}
+
+/** `?promo=CODE` (T21): latest valid code wins, 30 days; checkout sends it to the backend. */
+function withPromoCode(request: NextRequest, response: NextResponse): void {
+    try {
+        const { pathname, searchParams } = request.nextUrl;
+        if (pathname.startsWith('/api/')) return;
+        const code = searchParams.get('promo')?.trim();
+        if (!code || !PROMO_CODE_PATTERN.test(code)) return;
+        response.cookies.set(PROMO_COOKIE, code, {
+            path: '/',
+            maxAge: PROMO_MAX_AGE_SECONDS,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: false,
+        });
+    } catch {
+        /* a promo link must never break routing */
+    }
 }
 
 export function middleware(request: NextRequest) {

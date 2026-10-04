@@ -4,7 +4,7 @@ Paste-ready article JSON from the [Oct 2026 article review](../../../../docs/mar
 
 **These files are the current version of these articles.** The older JSON files for the same slugs in `import/` are superseded.
 
-**`seo_phrases` is left out on purpose.** The admin importer appends a "Topics & related search terms" block whenever that field is present (`drone/src/app/lib/article-import-json.ts`). That block is the keyword list showing on live articles.
+**`seo_phrases` is left out on purpose.** The admin importer used to append a "Topics & related search terms" block whenever that field was present. Fixed Oct 4 2026: the importer no longer appends it, and `prepareArticleBodyHtml` strips the block from already-published articles at render, so the field is safe to include again.
 
 ## How to apply each file
 

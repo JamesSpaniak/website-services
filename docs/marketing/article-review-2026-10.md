@@ -25,7 +25,7 @@ A keep/fix/retire decision for every article in [`assets/articles/import/`](../.
    - story-10 ("wrap in a scroll container in your layout component").
    - school-01 ("(verify current count before external decks)").
 
-   Most story and advance pieces also have "Hook:" labels and a "Topics & related search terms" keyword footer. Strip all of these before anything else is imported. If the published versions match the repo, fix advance-01 in prod now.
+   Most story and advance pieces also have "Hook:" labels and a "Topics & related search terms" keyword footer (the footer is now stripped at render and removed from the repo JSON, Oct 4 2026; the "Hook:" labels are not). Strip all of these before anything else is imported. If the published versions match the repo, fix advance-01 in prod now.
 2. **Thirteen of 28 articles are stubs** of 92–194 words. advance-01 and advance-05 are listed as Published. Check whether the live versions are longer.
 3. **22 of 28 use `hero-default.svg`.**
 4. **advance-01's live hero shows weapon targeting** (`advance-01-hero-cv-targeting.png`: an FPV quad with a "DETECT 0.94 / TRACK" box on a vehicle). Swap in `advance-01-hero-cv-flight.png`.

@@ -12,6 +12,16 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 - **Finish the other two course tracks before initial launch** — Video & Photography (`/courses/tracks/video`) and AI & Drones (`/courses/tracks/ai`) are stub "coming soon" pages today; home page track cards link to them. Ship full course content + catalog entries before launch so the three-path hero is accurate. Part 107 remains P0 for recordings first.
 - **Home page join CTAs** (after Part 107 content) — hero primary should be "Try Unit 1 free" / register; secondary purchase or preview; header Sign up — see B2C conversion backlog below.
 
+### Batch 2 (planned Oct 4 2026 — code only, no deploy)
+
+| Group | Items | Notes |
+|-------|-------|-------|
+| 1 · Launch blockers | **T21** promo codes · remove `mergeSeoPhrasesIntoBody` keyword block · commit the profile Pro card + verify-banner refresh | Before the Oct 8 / Oct 16 announcements |
+| 2 · Account deletion | **AS1, AS2, AS3, AS4 (+ NL-A1), AS5, AS9** — AS5 = PD23 option 1: archive job drops `user_id` + `anonymous_id` before writing to S3 | AS4 decided Oct 4: keep `orders` email (tax/dispute retention, already covered by privacy § 7); `USER_DELETED` audit row keeps the email, written with a null actor so it survives the cascade (small migration: `audit_logs.user_id` is `NOT NULL` today); active Pro is cancelled immediately, then the Stripe customer is deleted. AS6–AS8 deferred until a native app is decided |
+| 3 · Newsletter Phase 1 | **NL1–NL8** + **NL16b** (profile email preferences) | Name decided: **Field Notes** (NL-D1). D2–D4 still open |
+| 4 · Measurement | **T1**, **T3 / PA37 / PA7** funnel events, **PA42** idempotent webhook events | |
+| Ops (you) | Apply `ses_events_subscription_enabled = true` (NL0.2) · **PA41** webhook secret · **PA39** contact-point Test | Deploys production |
+
 ---
 
 ## P0 — Product & course delivery
@@ -102,7 +112,6 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Teacher training offer** — price/packaging, trainers (Part 107 + PA clearances), insurance, test the 2-day hybrid at first school (T1–T6) | Draft design | [`sales/teacher-training.md`](sales/teacher-training.md) |
 | **Grant toolkit for `/schools/funding`** — full-cost budget template, evaluation template, narrative paragraph (D2) | Idea | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §5.3–5.4 |
 | **Counsel check: 2 CFR 200.319(b)** — where grant-narrative help becomes drafting specs on federal-funds deals (D4) | Open | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §5.3 |
-| **Funding page claims "optional video and AI tracks"** — conflicts with positioning § Prohibited; reword or remove | Open | [`../drone/src/app/schools/funding/page.tsx`](../drone/src/app/schools/funding/page.tsx) · [`sales/positioning.md`](sales/positioning.md) |
 | **Lateral channels** — inter-school challenge, student peer teaching, clubs, shared design gallery (ideas only) | Idea | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §2.9 |
 
 ### Money model — offer ladder decisions and surfaces
@@ -151,7 +160,6 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Expand & publish B2C articles** — study guide (A), practice questions (B), **rewrite C at $129** (draft still titled $29 vs ground school) | Draft JSON in repo; C stale | [`marketing/article-inventory.md`](marketing/article-inventory.md) |
 | **Resolve Hidden "AI & Drones" article** in prod — publish, merge, or retire | Open — review Oct 3 2026 says **retire**; move `ai_drones.json` / `video_photo.json` (course payloads) out of `import/` | Prod admin · [`marketing/article-review-2026-10.md`](marketing/article-review-2026-10.md) |
 | **Article review Oct 2026: act on it** — strip leaked editor notes (advance-01 live), swap advance-01 targeting hero, unpublish story-01 + advance-06, retire/merge 10 stubs, rewrite 9 | Open | [`marketing/article-review-2026-10.md`](marketing/article-review-2026-10.md) § 5 |
-| **Article importer appends a "Topics & related search terms" keyword block** whenever `seo_phrases` is in the pasted JSON (`drone/src/app/lib/article-import-json.ts` `mergeSeoPhrasesIntoBody`). That's keyword stuffing on every live article; remove the merge (keep `seo_phrases` as metadata only). Workaround: the paste batch leaves the field out | Open | [`../assets/articles/import/paste-2026-10/README.md`](../assets/articles/import/paste-2026-10/README.md) |
 | **Apply Oct 2026 article paste batch** (edits #40/#39, new school-02 + gap-01/02/03) | Open | [`../assets/articles/import/paste-2026-10/README.md`](../assets/articles/import/paste-2026-10/README.md) |
 | **Review + publish gap articles 1–3** (jobs/hobby/building · education by level · 2026 funding); gap-01 waits on launch W2 building page | Draft (repo) | [`marketing/article-inventory.md`](marketing/article-inventory.md) · [`marketing/article-stats-2026-10.md`](marketing/article-stats-2026-10.md) |
 | **Check Drone Building kit parts against the FCC Covered List** (Dec 22 2025: all foreign-produced drones + critical components incl. FCs, radios, motors; new authorizations frozen) before quoting kits | Open | [`marketing/article-stats-2026-10.md`](marketing/article-stats-2026-10.md) § 5 |
@@ -248,7 +256,8 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **T18** | PWA manifest (`app/manifest.ts`) + maskable icons from the brand kit | Build | Not started |
 | **T19** | PWA service worker (Serwist) — **exclude signed media domain and `/api/*` from caching**; keep protected routes out of precache | Build | Not started |
 | **T20** | Install prompt for logged-in learners only (do not prompt paid traffic mid-conversion) | Build | Not started |
-| **T21** | **Launch promo codes** — set `allow_promotion_codes: true` on both Checkout sessions (or apply a code server-side from a `?promo=` link via `discounts`), create the coupon + promotion code in Stripe (expiry, max redemptions; Pro `duration: once` or `repeating`). Keep list prices unchanged. Rationale: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8.3 | Build | Not started |
+| **T21** | **Launch promo codes** — set `allow_promotion_codes: true` on both Checkout sessions (or apply a code server-side from a `?promo=` link via `discounts`), create the coupon + promotion code in Stripe (expiry, max redemptions; Pro `duration: once` or `repeating`). Keep list prices unchanged. Rationale: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8.3 | Build | **Code done Oct 4 2026** — `?promo=CODE` → `de_promo` cookie (30 d, latest wins) → sent with both checkouts; an active Stripe promotion code is pre-applied via `discounts`, otherwise Checkout shows its own code field. Remaining: create the coupon + promotion code in the Stripe sandbox, then live (E8: `EDGE25`); **never 100% off a course** (no PaymentIntent → no fulfilment). Ships with the next deploy · [`tech/purchase-flows.md`](tech/purchase-flows.md) |
+| **T22** | **App Store compliance (Guidelines 5.1.1(v) + 1.2)** — no self-serve account deletion (`deleteUser` exists but unrouted; admin delete skips analytics tables); comments lack report, block, and filter. Items **AS1–AS10**; AS1–AS5 also close the privacy-notice § 7/§ 9 gap on the web | Build | Not started — audit Oct 4 2026, [`tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) § App Store compliance |
 
 *Prerequisites already tracked elsewhere:* free Unit 1 without verify friction (**S6**), public pricing page (**S2**), home join CTAs (**S3**), email capture / lead magnet (**S5**), dead social links (**S7**), P0 course video.
 
@@ -359,7 +368,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **PD20** | Materialize org seats as `entitlements` rows, or derive from members × org courses in the view? Recommendation: derive — avoids fan-out writes when a course is attached to an org | PA27 | Open |
 | **PD21** | Bundle revenue allocation per course — proportional to standalone price (recommended) or equal split? Computed at grant time, never recomputed | PA27, T16 | Open |
 | **PD22** | When does `hasAccess` switch to `entitlements`? — **Decided:** behind `ENTITLEMENTS_AUTHORITATIVE`, enabled in the PA34 deploy (14-night wait waived on the strength of the prod-clone trace; `access_diff` keeps running nightly as the post-hoc gate). Granting access is unaffected: purchase, admin grant, signup link, Pro and org seats all keep working (they already write the ledger); only the *read* changes | PA27 | Decided → PA36 |
-| **PD23** | Archive org-member raw events to S3 at the 12-month boundary, or delete? Recommendation: **delete** unless the DPA covers the archive and user deletion reaches S3; archive B2C partitions; keep rollups for everyone with cascade-on-delete | PA31, PD2 | Open |
+| **PD23** | Archive org-member raw events to S3 at the 12-month boundary, or delete? | PA31, PD2 | **Decided Oct 4 2026:** org-member rows deleted (as built); B2C rows archived **without `user_id` / `anonymous_id`**, so the archive identifies no one and account deletion never has to reach S3. Rollups kept for everyone, cascade on delete. Code change ships with AS5 (Batch 2) |
 
 ---
 
@@ -383,7 +392,6 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Home page join CTAs** — Try Unit 1 free primary, purchase/preview secondary, header Sign up | **Code done Oct 3 2026** — hero CTAs already live; header Sign up added (launch W6). Ships with the W9 deploy | **S3** · Wave 2 |
 | **Testimonials / social proof** | Not started | **S4** |
 | **Email capture / lead magnet** (e.g. free practice exam) | **Capture half code done Oct 3 2026 (launch W3 + Z1–Z5)** — `leads` table, `POST /leads`, waitlist form, SES confirmation, one-click unsubscribe, admin Leads tab + CSV, SES broadcast. Lead magnet itself not started. Ships with the W9 deploy; needs `marketing_postal_address` set + SES production access | **S5** |
-| **Fix or remove dead social links** (footer `#` hrefs; JSON-LD `sameAs`) | Open | **S7** |
 | **Conversion funnel analytics** — signup_started, purchase_completed, consultation_submitted | Partial | **S10** — exam events sent but dropped by backend; signup/purchase missing · [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) Phase 1 |
 | **Creative / STEM tracks** | **Oct 3 2026 (launch W1):** removed from home, footer and funding page; `/courses/tracks/video` + `/ai` 308 → `/courses`; kept on `/schools/curriculum` as **Planned** (AI possibly step 2 of Drone Building — RL). Ships with the W9 deploy | **S11** (partial) |
 

@@ -29,6 +29,9 @@ describe('PurchaseService — hosted Checkout', () => {
       },
     },
     customers: { create: jest.fn(async () => ({ id: 'cus_new' })) },
+    promotionCodes: {
+      list: jest.fn(async () => ({ data: [] as { id: string }[] })),
+    },
   };
   const config: Record<string, string> = {
     FRONTEND_URL: 'https://thedroneedge.com/',
@@ -83,7 +86,7 @@ describe('PurchaseService — hosted Checkout', () => {
         customer: 'cus_existing',
         client_reference_id: '7',
         billing_address_collection: 'auto',
-        allow_promotion_codes: false,
+        allow_promotion_codes: true,
         success_url:
           'https://thedroneedge.com/courses/3?purchase=success&session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'https://thedroneedge.com/courses/3?purchase=1',
@@ -98,6 +101,45 @@ describe('PurchaseService — hosted Checkout', () => {
       // payment_intent.succeeded fulfils from this — must match the legacy PI metadata.
       expect(params.payment_intent_data.metadata).toEqual(meta);
       expect(stripe.customers.create).not.toHaveBeenCalled();
+    });
+
+    it('pre-applies an active promo code from a ?promo= link', async () => {
+      stripe.promotionCodes.list.mockResolvedValueOnce({
+        data: [{ id: 'promo_launch' }],
+      });
+      await service.createCourseCheckoutSession(7, 3, 'EDGE25');
+      expect(stripe.promotionCodes.list).toHaveBeenCalledWith({
+        code: 'EDGE25',
+        active: true,
+        limit: 1,
+      });
+      const params = sessionParams();
+      expect(params.discounts).toEqual([{ promotion_code: 'promo_launch' }]);
+      // Stripe rejects discounts + allow_promotion_codes together.
+      expect(params.allow_promotion_codes).toBeUndefined();
+    });
+
+    it('falls back to the manual code field for an unknown promo code', async () => {
+      await service.createCourseCheckoutSession(7, 3, 'NOPE');
+      const params = sessionParams();
+      expect(params.discounts).toBeUndefined();
+      expect(params.allow_promotion_codes).toBe(true);
+    });
+
+    it('sells without the code when Stripe rejects it for this product', async () => {
+      stripe.promotionCodes.list.mockResolvedValueOnce({
+        data: [{ id: 'promo_pro_only' }],
+      });
+      stripe.checkout.sessions.create.mockRejectedValueOnce(
+        Object.assign(new Error('coupon not applicable'), {
+          type: 'StripeInvalidRequestError',
+        }),
+      );
+      const res = await service.createCourseCheckoutSession(7, 3, 'PROONLY');
+      expect(res.url).toContain('checkout.stripe.com');
+      const retry = stripe.checkout.sessions.create.mock.calls[1][0];
+      expect(retry.discounts).toBeUndefined();
+      expect(retry.allow_promotion_codes).toBe(true);
     });
 
     it('creates a Stripe customer when the user has none', async () => {
@@ -196,7 +238,7 @@ describe('PurchaseService — hosted Checkout', () => {
         customer: 'cus_existing',
         line_items: [{ price: 'price_pro_monthly', quantity: 1 }],
         billing_address_collection: 'auto',
-        allow_promotion_codes: false,
+        allow_promotion_codes: true,
         metadata: { userId: '7' },
         subscription_data: { metadata: { userId: '7' } },
       });
