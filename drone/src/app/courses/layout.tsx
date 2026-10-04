@@ -2,10 +2,10 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Courses',
-  description: 'Professional drone certification courses including FAA Part 107 exam prep, flight training, and advanced drone operations.',
+  description: 'FAA Part 107 exam prep with practice exams and progress tracking. Unit 1 is free. Drone Building opens for early access in January 2027.',
   openGraph: {
     title: 'Courses — Drone Edge',
-    description: 'Professional drone certification courses including FAA Part 107 exam prep, flight training, and advanced drone operations.',
+    description: 'FAA Part 107 exam prep with practice exams and progress tracking. Unit 1 is free. Drone Building opens for early access in January 2027.',
   },
   other: {
     'robots': 'max-image-preview:large',

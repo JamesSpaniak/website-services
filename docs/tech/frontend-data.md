@@ -21,13 +21,18 @@ It strips `host`, forwards query strings, and fixes missing `Content-Type` for J
 | **Browser** | `/api` (relative — hits the Next route handler above) |
 | **Server / SSR helpers** | `API_INTERNAL_BASE_URL` → `NEXT_PUBLIC_API_BASE_URL` → `http://localhost:3000` |
 
-The shared `apiClient` sets `Content-Type: application/json`, `X-Request-Id`, and `Authorization: Bearer <access_token>` when tokens exist in `localStorage`. On **401**, it attempts **`POST /api/auth/refresh`** with the refresh token, updates tokens, and retries once.
+The shared `apiClient` sets `Content-Type: application/json` and `X-Request-Id`; auth rides on cookies the browser attaches. On **401** (browser only, not for `auth/login|refresh|logout`), it calls **`POST /api/auth/refresh`** with an empty body and retries once. The refresh is **single-flight** (`refreshSession`): requests that 401 together — e.g. the course page polling right after checkout, when the purchase has just bumped `token_version` — share one refresh call instead of racing to rotate the same cookie.
 
 ### Tokens and cookies
 
-- **Access / refresh:** stored in `localStorage` (`access_token`, `refresh_token`).
-- **Cookie:** on login/refresh, `access_token` is mirrored to a **Lax** cookie (`max-age=86400`) so **Edge middleware** can read the JWT for route gating without `localStorage`.
-- **Logout:** clears `localStorage` and expires the cookie.
+- **Access / refresh:** HttpOnly, `SameSite=Lax` cookies set by the backend (`access_token`, `refresh_token`) and forwarded by the `/api` proxy. Never readable from JavaScript; Edge middleware reads the access cookie for route gating.
+- **Refresh rotation:** each refresh rotates the refresh cookie. If a parallel refresh already rotated it, the backend returns only a new access cookie and leaves the refresh cookie alone (see [`backend-data.md`](backend-data.md) `/auth/refresh`).
+- **Logout:** `POST /api/auth/logout` invalidates the session and clears both cookies.
+- **`de_attr` (first-touch attribution, launch W5):** set by `middleware.ts` on the first request whose URL has any of `utm_source/medium/campaign/term/content`, `gclid`, `fbclid`, `ref` and no existing cookie (first touch wins, never overwritten). Value = URL-encoded JSON of those params (≤ 200 chars each) + `landing_path` + `ts`; `Path=/`, 90 days, `SameSite=Lax`, `Secure` in production, **not HttpOnly** — `lib/attribution.ts` `readAttribution()` reads it client-side for `POST /leads` and `page_view`. Skipped for `/api/*` and on the www→apex 301 (the apex request records it). No personal data; disclosed in Privacy § 6.
+
+### Browser tests (Playwright)
+
+`drone/e2e/` drives the real purchase flows against Stripe's sandbox (course buy, cancel, decline, 3DS, Pro + Customer Portal) and checks the user is still signed in afterwards. Needs the local stack running (API on 3000 with `EMAIL_ENABLED=false`, Next on 8080, one `stripe listen`), Node ≥ 18, then `npm run test:e2e` in `drone/`. Steps: [`stripe-sandbox-test-plan.md`](stripe-sandbox-test-plan.md) § 5.1.
 
 ### Environment variables (frontend-relevant)
 
@@ -42,6 +47,7 @@ The shared `apiClient` sets `Content-Type: application/json`, `X-Request-Id`, an
 ### Next.js config (`next.config.mjs`)
 
 - **`images.remotePatterns`:** allows `https://media.thedroneedge.com/**` for `next/image`.
+- **`redirects()`:** `/courses/tracks/video` and `/courses/tracks/ai` → `/courses` (permanent). Next loads `next.config.mjs` first; `next.config.ts` is kept in sync but shadowed.
 
 ### Server-only fetches (bypass `/api` proxy)
 
@@ -100,7 +106,7 @@ Org roles (**manager** / **member**) are **not** in the JWT; `/manager` only req
 | Pro subscription | **`POST /api/purchases/create-pro-checkout`** → `{ url }` redirect; manage via **`POST /api/purchases/billing-portal`** |
 | Return | Course page snapshots `?purchase=success&session_id=…` or `?pro=success`, cleans the URL, shows "unlocking…" and polls `getCourseById` (15 × 2 s) until `has_access`; `?purchase=1` (cancel) reopens `PurchaseFlow` |
 | Fulfillment | Server-side **`POST /purchases/webhook`** (Stripe signature); course PI + subscription events |
-| Reconcile | **`POST /api/purchases/confirm-checkout`** with the `session_id` after the 3rd poll if access is still off (`confirmCourseCheckout`) |
+| Reconcile | Course: **`POST /api/purchases/confirm-checkout`** with the `session_id` after the 3rd poll if access is still off (`confirmCourseCheckout`). Pro (`?pro=success&session_id=…`, on the course page or `/profile`): **`POST /api/purchases/confirm-pro-checkout`** (`confirmProCheckout`). The profile page polls `getProfile` (5 × 2 s), confirms after the first poll, then shows "Pro is active" or the still-activating notice |
 
 Profile Membership wires Pro upgrade + billing portal (Enterprise → `/consultation`). Flow detail: [`purchase-flows.md`](purchase-flows.md).
 
@@ -141,6 +147,8 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 | **`fetch(uploadUrl, { method: 'PUT', body: file })`** | S3 upload after presigned URL from backend (`uploadMediaToS3`). |
 | **`fetch(buildUrl('logs'), …)`** in `logToServer` | Client logs; **no** `Authorization` header (public backend route; abuse risk noted in backend doc). |
 | **`navigator.sendBeacon` / `fetch`** in `analytics.ts` | **`POST /api/analytics/event`** — page/article/course view events (backend OTLP metrics). |
+| **`createLead`, `getLeadPreferences`, `unsubscribeLead`** (`api-client.tsx`) | **`POST /api/leads`**, **`GET /api/leads/preferences?t=`**, **`POST /api/leads/unsubscribe`** — plain `fetch` on purpose: `apiClient` posts failing request bodies to `/logs`, which would log emails and unsubscribe tokens. Throw `ApiError` (has `.status`; 429 → "too many tries"). |
+| **`getLeadsAdmin`, `leadsCsvUrl`, `sendMarketingBroadcast`** | Admin: **`GET /api/leads`**, **`/api/leads/export.csv`** (link), **`POST /api/email/marketing/broadcast`** (`dry_run` / `test` / `send`; `send` returns `status: 'queued'`). |
 
 ### Course exams
 
@@ -153,17 +161,18 @@ The **Exam** UI (`exam.tsx`) submits answers via **`submitUnitExam`** → **`POS
 - **`track(event, payload)`** (`lib/analytics.ts`) is the single client entry point for product events. Events are **batched**: queued in memory and flushed as `{ events: [...], anonymousId }` to **`POST /analytics/event`** every 5 s, at 20 events, or on `pagehide` / tab-hidden via `sendBeacon` (`fetch keepalive` fallback). Each event carries `eventId` (uuid, server dedupe), `occurredAt`, and a per-tab `sessionId` (`sessionStorage['de:session']`). Allowed names: `lib/types/analytics.ts` → `ProductEventName` (mirror of the backend allow-list).
 - **Delivery guarantees:** the queue (≤ 200 events) is mirrored to `sessionStorage['de:analytics:queue']` and restored on the next page load, so a reload mid-lesson does not lose the last heartbeats. A flush that fails with a network error, 429 or 5xx is put back at the head and retried with exponential backoff (10 s → 60 s, 5 attempts, then dropped with a console error); 400/401/413 drop the batch immediately (bad payload, retrying cannot help). `online` triggers a flush. `sendBeacon` results are unknowable and treated as delivered. `track()` never throws.
 - **Anonymous id + identity stitch:** `anonymousId()` is a random UUID in `localStorage['de:anon']` (first-party, no cookie, no third party) sent with every batch. The backend only stores intent events for it (course/article/pricing views, `signup_started`, `checkout_started`, offer events). `AuthProvider` calls `identifyUser(user.id)` once per user per browser (`localStorage['de:anon:linked']`), which sends the `identified` event that joins pre-login rows to the account — see `docs/tech/analytics-and-attribution.md` § Consent (legitimate interest, non-identifying pre-login). Not a consent-banner substitute for ad pixels.
-- **`usePageAnalytics`** (root layout via `PageAnalytics`) calls **`trackPageView`** on route changes; **`trackArticleView`**, **`trackCourseView`**, **`sendExamEvent`** are thin wrappers over `track`.
+- **`usePageAnalytics`** (root layout via `PageAnalytics`) calls **`trackPageView`** on route changes (properties include `utm_source`, `utm_medium`, `utm_campaign`, `ref` from `de_attr` when present — stored only for signed-in users; anonymous page views stay OTel-only); **`trackArticleView`**, **`trackCourseView`**, **`sendExamEvent`** are thin wrappers over `track`.
 - **`useLessonHeartbeat(courseId, unitRef)`** (`lib/use-lesson-heartbeat.ts`, mounted by `UnitComponent`) emits `lesson_viewed` on open and `lesson_heartbeat` every 30 s while the tab is visible **and** (input in the last 5 min **or** a video is playing). When `VideoComponent` has registered state for the unit (`publishVideoState`), the heartbeat carries `position`, `duration`, `playing`, and the watched `ranges` since the last tick; a final `video_position` is sent on unmount. One tick = 0.5 min of engaged time in the rollups.
 - **Video tracking** (`ui/components/video.tsx`, HLS and native branches): watched ranges from `timeupdate` (a seek starts a new range, so scrubbing to the end does not count), `video_started` once per mount, `video_progress` at 25/50/75 % watched, `video_completed` at ≥ 90 % or `ended`; position mirrored to `localStorage['de:video:{courseId}:{unitRef}']` every 5 s. YouTube/Vimeo embeds are not tracked (TODO MP8).
 - **Resume:** `CourseUnitVideo` calls `GET /courses/:id/units/:ref/media` for any self-hosted / HLS video (not only signed ones) and reads `resume { position_seconds, percent_watched, completed }`; shows a **"Resume from m:ss · Start over"** chip when position ≥ 10 s, < 95 % watched and not completed; falls back to the `localStorage` mirror when the server has nothing. hls.js gets `startPosition`; native `<video>` seeks on `loadedmetadata`.
+- **`pricing_viewed`** fires once per visit to `/pricing` (`pricing-view-tracker.tsx`). **`lead_captured`** is recorded **server-side** by `POST /leads` — the waitlist form does not track it (no double count); it is in `ProductEventName` only for parity.
 - Client **`logger`** can forward to **`POST /logs`** via `logToServer`. Levels sent are `info` / `warn` / `error` (`logger.info` maps to `info`; sending `log` is a 400). Warn/error always ship; info only if `NEXT_PUBLIC_CLIENT_SEND_INFO_LOGS` or API-timing flags are on.
 
 ---
 
 ## 6. Pages — route map
 
-**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav + auth menu + Book a Call CTA; logged-out Sign in / Get started preserve the current path via `loginHref` / `registerHref`), and `FooterComponent` (nav columns + socials).
+**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav incl. **Pricing** + auth menu + Book a Call CTA at `lg`+; logged-out **Log in** (outline) / **Sign up** (primary) on desktop and mobile, preserving the current path via `loginHref` / `registerHref`), and `FooterComponent` (nav columns incl. Pricing + socials — X/LinkedIn icons are still `#`, TODO **S7**/W4).
 
 Below: **page file** → **permissions** → **HTTP/API** (backend names match [`backend-data.md`](./backend-data.md) §4) → **UI components** (primary children; nested components may call additional APIs).
 
@@ -173,7 +182,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 |--|--|
 | **Permissions** | Public (RSC). `HomeAuthCta` uses session from `AuthProvider` (no API by itself). |
 | **API** | Server-side **`GET /articles`** (direct fetch, `revalidate: 3600`) for the "Recent Articles" section; static teaser cards as fallback when unreachable. |
-| **Components** | Full-viewport hero (`BrandLogo`, `HomeAuthCta`, `HeroScrollNext`), course-track cards (FAA 107 / Video / AI — Video & AI tracks are coming-soon stubs), For Schools callout, `ArticlePreviewComponent` grid, `JsonLd` (organization + website). |
+| **Components** | Full-viewport hero (`BrandLogo`, `HomeAuthCta`, `HeroScrollNext`), course-track cards (FAA Part 107 + Drone Building early access → `/courses/tracks/building`; Video/AI cards removed Oct 2026, launch W1), For Schools callout, `ArticlePreviewComponent` grid, `JsonLd` (organization + website). |
 
 ### `/about` — `app/about/page.tsx`
 
@@ -203,6 +212,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 
 | | |
 |--|--|
+| **Flow** | After `POST /auth/register` succeeds the page **signs the user in immediately** (`useAuth().login` with the same credentials) and continues to the sanitized `?redirect=` → stashed redirect → `/courses/{FEATURED_COURSE_ID}`. Email verification is **not** part of the purchase or Unit 1 path (backend never required it); the verification email still goes out and `VerifyEmailBanner` nudges. If auto sign-in fails, a sign-in link is shown. |
 | **Permissions** | Public; redirects to sanitized `?redirect=` (else stashed redirect, else `/profile`) if logged in. Optional `?code=` org invite and `?signup=` admin promo link. `?redirect=` supported — sanitized, stashed to sessionStorage, and drives purchase-intent messaging (`redirectIndicatesPurchase`). |
 | **API** | **`GET /organizations/invite-info?code=`** when `code` present → `getInviteCodeInfo`. **`GET /users/signup-link-info?code=`** when `signup` present → `getSignupLinkInfo` (shows a "this link includes course access" banner listing courses; invalid links warn but don't block plain registration). **`POST /auth/register`** → `createUser` (includes `invite_code` and/or `signup_code` when valid). |
 | **Components** | `PageShell`, `ErrorComponent`, inline form (Heroicon), Suspense wrapper. |
@@ -284,7 +294,7 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | | |
 |--|--|
 | **Permissions** | **`AuthGuard`**. Backend **`GET /courses/:id`** requires JWT and enforces access. **`?purchase=1`** auto-opens `PurchaseFlow` (`initialShowPurchase`) when the course is paid and not yet owned. |
-| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-course-checkout`** / **`create-pro-checkout`** → redirect to Stripe. **Return:** page polls `getCourseById`, reconciles via **`POST /purchases/confirm-checkout`** (see §3). Logged-out state renders account-required CTAs. |
+| **API** | **`GET /courses/:id`** → `getCourseById`; **`trackCourseView`** → `POST /analytics/event`. **`CourseComponent`:** `PATCH /progress/courses/:id`, `PATCH /progress/courses/:courseId/units/:unitId`. **`PurchaseFlow`:** **`POST /purchases/create-course-checkout`** / **`create-pro-checkout`** → redirect to Stripe. **Return:** page polls `getCourseById`, reconciles via **`POST /purchases/confirm-checkout`** (course) or **`confirm-pro-checkout`** (Pro return) (see §3). Logged-out state renders account-required CTAs. |
 | **Components** | `AuthGuard`, `LoadingComponent`, `ErrorComponent`, **`CourseComponent`** (`CoursePurchaseBanner`, `PurchaseFlow`, `StatusUpdater`, `UnitPreviewComponent`, `VideoComponent`, `CourseImageStrip`, `CourseExamsSection`, `CourseOutlineSidebar`, `JsonLd`). **Hit targets:** unit preview cards are full-card links (status menu excluded); outline rows use a larger min-height link area (chevron alone expands). **`CourseImageStrip`:** unit galleries default to `fit="contain"` (`object-contain`, `max-h-[70vh]`, letterbox on `--surface`) so instructional charts are not cropped; course hero passes `fit="cover"` (16:9 `object-cover` + optional `image_focal_point`). Catalog cards and `/preview` also use cover and honor `image_focal_point`. Authoring sizes: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md). **Layout:** full-width (no `max-w` cap) with a fixed-width info/outline column on `lg+`; the info card (course `h1`) comes **first in DOM** (sane heading order, title-first on mobile) and is placed visually right via grid `col-start`. |
 
 ### `/courses/[courseId]/preview` — `app/courses/[courseId]/preview/page.tsx`
@@ -295,13 +305,37 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | **API** | Server-side **`GET /courses/:id/public`** (direct fetch, `revalidate: 3600`) for metadata + page; 404 via `notFound()` when missing. |
 | **Components** | Hero image (`aspect-video` + `object-cover`, honors `image_focal_point`), price / unit-count badges, **`CoursePreviewActions`** (auth-aware: continue-learning + unlock for logged-in; create-account / purchase / sign-in register-redirects for logged-out), course outline with `free_preview` markers, FAQ section, `JsonLd` (course + FAQ). Image size/format guidelines: [`workflows/tech/course-images.md`](../../workflows/tech/course-images.md) § Display modes / Authoring. |
 
-### `/courses/tracks/video`, `/courses/tracks/ai` — `app/courses/tracks/*/page.tsx`
+### `/courses/tracks/building` — `app/courses/tracks/building/page.tsx`
 
 | | |
 |--|--|
-| **Permissions** | Public; static "coming soon" stubs linked from the home track cards. Both tracks must ship before initial launch (see `docs/TODO.md` P0). |
-| **API** | None. |
-| **Components** | `PageShell`, copy + link back to `/courses`. |
+| **Permissions** | Public (RSC). Early-access marketing page — "January 2027", no price, no course payload. Facts from `assets/courses/drone-building/` (outline v3, parts list v4). |
+| **API** | **`POST /leads`** (`interest: building`) via `WaitlistForm`. |
+| **Components** | `PageShell`, `WaitlistForm` (email + hidden `website` honeypot + consent line → success state). |
+
+`/courses/tracks/video` and `/courses/tracks/ai` were deleted Oct 2026 (launch W1) and **redirect to `/courses`** (`next.config.mjs`). Those tracks appear only on `/schools/curriculum` as *Planned*.
+
+### `/pricing` — `app/pricing/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (RSC). |
+| **API** | None (static); `pricing_viewed` via `pricing-view-tracker.tsx`. |
+| **Content** | Free Unit 1 → Part 107 **$129** one-time (recommended) → Pro **$35/mo** (`DRAFT_PRO` comment; E5) → Schools "starting at **$79/seat**" + Book a call. Included / not included (FAA test fee excluded). Short taglines only ("Full refund available" on the course card with a Refund policy link; strip: Full refund available · Lifetime course access · Cancel Pro anytime → `/refunds`). FAQ (no email verification needed to buy; lifetime access — course purchases have no end date in code). Linked from header, footer, course preview ("View pricing"). |
+
+### `/refunds` — `app/refunds/page.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public (RSC, static). Linked from `/pricing`, footer (Refund Policy), sitemap. |
+| **Content** | Full refund & access policy (E7/D9, approved 2026-10-03): 30-day "tried it" refund (first 3 units + one practice exam, not more than half the course or the final exam), 14-day changed-your-mind refund if not past Unit 1, Pro cancel anytime / no partial months, how to request (support@), lifetime access = as long as Drone Edge offers the course, FAA test fee not refundable by us, individual purchases only. `REFUNDS_LAST_UPDATED` constant. |
+
+### `/unsubscribe` — `app/unsubscribe/page.tsx` + `unsubscribe-client.tsx`
+
+| | |
+|--|--|
+| **Permissions** | Public, token-authorized (`?t=` from the email footer). `noindex`; disallowed in `robots.ts`. |
+| **API** | **`GET /leads/preferences?t=`** → per-list checkboxes; **`POST /leads/unsubscribe`** `{ t, interests? }` (omitted = all). One-click unsubscribe from the mail client goes straight to `POST /api/leads/unsubscribe?t=` and never loads this page. |
 
 ### `/courses/[courseId]/units/[unitId]` — `app/courses/[courseId]/units/[unitId]/page.tsx`
 
@@ -324,6 +358,7 @@ Each tab is a **real route** (shared tab bar renders on every admin page, includ
 | `/admin/questions` | **`QuestionBankEditor`** — question CRUD, bulk import/export. Accepts `?course=<id>` to preselect a course. |
 | `/admin/organizations` | Org CRUD, invites (single + bulk, optional class selector for students), **classes panel** (create/rename/delete periods with member counts — `GET/POST/PATCH/DELETE .../classes`), course assignment — `POST/PATCH/DELETE /organizations`, `GET/PATCH/DELETE .../invite-codes`, `POST .../invite-codes/bulk`, `GET/POST/DELETE .../organizations/:id/courses`. |
 | `/admin/users` | **Users table** (search; expandable row per user) — `GET /users/admin/all`. Per-user: course access list with **source badges** (Purchased / Gift / Promo link), gift a course (`POST /users/:id/courses`), revoke (`DELETE /users/:id/courses/:courseId`), send password reset (`POST /auth/admin/users/:id/send-password-reset`), resend verification, delete account (`DELETE /users/:id`); **"Show learning & revenue (user 360)"** renders `User360Panel` (`GET /reporting/users/:id`) inline. **Signup links panel** — create one-time promo links (courses, optional email lock+send, note, expiry) via `POST /users/admin/signup-links`, list with status/copy-URL, delete unused ones. Types in `lib/types/admin-users.ts`. |
+| `/admin/leads` | **Leads** (launch W3/Z4) — `GET /leads?include_unsubscribed=true` once, count cards per interest, interest filter, include-unsubscribed toggle, status column, **Download CSV** (`/api/leads/export.csv`). **Broadcast panel** (SES): interests, subject, markdown body → **Count recipients** (`dry_run`; warns when the server is not configured) → **Send test to me** → **Send** (enabled only after a dry run, confirm shows the count; reports "sending in the background"). Layout, unsubscribe link and postal address are added server-side. Replaces the old relay `/email/broadcast`, which had no UI. |
 | `/admin/analytics` | Sub-tabs (hash-routed, `#overview` …): **Overview** (`GET /reporting/overview` + `/health` — five headline numbers, by-source table, reconciliation, "Refresh views" → `POST /reporting/refresh`), **Revenue** (`/reporting/revenue?months=`), **Courses** (`/reporting/utilization`, `/reporting/courses/:id/funnel`, `/reporting/cohorts` — lesson funnel columns are Viewed / Quiz passed / Marked done / Video done; exam rows show lesson titles and expand to `GET /reporting/courses/:id/exams/:examId/attempts`, names open `User360Panel`), **Organizations** (`/reporting/organizations`), **Pro** (`/reporting/pro` + Pro-at-risk queue), **Signals** (`/reporting/signals` — six offer queues; rows open the `User360Panel` drawer), **Activity** (legacy audit chart `GET /audit/analytics/overview` + `/daily`, in `activity-chart.tsx`). CSV links use `reportingCsvUrl` → `/api/reporting/export/:report.csv`. Widgets in `admin/analytics/report-widgets.tsx` and `exam-funnel.tsx`; types in `lib/types/analytics.ts`; number formatting in `lib/format-time.ts`. SQL behind every tab: [`analytics-queries.md`](analytics-queries.md). |
 
 **Permissions:** middleware cookie + JWT `role === 'admin'` (prefix match covers all nested routes); `AdminGuard` in the layout; backend admin-only on mutating routes.
@@ -358,7 +393,7 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 |--|--|
 | **Permissions** | Public (RSC, `data-edu-theme`). |
 | **API** | Server-side **`GET /courses`** (direct fetch) for live course catalog data on the curriculum overview. |
-| **Components** | Static curriculum/track sections + fetched course info. |
+| **Components** | Static curriculum/track sections + fetched course info. Each track carries a status: Part 107 *Available now*, Drone Building *Early access — January 2027*, Video & Photography and AI & Drones *Planned — not yet available* (AI possibly step 2 of Drone Building). |
 
 ### `/consultation` — `app/consultation/page.tsx`
 
@@ -380,8 +415,8 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 
 | File | Role |
 |------|------|
-| `app/sitemap.ts` | Server **`GET /articles`** for URLs; uses `API_INTERNAL_BASE_URL`. |
-| `app/robots.ts` | Disallow rules for `/api/`, `/admin/`, auth pages, etc. |
+| `app/sitemap.ts` | Server **`GET /articles`** for URLs; uses `API_INTERNAL_BASE_URL`. Static entries include `/pricing` and `/courses/tracks/building` (video/ai removed). |
+| `app/robots.ts` | Disallow rules for `/api/`, `/admin/`, auth pages, `/unsubscribe`, etc. |
 | `app/opengraph-image.tsx`, `app/twitter-image.tsx` | Generated OG/Twitter images (no REST API). |
 
 ---
@@ -392,7 +427,9 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 |---------|----------|
 | API wrapper, auth header, refresh | `drone/src/app/lib/api-client.tsx` |
 | Proxy to backend | `drone/src/app/api/[...path]/route.ts` |
-| Edge JWT gating | `drone/src/middleware.ts` |
+| Edge JWT gating + `de_attr` attribution cookie | `drone/src/middleware.ts` |
+| Attribution cookie reader | `drone/src/app/lib/attribution.ts` |
+| Waitlist form / lead types | `drone/src/app/ui/components/waitlist-form.tsx`, `drone/src/app/lib/types/lead.ts` |
 | Session / profile | `drone/src/app/lib/auth-context.tsx` |
 | Redirect / purchase-intent helpers | `drone/src/app/lib/auth-redirect.ts` (sanitize, login/register hrefs, sessionStorage stash, `PURCHASE_QUERY`) |
 | Conversion CTAs | `drone/src/app/ui/components/login-conversion-panel.tsx`, `course-preview-actions.tsx`, `course-purchase-banner.tsx` |

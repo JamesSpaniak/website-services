@@ -79,6 +79,17 @@ The browser scales the file as-uploaded (CloudFront media is `unoptimized` in Ne
 - Unit ids are matched via the backend's ref normalization (`243` ≡ `u243`), so CSV rows may use either form against `faa_107_course.json` (canonical string refs).
 - No frontend upload portal needed: uploads go direct to S3 with the AWS CLI (same precedent as `scripts/bulk-upload-videos.sh`); the API's presigned-URL flow is for the admin UI's one-off uploads.
 
+## Article images (loose files)
+
+Article heroes and inline images use the same script without a mapping CSV:
+
+```
+python3 scripts/course_images.py upload-files assets/articles/images/<file>.png            # dry run
+python3 scripts/course_images.py upload-files assets/articles/images/<file>.png --execute  # upload
+```
+
+Keys are `articles/<slug>-<hash8>.png`. The script prints each CloudFront URL; put it in the article JSON's `hero_image` or an inline `<img src>`. Article images are **not** copied into `drone/public/`, which keeps the frontend build small. Only `hero-default.svg`, the code fallback, lives there. First batch uploaded Oct 3 2026: 11 heroes and inline images.
+
 ## Example (done Jul 8 2026)
 
 `assets/courses/faa-107/images/Pictures for Airports` → 61 images mapped to 31 units under units 2 and 3 of course 35, uploaded, and merged into `faa_107_course.json`. Artifacts: `assets/courses/faa-107/images/pictures-for-airports_mapping.csv`, `pictures-for-airports_review.md`.

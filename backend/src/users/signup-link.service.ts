@@ -19,6 +19,7 @@ import {
   SignupLinkInfo,
   SignupLinkRow,
 } from './types/admin-users.dto';
+import { maskEmail } from '../common/pii';
 
 /**
  * Admin-generated signup links (`/register?signup=CODE`).
@@ -93,7 +94,7 @@ export class SignupLinkService {
         );
       } catch (err) {
         this.logger.error(
-          `Failed to send signup link email to ${link.email}: ${(err as Error).message}`,
+          `Failed to send signup link email to ${maskEmail(link.email)}: ${(err as Error).message}`,
         );
       }
     }

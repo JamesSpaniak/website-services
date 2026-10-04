@@ -16,6 +16,17 @@ import {
     ClassExamResults,
     AssignedClassExam,
 } from "./types/question";
+import type {
+    AdminLeadRow,
+    AdminLeadsQuery,
+    CreateLeadPayload,
+    CreateLeadResponse,
+    LeadPreferencesResponse,
+    MarketingBroadcastPayload,
+    MarketingBroadcastResult,
+    UnsubscribePayload,
+    UnsubscribeResponse,
+} from "./types/lead";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
 
@@ -45,6 +56,38 @@ interface ResetPasswordPayload {
 const isAuthEndpoint = (endpoint: string) =>
     endpoint === 'auth/login' || endpoint === 'auth/refresh' || endpoint === 'auth/logout';
 
+/**
+ * One cookie refresh shared by every request that 401s at the same time
+ * (e.g. the course page polling right after checkout). Parallel refreshes
+ * with the same cookie would each try to rotate it.
+ */
+let refreshInFlight: Promise<boolean> | null = null;
+const refreshSession = () => {
+    if (!refreshInFlight) {
+        refreshInFlight = fetch(buildUrl('auth/refresh'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Request-Id': uuidv4() },
+            body: JSON.stringify({}),
+        })
+            .then((res) => res.ok)
+            .catch(() => false)
+            .finally(() => {
+                refreshInFlight = null;
+            });
+    }
+    return refreshInFlight;
+};
+
+/** Error thrown by apiClient for non-2xx responses; carries the HTTP status. */
+export class ApiError extends Error {
+    readonly status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+    }
+}
+
 // --- Core API Function ---
 const apiClient = async (endpoint: string, options: RequestInit = {}) => {
     const requestId = uuidv4();
@@ -61,13 +104,7 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
 
         if (response.status === 401 && typeof window !== 'undefined' && !isAuthEndpoint(endpoint)) {
             // Access token expired — try a cookie-based refresh, then retry once.
-            const refreshResponse = await fetch(buildUrl('auth/refresh'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Request-Id': uuidv4() },
-                body: JSON.stringify({}),
-            });
-
-            if (!refreshResponse.ok) {
+            if (!(await refreshSession())) {
                 throw new Error("Session expired. Please log in again.");
             }
 
@@ -89,7 +126,7 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
             const errorData = (await response.json().catch(() => ({ message: response.statusText }))) as {
                 message?: string;
             };
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new ApiError(errorData.message || `HTTP error! status: ${response.status}`, response.status);
         }
 
         if (response.status === 204 || response.headers.get('Content-Length') === '0') {
@@ -231,6 +268,66 @@ async function sendConsultationRequest(payload: ConsultationPayload): Promise<{ 
     });
 }
 
+// ── Leads / waitlist (public) ──────────────────────────────────────────────────
+// Plain fetch instead of apiClient: apiClient ships the request options (body)
+// to /logs on failure, and these bodies carry an email address or an
+// unsubscribe token. Errors still surface as ApiError with the status.
+
+async function publicJson<T>(endpoint: string, init: RequestInit = {}): Promise<T> {
+    const headers = new Headers(init.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.set('X-Request-Id', uuidv4());
+    const response = await fetch(buildUrl(endpoint), { ...init, headers });
+    if (!response.ok) {
+        const errorData = (await response.json().catch(() => ({}))) as { message?: string | string[] };
+        const message = Array.isArray(errorData.message) ? errorData.message[0] : errorData.message;
+        throw new ApiError(message || `HTTP error! status: ${response.status}`, response.status);
+    }
+    return response.json().catch(() => ({}) as T);
+}
+
+/** POST /leads → 202 `{ ok: true }` for any valid input. Throws ApiError (429 when throttled). */
+async function createLead(body: CreateLeadPayload): Promise<CreateLeadResponse> {
+    return publicJson('leads', { method: 'POST', body: JSON.stringify(body) });
+}
+
+/** GET /leads/preferences?t= — the signed token from the email's unsubscribe link. */
+async function getLeadPreferences(token: string): Promise<LeadPreferencesResponse> {
+    return publicJson(`leads/preferences?t=${encodeURIComponent(token)}`);
+}
+
+/** POST /leads/unsubscribe — omit `interests` to unsubscribe from everything. */
+async function unsubscribeLead(payload: UnsubscribePayload): Promise<UnsubscribeResponse> {
+    return publicJson('leads/unsubscribe', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// ── Leads + marketing email (admin) ───────────────────────────────────────────
+
+function leadsQueryString(q: AdminLeadsQuery = {}): string {
+    const params = new URLSearchParams();
+    if (q.interest) params.set('interest', q.interest);
+    if (q.include_unsubscribed) params.set('include_unsubscribed', 'true');
+    const qs = params.toString();
+    return qs ? `?${qs}` : '';
+}
+
+async function getLeadsAdmin(q: AdminLeadsQuery = {}): Promise<AdminLeadRow[]> {
+    return apiClient(`leads${leadsQueryString(q)}`);
+}
+
+/** Browser link for the admin CSV export (cookie auth rides along). */
+function leadsCsvUrl(q: AdminLeadsQuery = {}): string {
+    return `/api/leads/export.csv${leadsQueryString(q)}`;
+}
+
+/** POST /email/marketing/broadcast — SES; `dry_run` counts, `test` sends to the caller, `send` sends. */
+async function sendMarketingBroadcast(payload: MarketingBroadcastPayload): Promise<MarketingBroadcastResult> {
+    return apiClient('email/marketing/broadcast', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+}
+
 async function resetPassword(payload: ResetPasswordPayload) {
     return apiClient('auth/reset-password', {
         method: 'POST',
@@ -281,6 +378,14 @@ async function createCourseCheckout(courseId: number): Promise<{ url: string }> 
 /** Fallback after the Checkout redirect if the webhook has not granted access yet. */
 async function confirmCourseCheckout(sessionId: string): Promise<{ granted: boolean; alreadyOwned: boolean }> {
     return apiClient('purchases/confirm-checkout', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId }),
+    });
+}
+
+/** Fallback when the Pro webhook is late: activates Pro from the Checkout session. */
+async function confirmProCheckout(sessionId: string): Promise<{ active: boolean }> {
+    return apiClient('purchases/confirm-pro-checkout', {
         method: 'POST',
         body: JSON.stringify({ sessionId }),
     });
@@ -902,6 +1007,13 @@ export {
     forgotPassword,
     sendContactMessage,
     sendConsultationRequest,
+    // Leads / waitlist
+    createLead,
+    getLeadPreferences,
+    unsubscribeLead,
+    getLeadsAdmin,
+    leadsCsvUrl,
+    sendMarketingBroadcast,
     resetPassword,
     verifyEmail,
     resendVerificationEmail,
@@ -909,6 +1021,7 @@ export {
     confirmCoursePurchase,
     createCourseCheckout,
     confirmCourseCheckout,
+    confirmProCheckout,
     logToServer,
     createPaymentIntent,
     createProCheckout,

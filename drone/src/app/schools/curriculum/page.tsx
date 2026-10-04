@@ -8,6 +8,8 @@ import {
   AcademicCapIcon,
   FilmIcon,
   CpuChipIcon,
+  WrenchScrewdriverIcon,
+  ClockIcon,
   BeakerIcon,
   DocumentTextIcon,
   UserGroupIcon,
@@ -18,7 +20,7 @@ import {
 export const metadata: Metadata = {
   title: 'Curriculum Overview — Drone Edge for Schools',
   description:
-    'Three distinct learning tracks for every type of student: FAA Part 107 certification, Drone Video & Photography, and AI & Drones STEM. Explore units, activities, practice tests, and teacher resources.',
+    'FAA Part 107 certification prep is available now; Drone Building opens for early access in January 2027; Video & Photography and AI & Drones are planned. Explore units, activities, practice tests, and teacher resources.',
 };
 
 export const revalidate = 3600;
@@ -60,9 +62,25 @@ async function fetchAllCourses(): Promise<ApiCourse[]> {
 
 // ── Static Content ─────────────────────────────────────────────────────────────
 
+/**
+ * Availability of each track. Only `available` tracks can be bought or assigned
+ * today — keep planned tracks clearly labelled (no product claims; see
+ * docs/sales/features.md).
+ */
+type TrackStatus = 'available' | 'early_access' | 'planned';
+
+const STATUS_BADGE: Record<TrackStatus, { label: string; cls: string }> = {
+  available: { label: 'Available now', cls: 'bg-[#4a6b2f]/10 text-[#4a6b2f] border-[#4a6b2f]/30' },
+  early_access: { label: 'Early access — January 2027', cls: 'bg-sky-50 text-sky-700 border-sky-200' },
+  planned: { label: 'Planned', cls: 'bg-[#f5f5f5] text-[#525252] border-[#d4d4d4]' },
+};
+
 const TRACKS = [
   {
     id: 'faa',
+    status: 'available' as TrackStatus,
+    statusNote: null,
+    href: null,
     icon: AcademicCapIcon,
     badge: 'Prerequisites',
     badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -73,9 +91,9 @@ const TRACKS = [
     title: 'FAA Part 107 Certification',
     tagline: 'Where every student starts — required for all program tracks',
     description:
-      'The FAA Part 107 knowledge exam is the legal gateway to commercial and educational drone operations. This foundational course is the prerequisite for every other track — whether a student wants to film, code, or compete. It covers federal aviation regulations, airspace classification, weather, safety, and decision-making.',
+      'The FAA Part 107 knowledge exam is the legal gateway to commercial and educational drone operations. This foundational course is where every student starts, and it is available today. It covers federal aviation regulations, airspace classification, weather, safety, and decision-making.',
     forWhom:
-      'Required for all students in every track. Before a student flies for creative projects, codes autonomous missions, or competes in drone challenges, they need to understand the rules of the airspace. Part 107 is that foundation. School programs run this over a semester or full year as part of a broader class — the content can be condensed for individual learners (career changers, adult pilots), but the school version is paced to cover the material thoroughly across the term.',
+      'The recommended starting point for every student. Before a student builds, films, or flies for a program, they need to understand the rules of the airspace. Part 107 is that foundation. School programs run this over a semester or full year as part of a broader class — the content can be condensed for individual learners (career changers, adult pilots), but the school version is paced to cover the material thoroughly across the term.',
     unitCount: 9,
     includes: [
       '9 content units mapped to FAA Airman Certification Standards (ACS)',
@@ -101,7 +119,53 @@ const TRACKS = [
       'Includes pacing guides for semester and full-year delivery. Practice tests auto-generate randomized question sets from the full question bank to mimic the real exam — generate multiple versions for different class periods or a single fixed version to keep all students on equal footing. Includes a student readiness rubric and printable concept references covering all ACS-tested topics.',
   },
   {
+    id: 'building',
+    status: 'early_access' as TrackStatus,
+    statusNote:
+      'Opens for early access in January 2027. The outline below is the current school edition and may change before launch. Join the waitlist to hear when it opens.',
+    href: '/courses/tracks/building',
+    icon: WrenchScrewdriverIcon,
+    badge: 'Hands-on Track',
+    badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
+    iconColor: 'text-sky-600',
+    cardBorder: 'border-sky-200',
+    accentBg: 'bg-sky-50',
+    titleColor: 'text-sky-800',
+    title: 'Drone Building',
+    tagline: 'Design, build, configure, and fly a 3.5" quad',
+    description:
+      'Students design a 3D-printed frame in CAD, assemble a 3.5" prop-guarded quadcopter, set it up in Betaflight, and fly it in a supervised flight lab under Part 107. Physics, materials, and heat are taught where the build needs them, and safety gates come before every power-on and flight.',
+    forWhom:
+      'Built for CTE, engineering, and STEM programs and school makerspaces. Part 107 is a helpful starting point; the course teaches the builder-scoped rules (registration, Remote ID, line of sight) in its own unit. The school edition runs about 33–38 class sessions. Kits come in a Solder version, where students make the joints, and a Pre-soldered version for programs without a soldering station.',
+    unitCount: 8,
+    includes: [
+      '8 units: Safety, Components, Laws, Physics, Frame design, Assembly, Software setup, Testing & flight',
+      'Frame design in CAD (Onshape by default, free for education) — students print the whole frame; a stock frame is the fallback',
+      'Reference kit: F722 flight controller stack, ELRS receiver, GPS + Remote ID module per aircraft, 3S battery',
+      'Three safety gates: signed shop certificate, failsafe demonstrated props-off, bench checklist before first flight',
+      'Grading built on the bench checklist and a maiden-flight rubric',
+    ],
+    activities: [
+      'Parts identification lab on the real kit',
+      'Break printed test bars in two print orientations — strength is a design decision',
+      'Budget all-up weight and thrust for your own design',
+      'Smoke-stopper first power-on after a continuity and polarity check',
+      'Bench checks, then a line-of-sight maiden hover with a Remote Pilot in Command present',
+    ],
+    sampleQuestion: {
+      q: 'Before any motor spins on the bench, what must be set and demonstrated with the props off?',
+      options: ['Acro mode rates', 'Failsafe on signal loss', 'GPS Position Hold', 'Video transmitter power'],
+      correct: 1,
+    },
+    teacherNote:
+      'Includes a signed shop-certificate checklist, a written safety brief that opens every unit, bench and maiden-flight checklists, and a frame-critique rubric. Schools without a 3D printer can receive pre-printed stock frames.',
+  },
+  {
     id: 'photo',
+    status: 'planned' as TrackStatus,
+    statusNote:
+      'Planned — in development, not yet available. The outline below describes what we intend to build; units and activities may change.',
+    href: null,
     icon: FilmIcon,
     badge: 'Creative Track',
     badgeColor: 'bg-violet-50 text-violet-700 border-violet-200',
@@ -141,6 +205,10 @@ const TRACKS = [
   },
   {
     id: 'ai',
+    status: 'planned' as TrackStatus,
+    statusNote:
+      'Planned — in development, not yet available. AI may instead become a second stage of Drone Building — applying reinforcement learning to the drone students build. That direction is not decided yet. The outline below describes the current idea and may change.',
+    href: null,
     icon: CpuChipIcon,
     badge: 'STEM Track',
     badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
@@ -197,17 +265,28 @@ const DELIVERY_FEATURES = [
 
 // ── Components ─────────────────────────────────────────────────────────────────
 
+function StatusBadge({ status }: { status: TrackStatus }) {
+  const meta = STATUS_BADGE[status];
+  return (
+    <span className={`inline-block text-xs font-semibold border px-2.5 py-1 ${meta.cls}`} style={{ borderRadius: '2px' }}>
+      {meta.label}
+    </span>
+  );
+}
+
 function TrackCard({ track }: { track: typeof TRACKS[number] }) {
   const Icon = track.icon;
+  const planned = track.status === 'planned';
   return (
-    <div className={`border ${track.cardBorder} bg-white p-6 flex flex-col gap-4`} style={{ borderRadius: '4px' }}>
+    <div
+      className={`border ${planned ? 'border-dashed border-[#d4d4d4] bg-[#fafafa]' : `${track.cardBorder} bg-white`} p-6 flex flex-col gap-4`}
+      style={{ borderRadius: '4px' }}
+    >
       <div className="flex items-start justify-between gap-3">
-        <div className={`p-2.5 ${track.accentBg} inline-flex`} style={{ borderRadius: '4px' }}>
+        <div className={`p-2.5 ${track.accentBg} inline-flex ${planned ? 'opacity-60' : ''}`} style={{ borderRadius: '4px' }}>
           <Icon className={`h-5 w-5 ${track.iconColor}`} />
         </div>
-        <span className={`text-xs font-semibold border px-2.5 py-1 ${track.badgeColor}`} style={{ borderRadius: '2px' }}>
-          {track.badge}
-        </span>
+        <StatusBadge status={track.status} />
       </div>
       <div>
         <h3 className="text-base font-display font-semibold text-[#171717]">{track.title}</h3>
@@ -215,8 +294,20 @@ function TrackCard({ track }: { track: typeof TRACKS[number] }) {
       </div>
       <p className="text-xs text-[#6b7280] leading-relaxed flex-1">{track.description}</p>
       <div className="flex items-center justify-between pt-2 border-t border-[#f0f0f0]">
-        <span className="text-xs text-[#9ca3af]">{track.unitCount} units</span>
-        <span className={`text-xs font-medium ${track.iconColor}`}>↓ Details below</span>
+        <span className="text-xs text-[#9ca3af]">
+          {track.unitCount} units{planned ? ' (planned)' : ''}
+        </span>
+        {track.href ? (
+          <Link
+            href={track.href}
+            className={`inline-flex items-center gap-1 min-h-[44px] text-xs font-semibold ${track.iconColor} hover:opacity-80`}
+          >
+            Join the waitlist
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </Link>
+        ) : (
+          <span className={`text-xs font-medium ${track.iconColor}`}>↓ Details below</span>
+        )}
       </div>
     </div>
   );
@@ -265,7 +356,35 @@ function TrackDetail({ track, flip }: { track: typeof TRACKS[number]; flip?: boo
             </span>
             <h2 className="text-xl font-display font-semibold text-[#171717]">{track.title}</h2>
           </div>
+          <div className="ml-auto">
+            <StatusBadge status={track.status} />
+          </div>
         </div>
+
+        {track.statusNote && (
+          <div
+            className={`mb-8 flex items-start gap-3 border px-4 py-3 text-sm ${
+              track.status === 'planned'
+                ? 'border-dashed border-[#d4d4d4] bg-[#fafafa] text-[#525252]'
+                : 'border-sky-200 bg-sky-50 text-[#171717]'
+            }`}
+            style={{ borderRadius: '4px' }}
+          >
+            <ClockIcon className="h-5 w-5 shrink-0 text-[#6b7280] mt-0.5" aria-hidden />
+            <div>
+              <p>{track.statusNote}</p>
+              {track.href && (
+                <Link
+                  href={track.href}
+                  className="mt-2 inline-flex items-center gap-1 min-h-[44px] font-semibold text-sky-700 hover:opacity-80"
+                >
+                  Drone Building early access — join the waitlist
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
@@ -283,7 +402,8 @@ function TrackDetail({ track, flip }: { track: typeof TRACKS[number]; flip?: boo
             {/* What's included */}
             <div>
               <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                <ClipboardDocumentCheckIcon className="h-3.5 w-3.5" /> What&apos;s Included
+                <ClipboardDocumentCheckIcon className="h-3.5 w-3.5" />{' '}
+                {track.status === 'available' ? <>What&apos;s Included</> : <>What&apos;s Planned</>}
               </p>
               <ul className="space-y-2">
                 {track.includes.map((item) => (
@@ -356,10 +476,10 @@ export default async function CurriculumPage() {
                 Curriculum Overview
               </span>
               <h1 className="text-3xl sm:text-4xl font-display font-semibold tracking-tight text-[#171717]">
-                Three tracks. One platform.<br />Every type of student.
+                Part 107 today. Building next.<br />More tracks planned.
               </h1>
               <p className="mt-5 text-base text-[#525252] leading-relaxed">
-                Drone Edge is organized around three distinct learning paths: a certification foundation that all students need, a creative track for media and storytelling, and a STEM track that uses drones to teach AI and computer science. Programs can run one track or all three.
+                FAA Part 107 is available now. Drone Building opens for early access in January 2027. Video &amp; Photography and AI &amp; Drones are planned tracks — in development and not yet available.
               </p>
               <p className="mt-4 text-sm">
                 <Link
@@ -372,13 +492,20 @@ export default async function CurriculumPage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5" style={{ borderRadius: '2px' }}>
-                  <AcademicCapIcon className="h-3.5 w-3.5" /> FAA Part 107 — All Students
+                  <AcademicCapIcon className="h-3.5 w-3.5" /> FAA Part 107 — Available now
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200 px-3 py-1.5" style={{ borderRadius: '2px' }}>
-                  <FilmIcon className="h-3.5 w-3.5" /> Video & Photography — Creative Track
+                <Link
+                  href="/courses/tracks/building"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1.5 hover:opacity-80"
+                  style={{ borderRadius: '2px' }}
+                >
+                  <WrenchScrewdriverIcon className="h-3.5 w-3.5" /> Drone Building — Early access Jan 2027
+                </Link>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#f5f5f5] text-[#525252] border border-dashed border-[#d4d4d4] px-3 py-1.5" style={{ borderRadius: '2px' }}>
+                  <FilmIcon className="h-3.5 w-3.5" /> Video &amp; Photography — Planned
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1.5" style={{ borderRadius: '2px' }}>
-                  <CpuChipIcon className="h-3.5 w-3.5" /> AI & Drones — STEM Track
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#f5f5f5] text-[#525252] border border-dashed border-[#d4d4d4] px-3 py-1.5" style={{ borderRadius: '2px' }}>
+                  <CpuChipIcon className="h-3.5 w-3.5" /> AI &amp; Drones — Planned
                 </span>
               </div>
             </div>
@@ -405,8 +532,8 @@ export default async function CurriculumPage() {
             <h2 className="text-xl font-display font-semibold text-[#171717]">How the tracks fit together</h2>
           </div>
           <p className="text-sm text-[#525252] leading-relaxed max-w-2xl mb-10">
-            Part 107 is the entry point for every student — it builds the airspace knowledge and safety mindset required for all drone operations.
-            After completing Part 107, students choose their path based on interest and program goals.
+            Part 107 is the entry point for every student — it builds the airspace knowledge and safety mindset behind all drone operations.
+            Drone Building is the next step (early access January 2027). Video &amp; Photography and AI &amp; Drones are planned and not yet available.
           </p>
 
           {/* Track pathway diagram */}
@@ -419,25 +546,37 @@ export default async function CurriculumPage() {
             </div>
 
             {/* Arrow */}
-            <div className="text-[#d1d5db] text-lg">↓ then choose a track</div>
+            <div className="text-[#d1d5db] text-lg">↓ then</div>
 
-            {/* Two tracks */}
+            {/* Step 2 — Drone Building */}
+            <Link
+              href="/courses/tracks/building"
+              className="w-full max-w-sm bg-sky-50 border border-sky-200 px-6 py-4 text-center hover:opacity-90"
+              style={{ borderRadius: '4px' }}
+            >
+              <p className="text-xs font-semibold text-sky-700 uppercase tracking-wide mb-1">Step 2 — Early access January 2027</p>
+              <p className="text-base font-display font-semibold text-[#171717]">Drone Building</p>
+              <p className="text-xs text-[#6b7280] mt-1">Safety · Components · CAD · Assembly · Betaflight · Flight</p>
+            </Link>
+
+            {/* Planned tracks */}
+            <div className="text-[#d1d5db] text-lg">↓ planned</div>
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
-              <div className="bg-violet-50 border border-violet-200 px-5 py-4" style={{ borderRadius: '4px' }}>
-                <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide mb-1">Creative Track</p>
-                <p className="text-sm font-display font-semibold text-[#171717]">Video & Photography</p>
+              <div className="bg-[#fafafa] border border-dashed border-[#d4d4d4] px-5 py-4" style={{ borderRadius: '4px' }}>
+                <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Planned — not yet available</p>
+                <p className="text-sm font-display font-semibold text-[#525252]">Video &amp; Photography</p>
                 <p className="text-xs text-[#6b7280] mt-1">Camera · Composition · Editing · Portfolio</p>
               </div>
-              <div className="bg-sky-50 border border-sky-200 px-5 py-4" style={{ borderRadius: '4px' }}>
-                <p className="text-xs font-semibold text-sky-700 uppercase tracking-wide mb-1">STEM Track</p>
-                <p className="text-sm font-display font-semibold text-[#171717]">AI & Drones</p>
-                <p className="text-xs text-[#6b7280] mt-1">Python · Computer Vision · Autonomous Flight · Projects</p>
+              <div className="bg-[#fafafa] border border-dashed border-[#d4d4d4] px-5 py-4" style={{ borderRadius: '4px' }}>
+                <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Planned — not yet available</p>
+                <p className="text-sm font-display font-semibold text-[#525252]">AI &amp; Drones</p>
+                <p className="text-xs text-[#6b7280] mt-1">Possibly a second stage of Drone Building: reinforcement learning on the drone you build</p>
               </div>
             </div>
           </div>
 
           {/* Track overview cards */}
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {TRACKS.map((track) => (
               <TrackCard key={track.id} track={track} />
             ))}

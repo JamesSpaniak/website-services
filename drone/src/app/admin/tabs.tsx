@@ -7,6 +7,7 @@ import {
     BuildingOfficeIcon,
     UsersIcon,
     ChartBarIcon,
+    EnvelopeIcon,
 } from '@heroicons/react/24/solid';
 import DashboardTabs, { DashboardTab } from '@/app/ui/components/dashboard-tabs';
 
@@ -16,6 +17,7 @@ const ADMIN_TABS: DashboardTab[] = [
     { href: '/admin/questions', label: 'Question Bank', icon: ClipboardDocumentListIcon },
     { href: '/admin/organizations', label: 'Organizations', icon: BuildingOfficeIcon },
     { href: '/admin/users', label: 'Users', icon: UsersIcon },
+    { href: '/admin/leads', label: 'Leads', icon: EnvelopeIcon },
     { href: '/admin/analytics', label: 'Analytics', icon: ChartBarIcon },
 ];
 

@@ -25,6 +25,8 @@ export const MARKETING_EVENTS = [
   'article_view',
   'course_view',
   'pricing_viewed',
+  /** Waitlist / email capture — recorded server-side by POST /leads only. */
+  'lead_captured',
 ] as const;
 
 export const LEARNING_EVENTS = [

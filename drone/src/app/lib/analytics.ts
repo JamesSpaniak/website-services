@@ -1,6 +1,7 @@
 'use client';
 
 import type { AnalyticsEventPayload, ProductEventName, VideoPlaybackState } from './types/analytics';
+import { pageViewAttributionFields } from './attribution';
 
 const getApiBase = () => {
     if (typeof window !== 'undefined') return '/api';
@@ -246,9 +247,13 @@ export function track(event: ProductEventName, payload: Omit<AnalyticsEventPaylo
 
 export function trackPageView(path: string | null | undefined): void {
     const safePath = (path && String(path).trim()) || '/';
+    // First-touch attribution (de_attr cookie, set by middleware) — utm_source /
+    // utm_medium / utm_campaign / ref only, each ≤ 200 chars.
+    const attribution = pageViewAttributionFields();
     track('page_view', {
         path: safePath,
         referrer: typeof document !== 'undefined' ? document.referrer || undefined : undefined,
+        ...(Object.keys(attribution).length ? { properties: attribution } : {}),
     });
 }
 

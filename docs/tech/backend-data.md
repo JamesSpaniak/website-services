@@ -30,7 +30,9 @@ JWT payload is validated in `JwtStrategy`; **`token_version`** on `users` must m
 | Area | Variables (typical) |
 |------|---------------------|
 | Stripe | `STRIPE_SECRET_KEY`; `STRIPE_WEBHOOK_SECRET` only when Terraform `stripe_webhook_enabled = true` (unset in prod today → webhook handler returns 400; course purchases still complete via the `confirm-checkout` / `confirm-payment` fallback, which retrieves the payment server-side, records the order and grants the entitlement). The webhook route gets a **raw** body (`main.ts`) for signature verification |
-| Email | SMTP / provider settings used by `EmailModule` |
+| Email | SMTP / provider settings used by `EmailModule` (Google Workspace relay — transactional only: verification, reset, contact) |
+| Marketing email (SES) | `SES_FROM_ADDRESS` (`Drone Edge <hello@news.thedroneedge.com>`), `SES_REPLY_TO` (`support@`), `SES_CONFIGURATION_SET`, `SES_EVENTS_TOPIC_ARN`, `MARKETING_POSTAL_ADDRESS` (CAN-SPAM footer — **`MarketingMailerService` refuses to send while empty**), `LEADS_UNSUBSCRIBE_SECRET` (HMAC for unsubscribe links; Terraform-generated; rotating it breaks every link already sent), optional `SES_MAX_SEND_RATE` (default 10/s). Credentials = task role (`ses:SendEmail` on the `news.` identity + config set). Terraform: `terraform/ses.tf` |
+| Docs / hardening | Swagger `/api` is **off when `NODE_ENV=production`** (set `ENABLE_SWAGGER=true` to turn it on temporarily). Log lines mask email addresses (`common/pii.ts` `maskEmail`); TypeORM CLI logs errors only in production |
 | Media / CloudFront | `CLOUDFRONT_MEDIA_DOMAIN`, signing keys for video URLs |
 | OpenTelemetry | `OTEL_EXPORTER_OTLP_*`, `OTEL_SERVICE_NAME` — optional; loaded via `telemetry.ts` before Nest bootstrap |
 | Analytics archive | `ANALYTICS_ARCHIVE_BUCKET` (S3 bucket for `product_events` partitions older than `ANALYTICS_RETENTION_MONTHS`, default 12). Unset → archival step is a no-op. Bucket `droneedge-dev-analytics-archive` + task-role `s3:PutObject` + env live since 2026-09-12 (PA35). |
@@ -45,6 +47,7 @@ JWT payload is validated in `JwtStrategy`; **`token_version`** on `users` must m
 - **Analytics never blocks business flows.** `ProductEventsService.record` (server events) and every `EntitlementService` write catch + log and return; `PurchaseService.recordCourseOrder` swallows an order-insert failure so the Stripe webhook still grants access (and Stripe is not asked to retry). The safety net is the nightly reconciliation (`paid_grant_without_order` flags such grants; `POST /purchases/admin/backfill-order` repairs them from Stripe) plus bounded-label OTel metrics: `product_events.accepted{source}`, `product_events.dropped{reason}`, `product_events.failures{stage}`, `orders.record_failures`, `analytics.maintenance.step_ms{step,status}`, `analytics.maintenance.failures{step}`, `analytics.maintenance.lock_skipped`, and the gauge `analytics.reconcile.mismatches{check}`. Alert on any `failures`, any `orders.record_failures`, `accepted` flat-lining in school hours, and `reconcile.mismatches > 0` on a gate check.
 - **Nightly job is cluster-exclusive:** `AnalyticsMaintenanceService.runAll` takes `pg_try_advisory_lock` for the run, so a second API task's 00:30 tick is a logged no-op rather than a colliding `REFRESH … CONCURRENTLY`.
 - **Stripe webhook:** Raw body middleware **only** for `POST /purchases/webhook` (signature verification).
+- **SES events:** `POST /email/ses-events` gets a **text** body parser (`main.ts`) — SNS posts JSON as `text/plain`, and CloudFront drops the `x-amz-sns-message-type` header, so the handler reads `Type` from the body.
 
 ---
 
@@ -127,6 +130,10 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 
 - Marketing views (`page_view`, `article_view`, `course_view`) still increment **OpenTelemetry counters** via `AnalyticsService` for Grafana; they are *also* stored as `product_events` rows when the caller is authenticated.
 
+### `leads` (migration `1765000006000`, `backend/src/leads/`)
+
+Waitlist / email capture (launch plan W3). One row per **(email, interest)** — `interest` ∈ `building` · `part107` · `schools` · `newsletter`; email stored lowercased. Columns: first-touch attribution (`source_path`, `landing_path`, `utm_source/medium/campaign/term/content`, `gclid`, `fbclid`, `ref` — from the `de_attr` cookie), `consent_at`, `confirmation_sent_at` (SES accepted the confirmation), `unsubscribed_at` (unsubscribe link or SES complaint), `bounced_at` (SES permanent bounce), `created_at`, `updated_at`. A repeat signup for an active row changes nothing and sends nothing; a signup for an unsubscribed row re-consents it (attribution keeps first touch). `POST /leads` records `lead_captured` server-side.
+
 ### Product analytics & commerce (migrations `1765000001000`–`1765000003000`)
 
 Full column reference and query cookbook: [`analytics-queries.md`](analytics-queries.md) § 1. Design: [`analytics-implementation-plan.md`](analytics-implementation-plan.md).
@@ -197,7 +204,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | POST | `/auth/login` | Public | Username **or** email (case-insensitive). 401 `No account found with that username or email.` vs `Incorrect password.` Returns tokens + user (+ org summary if any). |
 | POST | `/auth/register` | Public | Sends verification email. Optional `invite_code` (org) and `signup_code` (promo link — validated before account creation, consumed after). |
 | POST | `/auth/verify-email` | Public | |
-| POST | `/auth/refresh` | Public | Body: refresh token. |
+| POST | `/auth/refresh` | Public | `refresh_token` cookie (or body token). Re-reads the user, so the new access JWT carries the current `role` / `token_version` (purchases bump it). Rotates the verifier with a conditional update: if a parallel refresh with the same cookie already rotated it, this one still returns an access token but **no** new refresh token / cookie, so the browser keeps the winner's — otherwise the user gets silently logged out. |
 | GET | `/auth/profile` | JWT | Current user. |
 | POST | `/auth/logout` | Public | Invalidates refresh session. |
 | POST | `/auth/forgot-password` | Public | Throttled. |
@@ -319,12 +326,16 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | POST | `/purchases/create-course-checkout` | JWT | Body `{ courseId }` → `{ url }`. Hosted Stripe Checkout (`mode: payment`) — **one course**, lifetime, priced from `courses.price` (`price_data`). Course metadata copied to the PaymentIntent so `payment_intent.succeeded` fulfils. Returns to `/courses/:id?purchase=success&session_id=…` (cancel → `?purchase=1`). Logged-in only; **email verification not required**. Rejects if already owned or active Pro. |
 | POST | `/purchases/confirm-checkout` | JWT | Body `{ sessionId }`. Idempotent reconcile after the Checkout redirect when the webhook lags: session must be `mode=payment`, `paid`, and belong to the caller; then same path as `confirm-payment`. |
 | POST | `/purchases/create-payment-intent` | JWT | **Legacy** (Card Element) — superseded by `create-course-checkout`, kept one release. Same guards. |
-| POST | `/purchases/create-pro-checkout` | JWT | Stripe Checkout **subscription** for Pro (all courses while active). Needs `STRIPE_PRO_PRICE_ID_MONTHLY` (or yearly). Email verification **not** required. |
+| POST | `/purchases/create-pro-checkout` | JWT | Stripe Checkout **subscription** for Pro (all courses while active). Needs `STRIPE_PRO_PRICE_ID_MONTHLY` (or yearly). Email verification **not** required. The success URL gets `session_id={CHECKOUT_SESSION_ID}` appended for `confirm-pro-checkout`. |
+| POST | `/purchases/confirm-pro-checkout` | JWT | Body `{ sessionId }` → `{ active }`. The Pro version of `confirm-checkout`, called by the profile and course pages when the subscription webhook is late. The session must be `mode=subscription`, `status=complete` and belong to the caller; it then runs the same path as `checkout.session.completed`. It does nothing if the user is already Pro on that subscription, so no extra `token_version` bump. |
 | POST | `/purchases/billing-portal` | JWT | Stripe Customer Portal (manage/cancel Pro). Requires `stripe_customer_id`. |
 | POST | `/purchases/confirm-payment` | JWT | Idempotent reconcile from a succeeded course PaymentIntent (legacy client + `confirm-checkout` internals). |
-| POST | `/purchases/webhook` | Public | Stripe signature; `payment_intent.succeeded` (order + entitlement + `purchase_completed`), `invoice.paid` / `invoice.payment_failed` (Pro orders + lifecycle events), `charge.refunded` (refund → revoke; Pro invoice resolved via `invoicePayments` on API ≥ basil), subscription lifecycle. Payload samples + field map: [`stripe-webhook-payloads.md`](stripe-webhook-payloads.md). **Not** in Swagger. |
+| POST | `/purchases/webhook` | Public | Stripe signature, then `PurchaseService.processEvent`. That method is shared with the replay job, so it must stay idempotent. It **ignores** (with a 200) any event whose Stripe customer no user in this DB owns, because local dev and the site share the sandbox account and each receives the other's events. A processing error returns 500 so Stripe retries; the `stripe.webhook.failures{stage}` counter records it. Handles `payment_intent.succeeded` (order + entitlement + `purchase_completed`), `invoice.paid` / `invoice.payment_failed` (Pro orders + lifecycle events), `charge.refunded` (refund → revoke; Pro invoice resolved via `invoicePayments` on API ≥ basil), subscription lifecycle. Payload samples + field map: [`stripe-webhook-payloads.md`](stripe-webhook-payloads.md). **Not** in Swagger. |
 | POST | `/purchases/pro-membership` | JWT + **Admin** | Pro comp / testing (no Stripe subscription). |
 | POST | `/purchases/admin/backfill-order` | JWT + **Admin** | Repairs course entitlements with no `orders` row from Stripe: body `{ paymentIntentId }`, `{ userId, courseId }` (PI found by metadata search), or `{}` for every flagged entitlement. Records the order idempotently (`backfill_<pi>`), links `order_item_id`, sets the real amount. Returns `{ repaired[], unmatched[] }`. |
+| POST | `/purchases/admin/replay-failed-events` | JWT + **Admin** | Runs the undelivered-webhook replay now, for example right after fixing an outage. Returns `{ seen, processed, failed, dead, skipped, deadUnresolved }`. Works even when the hourly cron is off. |
+
+**Undelivered webhook replay** (`StripeEventReplayService`): every hour at :15, when `STRIPE_EVENT_REPLAY_ENABLED=true`, it asks Stripe for handled events whose delivery is still failing. Terraform sets that variable only on the deployed API; local dev leaves it off because Stripe's filter covers the whole account. It looks at events created between 1 hour and 3 days ago, up to 200 per run, and runs each one through `processEvent`. Progress is kept in `stripe_event_replays`. An event that fails 5 replays is marked `dead`: the job logs an error, sets the `stripe.webhook.dead_events` gauge, and writes the `stripe_events_dead` reconciliation check, which shows in admin health. These dead events stay flagged until someone fixes them and sets `resolved_at`. Each run also records the counter `stripe.webhook.replays{result}`. A cluster-wide advisory lock (key `7461_0002`) stops two API tasks from running it at once.
 
 Flow map + permission pitfalls: [`purchase-flows.md`](purchase-flows.md).
 
@@ -374,7 +385,19 @@ Every route reads the materialized views (+ a few live tables); SQL equivalents 
 | Method | Path | Auth | Notes |
 |--------|------|------|--------|
 | POST | `/email/contact` | Public | Contact form. |
-| POST | `/email/broadcast` | JWT + **Admin** | Mass email. |
+| POST | `/email/consultation` | Public | Consultation request. |
+| POST | `/email/marketing/broadcast` | JWT + **Admin** | SES broadcast to `leads` by interest. Body `{ subject, body_markdown, interests[], mode }` — `dry_run` counts recipients (one per address, excludes unsubscribed/bounced), `test` sends `[TEST]` to the admin's own email, `send` queues the send in the background (rate-limited by `SES_MAX_SEND_RATE`; progress in logs) and returns `status: 'queued'`. 503 if SES / postal address / unsubscribe secret is missing; 409 if a broadcast is already running. Markdown only (raw HTML not rendered); `{{site_url}}` is substituted; layout, unsubscribe link and postal address are added. The old relay `POST /email/broadcast` was **removed** (bulk mail must never use the Workspace relay). |
+| POST | `/email/ses-events` | Public, **SNS signature** | SES → SNS events. Verifies the SNS signature (cert must be on `sns.<region>.amazonaws.com`) and `TopicArn = SES_EVENTS_TOPIC_ARN`; confirms the subscription; permanent bounce → `leads.bounced_at`, complaint → `leads.unsubscribed_at`. Not throttled. |
+
+### Leads — `/leads` (`backend/src/leads/`)
+
+| Method | Path | Auth | Notes |
+|--------|------|------|--------|
+| POST | `/leads` | Public, **5/min/IP** | `{ email, interest, website?, source_path?, landing_path?, utm_*?, gclid?, fbclid?, ref? }` → always **202 `{ ok: true }`** for valid input (does not reveal whether the address was already listed). `website` is a honeypot — non-empty = silently dropped. New or re-consenting signups get the SES waitlist confirmation. |
+| GET | `/leads/preferences?t=` | Public (token), 20/min | `{ email_masked, interests: [{ interest, subscribed }] }`. Token = `v1.<leadId>.<hmac>` (no email in the URL). 400 bad token, 404 lead gone. |
+| POST | `/leads/unsubscribe` | Public (token), not throttled | Token in `?t=` (RFC 8058 one-click from the mail client's `List-Unsubscribe-Post`) or body `{ t, interests? }` (preference page). `interests` = lists to drop; omitted = all lists for that address. Returns `{ ok, email_masked, interests }`. |
+| GET | `/leads?interest=&include_unsubscribed=` | JWT + **Admin** | Up to 10 000 rows, newest first. Default excludes unsubscribed/bounced. |
+| GET | `/leads/export.csv` | JWT + **Admin** | Same filters, CSV (formula-injection safe). |
 
 ### Analytics — `/analytics`
 

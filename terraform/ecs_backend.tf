@@ -100,7 +100,8 @@ resource "aws_iam_policy" "secrets_manager_policy" {
           aws_secretsmanager_secret.admin_seed_password.arn,
           aws_secretsmanager_secret.test_user_password.arn,
           aws_secretsmanager_secret.grafana_otel_headers.arn,
-          aws_secretsmanager_secret.cloudfront_signing_private_key.arn
+          aws_secretsmanager_secret.cloudfront_signing_private_key.arn,
+          aws_secretsmanager_secret.leads_unsubscribe_secret.arn
         ]
       }
     ]
@@ -240,6 +241,12 @@ resource "aws_ecs_task_definition" "api_server" {
         {
           name      = "CLOUDFRONT_SIGNING_PRIVATE_KEY"
           valueFrom = aws_secretsmanager_secret.cloudfront_signing_private_key.arn
+        },
+        {
+          # HMAC key for marketing-email unsubscribe tokens (Z3). Value is
+          # terraform-generated (secrets_stripe.tf), so it always exists.
+          name      = "LEADS_UNSUBSCRIBE_SECRET"
+          valueFrom = aws_secretsmanager_secret.leads_unsubscribe_secret.arn
         }
         ], var.seed_test_data ? [
         {
@@ -284,14 +291,30 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id },
         { name = "SEED_TEST_DATA", value = tostring(var.seed_test_data) },
         { name = "STRIPE_PRO_PRICE_ID_MONTHLY", value = var.stripe_pro_price_id_monthly },
-        { name = "STRIPE_PRO_PRICE_ID_YEARLY", value = var.stripe_pro_price_id_yearly }
+        { name = "STRIPE_PRO_PRICE_ID_YEARLY", value = var.stripe_pro_price_id_yearly },
+        # Hourly replay of Stripe events whose webhook delivery failed
+        # (StripeEventReplayService). Only where the webhook is live; local dev
+        # leaves it unset because it shares the sandbox account.
+        { name = "STRIPE_EVENT_REPLAY_ENABLED", value = tostring(var.stripe_webhook_enabled) },
+        # Marketing email via SES on news.<domain> (ses.tf). Transactional mail
+        # still uses EMAIL_* (Workspace relay). The mailer refuses to send
+        # while MARKETING_POSTAL_ADDRESS is empty (CAN-SPAM).
+        { name = "SES_FROM_ADDRESS", value = local.ses_from_address },
+        { name = "SES_REPLY_TO", value = local.ses_reply_to },
+        { name = "SES_CONFIGURATION_SET", value = aws_sesv2_configuration_set.marketing.configuration_set_name },
+        { name = "SES_EVENTS_TOPIC_ARN", value = aws_sns_topic.ses_events.arn },
+        { name = "MARKETING_POSTAL_ADDRESS", value = var.marketing_postal_address }
       ])
     }
   ])
 
-  # Ensure the test-user secret has a value before the task (which references it
-  # when seeding) is registered/started.
-  depends_on = [aws_secretsmanager_secret_version.test_user_password]
+  # Ensure conditionally referenced secrets have a value before the task is
+  # registered/started.
+  depends_on = [
+    aws_secretsmanager_secret_version.test_user_password,
+    aws_secretsmanager_secret_version.stripe_webhook_secret,
+    aws_secretsmanager_secret_version.leads_unsubscribe_secret,
+  ]
 
   # No ignore_changes here on purpose: env vars added in this file must reach
   # the task. pipeline.sh passes the new image URI as a var, applies (which

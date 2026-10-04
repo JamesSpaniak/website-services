@@ -15,6 +15,13 @@ const nextConfig = {
         },
       ],
     },
+    // Shadowed by next.config.mjs (Next loads .mjs first) — keep in sync.
+    async redirects() {
+      return [
+        { source: '/courses/tracks/video', destination: '/courses', permanent: true },
+        { source: '/courses/tracks/ai', destination: '/courses', permanent: true },
+      ];
+    },
   };
 
 export default nextConfig;

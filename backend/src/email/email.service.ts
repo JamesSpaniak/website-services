@@ -7,7 +7,6 @@ import * as sanitizeHtml from 'sanitize-html';
 import { User } from 'src/users/types/user.entity';
 import { ContactDto } from './types/contact.dto';
 import { ConsultationDto } from './types/consultation.dto';
-import { BroadcastDto } from './types/broadcast.dto';
 
 @Injectable()
 export class EmailService {
@@ -301,36 +300,5 @@ export class EmailService {
       message:
         "Your request has been received. We'll be in touch within one business day.",
     };
-  }
-
-  async sendBroadcastEmail(
-    broadcastDto: BroadcastDto,
-  ): Promise<{ success: boolean; count: number }> {
-    if (!this.emailEnabled || !this.transporter) {
-      this.logger.warn('Email disabled; skipping broadcast email.');
-      return { success: true, count: 0 };
-    }
-
-    const users: User[] = [];
-    const emails = users.map((user) => user.email).filter((email) => !!email);
-
-    // Derive a plain-text part from the admin-authored HTML so broadcasts
-    // aren't HTML-only (a spam-filter penalty).
-    const broadcastText = sanitizeHtml(broadcastDto.message, {
-      allowedTags: [],
-      allowedAttributes: {},
-    }).trim();
-
-    for (const email of emails) {
-      await this.transporter.sendMail({
-        from: this.defaultFrom,
-        to: email,
-        subject: broadcastDto.subject,
-        text: broadcastText,
-        html: broadcastDto.message,
-      });
-    }
-
-    return { success: true, count: emails.length };
   }
 }

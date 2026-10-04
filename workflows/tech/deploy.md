@@ -32,7 +32,14 @@ This will:
 
 Until 2026-09-12 the task definitions had `ignore_changes = [container_definitions]` and the pipeline cloned the *service's current* revision, so env vars added in Terraform (`SEED_TEST_DATA`, `STRIPE_PRO_PRICE_ID_*`, …) never reached prod. Now: **Terraform owns the container definition**, the service keeps `ignore_changes = [task_definition]` (so an apply never re-points the service before the pipeline's health-checked rollout), and `ecs_force_deploy` deploys the family's latest revision. Adding an env var = edit `ecs_*.tf` + tfvars, run the pipeline.
 
-**Secrets rule:** ECS refuses to start a task that references a Secrets Manager secret with no value (`ResourceInitializationError … can't find the specified secret value for staging label: AWSCURRENT`) and the rollout hangs on the old revision until the 900 s wait times out. Secret references that may be empty are therefore conditional: `TEST_USER_PASSWORD` (`seed_test_data`), `STRIPE_WEBHOOK_SECRET` (`stripe_webhook_enabled`, default false). Set the value first, then flip the variable.
+**Secrets rule:** ECS refuses to start a task that references a Secrets Manager secret with no value (`ResourceInitializationError … can't find the specified secret value for staging label: AWSCURRENT`) and the rollout hangs on the old revision until the 900 s wait times out. Secret references that may be empty are therefore conditional: `TEST_USER_PASSWORD` (`seed_test_data`), `STRIPE_WEBHOOK_SECRET` (`stripe_webhook_enabled`, default false). Set the value first, then flip the variable. The Stripe webhook secret's value is Terraform-managed: the first apply with `stripe_webhook_enabled = true` needs `TF_VAR_stripe_webhook_secret=whsec_…` in the environment (the pipeline refuses without it); later deploys don't. Rotate with `--replace 'aws_secretsmanager_secret_version.stripe_webhook_secret[0]'` plus the new `TF_VAR_`.
+
+How the webhook secret behaves across routine deploys:
+- **Stored once, kept for good.** The value sits in Secrets Manager, and its version resource sits in the S3 Terraform state, so any machine running the pipeline sees it. `ignore_changes` means a deploy without `TF_VAR_stripe_webhook_secret` never blanks or overwrites it, and the pipeline guard looks at state, so it fires only before the first store.
+- **A stray `TF_VAR_` does nothing.** It's ignored after the first store; changing the secret always needs the `--replace` above.
+- **Turning `stripe_webhook_enabled` off** drops the version from state, and the API stops reading the secret. Turning it back on asks for the secret again, because the guard checks state. That's safe, just one more paste.
+- **Live cutover:** the live endpoint has a different `whsec_`, so use the rotation command with the live secret in the same deploy that switches the keys.
+- `STRIPE_EVENT_REPLAY_ENABLED` (the hourly replay of undelivered webhooks) follows `stripe_webhook_enabled` automatically and needs no secret of its own.
 
 ## Partial deploys
 
@@ -61,6 +68,7 @@ NAT replace + image deploy in one shot (SMTP timeouts live in the API image):
    ```
 2. CloudWatch logs: `/ecs/droneedge-dev/frontend`, `/ecs/droneedge-dev/api-server`
 3. Site: https://thedroneedge.com (hard refresh after invalidation)
+   - Full click-through (site, waitlist, Stripe test purchases), runnable by a browser agent: [`post-deploy-smoke-test.md`](post-deploy-smoke-test.md)
 4. After the first apply that creates `droneedge-dev-ops-alerts`, confirm the SNS email sent to `admin_email` (`james@thedroneedge.com`). Until then NAT alarm `droneedge-dev-nat-no-egress` is still visible under CloudWatch → Alarms but will not email. OK/ALARM both email after confirm.
 
 ## Do not

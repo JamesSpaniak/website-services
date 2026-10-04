@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 /** Keep in sync with §10 of Sales Agreement and docs/tech/legal-and-privacy-site-sync.md */
-const PRIVACY_LAST_UPDATED = '2026-09-12';
+const PRIVACY_LAST_UPDATED = '2026-10-03';
 
 export default function PrivacyPage() {
   return (
@@ -67,6 +67,11 @@ export default function PrivacyPage() {
               <strong className="text-[var(--brand-foreground)]">Communications:</strong> content you send through contact
               forms, email, or support channels.
             </li>
+            <li>
+              <strong className="text-[var(--brand-foreground)]">Waitlist and mailing lists:</strong> your email address,
+              which list you joined (for example Drone Building early access), the page you signed up on, the campaign
+              link that first brought you to the site (if any), and when you consented, confirmed, or unsubscribed.
+            </li>
           </ul>
         </section>
 
@@ -79,6 +84,10 @@ export default function PrivacyPage() {
             <li>Provide, secure, and improve the Offerings;</li>
             <li>Authenticate users, manage organizations, and track progress as described in the product;</li>
             <li>Communicate about the service, respond to inquiries, and send transactional messages;</li>
+            <li>
+              Send the waitlist and marketing emails you asked for. Every one has an unsubscribe link that works in one
+              click, and we never send marketing email to school or organization members because of their enrollment;
+            </li>
             <li>Comply with law and enforce our agreements.</li>
           </ul>
         </section>
@@ -107,7 +116,9 @@ export default function PrivacyPage() {
           </h2>
           <p>
             We may share information with service providers who assist us (for example hosting, email delivery, analytics,
-            or payment processing) under contractual safeguards. We may disclose information if required by law or to
+            or payment processing) under contractual safeguards. Waitlist and marketing emails are delivered through
+            Amazon Web Services (Amazon SES), which reports back whether a message bounced or was marked as spam so we
+            stop sending to that address. We may disclose information if required by law or to
             protect rights and safety.
           </p>
         </section>
@@ -128,6 +139,13 @@ export default function PrivacyPage() {
             overviews, and pricing. If you later create an account, that identifier is associated with your account so we
             can see the path that led to sign-up. It is not created for members of school or organization programs, is
             never sold or shared with advertisers, and is removed when you clear your browser&apos;s site data.
+          </p>
+          <p className="mt-3">
+            <strong className="text-[var(--brand-foreground)]">Campaign links.</strong> When you arrive through a tagged
+            link (for example one in an event announcement), we store the link&apos;s campaign tags (such as
+            <code> utm_source</code> and <code>utm_campaign</code>) and the page you landed on in a first-party cookie
+            named <code>de_attr</code> for 90 days. It contains no personal information. If you then join a waitlist or
+            sign in, those tags are saved with your signup so we know which announcement worked.
           </p>
           <p className="mt-3">
             We do not currently use third-party advertising pixels or cross-site tracking. If that changes, we will update
@@ -164,6 +182,10 @@ export default function PrivacyPage() {
               james@thedroneedge.com
             </a>{' '}
             to make a request. We may need to verify your identity before responding.
+          </p>
+          <p className="mt-3">
+            To stop waitlist or marketing emails, use the unsubscribe link at the bottom of any of them. You can drop one
+            list or all of them, and it takes effect immediately.
           </p>
         </section>
 

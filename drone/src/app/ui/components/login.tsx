@@ -98,7 +98,7 @@ export default function LoginComponent({ redirectPath }: { redirectPath?: string
                 first_name: formData.firstName, 
                 last_name: formData.lastName 
             });
-            setInfoMessage('Registration successful. Please verify your email before logging in.');
+            setInfoMessage('Registration successful. You can log in now — check your email for a verification link when you get a chance.');
         } catch (err) {
             if (err instanceof Error) {
                 setError(`Sign-up failed: ${err.message}`);

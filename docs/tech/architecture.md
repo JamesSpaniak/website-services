@@ -201,11 +201,13 @@ DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
 | `droneedge-dev-test-user-password` | API (dev-only, when `seed_test_data = true`) |
 | `droneedge-dev-grafana-otel-headers` | API OTLP auth |
 | `droneedge-dev-cloudfront-signing-private-key` | API video URL signing |
+| `droneedge-dev-leads-unsubscribe-secret` | API `LEADS_UNSUBSCRIBE_SECRET` (HMAC for marketing unsubscribe links) |
 
 **Terraform owns the resources.** All AWS resources — including the secret *containers* above — are declared in Terraform, never created by hand. See [Resource ownership](#resource-ownership-terraform-first) below.
 
 Secret **values** are split by sensitivity:
 - Stripe / JWT / admin / DB / CloudFront private key: seeded out-of-band (manual or pipeline reconcile scripts), never in Terraform or git.
+- `leads-unsubscribe-secret`: the value **is** Terraform-generated (`random_password`) — nobody needs to know it, and it must exist before the task starts. Replacing it breaks every unsubscribe link already sent.
 - `test-user-password`: the value **is** Terraform-managed (`terraform/env/dev.tfvars` → `test_user_password`), because it is a throwaway dev credential and this removes the create-secret-before-deploy ordering trap.
 
 ### IAM (shared ECS roles)
@@ -355,6 +357,7 @@ Terraform owns the task definition's `container_definitions` (no `ignore_changes
 | `ADMIN_SEED_PASSWORD` | `admin-seed-password` |
 | `OTEL_EXPORTER_OTLP_HEADERS` | `grafana-otel-headers` |
 | `CLOUDFRONT_SIGNING_PRIVATE_KEY` | `cloudfront-signing-private-key` |
+| `LEADS_UNSUBSCRIBE_SECRET` | `leads-unsubscribe-secret` |
 
 #### Environment (plain)
 
@@ -379,6 +382,7 @@ Terraform owns the task definition's `container_definitions` (no `ignore_changes
 | `cloudwatch-logs-policy` | `CreateLogStream`, `PutLogEvents`, `DescribeLogStreams` | API log group |
 | `s3-media-policy` | `PutObject`, `DeleteObject`, `ListBucket` | Media bucket |
 | `s3-media-policy` | `cloudfront:CreateInvalidation` | Media distribution ARN |
+| `ses-send-policy` | `ses:SendEmail`, `ses:SendRawEmail` (condition `ses:FromAddress = hello@news.thedroneedge.com`) | SES identity `news.thedroneedge.com` + configuration set `droneedge-dev-marketing` (`terraform/ses.tf`) |
 
 SDK calls use **task role credentials** via ECS metadata (no static keys in env).
 
@@ -503,7 +507,8 @@ Neither Lambda is in the VPC (default AWS-managed networking).
 | Service | Role | Called from | Credentials |
 |---------|------|-------------|-------------|
 | **Stripe** | Payments, webhooks | API (+ Stripe.js in browser) | Secret key + webhook secret in Secrets Manager; publishable key in frontend build |
-| **Google Workspace SMTP** | Outbound email | API (`nodemailer`) | No auth in env—IP allowlist (NAT EIP in SPF) |
+| **Google Workspace SMTP** | Transactional email (verify, reset, contact) | API (`nodemailer`) | No auth in env—IP allowlist (NAT EIP in SPF) |
+| **Amazon SES** (`news.thedroneedge.com`) | Marketing email — waitlist confirmation, broadcasts | API (`@aws-sdk/client-sesv2`, `MarketingMailerService`) | Task role; Easy DKIM + MAIL FROM `bounce.news…` + DMARC in `terraform/ses.tf`; events → SNS `droneedge-dev-ses-events` → `POST /api/email/ses-events`. Account starts in the SES sandbox until production access is granted (console request) |
 | **Grafana Cloud** | Metrics & traces | API (OTLP HTTP) | Basic auth header in Secrets Manager |
 
 ---

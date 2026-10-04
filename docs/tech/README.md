@@ -12,6 +12,7 @@ Architecture, development, deployment, and product-engineering reference for The
 | [purchase-flows.md](purchase-flows.md) | Course one-time vs Pro monthly Stripe flows + permission gaps |
 | [stripe-webhook-payloads.md](stripe-webhook-payloads.md) | Real sandbox webhook payloads (fixtures), field → table map, Oct 1 2026 test log, bugs found |
 | [stripe-sandbox-test-plan.md](stripe-sandbox-test-plan.md) | **Build + test plan** to run every Stripe flow end to end in the sandbox: Dashboard (UI) steps vs code vs prod ops, course move to hosted Checkout, test matrix, test clocks |
+| [launch-website-plan.md](launch-website-plan.md) | **Build plan** for the Oct 2026 launch window: site honesty fixes, waitlist, UTM capture, `/pricing`, promo codes, Stripe go-live, talk landing page — batched to the Oct 8 / Oct 16 announcements and Oct 23 talk |
 | [analytics-and-attribution.md](analytics-and-attribution.md) | Event taxonomy, platform accounts, pixels vs first-party vs OTel, click-ID capture, server-side conversions, consent |
 | [product-analytics.md](product-analytics.md) | User-level usage × entitlement × revenue; tooling choice, schema gaps, signal→offer map, student-data rules |
 | [analytics-implementation-plan.md](analytics-implementation-plan.md) | **Build plan** for product analytics + progress visibility: `products` → `orders` → `entitlements` → usage data model (many packages, one course), manager / company / learner APIs, admin + manager screens, phases, backfill, acceptance |

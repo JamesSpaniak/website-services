@@ -97,9 +97,45 @@ v_user_entitlements → v_user_course_usage → v_entitlement_utilization
 | `product_events` | one event | `user_id` / `anonymous_id`, `session_id`, `organization_id`, `class_id`, `event_name`, `occurred_at`, `course_id`, `unit_ref`, `entitlement_source`, `properties` jsonb, `event_id` | RANGE-partitioned by month (`product_events_YYYY_MM`). **Always filter on `occurred_at`** so Postgres prunes partitions. `lesson_heartbeat` = 30 s → 0.5 min. Partitions older than `ANALYTICS_RETENTION_MONTHS` (12) are archived to S3 and dropped. |
 | `product_events_daily` | user × course × day | `organization_id`, `class_id`, `entitlement_source`, `minutes_engaged`, `lessons_viewed`, `videos_completed`, `units_completed`, `exams_submitted`, `events`, `computed_at` | The rollup. Survives partition archival — this is the +12-month history. |
 | `analytics_reconciliation` | one check run | `check_name`, `mismatches`, `detail`, `ran_at` | Also logs `views_refreshed`. |
+| `leads` | email × interest | `email`, `interest` (building·part107·schools·newsletter), `source_path`, `landing_path`, `utm_source/medium/campaign/term/content`, `gclid`, `fbclid`, `ref`, `consent_at`, `confirmation_sent_at`, `unsubscribed_at`, `bounced_at`, `created_at` | Waitlist / email capture (launch W3). Attribution = first-touch `de_attr` cookie. **Active** = `unsubscribed_at IS NULL AND bounced_at IS NULL`. |
 
 Event names (allow-list in `backend/src/product-events/types/product-event.dto.ts`):
-`page_view article_view course_view pricing_viewed` · `lesson_viewed lesson_heartbeat video_started video_progress video_completed video_position course_started lesson_completed unit_completed course_completed` · `exam_started exam_submitted exam_category_scored` · `checkout_started purchase_completed order_recorded refund_issued pro_started pro_renewed pro_payment_failed pro_cancel_scheduled pro_cancelled pro_expired billing_portal_opened` · `upsell_shown/accepted/declined downsell_shown/accepted/declined` · `signup_started signup_completed login email_verified` · `invite_sent invite_redeemed manager_dashboard_viewed org_progress_exported class_created` · `feature_used`.
+`page_view article_view course_view pricing_viewed lead_captured` · `lesson_viewed lesson_heartbeat video_started video_progress video_completed video_position course_started lesson_completed unit_completed course_completed` · `exam_started exam_submitted exam_category_scored` · `checkout_started purchase_completed order_recorded refund_issued pro_started pro_renewed pro_payment_failed pro_cancel_scheduled pro_cancelled pro_expired billing_portal_opened` · `upsell_shown/accepted/declined downsell_shown/accepted/declined` · `signup_started signup_completed login email_verified` · `invite_sent invite_redeemed manager_dashboard_viewed org_progress_exported class_created` · `feature_used`.
+
+### 1.1a Leads and campaign attribution (launch W3/W5)
+
+Which tagged links bring signups. `utm_source` / `utm_campaign` come from the first-touch cookie, so a lead who first arrived from the Oct 8 email and signed up a week later still counts for that email. Tagged links: [`../marketing/utm-links.md`](../marketing/utm-links.md).
+
+```sql
+-- Leads by source and campaign (last 30 days)
+SELECT coalesce(utm_source, '(direct)') AS source,
+       coalesce(utm_campaign, '—')      AS campaign,
+       interest,
+       count(*)                                             AS leads,
+       count(*) FILTER (WHERE confirmation_sent_at IS NOT NULL) AS confirmed_sent,
+       count(*) FILTER (WHERE unsubscribed_at IS NOT NULL)     AS unsubscribed,
+       count(*) FILTER (WHERE bounced_at IS NOT NULL)          AS bounced
+FROM leads
+WHERE created_at >= now() - interval '30 days'
+GROUP BY 1, 2, 3
+ORDER BY leads DESC;
+
+-- Active list sizes (what a broadcast would reach, before per-address dedupe)
+SELECT interest, count(*) AS active
+FROM leads
+WHERE unsubscribed_at IS NULL AND bounced_at IS NULL
+GROUP BY interest ORDER BY interest;
+
+-- Signups per day, by source (announcement-day spike check)
+SELECT date_trunc('day', created_at)::date AS day,
+       coalesce(utm_source, '(direct)') AS source,
+       count(*) AS leads
+FROM leads
+WHERE created_at >= now() - interval '14 days'
+GROUP BY 1, 2 ORDER BY 1, 3 DESC;
+```
+
+Anonymous `page_view`s are **not** stored in `product_events` (OTel counters only — crawler noise), so visits by `utm_source` are not queryable in SQL yet; signed-in page views carry `utm_source` / `utm_medium` / `utm_campaign` / `ref` in `properties`. Full visit-level attribution is TODO **T8** (`marketing_attribution` table).
 
 ### 1.2 Materialized views
 

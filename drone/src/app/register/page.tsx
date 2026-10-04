@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
@@ -19,6 +19,7 @@ import {
     readStashedPostAuthRedirect,
     clearStashedPostAuthRedirect,
     loginHref,
+    FEATURED_COURSE_ID,
 } from '@/app/lib/auth-redirect';
 
 const signupSchema = z.object({
@@ -36,7 +37,7 @@ export default function RegisterPage() {
 }
 
 function RegisterPageInner() {
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, login } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const inviteCode = searchParams.get('code');
@@ -63,13 +64,15 @@ function RegisterPageInner() {
     const [error, setError] = useState<string | null>(null);
     const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    /** Set while handleSubmit signs the new account in, so it (not the effect below) picks the destination. */
+    const autoSigningIn = useRef(false);
 
     useEffect(() => {
         if (redirect) stashPostAuthRedirect(redirect);
     }, [redirect]);
 
     useEffect(() => {
-        if (!authLoading && user) {
+        if (!authLoading && user && !autoSigningIn.current) {
             const target = redirect ?? readStashedPostAuthRedirect() ?? '/profile';
             clearStashedPostAuthRedirect();
             router.replace(target);
@@ -146,13 +149,28 @@ function RegisterPageInner() {
                 // link shows a warning but doesn't block a normal registration.
                 signup_code: signupCode && signupInfo?.valid ? signupCode : undefined,
             });
-            setInfoMessage(
-                purchaseIntent
-                    ? 'Account created! Verify your email before checkout, or sign in now to browse Unit 1 free.'
-                    : 'Registration successful! Check your email for a verification link, or sign in now to start Unit 1.',
-            );
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Registration failed.');
+            setLoading(false);
+            return;
+        }
+
+        // Sign straight in — email verification is not required to buy or to
+        // start Unit 1, so don't make the user detour through their inbox.
+        const target = redirect ?? readStashedPostAuthRedirect() ?? `/courses/${FEATURED_COURSE_ID}`;
+        autoSigningIn.current = true;
+        try {
+            await login(formData.username, formData.password);
+            clearStashedPostAuthRedirect();
+            router.replace(target);
+            return;
+        } catch {
+            autoSigningIn.current = false;
+            setInfoMessage(
+                purchaseIntent
+                    ? 'Account created! Sign in to continue to checkout. We also sent you an email to confirm your address.'
+                    : 'Registration successful! Sign in to start Unit 1. We also sent you an email to confirm your address.',
+            );
         } finally {
             setLoading(false);
         }
@@ -167,7 +185,7 @@ function RegisterPageInner() {
             title={purchaseIntent ? 'Create account to purchase' : 'Create account'}
             subtitle={
                 purchaseIntent
-                    ? 'Verify your email, sign in, then checkout — access stays on this account.'
+                    ? 'Create your account, then go straight to checkout.'
                     : 'Join to access courses and track your progress.'
             }
             maxWidthClass="max-w-lg"
@@ -255,17 +273,8 @@ function RegisterPageInner() {
                                 href={redirect ? loginHref(redirect) : '/login'}
                                 className="font-medium text-[var(--brand-primary)] hover:underline"
                             >
-                                Sign in{purchaseIntent ? ' after verifying' : ''}
+                                Sign in{purchaseIntent ? ' and check out' : ''}
                             </Link>
-                            {!purchaseIntent && (
-                                <>
-                                    {' '}
-                                    or{' '}
-                                    <Link href="/login" className="font-medium text-[var(--brand-primary)] hover:underline">
-                                        skip for now — start Unit 1
-                                    </Link>
-                                </>
-                            )}
                         </p>
                     </div>
                 )}

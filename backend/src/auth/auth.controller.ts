@@ -68,12 +68,15 @@ export class AuthController {
 
   private setAuthCookies(
     res: Response,
-    tokens: { access_token: string; refresh_token: string },
+    tokens: { access_token: string; refresh_token?: string },
   ) {
     res.cookie(ACCESS_TOKEN_COOKIE, tokens.access_token, {
       ...baseCookieOptions(),
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
     });
+    // Absent when a parallel refresh already rotated the session: keep the
+    // browser's existing refresh cookie.
+    if (!tokens.refresh_token) return;
     res.cookie(REFRESH_TOKEN_COOKIE, tokens.refresh_token, {
       ...baseCookieOptions(),
       maxAge: REFRESH_TOKEN_MAX_AGE_MS,

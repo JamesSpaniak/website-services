@@ -117,12 +117,18 @@ export default async function CoursePreviewPage({
       <section id="purchase" className="mt-10 p-6 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
         <h2 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">Start learning</h2>
         <CoursePreviewActions courseId={id} price={price} />
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1">
           <Link
             href="/courses"
-            className="text-sm text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
+            className="inline-flex min-h-[44px] items-center text-sm text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
           >
             ← All courses
+          </Link>
+          <Link
+            href="/pricing"
+            className="inline-flex min-h-[44px] items-center text-sm text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors"
+          >
+            View pricing
           </Link>
         </div>
       </section>

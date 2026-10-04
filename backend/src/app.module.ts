@@ -23,6 +23,7 @@ import { QuestionModule } from './questions/question.module';
 import { ProductEventsModule } from './product-events/product-events.module';
 import { CommerceModule } from './commerce/commerce.module';
 import { ReportingModule } from './reporting/reporting.module';
+import { LeadsModule } from './leads/leads.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ReportingModule } from './reporting/reporting.module';
     }),
     CourseModule,
     EmailModule,
+    LeadsModule,
     QuestionModule,
     TypeOrmModule.forRoot({
       ...defaultConnection,

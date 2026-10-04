@@ -8,6 +8,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 |------|------------|----------------|
 | Run app locally | [`docs/tech/local-dev.md`](tech/local-dev.md) | `docker compose`, `backend/`, `drone/` |
 | Deploy to AWS | [`workflows/tech/deploy.md`](../workflows/tech/deploy.md) | `./pipeline.sh --env dev` |
+| Smoke-test the site after a deploy (browser agent or by hand) | [`workflows/tech/post-deploy-smoke-test.md`](../workflows/tech/post-deploy-smoke-test.md) | Claude in Chrome · Stripe test cards |
 | Deploy from a cloud session / phone | [`workflows/tech/deploy-from-cloud.md`](../workflows/tech/deploy-from-cloud.md) | `scripts/deploy-preflight.sh`, `scripts/cloud-setup.sh` |
 | Rehearse migrations on a prod clone / get prod-shaped data locally | [`workflows/tech/prod-db-clone.md`](../workflows/tech/prod-db-clone.md) | `scripts/prod-db-clone.sh dump && …/prod-db-clone.sh restore` |
 

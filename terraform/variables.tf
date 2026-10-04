@@ -65,6 +65,18 @@ variable "stripe_webhook_enabled" {
   default     = false
 }
 
+variable "stripe_webhook_secret" {
+  description = "Stripe webhook signing secret (whsec_...). Pass at apply time with TF_VAR_stripe_webhook_secret — never put it in tfvars. Only read when the secret version is first created (stripe_webhook_enabled); rotate with --replace 'aws_secretsmanager_secret_version.stripe_webhook_secret[0]'."
+  type        = string
+  default     = ""
+  sensitive   = true
+
+  validation {
+    condition     = var.stripe_webhook_secret == "" || startswith(var.stripe_webhook_secret, "whsec_")
+    error_message = "stripe_webhook_secret must start with whsec_."
+  }
+}
+
 variable "frontend_debug_logging" {
   description = "Set to 1 to enable NEXT_PUBLIC_DEBUG_LOGGING in the frontend task (visible in AWS console). Actual debug output is enabled at build time via pipeline build-arg; this is for visibility/consistency."
   type        = string
@@ -154,4 +166,16 @@ variable "test_user_password" {
   type        = string
   default     = ""
   sensitive   = true
+}
+
+variable "marketing_postal_address" {
+  description = "CAN-SPAM physical address for marketing email footer; mailer refuses to send while empty."
+  type        = string
+  default     = ""
+}
+
+variable "ses_events_subscription_enabled" {
+  description = "Create the SNS -> https://<domain>/api/email/ses-events subscription for SES events. Enable only after the backend serving that endpoint is deployed, so it can confirm the subscription (two-step apply, see ses.tf)."
+  type        = bool
+  default     = false
 }

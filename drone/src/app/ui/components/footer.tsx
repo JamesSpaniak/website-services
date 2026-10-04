@@ -7,6 +7,7 @@ const NAV_COLUMNS = [
     links: [
       { href: '/courses', label: 'Courses' },
       { href: '/articles', label: 'Articles' },
+      { href: '/pricing', label: 'Pricing' },
     ],
   },
   {
@@ -25,6 +26,7 @@ const NAV_COLUMNS = [
       { href: '/contact', label: 'Contact' },
       { href: '/legal', label: 'Terms of Service' },
       { href: '/privacy', label: 'Privacy Notice' },
+      { href: '/refunds', label: 'Refund Policy' },
     ],
   },
 ] as const;
@@ -66,7 +68,7 @@ export default function FooterComponent() {
               <BrandLogo variant="header" />
             </Link>
             <p className="mt-3 text-xs text-[var(--brand-muted)] leading-relaxed max-w-[200px]">
-              FAA Part 107 prep, aerial video &amp; photography, and AI/STEM drone education.
+              FAA Part 107 prep and hands-on drone education for students and schools.
             </p>
           </div>
 

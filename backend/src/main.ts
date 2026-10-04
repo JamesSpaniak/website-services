@@ -118,6 +118,13 @@ async function bootstrap() {
     bodyParser.raw({ type: 'application/json', limit: '1mb' }),
   );
 
+  // SNS posts its JSON as text/plain (and CloudFront may drop the header), so
+  // the SES events endpoint takes the body as a string and parses it itself.
+  app.use(
+    '/email/ses-events',
+    bodyParser.text({ type: () => true, limit: '256kb' }),
+  );
+
   // The default Express body-parser limit is 100 kb, which is too small for
   // large course payloads. Set to 10 mb; adjust if payloads grow further.
   app.use(bodyParser.json({ limit: '10mb' }));
@@ -148,20 +155,27 @@ async function bootstrap() {
   );
 
   // --- Swagger (OpenAPI) Setup ---
-  const config = new DocumentBuilder()
-    .setTitle('Drone Website API')
-    .setDescription(
-      'API documentation for the course and user management system.',
-    )
-    .setVersion('1.0')
-    .addBearerAuth() // This is for JWT authentication
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true, // Remembers the JWT token in the UI
-    },
-  });
+  // Off in production: a public route map is free recon (app-review L1).
+  // ENABLE_SWAGGER=true turns it back on for a one-off debugging session.
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.ENABLE_SWAGGER === 'true'
+  ) {
+    const config = new DocumentBuilder()
+      .setTitle('Drone Website API')
+      .setDescription(
+        'API documentation for the course and user management system.',
+      )
+      .setVersion('1.0')
+      .addBearerAuth() // This is for JWT authentication
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true, // Remembers the JWT token in the UI
+      },
+    });
+  }
 
   const dataSource = app.get(DataSource);
   const pending = await dataSource.showMigrations();
