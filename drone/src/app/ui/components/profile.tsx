@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { updateUser, getCoursesWithProgress, getMyActivity, uploadProfilePicture, createProCheckout, createBillingPortal, getProfile } from '@/app/lib/api-client';
+import { updateUser, getCoursesWithProgress, getMyActivity, uploadProfilePicture, createProCheckout, createBillingPortal, getProfile, confirmProCheckout } from '@/app/lib/api-client';
 import { useAuth } from '@/app/lib/auth-context';
 import { CourseData } from '@/app/lib/types/course';
 import type { AuditLogEntry } from '@/app/lib/types/audit';
@@ -99,12 +99,33 @@ export default function ProfileComponent() {
         const params = new URLSearchParams(window.location.search);
         const pro = params.get('pro');
         if (!pro) return;
+        const sessionId = params.get('session_id');
+        const isActivePro = (u: { role?: string; pro_membership_expires_at?: string | Date | null }) =>
+            u.role === 'pro' && !!u.pro_membership_expires_at && new Date(u.pro_membership_expires_at) > new Date();
         (async () => {
             try {
-                const refreshed = await getProfile();
+                let refreshed = await getProfile();
+                // The subscription webhook usually lands within seconds; if it
+                // hasn't, activate from the Checkout session (confirm-pro-checkout).
+                if (pro === 'success' && !isActivePro(refreshed)) {
+                    setBillingMessage('Payment received — activating Pro…');
+                    for (let attempt = 1; attempt <= 5 && !isActivePro(refreshed); attempt++) {
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                        if (attempt === 1 && sessionId) {
+                            await confirmProCheckout(sessionId).catch((e) =>
+                                console.warn('confirm-pro-checkout fallback failed', e),
+                            );
+                        }
+                        refreshed = await getProfile();
+                    }
+                }
                 setUser(refreshed);
                 if (pro === 'success') {
-                    setBillingMessage('Pro checkout completed. If access is not active yet, refresh in a moment or sign in again.');
+                    setBillingMessage(
+                        isActivePro(refreshed)
+                            ? 'Pro is active — every course is unlocked.'
+                            : 'Payment received, but Pro is still being activated. Refresh in a minute; if it stays inactive, contact support with your Stripe receipt.',
+                    );
                 } else if (pro === 'canceled') {
                     setBillingMessage('Pro checkout was canceled. You can try again anytime.');
                 }

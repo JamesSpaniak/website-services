@@ -38,6 +38,10 @@ suffix rules changed twice in 2025.
 | `product_events.dropped` | counter | `reason` = `invalid` \| `anonymous` \| `course_scoped_anonymous` \| `no_access` \| `identify_skipped` | `ProductEventsService` |
 | `product_events.failures` | counter | `stage` = `batch` \| `insert` \| `video_progress` \| `progress_touch` \| `server` | `ProductEventsService`, `AnalyticsController` |
 | `orders.record_failures` | counter | — | `PurchaseService.recordCourseOrder` |
+| `stripe.webhook.failures` | counter | `stage` = `signature` \| `processing`; `type` = Stripe event type (8 fixed, only on `processing`) | `PurchaseService.handleWebhookEvent` (added 2026-10-03) |
+| `stripe.webhook.replays` | counter | `result` = `processed` \| `failed` \| `dead` \| `skipped` | `StripeEventReplayService`, hourly at :15 |
+| `stripe.webhook.dead_events` | gauge | — | same: unresolved events that failed 5 replays (latest run) |
+| `stripe.payments_failed` | counter | `kind` = `renewal` \| `other` | `PurchaseService` on `invoice.payment_failed` (added 2026-10-03; live after the next deploy) |
 | `entitlements.write_failures` | counter | `op` = `grantCourse` \| `syncPro` \| `revokeCourse` \| `revokeByOrderItems` \| `revokePro` | `EntitlementService` — grants also rethrow while `ENTITLEMENTS_AUTHORITATIVE=true` |
 | `analytics.maintenance.step_ms` | histogram (ms) | `step`, `status` = `ok` \| `error` | `AnalyticsMaintenanceService` |
 | `analytics.maintenance.failures` | counter | `step` | same |
@@ -105,7 +109,29 @@ instead of SQL, or wanting Loki logs with >14 d retention. None is on the roadma
 
 ---
 
-## 3. Alert rules to add (Grafana Alerting → Alert rules)
+## 3. Alert rules (Grafana Alerting → Alert rules)
+
+### Live now (phase 1, created 2026-10-03)
+
+Folder **DroneEdge**, group `droneedge-critical`, evaluated every 1 m. All of them email the contact point **`admin-email`** (james@thedroneedge.com).
+
+- **Routing:** the default policy groups by folder and alert name, waits 30 s before the first email, then sends updates at most every 5 m. Critical alerts repeat every 4 h while firing; `severity=warning` repeats every 24 h.
+- **Source of truth:** created with [`scripts/grafana_alerts.py`](../../scripts/grafana_alerts.py) (`check` validates the queries against live data; `apply` creates or updates). Exports are in [`grafana/`](grafana/).
+- **"No data" never means healthy:** every expression ends in `or vector(0)`, so a counter that hasn't fired yet reads 0. "No data" is therefore set to *Alerting*, because it can only mean the query broke.
+
+| Rule | Severity | Fires when | Maps to |
+|------|----------|-----------|---------|
+| Stripe events dead | critical | `stripe_webhook_dead_events > 0` | A13 |
+| Stripe webhook signature failing | critical | ≥ 3 signature failures in 1 h (1–2 can be bots) | A14 |
+| Stripe webhook 5xx | critical | any 5xx on `/purchases/webhook` in 15 m | A7 |
+| Order or access write failed | critical | any `orders_record_failures` / `entitlements_write_failures` in 1 h | A2 |
+| API error rate high | critical | 5xx > 5 % of requests **and** ≥ 5 errors, for 10 m | A8, tightened |
+| API not reporting | critical | no `target_info` sample for 15 m, for 5 m | replaces A15's 3 h window |
+| Pro payment failed | warning | any `stripe_payments_failed` in 1 h | A16 (new) |
+
+Phase 2, not created yet: A1, A3–A6 and A9–A12 below. Add them by appending to `RULES` in the script.
+
+### Full plan
 
 All rules: data source = the stack's Prometheus, evaluation group `droneedge-api`,
 interval 1 m, labels `team=core`, contact point **`admin-email`** (see § 4).
@@ -125,6 +151,9 @@ adjust after checking Explore.
 | A9 | **Course page latency** | `histogram_quantile(0.95, sum by (le) (rate(http_server_duration_milliseconds_bucket{http_route=~"/courses.*"}[10m]))) > 1500` | 15 m | warning | Learners' hot path. Usually a missing index or a view scan (see `analytics-implementation-plan.md` § 12.1). |
 | A10 | **Sign-up route 5xx** | `sum(increase(http_server_duration_milliseconds_count{http_route="/auth/register",http_status_code=~"5.."}[30m])) > 0` | 0 | critical | Registration is the top of every funnel. |
 | A11 | **Login failures spike** | `increase(auth_login_failed_total[10m]) > 50` | 0 | warning | Credential stuffing or a broken login form. Check source IPs in CloudWatch. |
+| A13 | **Stripe events dead** | `max(stripe_webhook_dead_events) > 0` | 0 | **critical** | A purchase, renewal, cancel or refund failed Stripe's retries **and** 5 hourly replays, so access or revenue is wrong for someone. `stripe_event_replays` (status `dead`) has the event id and `last_error`. Fix the cause, run `POST /purchases/admin/replay-failed-events` (or Stripe → resend), then set `resolved_at`. |
+| A14 | **Stripe webhook signature failures** | `sum(increase(stripe_webhook_failures_total{stage="signature"}[30m])) > 0` | 10 m | critical | Every delivery is being rejected, usually a wrong or rotated `whsec_` or the CloudFront `Stripe-Signature` header being stripped. Stripe keeps retrying, but nothing is recorded until it's fixed. Check `STRIPE_WEBHOOK_SECRET` against Dashboard → Webhooks. |
+| A15 | **Stripe replay job not running** | `absent_over_time(stripe_webhook_dead_events[3h])` | 0 | warning | The gauge reports every 30 s while the API is up, so if it's absent the API isn't exporting at all. The replay job itself is only on when `stripe_webhook_enabled = true`. |
 | A12 | **Maintenance lock skipped** | `increase(analytics_maintenance_lock_skipped_total[24h]) > 0` | 0 | info | Only expected if `desired_count` > 1 or a rolling deploy overlapped 00:30 ET. Noise if it repeats → move cron off the API task (PA37). |
 
 Not alerted on purpose: `product_events.dropped` (expected: anonymous learning
@@ -155,16 +184,37 @@ CloudWatch data source (free tier includes it) for a "task restart loop" panel.
 
 ---
 
-## 5. Dashboard `DroneEdge — API & analytics health`
+## 5. Dashboard
+
+**Live (2026-10-03):** "DroneEdge — API & Stripe health" at `https://droneedge.grafana.net/d/droneedge-health`, in the DroneEdge folder. It is generated by [`scripts/grafana_dashboard.py`](../../scripts/grafana_dashboard.py) (JSON in [`grafana/dashboard-health.json`](grafana/dashboard-health.json)) and has these rows: Overview, Stripe & commerce, HTTP, Product & auth, Nightly job, Runtime. Every panel query was checked against live data.
+
+**Old "DroneEdge" dashboard (uid `jawbcxh`)** is the same as [`../../grafana-dashboard.json`](../../grafana-dashboard.json), saved as [`grafana/dashboard-droneedge-live.json`](grafana/dashboard-droneedge-live.json). It is mostly broken: about half the panels use metric names we never export (`http_server_request_count_requests_total`, `…response_count…`, `…response_size…`), and the "by route" and "by status" panels group by `method`, `path` and `status`, which don't exist. The real labels are `http_method`, `http_route` and `http_status_code`. Delete it once the new one is confirmed.
+
+Original spec (`DroneEdge — API & analytics health`):
 
 One dashboard, 14-day time picker default 24 h. Panels (top → bottom):
 
 1. **Ingest** — `sum by (source) (rate(product_events_accepted_total[5m]))` (stat + timeseries); `sum by (reason) (increase(product_events_dropped_total[1h]))` (bar); `sum by (stage) (increase(product_events_failures_total[1h]))` (stat, red when >0).
 2. **Nightly job** — `analytics_maintenance_step_ms_milliseconds_sum / _count by (step)` (bar gauge, last run); `analytics_reconcile_mismatches by (check)` (table, threshold >0 red); last-run time = `time() - max(timestamp(analytics_maintenance_step_ms_milliseconds_count))`.
-3. **Commerce** — `orders_record_failures_total` (stat); webhook request count / 5xx (A7 query without the threshold).
+3. **Commerce / Stripe**
+   - `orders_record_failures_total` (stat).
+   - Webhook request count and 5xx (the A7 query without its threshold).
+   - `sum by (stage) (increase(stripe_webhook_failures_total[1h]))` (bar).
+   - `sum by (result) (increase(stripe_webhook_replays_total[24h]))` (bar).
+   - `stripe_webhook_dead_events` (stat, red when > 0).
+   - `analytics_reconcile_mismatches{check="paid_grant_without_order"}` (stat).
+
+   For money itself (revenue, refunds, failed renewals), use SQL / `/reporting`, not metrics.
 4. **HTTP** — RPS by `http_route` (top 10), p50/p95 latency, 5xx ratio (A8), by-route p95 table.
 5. **Auth & traffic** — `auth_*_total` rates; `page_view_total by (channel)` stacked; `page_view_total by (route)` top 10; `course_view_total by (course_id)`.
 6. **Runtime** — heap used, event-loop lag (`nodejs_eventloop_lag_*`), pg pool in-use (`db_client_connections_usage`), cpu %.
+
+**Existing `grafana-dashboard.json` (repo root, title "DroneEdge")** is an older HTTP + auth + traffic dashboard, not this one. Checked 2026-10-03, it has three problems:
+- **Removed labels:** "Top Articles/Courses by Views" group by `title`, and "Top Pages by Views" groups by `path`. Those labels were removed on 2026-09-12, so the panels show one unlabeled series. Switch them to `article_id`, `course_id` and `route`.
+- **Unconfirmed metric names:** several panels use `http_server_response_count_responses_total`, `…_error_count_total` and similar. Confirm those exist in Explore.
+- **Missing sections:** it has no Ingest, Nightly or Commerce/Stripe panels.
+
+Either extend it with sections 1–3 above or build the new one and retire it.
 
 Export the dashboard JSON and the alert-rule group (Alert rules → **Export** →
 YAML) into `docs/tech/grafana/` once created, so they can be re-imported or
@@ -183,7 +233,7 @@ second stack appears (`environment-split-plan.md`).
 4. Alerting → Notification policies → default → `admin-email`; add the
    `severity=critical` child route (repeat 4 h).
 5. Alerting → Alert rules → New → folder `DroneEdge`, group `droneedge-api`
-   (1 m) → create A1–A12 from § 3 (copy the expression, set `for`, labels
+   (1 m) → create A1–A15 from § 3 (copy the expression, set `for`, labels
    `severity`, summary = rule name, description = the "Why / action" cell).
 6. Dashboards → New → import panels from § 5; save under folder `DroneEdge`.
 7. Billing → Usage alerts → metrics series 8 000.

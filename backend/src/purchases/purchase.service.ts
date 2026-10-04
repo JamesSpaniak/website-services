@@ -41,6 +41,19 @@ export class PurchaseService {
     .createCounter('orders.record_failures', {
       description: 'Stripe course payments granted without an orders row',
     });
+  /** Pro invoice payments that failed (invoice.payment_failed for a known user). */
+  private readonly paymentFailures = metrics
+    .getMeter('droneedge')
+    .createCounter('stripe.payments_failed', {
+      description: 'Pro subscription invoice payments that failed',
+    });
+  /** Webhook deliveries answered non-2xx (Stripe will retry). */
+  private readonly webhookFailures = metrics
+    .getMeter('droneedge')
+    .createCounter('stripe.webhook.failures', {
+      description:
+        'Stripe webhook deliveries rejected or failed while processing',
+    });
 
   constructor(
     @InjectRepository(User)
@@ -480,6 +493,47 @@ export class PurchaseService {
   }
 
   /**
+   * Pro counterpart of confirmCheckoutSession: after the Checkout redirect,
+   * activates Pro from the session itself if the webhook hasn't yet (same
+   * code path as checkout.session.completed, so repeating it is harmless).
+   */
+  async confirmProCheckoutSession(
+    userId: number,
+    sessionId: string,
+  ): Promise<{ active: boolean }> {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    if (session.mode !== 'subscription') {
+      throw new BadRequestException('Not a Pro checkout session.');
+    }
+    const owner = session.metadata?.userId ?? session.client_reference_id;
+    if (String(owner) !== String(userId)) {
+      throw new ForbiddenException(
+        'This payment belongs to a different account.',
+      );
+    }
+    if (session.status !== 'complete') {
+      throw new BadRequestException('Payment has not completed yet.');
+    }
+    // Already activated (webhook or an earlier call): skip the re-sync, which
+    // would bump token_version and force another session refresh for nothing.
+    const subscriptionId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id;
+    const current = await this.userRepository.findOneBy({ id: userId });
+    if (
+      current &&
+      this.isActivePro(current) &&
+      current.stripe_subscription_id === subscriptionId
+    ) {
+      return { active: true };
+    }
+    await this.fulfillProCheckoutSession(session);
+    const user = await this.userRepository.findOneBy({ id: userId });
+    return { active: !!user && this.isActivePro(user) };
+  }
+
+  /**
    * Monthly (or yearly) Pro subscription via Stripe Checkout.
    * Active Pro grants access to all courses until the subscription ends.
    */
@@ -509,11 +563,13 @@ export class PurchaseService {
 
     const customerId = await this.ensureStripeCustomer(user);
     const frontend = this.frontendBaseUrl();
+    const success = this.sanitizePath(successPath);
     const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${frontend}${this.sanitizePath(successPath)}`,
+      // session_id lets the return page call confirm-pro-checkout if the webhook is late.
+      success_url: `${frontend}${success}${success.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${frontend}${this.sanitizePath(cancelPath)}`,
       client_reference_id: String(userId),
       metadata: {
@@ -613,10 +669,47 @@ export class PurchaseService {
       this.logger.error(
         `Webhook signature verification failed: ${err.message}`,
       );
+      this.webhookFailures.add(1, { stage: 'signature' });
       throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
 
-    this.logger.log(`Received Stripe event: ${event.type}`);
+    try {
+      return await this.processEvent(event);
+    } catch (err) {
+      // Non-2xx → Stripe retries; StripeEventReplayService picks up whatever
+      // is still undelivered after that.
+      this.webhookFailures.add(1, { stage: 'processing', type: event.type });
+      throw err;
+    }
+  }
+
+  /**
+   * Fulfils one Stripe event. Shared by the webhook and the hourly replay of
+   * undelivered events (StripeEventReplayService), so it must stay safe to
+   * run more than once for the same event.
+   */
+  async processEvent(
+    event: Stripe.Event,
+  ): Promise<{ received: true; ignored?: string }> {
+    this.logger.log(`Received Stripe event: ${event.type} (${event.id})`);
+
+    // The sandbox account is shared by every environment (local dev and the
+    // site both use it), so each receives the others' events. Customers are
+    // created per environment and stored on the user, so an event whose
+    // customer no user here owns belongs elsewhere — ignore it rather than
+    // grant access to whichever local user has the same id.
+    const customerId = this.customerIdOf(event);
+    if (
+      customerId &&
+      !(await this.userRepository.findOneBy({
+        stripe_customer_id: customerId,
+      }))
+    ) {
+      this.logger.warn(
+        `Ignoring ${event.type} ${event.id}: customer ${customerId} is not from this environment`,
+      );
+      return { received: true, ignored: 'foreign_customer' };
+    }
 
     switch (event.type) {
       case 'payment_intent.succeeded': {
@@ -690,6 +783,13 @@ export class PurchaseService {
         const invoice = event.data.object as Stripe.Invoice;
         const userId = await this.userIdFromInvoice(invoice);
         if (userId != null) {
+          // Grafana emails on this (observability.md A16); Stripe retries the card itself.
+          this.paymentFailures.add(1, {
+            kind:
+              invoice.billing_reason === 'subscription_cycle'
+                ? 'renewal'
+                : 'other',
+          });
           void this.productEvents.record({
             userId,
             event: 'pro_payment_failed',
@@ -711,6 +811,13 @@ export class PurchaseService {
     }
 
     return { received: true };
+  }
+
+  private customerIdOf(event: Stripe.Event): string | null {
+    const customer = (
+      event.data.object as { customer?: string | { id: string } | null }
+    ).customer;
+    return typeof customer === 'string' ? customer : (customer?.id ?? null);
   }
 
   private async fulfillProCheckoutSession(

@@ -245,6 +245,19 @@ log_service_state "pre-terraform" "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERV
     CF_PUBLIC_KEY_PEM="$(cat "${CF_PUBLIC_KEY_FILE}")"
   fi
 
+  # The webhook secret version is created once from TF_VAR_stripe_webhook_secret
+  # (ignore_changes afterwards). Creating it empty would ship a task that
+  # rejects every Stripe delivery, so refuse the first apply without it.
+  if [[ "${TERRAFORM_APPLY}" == "true" && -f "${TFVARS_FILE}" ]] \
+    && grep -Eq '^[[:space:]]*stripe_webhook_enabled[[:space:]]*=[[:space:]]*true' "${TFVARS_FILE}" \
+    && ! terraform state show 'aws_secretsmanager_secret_version.stripe_webhook_secret[0]' >/dev/null 2>&1 \
+    && [[ -z "${TF_VAR_stripe_webhook_secret:-}" ]]; then
+    echo "Error: stripe_webhook_enabled = true but the webhook secret is not stored yet." >&2
+    echo "  Re-run with: TF_VAR_stripe_webhook_secret=whsec_... ./pipeline.sh --env ${ENVIRONMENT}" >&2
+    echo "  (Stripe Dashboard -> Developers -> Webhooks -> endpoint -> Signing secret)" >&2
+    exit 1
+  fi
+
   COMMON_VARS=(
     ${TFVARS_ARGS[@]+"${TFVARS_ARGS[@]}"}
     ${VAR_ARGS[@]+"${VAR_ARGS[@]}"}

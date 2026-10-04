@@ -20,6 +20,7 @@ import {
   UpgradeToProDto,
 } from './types/purchase.dto';
 import { PurchaseService } from './purchase.service';
+import { StripeEventReplayService } from './stripe-event-replay.service';
 import {
   ApiBearerAuth,
   ApiExcludeEndpoint,
@@ -37,7 +38,10 @@ import { Role } from 'src/users/types/role.enum';
 @Controller('purchases')
 @UseInterceptors(ClassSerializerInterceptor)
 export class PurchaseController {
-  constructor(private readonly purchasesService: PurchaseService) {}
+  constructor(
+    private readonly purchasesService: PurchaseService,
+    private readonly eventReplay: StripeEventReplayService,
+  ) {}
 
   /**
    * Grants the current user access to a course without going through Stripe.
@@ -96,6 +100,23 @@ export class PurchaseController {
   @Post('confirm-checkout')
   async confirmCheckout(@Request() req, @Body() dto: ConfirmCheckoutDto) {
     return this.purchasesService.confirmCheckoutSession(
+      req.user.userId,
+      dto.sessionId,
+    );
+  }
+
+  /**
+   * Pro counterpart of confirm-checkout: activates Pro from a completed
+   * subscription Checkout session when the webhook hasn't arrived.
+   */
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Confirm Pro membership from a completed Checkout session',
+  })
+  @Post('confirm-pro-checkout')
+  async confirmProCheckout(@Request() req, @Body() dto: ConfirmCheckoutDto) {
+    return this.purchasesService.confirmProCheckoutSession(
       req.user.userId,
       dto.sessionId,
     );
@@ -222,10 +243,26 @@ export class PurchaseController {
   @Roles(Role.Admin)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Backfill orders for entitlements missing one, from Stripe (Admin only)',
+    summary:
+      'Backfill orders for entitlements missing one, from Stripe (Admin only)',
   })
   @Post('admin/backfill-order')
   backfillOrder(@Body() dto: BackfillOrderDto) {
     return this.purchasesService.backfillOrders(dto ?? {});
+  }
+
+  /**
+   * Runs the hourly undelivered-webhook replay now (StripeEventReplayService),
+   * e.g. right after fixing an outage. Works even when the cron is disabled.
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Replay Stripe events whose webhook delivery failed (Admin only)',
+  })
+  @Post('admin/replay-failed-events')
+  replayFailedEvents() {
+    return this.eventReplay.run();
   }
 }

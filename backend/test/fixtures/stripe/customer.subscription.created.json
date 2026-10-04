@@ -1,7 +1,7 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1790906310,
+  "created": 1791028805,
   "data": {
     "object": {
       "application": null,
@@ -11,14 +11,11 @@
         "enabled": false,
         "liability": null
       },
-      "billing_cycle_anchor": 1790906304,
+      "billing_cycle_anchor": 1791028802,
       "billing_cycle_anchor_config": null,
       "billing_mode": {
-        "flexible": {
-          "proration_discounts": "included"
-        },
-        "type": "flexible",
-        "updated_at": 1790906304
+        "flexible": null,
+        "type": "classic"
       },
       "billing_thresholds": null,
       "cancel_at": null,
@@ -31,18 +28,18 @@
         "reason": null
       },
       "collection_method": "charge_automatically",
-      "created": 1790906304,
+      "created": 1791028802,
       "currency": "usd",
-      "customer": "cus_VMf4Ec17aQglv1",
+      "customer": "cus_VNBzRem9rtRQAq",
       "customer_account": null,
       "days_until_due": null,
-      "default_payment_method": "pm_1ULvjy2Rw6cpyMyJenQFAJIz",
+      "default_payment_method": "pm_1UMRbh2Rw6cpyMyJoxIJ9M0Q",
       "default_source": null,
       "default_tax_rates": [],
       "description": null,
       "discounts": [],
       "ended_at": null,
-      "id": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG",
+      "id": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
       "invoice_settings": {
         "account_tax_ids": null,
         "custom_fields": null,
@@ -56,12 +53,12 @@
         "data": [
           {
             "billing_thresholds": null,
-            "created": 1790906304,
-            "current_period_end": 1793584704,
-            "current_period_start": 1790906304,
+            "created": 1791028802,
+            "current_period_end": 1793707202,
+            "current_period_start": 1791028802,
             "current_trial": null,
             "discounts": [],
-            "id": "si_VMf4AYWofrH7vV",
+            "id": "si_VNBzc53Ffr6JfS",
             "metadata": {},
             "object": "subscription_item",
             "plan": {
@@ -113,7 +110,7 @@
               "unit_amount_decimal": "3500"
             },
             "quantity": 1,
-            "subscription": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG",
+            "subscription": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
             "tax_rates": []
           }
         ],
@@ -122,7 +119,7 @@
         "total_count": 1,
         "url": "REDACTED"
       },
-      "latest_invoice": "in_1ULvjz2Rw6cpyMyJznqfEPy9",
+      "latest_invoice": "in_1UMRbi2Rw6cpyMyJfvjZ40zS",
       "livemode": false,
       "managed_payments": {
         "enabled": false
@@ -130,14 +127,30 @@
       "metadata": {
         "duration": "monthly",
         "productType": "pro_membership",
-        "userId": "4"
+        "userId": "29"
       },
       "next_pending_invoice_item_invoice": null,
       "object": "subscription",
       "on_behalf_of": null,
       "pause_collection": null,
       "payment_settings": {
-        "payment_method_options": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "billie": null,
+          "blik": null,
+          "card": {
+            "network": null,
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "payto": null,
+          "pix": null,
+          "sepa_debit": null,
+          "upi": null,
+          "us_bank_account": null
+        },
         "payment_method_types": null,
         "save_default_payment_method": "off"
       },
@@ -167,9 +180,9 @@
       },
       "quantity": 1,
       "schedule": null,
-      "start_date": 1790906304,
+      "start_date": 1791028802,
       "status": "active",
-      "test_clock": "clock_1ULvjw2Rw6cpyMyJBA9q448d",
+      "test_clock": null,
       "transfer_data": null,
       "trial_end": null,
       "trial_settings": {
@@ -181,13 +194,13 @@
       "trial_start": null
     }
   },
-  "id": "evt_1ULvk22Rw6cpyMyJGnMPkz3D",
+  "id": "evt_1UMRbm2Rw6cpyMyJp4Y54T8s",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
-    "id": "req_jdZmgiIko9lYdL",
-    "idempotency_key": "9fac2118-acda-4d7e-a4ae-55b39aff189c"
+    "id": null,
+    "idempotency_key": "1ae19548-05b0-43c5-b667-538da5758ec1"
   },
   "type": "customer.subscription.created"
 }

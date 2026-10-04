@@ -38,6 +38,8 @@ Logged-in account (email verification **not** required)
   → entitlements(course_id NULL, source=pro, ends_at = period end) via EntitlementService.syncPro
   → invoice.paid → orders (PRO_MONTHLY / PRO_YEARLY line, idempotent on invoice id) + pro_started | pro_renewed
   → invoice.payment_failed → pro_payment_failed · cancel_at_period_end → pro_cancel_scheduled
+  → if the webhook is late: return page (/profile or /courses/:id ?pro=success&session_id=…)
+    calls POST /purchases/confirm-pro-checkout { sessionId } → same path as checkout.session.completed
   → has_access true for every course until cancel/expire
 ```
 
@@ -72,6 +74,19 @@ Access rule: `has_access(course) = admin OR active Pro (role=pro AND expires_at 
 | Purchase completes | `token_version` bump → in-flight JWT refreshes (see callouts) | ✅ — confirm no forced logout in the browser run |
 
 ---
+
+### When a webhook fails: retries and fallbacks
+
+There are four layers, each limited, and every one goes through the same idempotent code:
+
+| Layer | Covers | Limit |
+|-------|--------|-------|
+| Stripe's own retries | Any non-2xx from `/purchases/webhook` (bad signature, a 500 while processing) | Live: about 3 days with growing gaps. Sandbox: a few tries over hours |
+| Return-page confirm | The buyer is waiting: `confirm-checkout` (course) and `confirm-pro-checkout` (Pro), called after a few polls | Once per page visit |
+| Hourly replay (`StripeEventReplayService`) | Anything still undelivered after 1 hour, for example renewals, cancels and refunds where nobody is on a page | 5 tries per event, then `dead` |
+| Dead-event alert | `stripe_events_dead` in admin health, the `stripe.webhook.dead_events` gauge, and an error log | Stays flagged until a person fixes it and sets `stripe_event_replays.resolved_at` |
+
+**Shared sandbox:** local dev and the site use the same Stripe sandbox, so each receives the other's events. `processEvent` ignores any event whose customer isn't stored on a user in this database. Customers are created per environment, so this stops a local test purchase from granting access to the prod user with the same id.
 
 ## Config
 

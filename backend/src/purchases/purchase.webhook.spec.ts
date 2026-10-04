@@ -36,6 +36,7 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
     webhooks: { constructEvent: jest.fn() },
     invoicePayments: { list: jest.fn() },
     subscriptions: { retrieve: jest.fn() },
+    checkout: { sessions: { retrieve: jest.fn() } },
   };
   const orders = {
     recordStripeOrder: jest.fn(async () => ({
@@ -162,5 +163,73 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
   it('payment_intent.succeeded from a subscription invoice is skipped quietly', async () => {
     await deliver('payment_intent.succeeded.subscription-invoice');
     expect(orders.recordStripeOrder).not.toHaveBeenCalled();
+  });
+
+  it('ignores events whose customer no user here owns (other environment)', async () => {
+    // Local dev and the site share the sandbox: an event for a customer from
+    // the other side must not grant access to the same-numbered user here.
+    userRepo.findOneBy.mockResolvedValue(null);
+    const result = await deliver('customer.subscription.created');
+    expect(result).toEqual({ received: true, ignored: 'foreign_customer' });
+    expect(userRepo.save).not.toHaveBeenCalled();
+    expect(entitlements.syncPro).not.toHaveBeenCalled();
+  });
+
+  describe('confirmProCheckoutSession', () => {
+    const session = () =>
+      fixture('checkout.session.completed.subscription').data.object;
+
+    it('activates Pro from a completed session owned by the caller', async () => {
+      const s = session();
+      stripe.checkout.sessions.retrieve.mockResolvedValue(s);
+      stripe.subscriptions.retrieve.mockResolvedValue(
+        fixture('customer.subscription.created').data.object,
+      );
+      const userId = Number(s.metadata.userId);
+
+      await service.confirmProCheckoutSession(userId, s.id);
+
+      expect(stripe.subscriptions.retrieve).toHaveBeenCalledWith(
+        s.subscription,
+      );
+      expect(userRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ role: Role.Pro }),
+      );
+    });
+
+    it('does nothing when the webhook already activated that subscription', async () => {
+      const s = session();
+      stripe.checkout.sessions.retrieve.mockResolvedValue(s);
+      userRepo.findOneBy.mockResolvedValue({
+        ...user(),
+        role: Role.Pro,
+        pro_membership_expires_at: new Date(Date.now() + 86_400_000),
+        stripe_subscription_id: s.subscription,
+      });
+
+      const result = await service.confirmProCheckoutSession(
+        Number(s.metadata.userId),
+        s.id,
+      );
+
+      expect(result).toEqual({ active: true });
+      expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled();
+      expect(userRepo.save).not.toHaveBeenCalled(); // no token_version bump
+    });
+
+    it("refuses another account's session", async () => {
+      stripe.checkout.sessions.retrieve.mockResolvedValue(session());
+      await expect(
+        service.confirmProCheckoutSession(999, 'cs_x'),
+      ).rejects.toThrow('different account');
+    });
+
+    it('refuses an unfinished session', async () => {
+      const s = { ...session(), status: 'open' };
+      stripe.checkout.sessions.retrieve.mockResolvedValue(s);
+      await expect(
+        service.confirmProCheckoutSession(Number(s.metadata.userId), s.id),
+      ).rejects.toThrow('not completed');
+    });
   });
 });
