@@ -12,6 +12,10 @@ Three subcommands with a human/agent review gate between map and upload:
          Rows without a unit id are refused.
   merge  Append each uploaded row's CloudFront URL to the matching unit's
          images_url array in the course JSON (deduplicated, ordered).
+  upload-files
+         Upload loose files (article heroes, inline images) to
+         s3://<bucket>/<prefix>/<slug>-<hash><ext> (default prefix `articles`) and
+         print local path -> CloudFront URL. Dry-run by default; --execute uploads.
 
 Publishing the JSON to prod stays manual (admin course editor / PUT /courses/:id).
 
@@ -379,6 +383,50 @@ def cmd_merge(args: argparse.Namespace) -> None:
     print("Final step is manual: publish the JSON via the admin course editor (PUT /courses/:id).")
 
 
+def cmd_upload_files(args: argparse.Namespace) -> None:
+    """Upload loose files (article heroes, inline images) under a prefix and
+    print local path -> CloudFront URL. Same hashed keys as course images."""
+    files = [Path(f) for f in args.files]
+    missing = [str(f) for f in files if not f.is_file()]
+    if missing:
+        sys.exit("Missing file(s): " + ", ".join(missing))
+    prefix = args.prefix.strip("/")
+    plan = []
+    for local in files:
+        key = f"{prefix}/{slugify(local.stem)}-{content_hash(local)}{local.suffix.lower()}"
+        plan.append((local, key, f"https://{args.domain}/{key}"))
+
+    if not args.execute:
+        print(f"DRY RUN — would upload {len(plan)} file(s) to s3://{args.bucket}:")
+        for local, key, _ in plan:
+            print(f"  {local} -> s3://{args.bucket}/{key}")
+        print("\nRe-run with --execute to upload.")
+        return
+
+    check = subprocess.run(
+        ["aws", "sts", "get-caller-identity", "--region", args.region],
+        capture_output=True,
+    )
+    if check.returncode != 0:
+        sys.exit("AWS credentials not configured (aws sts get-caller-identity failed).")
+
+    urls = {}
+    for local, key, url in plan:
+        content_type = mimetypes.guess_type(local.name)[0] or "application/octet-stream"
+        print(f"Uploading {local.name} -> s3://{args.bucket}/{key}")
+        result = subprocess.run(
+            ["aws", "s3", "cp", str(local), f"s3://{args.bucket}/{key}",
+             "--region", args.region, "--content-type", content_type],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            print(result.stderr.strip(), file=sys.stderr)
+            sys.exit(f"Upload failed for {local}")
+        urls[str(local)] = url
+
+    print(json.dumps(urls, indent=2))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -410,6 +458,17 @@ def main() -> None:
     p_merge.add_argument("--csv", required=True, help="Mapping CSV (rows must be status=uploaded)")
     p_merge.add_argument("--json", default=DEFAULT_JSON, help="Course JSON payload to update")
     p_merge.set_defaults(func=cmd_merge)
+
+    p_files = sub.add_parser("upload-files",
+                             help="Upload loose files (e.g. article images) under a prefix; prints CloudFront URLs")
+    p_files.add_argument("files", nargs="+", help="Local image files")
+    p_files.add_argument("--prefix", default="articles", help="S3 key prefix (default: articles)")
+    p_files.add_argument("--bucket", default=DEFAULT_BUCKET)
+    p_files.add_argument("--domain", default=DEFAULT_DOMAIN)
+    p_files.add_argument("--region", default=DEFAULT_REGION)
+    p_files.add_argument("--execute", action="store_true",
+                         help="Actually upload (default is dry-run; touches the prod media bucket)")
+    p_files.set_defaults(func=cmd_upload_files)
 
     args = parser.parse_args()
     args.func(args)

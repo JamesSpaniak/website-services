@@ -13,6 +13,9 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { Session } from './types/session.entity';
 import { User } from '../users/types/user.entity';
 import { Role } from '../users/types/role.enum';
+import { ProductEventsService } from '../product-events/product-events.service';
+
+const productEvents = { record: jest.fn(async () => undefined) };
 
 describe('AuthService.validateUser', () => {
   let service: AuthService;
@@ -33,6 +36,7 @@ describe('AuthService.validateUser', () => {
     jest.clearAllMocks();
     jest.spyOn(UsersService, 'comparePassword').mockResolvedValue(true);
 
+    productEvents.record.mockClear();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -45,6 +49,7 @@ describe('AuthService.validateUser', () => {
         { provide: OrganizationService, useValue: {} },
         { provide: AuditService, useValue: { log: jest.fn() } },
         { provide: AnalyticsService, useValue: {} },
+        { provide: ProductEventsService, useValue: productEvents },
       ],
     }).compile();
 
@@ -65,6 +70,10 @@ describe('AuthService.validateUser', () => {
     expect(usersService.findForLogin).toHaveBeenCalledWith(
       'michael.atkinson@chichestersd.org',
     );
+    expect(productEvents.record).toHaveBeenCalledWith({
+      userId: sampleUser.id,
+      event: 'login',
+    });
   });
 
   it('says when the identifier is unknown', async () => {

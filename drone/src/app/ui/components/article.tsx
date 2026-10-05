@@ -8,6 +8,7 @@ import ImageComponent from './image';
 import ContentBlockRenderer from './content-block-renderer';
 import JsonLd, { articleJsonLd } from './json-ld';
 import CommentSection from './comment-section';
+import NewsletterSignup from './newsletter-signup';
 
 interface ArticleProps {
   article: ArticleFull;
@@ -55,6 +56,8 @@ export default function ArticleComponent({ article }: ArticleProps) {
               dangerouslySetInnerHTML={{ __html: bodyHtml }}
             />
           )}
+
+          <NewsletterSignup variant="card" className="mt-12" />
 
           <CommentSection articleId={article.id} />
         </div>

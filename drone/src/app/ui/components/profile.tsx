@@ -9,6 +9,8 @@ import { CourseData } from '@/app/lib/types/course';
 import type { AuditLogEntry } from '@/app/lib/types/audit';
 import { z } from 'zod';
 import CourseProgressPreview from './course-progress-preview';
+import DeleteAccountSection from './delete-account-section';
+import EmailPreferencesSection from './email-preferences-section';
 
 const emailSchema = z.string().email({ message: "Please enter a valid email." });
 
@@ -391,11 +393,15 @@ export default function ProfileComponent() {
                         {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
                     </div>
 
+                    <EmailPreferencesSection />
+
                     <p className="text-xs text-[var(--brand-muted)]">
                         Buying for a school or program?{' '}
                         <Link href="/consultation" className="text-[var(--brand-primary)] hover:underline">Book a consultation</Link>
                     </p>
                 </div>
+
+                <DeleteAccountSection />
             </div>
         </div>
     );

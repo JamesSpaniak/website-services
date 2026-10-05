@@ -4,6 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ProductEventsService } from '../product-events/product-events.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Organization } from './types/organization.entity';
@@ -66,6 +67,7 @@ export class OrganizationService {
     private emailService: EmailService,
     private configService: ConfigService,
     private insights: OrgInsightsService,
+    private productEvents: ProductEventsService,
   ) {}
 
   // ── Admin CRUD ──
@@ -119,6 +121,7 @@ export class OrganizationService {
       max_students: dto.max_students,
       school_year: dto.school_year || null,
       semester: dto.semester || null,
+      ...(dto.timezone && { timezone: dto.timezone }),
     });
     const saved = await this.orgRepository.save(org);
 
@@ -198,6 +201,7 @@ export class OrganizationService {
     if (dto.max_students !== undefined) org.max_students = dto.max_students;
     if (dto.school_year !== undefined) org.school_year = dto.school_year;
     if (dto.semester !== undefined) org.semester = dto.semester;
+    if (dto.timezone !== undefined) org.timezone = dto.timezone;
 
     const saved = await this.orgRepository.save(org);
     const [memberCount, managerCount, courseCount] = await Promise.all([
@@ -257,6 +261,12 @@ export class OrganizationService {
       maxStudents: dto.max_students ?? null,
     });
     const saved = await this.classRepository.save(cls);
+    void this.productEvents.record({
+      userId: null,
+      event: 'class_created',
+      organizationId: orgId,
+      classId: saved.id,
+    });
     return this.toClassResponse(saved, 0);
   }
 
@@ -499,6 +509,13 @@ export class OrganizationService {
       );
     }
 
+    void this.productEvents.record({
+      userId: createdByUserId,
+      event: 'invite_sent',
+      organizationId: orgId,
+      classId: orgClass?.id ?? null,
+      properties: { role, emailed: !!dto.email, count: 1 },
+    });
     return this.toInviteCodeResponse(saved);
   }
 
@@ -512,6 +529,21 @@ export class OrganizationService {
   }
 
   async validateAndConsumeInviteCode(
+    code: string,
+    userId: number,
+    userEmail: string,
+  ): Promise<{ organizationId: number; role: OrgRole }> {
+    const result = await this.consumeInviteCode(code, userId, userEmail);
+    void this.productEvents.record({
+      userId,
+      event: 'invite_redeemed',
+      organizationId: result.organizationId,
+      properties: { role: result.role },
+    });
+    return result;
+  }
+
+  private async consumeInviteCode(
     code: string,
     userId: number,
     userEmail: string,
@@ -634,25 +666,48 @@ export class OrganizationService {
   }
 
   // ── Progress Viewing ──
+  // Teacher views cover students (role `member`, never managers) on the
+  // org's assigned courses only — PTD5, docs/tech/progress-tracking-accuracy.md.
+
+  private studentMembers(orgId: number, classId?: number) {
+    return this.memberRepository.find({
+      where:
+        classId !== undefined
+          ? { organizationId: orgId, classId, role: OrgRole.Member }
+          : { organizationId: orgId, role: OrgRole.Member },
+      relations: ['user'],
+    });
+  }
+
+  /** Courses assigned to the org (id + title only — never the payload). */
+  private async orgCourses(
+    orgId: number,
+  ): Promise<Pick<Course, 'id' | 'title'>[]> {
+    return this.courseRepository
+      .createQueryBuilder('c')
+      .select(['c.id', 'c.title'])
+      .innerJoin(
+        'organization_courses',
+        'oc',
+        'oc."coursesId" = c.id AND oc."organizationsId" = :orgId',
+        { orgId },
+      )
+      .orderBy('c.id')
+      .getMany();
+  }
 
   async getOrgProgressSummary(
     orgId: number,
     classId?: number,
   ): Promise<MemberCourseProgressSummary[]> {
-    const members = await this.memberRepository.find({
-      where:
-        classId !== undefined
-          ? { organizationId: orgId, classId }
-          : { organizationId: orgId },
-      relations: ['user'],
-    });
+    const members = await this.studentMembers(orgId, classId);
     const memberUserIds = members.map((m) => m.userId);
     if (memberUserIds.length === 0) return [];
 
-    // Summary needs course id/title/hidden only — never load the JSON payload.
-    const courses = await this.courseRepository.find({
-      select: ['id', 'title', 'hidden'],
-    });
+    // Assigned courses are shown even when hidden from the public catalog
+    // (custom school courses); unassigned ones never are.
+    const courses = await this.orgCourses(orgId);
+    if (courses.length === 0) return [];
 
     // Only select summary columns -- never load the JSONB payload.
     // p.id is required for getMany() to properly hydrate distinct entities.
@@ -695,7 +750,6 @@ export class OrganizationService {
 
     for (const member of members) {
       for (const course of courses) {
-        if (course.hidden) continue;
         const progress = progressMap.get(`${member.userId}-${course.id}`);
 
         results.push({
@@ -727,7 +781,7 @@ export class OrganizationService {
       }
     }
 
-    return this.insights.enrichSummary(results);
+    return this.insights.enrichSummary(orgId, results);
   }
 
   async getOrgCourseDetailedProgress(
@@ -735,13 +789,13 @@ export class OrganizationService {
     courseId: number,
     classId?: number,
   ): Promise<MemberCourseDetailedProgress[]> {
-    const members = await this.memberRepository.find({
-      where:
-        classId !== undefined
-          ? { organizationId: orgId, classId }
-          : { organizationId: orgId },
-      relations: ['user'],
-    });
+    const assigned = await this.orgCourses(orgId);
+    if (!assigned.some((c) => c.id === courseId)) {
+      throw new NotFoundException(
+        'Course is not assigned to this organization.',
+      );
+    }
+    const members = await this.studentMembers(orgId, classId);
     const memberUserIds = members.map((m) => m.userId);
     if (memberUserIds.length === 0) return [];
 
@@ -884,6 +938,13 @@ export class OrganizationService {
       results.push(this.toInviteCodeResponse(saved));
     }
 
+    void this.productEvents.record({
+      userId: createdByUserId,
+      event: 'invite_sent',
+      organizationId: orgId,
+      classId: orgClass?.id ?? null,
+      properties: { role, emailed: true, count: results.length },
+    });
     return results;
   }
 
@@ -999,6 +1060,7 @@ export class OrganizationService {
       manager_count: managerCount,
       school_year: org.school_year,
       semester: org.semester,
+      timezone: org.timezone,
       course_count: courseCount,
       created_at: org.created_at,
     };

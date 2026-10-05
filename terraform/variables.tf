@@ -179,3 +179,9 @@ variable "ses_events_subscription_enabled" {
   type        = bool
   default     = false
 }
+
+variable "ses_custom_tracking_domain_enabled" {
+  description = "Wrap marketing-email links and the open pixel with the branded click.news.<domain> tracking domain. Enable only after ses_tracking.tf has been applied and SES shows the subdomain as Verified (two-step apply, see ses_tracking.tf)."
+  type        = bool
+  default     = false
+}

@@ -58,6 +58,18 @@ export default function AdminOrganizationsPage() {
     );
 }
 
+/** US school time zones — "today" and daily numbers in teacher views follow it (PTD4). */
+const TIMEZONES: { value: string; label: string }[] = [
+    { value: 'America/New_York', label: 'Eastern' },
+    { value: 'America/Chicago', label: 'Central' },
+    { value: 'America/Denver', label: 'Mountain' },
+    { value: 'America/Phoenix', label: 'Arizona' },
+    { value: 'America/Los_Angeles', label: 'Pacific' },
+    { value: 'America/Anchorage', label: 'Alaska' },
+    { value: 'Pacific/Honolulu', label: 'Hawaii' },
+];
+const tzLabel = (tz: string) => TIMEZONES.find((t) => t.value === tz)?.label ?? tz;
+
 function OrganizationsPanel({
     organizations,
     setOrganizations,
@@ -75,12 +87,14 @@ function OrganizationsPanel({
     const [initialManagerEmail, setInitialManagerEmail] = useState('');
     const [schoolYear, setSchoolYear] = useState('');
     const [semester, setSemester] = useState('');
+    const [timezone, setTimezone] = useState('America/New_York');
     const [creating, setCreating] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState('');
     const [editMaxStudents, setEditMaxStudents] = useState(10);
     const [editSchoolYear, setEditSchoolYear] = useState('');
     const [editSemester, setEditSemester] = useState('');
+    const [editTimezone, setEditTimezone] = useState('America/New_York');
     const [inviteOrgId, setInviteOrgId] = useState<number | null>(null);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState<'manager' | 'member'>('manager');
@@ -111,6 +125,7 @@ function OrganizationsPanel({
                 initial_manager_email: initialManagerEmail.trim() || undefined,
                 school_year: schoolYear.trim() || undefined,
                 semester: semester.trim() || undefined,
+                timezone,
             });
             setOrganizations((prev) => [org, ...prev]);
             setName('');
@@ -118,6 +133,7 @@ function OrganizationsPanel({
             setInitialManagerEmail('');
             setSchoolYear('');
             setSemester('');
+            setTimezone('America/New_York');
             setShowForm(false);
         } catch (err) {
             onError(err instanceof Error ? err.message : 'Failed to create organization');
@@ -143,6 +159,7 @@ function OrganizationsPanel({
                 max_students: editMaxStudents,
                 school_year: editSchoolYear.trim(),
                 semester: editSemester.trim(),
+                timezone: editTimezone,
             });
             setOrganizations((prev) => prev.map((o) => (o.id === id ? updated : o)));
             setEditingId(null);
@@ -351,6 +368,16 @@ function OrganizationsPanel({
                             onChange={(e) => setSemester(e.target.value)}
                             className="px-3 py-2 bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
                         />
+                        <select
+                            aria-label="School time zone"
+                            value={timezone}
+                            onChange={(e) => setTimezone(e.target.value)}
+                            className="px-3 py-2 bg-[var(--input-bg)] text-[var(--input-text)] border border-[var(--input-border)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
+                        >
+                            {TIMEZONES.map((t) => (
+                                <option key={t.value} value={t.value}>{t.label} time</option>
+                            ))}
+                        </select>
                         <button
                             onClick={handleCreate}
                             disabled={creating || !name.trim()}
@@ -417,9 +444,22 @@ function OrganizationsPanel({
                                             <input type="text" placeholder="Semester" value={editSemester}
                                                 onChange={(e) => setEditSemester(e.target.value)}
                                                 className="px-2 py-1 border border-[var(--input-border)] rounded text-xs w-28" />
+                                            <select aria-label="School time zone" value={editTimezone}
+                                                onChange={(e) => setEditTimezone(e.target.value)}
+                                                className="px-2 py-1 border border-[var(--input-border)] rounded text-xs w-28">
+                                                {!TIMEZONES.some((t) => t.value === editTimezone) && (
+                                                    <option value={editTimezone}>{editTimezone}</option>
+                                                )}
+                                                {TIMEZONES.map((t) => (
+                                                    <option key={t.value} value={t.value}>{t.label} time</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     ) : (
-                                        <span>{[org.school_year, org.semester].filter(Boolean).join(' / ') || '—'}</span>
+                                        <span>
+                                            {[org.school_year, org.semester].filter(Boolean).join(' / ') || '—'}
+                                            <span className="block text-xs">{tzLabel(org.timezone)} time</span>
+                                        </span>
                                     )}
                                 </td>
                                 <td className="hidden lg:table-cell px-4 sm:px-6 py-4 text-sm text-[var(--brand-muted)]">
@@ -470,6 +510,7 @@ function OrganizationsPanel({
                                                         setEditMaxStudents(org.max_students);
                                                         setEditSchoolYear(org.school_year || '');
                                                         setEditSemester(org.semester || '');
+                                                        setEditTimezone(org.timezone || 'America/New_York');
                                                     }}
                                                     className="p-1.5 text-[var(--brand-primary)] hover:opacity-90 rounded hover:bg-[var(--comment-secondary-bg)]"
                                                     title="Edit organization"

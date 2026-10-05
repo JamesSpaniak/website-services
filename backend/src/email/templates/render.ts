@@ -84,6 +84,13 @@ export interface LayoutInput {
   unsubscribeUrl: string;
   postalAddress: string;
   siteUrl: string;
+  /** Newsletter: web copy of this issue, shown as a small "View in browser" line. */
+  viewInBrowserUrl?: string;
+}
+
+/** Markdown → HTML fragment with the same safe settings as email (raw HTML not rendered). */
+export function renderMarkdown(markdown: string): string {
+  return md.render(markdown);
 }
 
 /** Markdown body → full HTML document + plain-text alternative. */
@@ -98,6 +105,9 @@ export function renderEmail(input: LayoutInput): {
   const preheader = input.preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(input.preheader)}</div>`
     : '';
+  const viewInBrowser = input.viewInBrowserUrl
+    ? `<div style="padding:0 4px 8px;font-size:12px;color:#737373;text-align:right"><a href="${escapeHtml(input.viewInBrowserUrl)}" style="color:#737373">View in browser</a></div>`
+    : '';
 
   const html = `<!doctype html>
 <html lang="en">
@@ -105,6 +115,7 @@ export function renderEmail(input: LayoutInput): {
 <body style="margin:0;padding:0;background:#f4f4f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#171717">
 ${preheader}
 <div style="max-width:560px;margin:0 auto;padding:24px 16px">
+${viewInBrowser}
   <div style="padding:0 4px 16px;font-weight:700;font-size:18px;letter-spacing:.02em;color:#4a6b2f">DRONE EDGE</div>
   <div style="background:#ffffff;border:1px solid #e5e5e5;border-radius:6px;padding:24px;font-size:15px;line-height:1.6">
     ${content.replace(/<a /g, '<a style="color:#4a6b2f;font-weight:600" ')}
@@ -119,6 +130,9 @@ ${preheader}
 </html>`;
 
   const text = [
+    ...(input.viewInBrowserUrl
+      ? [`View in browser: ${input.viewInBrowserUrl}`, '']
+      : []),
     input.bodyMarkdown,
     '',
     '---',

@@ -12,7 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "assets" / "news" / "images"
-PUBLIC_DIR = ROOT / "drone" / "public" / "images" / "articles"
 ICON_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Icon" / "IconWhite.svg"
 LOGO_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Logo" / "LogoWhite.svg"
 ICON_PNG = OUT_DIR / "icon-white.png"
@@ -124,7 +123,6 @@ def main() -> None:
             print(f"copied {src} -> {dest}")
 
     render_logos()
-    PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     for out_name, photo_name, title, subtitle in CARDS:
         src = OUT_DIR / photo_name
         if not src.exists():
@@ -133,7 +131,6 @@ def main() -> None:
         out = compose(src, title, subtitle)
         dest = OUT_DIR / out_name
         out.save(dest, "PNG", optimize=True)
-        out.save(PUBLIC_DIR / out_name, "PNG", optimize=True)
         print(f"ok {out_name}")
 
 

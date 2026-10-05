@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -47,9 +48,9 @@ const INTEREST_COPY: Record<
       `We'll send you updates on school programs, pacing and pricing. Want to talk sooner? [Book a call](${siteUrl}/consultation).`,
   },
   newsletter: {
-    title: 'the Drone Edge newsletter',
+    title: 'Drone Edge Field Notes',
     body: () =>
-      'Expect occasional articles and course news — never a daily blast.',
+      "Field Notes comes out once a month, on the first Tuesday: what changed in drone rules (dated and sourced), one classroom idea, notes from building our Drone Building course, and a practice Part 107 question. It's a five-minute read. Every issue has a one-click unsubscribe.",
   },
 };
 
@@ -113,9 +114,15 @@ export class LeadsService {
    * Sends the confirmation only for a new or re-consenting signup, never for
    * a repeat submit — otherwise the form could be used to mail-bomb someone.
    */
-  async capture(dto: CreateLeadDto): Promise<void> {
+  async capture(dto: CreateLeadDto, userId?: number): Promise<void> {
     if (dto.website) {
       this.logger.warn(`Waitlist honeypot tripped (interest=${dto.interest})`);
+      return;
+    }
+    // Students in a school account are never put on a marketing list
+    // (privacy § 3–4, newsletter plan § 7). Same 202 as any other submit.
+    if (userId && (await this.isSchoolStudent(userId))) {
+      this.logger.log(`Ignored ${dto.interest} signup from an org member`);
       return;
     }
     const email = dto.email.trim().toLowerCase();
@@ -186,7 +193,8 @@ export class LeadsService {
     }
   }
 
-  private unsubscribeUrls(leadId: number): {
+  /** Footer + List-Unsubscribe URLs for one lead (also used by the newsletter). */
+  unsubscribeUrls(leadId: number): {
     unsubscribePageUrl: string;
     oneClickUrl: string;
   } {
@@ -197,6 +205,62 @@ export class LeadsService {
       unsubscribePageUrl: `${this.mailer.siteUrl}/unsubscribe?t=${t}`,
       oneClickUrl: `${this.mailer.siteUrl}/api/leads/unsubscribe?t=${t}`,
     };
+  }
+
+  private async isSchoolStudent(userId: number): Promise<boolean> {
+    const rows: unknown[] = await this.dataSource.query(
+      `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'member' LIMIT 1`,
+      [userId],
+    );
+    return rows.length > 0;
+  }
+
+  // ── Signed-in preferences (NL16b / NL-A2) ───────────────────────────────
+
+  private async signedInEmail(userId: number): Promise<string> {
+    if (await this.isSchoolStudent(userId)) {
+      throw new ForbiddenException(
+        'Email lists are not available for school accounts.',
+      );
+    }
+    const rows: { email: string | null }[] = await this.dataSource.query(
+      `SELECT email FROM users WHERE id = $1`,
+      [userId],
+    );
+    const email = rows[0]?.email?.trim().toLowerCase();
+    if (!email) throw new NotFoundException('User not found.');
+    return email;
+  }
+
+  /** Lists for the signed-in user's email, matched like the unsubscribe page. */
+  async myPreferences(userId: number): Promise<LeadPreferences> {
+    return this.preferencesFor(await this.signedInEmail(userId));
+  }
+
+  /**
+   * Profile toggle. Subscribing goes through `capture` so it gets the same
+   * consent record and confirmation email as any form; unsubscribing only
+   * touches that one list.
+   */
+  async setMySubscription(
+    userId: number,
+    interest: LeadInterest,
+    subscribed: boolean,
+  ): Promise<LeadPreferences> {
+    const email = await this.signedInEmail(userId);
+    if (subscribed) {
+      await this.capture({ email, interest, source_path: '/profile' });
+    } else {
+      await this.dataSource.query(
+        `UPDATE leads SET unsubscribed_at = now(), updated_at = now()
+         WHERE email = $1 AND interest = $2 AND unsubscribed_at IS NULL`,
+        [email, interest],
+      );
+      this.logger.log(
+        `Unsubscribed ${maskEmail(email)} from ${interest} (profile)`,
+      );
+    }
+    return this.preferencesFor(email);
   }
 
   // ── Unsubscribe / preferences ───────────────────────────────────────────
@@ -328,16 +392,29 @@ export class LeadsService {
 
   // ── Broadcast (Z4) ──────────────────────────────────────────────────────
 
-  private async recipients(
+  /** Active, deduped, never an org member (shared with the newsletter send). */
+  async recipients(
     interests: LeadInterest[],
   ): Promise<{ id: number; email: string }[]> {
     // One message per address even when it is on several targeted lists.
+    // Never an address that belongs to a student in a school account, even if
+    // it reached a list some other way (privacy § 3–4).
     return this.dataSource.query(
-      `SELECT DISTINCT ON (email) id, email FROM leads
-       WHERE interest = ANY($1::text[]) AND unsubscribed_at IS NULL AND bounced_at IS NULL
-       ORDER BY email, id`,
+      `SELECT DISTINCT ON (l.email) l.id, l.email FROM leads l
+       WHERE l.interest = ANY($1::text[]) AND l.unsubscribed_at IS NULL AND l.bounced_at IS NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM users u
+           JOIN organization_members m ON m.user_id = u.id AND m.role = 'member'
+           WHERE lower(u.email) = l.email
+         )
+       ORDER BY l.email, l.id`,
       [interests],
     );
+  }
+
+  /** False when SES / postal address / unsubscribe secret is missing. */
+  canSend(): boolean {
+    return this.mailer.isReady() && !!this.unsubscribeSecret;
   }
 
   async broadcast(

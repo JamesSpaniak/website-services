@@ -2,6 +2,7 @@
 
 import type { AnalyticsEventPayload, ProductEventName, VideoPlaybackState } from './types/analytics';
 import { pageViewAttributionFields } from './attribution';
+import { refreshSession } from './api-client';
 
 const getApiBase = () => {
     if (typeof window !== 'undefined') return '/api';
@@ -10,31 +11,64 @@ const getApiBase = () => {
 
 // ── Batching queue ───────────────────────────────────────────────────────────
 // Events are queued and flushed as `{ events: [...] }` every FLUSH_MS, when the
-// queue reaches MAX_BATCH, or on pagehide via sendBeacon. One request per
-// flush instead of one per event keeps a 30-student classroom well inside the
-// per-user rate limit (backend: docs/tech/analytics-implementation-plan.md § 4.3).
+// queue reaches MAX_BATCH, or on pagehide / tab-hidden via sendBeacon. One
+// request per flush instead of one per event keeps a 30-student classroom well
+// inside the per-user rate limit (docs/tech/analytics-implementation-plan.md § 4.3).
 //
-// Delivery: a failed flush (network error, 429, 5xx) puts the batch back at the
-// head of the queue and retries with backoff; 4xx other than 429 means the
-// payload itself is bad and is dropped. The queue is mirrored to
-// sessionStorage so a reload mid-lesson does not lose the last few seconds of
-// heartbeats. Nothing here ever throws into the caller.
+// Delivery (docs/tech/progress-tracking-accuracy.md R1, R11, R12):
+//  • The queue — including a batch whose fetch has not answered yet — is
+//    mirrored to sessionStorage, so a reload or a page killed mid-request
+//    resends it on the next load. Event ids make every resend idempotent.
+//  • Network errors (offline, flaky Wi-Fi) never drop events: the batch goes
+//    back to the head of the queue and waits for `online` or the backoff.
+//    Only a server that keeps failing (429 / 5xx, MAX_ATTEMPTS times) drops one.
+//  • 400/413 mean the payload itself is bad and are dropped (the backend
+//    validates per event, so one bad event no longer costs the batch).
+//  • 401 = signed-in learner whose access cookie expired (backend answers 401
+//    only when the refresh cookie is still present): refresh the session and
+//    resend. If the refresh fails, resend flagged `x-analytics-guest` so it is
+//    handled like a guest's batch instead of looping.
+//  • Page going away: everything still queued (and any batch in flight) is
+//    handed to sendBeacon in MAX_BATCH chunks. Beacon outcomes are unknowable
+//    and treated as delivered.
+// Nothing here ever throws into the caller.
 
 const FLUSH_MS = 5000;
 const MAX_BATCH = 20;
-const MAX_QUEUE = 200;
+/** ~8 h of heartbeats — an offline afternoon survives; sessionStorage stays small. */
+const MAX_QUEUE = 1000;
 const MAX_ATTEMPTS = 5;
+const MAX_BACKOFF_MS = 60_000;
+const MAX_AUTH_RETRIES = 2;
 const SESSION_KEY = 'de:session';
 const QUEUE_KEY = 'de:analytics:queue';
 const ANON_KEY = 'de:anon';
 const ANON_LINKED_KEY = 'de:anon:linked';
 
 let queue: AnalyticsEventPayload[] = [];
+/** Batch handed to fetch and not yet answered; persisted with the queue. */
+let inFlightBatch: AnalyticsEventPayload[] | null = null;
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let listenersBound = false;
-let inFlight = false;
 let attempts = 0;
+let authRetries = 0;
+/** Session refresh failed on this page — stop asking the backend to wait for one. */
+let sendAsGuest = false;
 let queueRestored = false;
+/** Run before a page-leaving flush so components can queue their last state. */
+const beforeLeaveHooks = new Set<() => void>();
+
+/**
+ * Registers a callback that runs right before the page-leaving beacon (tab
+ * hidden / pagehide), so state such as unsent video ranges rides along.
+ * Returns the unregister function.
+ */
+export function onBeforeLeave(fn: () => void): () => void {
+    beforeLeaveHooks.add(fn);
+    return () => {
+        beforeLeaveHooks.delete(fn);
+    };
+}
 
 function sessionId(): string | undefined {
     if (typeof window === 'undefined') return undefined;
@@ -99,8 +133,9 @@ function newId(): string {
 
 function persistQueue(): void {
     try {
-        if (queue.length === 0) window.sessionStorage.removeItem(QUEUE_KEY);
-        else window.sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+        const pending = inFlightBatch ? [...inFlightBatch, ...queue] : queue;
+        if (pending.length === 0) window.sessionStorage.removeItem(QUEUE_KEY);
+        else window.sessionStorage.setItem(QUEUE_KEY, JSON.stringify(pending));
     } catch {
         /* quota / private mode — in-memory queue still works */
     }
@@ -114,7 +149,7 @@ function restoreQueue(): void {
         if (!raw) return;
         const saved = JSON.parse(raw);
         if (Array.isArray(saved) && saved.length) {
-            queue = [...saved.slice(-MAX_QUEUE), ...queue];
+            queue = [...saved, ...queue].slice(-MAX_QUEUE);
         }
     } catch {
         /* corrupt entry — ignore */
@@ -133,9 +168,18 @@ function scheduleFlush(delayMs: number): void {
     }, delayMs);
 }
 
-function requeue(batch: AnalyticsEventPayload[]): void {
+function isOffline(): boolean {
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+/**
+ * Puts a failed batch back at the head of the queue. `transient` (network
+ * error) never drops — offline waits for the `online` event, otherwise it
+ * retries with backoff. Server failures drop after MAX_ATTEMPTS.
+ */
+function requeue(batch: AnalyticsEventPayload[], transient: boolean): void {
     attempts += 1;
-    if (attempts > MAX_ATTEMPTS) {
+    if (!transient && attempts > MAX_ATTEMPTS) {
         console.error(`[analytics] dropping ${batch.length} events after ${MAX_ATTEMPTS} failed flushes`);
         attempts = 0;
         persistQueue();
@@ -144,7 +188,27 @@ function requeue(batch: AnalyticsEventPayload[]): void {
     }
     queue = [...batch, ...queue].slice(-MAX_QUEUE);
     persistQueue();
-    scheduleFlush(Math.min(60_000, FLUSH_MS * 2 ** attempts));
+    if (transient && isOffline()) return; // the `online` listener resumes
+    scheduleFlush(Math.min(MAX_BACKOFF_MS, FLUSH_MS * 2 ** Math.min(attempts, 4)));
+}
+
+/** Page is going away: hand everything pending to the browser in MAX_BATCH chunks. */
+function beaconAll(url: string): boolean {
+    if (typeof navigator === 'undefined' || !navigator.sendBeacon) return false;
+    const pending = inFlightBatch ? [...inFlightBatch, ...queue] : [...queue];
+    let sent = 0;
+    while (sent < pending.length) {
+        const chunk = pending.slice(sent, sent + MAX_BATCH);
+        if (!navigator.sendBeacon(url, new Blob([envelope(chunk)], { type: 'application/json' }))) break;
+        sent += chunk.length;
+    }
+    if (sent === 0) return false;
+    // The in-flight batch stays owned by its fetch (a duplicate is deduped by
+    // event id); everything else that was beaconed leaves the queue.
+    const inFlightSet = new Set(inFlightBatch ?? []);
+    queue = pending.slice(sent).filter((e) => !inFlightSet.has(e));
+    persistQueue();
+    return true;
 }
 
 export function flushAnalytics(useBeacon = false): void {
@@ -153,57 +217,75 @@ export function flushAnalytics(useBeacon = false): void {
         clearTimeout(flushTimer);
         flushTimer = null;
     }
-    if (queue.length === 0 || (inFlight && !useBeacon)) return;
+    const url = `${getApiBase()}/analytics/event`;
+    if (useBeacon) {
+        for (const hook of beforeLeaveHooks) {
+            try {
+                hook();
+            } catch {
+                /* a component hook must never block delivery */
+            }
+        }
+        if (beaconAll(url) && queue.length === 0) return;
+    }
+    if (queue.length === 0 || inFlightBatch) return;
 
     const batch = queue.slice(0, MAX_BATCH);
     queue = queue.slice(MAX_BATCH);
+    inFlightBatch = batch;
     persistQueue();
-    const url = `${getApiBase()}/analytics/event`;
-    const body = envelope(batch);
 
+    const settle = () => {
+        inFlightBatch = null;
+    };
     try {
-        // Page is going away: sendBeacon is the only reliable option. Its
-        // outcome is unknowable, so the batch is considered delivered.
-        if (useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
-            if (navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }))) {
-                if (queue.length) scheduleFlush(0);
-                return;
-            }
-        }
-        inFlight = true;
         const anon = anonymousId();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (anon) headers['x-anonymous-id'] = anon;
+        if (sendAsGuest) headers['x-analytics-guest'] = '1';
         fetch(url, {
             method: 'POST',
-            headers: anon
-                ? { 'Content-Type': 'application/json', 'x-anonymous-id': anon }
-                : { 'Content-Type': 'application/json' },
-            body,
+            headers,
+            body: envelope(batch),
             keepalive: true,
             credentials: 'same-origin',
         })
-            .then((res) => {
-                inFlight = false;
+            .then(async (res) => {
+                if (res.status === 401 && authRetries < MAX_AUTH_RETRIES) {
+                    // Stay in flight through the refresh so no other flush races it.
+                    authRetries += 1;
+                    if (!(await refreshSession())) sendAsGuest = true;
+                    settle();
+                    queue = [...batch, ...queue].slice(-MAX_QUEUE);
+                    persistQueue();
+                    scheduleFlush(0);
+                    return;
+                }
+                settle();
                 if (res.ok) {
                     attempts = 0;
+                    authRetries = 0;
+                    persistQueue();
                     if (queue.length) scheduleFlush(0);
                 } else if (res.status === 429 || res.status >= 500) {
-                    requeue(batch);
+                    requeue(batch, false);
                 } else {
                     // 400/401/413: the payload is the problem — retrying cannot help.
                     console.error(`[analytics] batch rejected (${res.status}); dropped ${batch.length} events`);
                     attempts = 0;
+                    persistQueue();
                     if (queue.length) scheduleFlush(FLUSH_MS);
                 }
             })
             .catch((err) => {
-                inFlight = false;
+                settle();
                 console.error('[analytics] flush failed', err);
-                requeue(batch);
+                requeue(batch, true);
             });
     } catch (err) {
-        inFlight = false;
+        settle();
         console.error('[analytics] post failed', err);
-        requeue(batch);
+        requeue(batch, true);
     }
 }
 
@@ -215,7 +297,10 @@ function bindLifecycle(): void {
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') flushAnalytics(true);
     });
-    window.addEventListener('online', () => flushAnalytics());
+    window.addEventListener('online', () => {
+        attempts = 0;
+        flushAnalytics();
+    });
     if (queue.length) scheduleFlush(FLUSH_MS);
 }
 
@@ -301,6 +386,11 @@ export function publishVideoState(unitRef: string, state: VideoPlaybackState | n
 
 export function readVideoState(unitRef: string): VideoPlaybackState | undefined {
     return videoStates.get(unitRef);
+}
+
+/** Every registered player (the lesson's own video and its sections' videos). */
+export function listVideoStates(): [string, VideoPlaybackState][] {
+    return Array.from(videoStates.entries());
 }
 
 /** Any registered video currently playing (used to keep heartbeats alive during passive watching). */

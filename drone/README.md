@@ -15,6 +15,8 @@ Next.js 15 App Router app for **TheDroneEdge.com**: courses, exams, articles, sc
 cd drone
 npm install
 npm run dev    # http://localhost:8080 — proxies /api to backend
+npm test       # Vitest unit tests (src/**/*.test.ts[x], jsdom)
+npm run test:e2e  # Playwright (e2e/)
 ```
 
 Backend must be running on port 3000 (see [`docs/tech/local-dev.md`](../docs/tech/local-dev.md)).

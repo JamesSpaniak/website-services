@@ -1,5 +1,5 @@
 import { ContactPayload, ConsultationPayload, CreateUserDto, UserDto } from "./types/profile";
-import { CourseData, UnitData } from "./types/course";
+import { CourseData, UnitData, UnitProgressUpdate } from "./types/course";
 import { ArticleCreateDto, ArticleFull, ArticleSlim } from "./types/article";
 import {
     Question,
@@ -21,12 +21,22 @@ import type {
     AdminLeadsQuery,
     CreateLeadPayload,
     CreateLeadResponse,
+    LeadInterest,
     LeadPreferencesResponse,
     MarketingBroadcastPayload,
     MarketingBroadcastResult,
     UnsubscribePayload,
     UnsubscribeResponse,
 } from "./types/lead";
+import type {
+    IssueCount,
+    IssueDetail,
+    IssueImportResult,
+    IssueMetrics,
+    IssuePreview,
+    NewsletterIssue,
+    PublicIssueSummary,
+} from "./types/newsletter";
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from "./logger";
 import { readPromoCode } from "./attribution";
@@ -63,7 +73,7 @@ const isAuthEndpoint = (endpoint: string) =>
  * with the same cookie would each try to rotate it.
  */
 let refreshInFlight: Promise<boolean> | null = null;
-const refreshSession = () => {
+export const refreshSession = () => {
     if (!refreshInFlight) {
         refreshInFlight = fetch(buildUrl('auth/refresh'), {
             method: 'POST',
@@ -176,6 +186,17 @@ async function logout() {
     }
 }
 
+/**
+ * Permanently deletes the signed-in account (App Store 5.1.1(v)). The backend
+ * clears the auth cookies; a wrong password is a 400 with "Incorrect password."
+ */
+async function deleteAccount(password: string): Promise<{ message: string }> {
+    return apiClient('auth/delete-account', {
+        method: 'POST',
+        body: JSON.stringify({ password }),
+    });
+}
+
 async function getArticles(): Promise<ArticleSlim[]> {
     return apiClient('articles');
 }
@@ -248,10 +269,20 @@ function progressUnitPath(courseId: number, unitId: string) {
     return `progress/courses/${courseId}/units/${encodeURIComponent(unitId)}`;
 }
 
-async function updateUnitProgress(courseId: number, unitId: string, status: string): Promise<UnitData> {
+/**
+ * `auto: true` for writes the learner did not ask for (opening a lesson): the
+ * server only applies them to a unit with no status yet, so a stale tab can
+ * never downgrade COMPLETED. The response carries the unit's actual status.
+ */
+async function updateUnitProgress(
+    courseId: number,
+    unitId: string,
+    status: string,
+    opts: { auto?: boolean } = {},
+): Promise<UnitProgressUpdate> {
     return apiClient(progressUnitPath(courseId, unitId), {
         method: 'PATCH',
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(opts.auto ? { status, auto: true } : { status }),
     });
 }
 
@@ -300,6 +331,68 @@ async function getLeadPreferences(token: string): Promise<LeadPreferencesRespons
 /** POST /leads/unsubscribe — omit `interests` to unsubscribe from everything. */
 async function unsubscribeLead(payload: UnsubscribePayload): Promise<UnsubscribeResponse> {
     return publicJson('leads/unsubscribe', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+/** GET /leads/me — the signed-in user's email lists (profile). 403 for school accounts. */
+async function getMyEmailLists(): Promise<LeadPreferencesResponse> {
+    return apiClient('leads/me');
+}
+
+/** PATCH /leads/me — join or leave one list from the profile. Joining sends the usual confirmation. */
+async function updateMyEmailList(interest: LeadInterest, subscribed: boolean): Promise<LeadPreferencesResponse> {
+    return apiClient('leads/me', {
+        method: 'PATCH',
+        body: JSON.stringify({ interest, subscribed }),
+    });
+}
+
+// ── Newsletter (Field Notes) — admin ──────────────────────────────────────────
+// Issue files are drafted in the repo (assets/newsletter/) and uploaded here.
+
+async function getNewsletterIssues(): Promise<NewsletterIssue[]> {
+    return apiClient('newsletter/issues');
+}
+
+async function getNewsletterIssue(slug: string): Promise<IssueDetail> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}`);
+}
+
+/** Render an issue file without saving it. */
+async function previewNewsletterFile(source: string): Promise<IssuePreview> {
+    return apiClient('newsletter/issues/preview', { method: 'POST', body: JSON.stringify({ source }) });
+}
+
+/** Create / replace the draft, or (after send) correct the web copy. */
+async function importNewsletterFile(source: string): Promise<IssueImportResult> {
+    return apiClient('newsletter/issues/import', { method: 'POST', body: JSON.stringify({ source }) });
+}
+
+async function countNewsletterRecipients(slug: string): Promise<IssueCount> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}/count`);
+}
+
+async function sendNewsletterTest(slug: string): Promise<{ sent: boolean; to: string; reason?: string }> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}/test`, { method: 'POST', body: '{}' });
+}
+
+async function approveNewsletterIssue(slug: string, approve: boolean): Promise<NewsletterIssue> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}/${approve ? 'approve' : 'unapprove'}`, {
+        method: 'POST',
+        body: '{}',
+    });
+}
+
+async function sendNewsletterIssue(slug: string): Promise<{ status: 'queued'; recipients: number }> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}/send`, { method: 'POST', body: '{}' });
+}
+
+async function getNewsletterMetrics(slug: string): Promise<IssueMetrics> {
+    return apiClient(`newsletter/issues/${encodeURIComponent(slug)}/metrics`);
+}
+
+/** Public archive list (sent ≥ 7 days ago). */
+async function getNewsletterArchive(): Promise<PublicIssueSummary[]> {
+    return publicJson('newsletter/public');
 }
 
 // ── Leads + marketing email (admin) ───────────────────────────────────────────
@@ -591,6 +684,7 @@ async function createOrganization(data: {
     initial_manager_email?: string;
     school_year?: string;
     semester?: string;
+    timezone?: string;
 }): Promise<Organization> {
     return apiClient('organizations', {
         method: 'POST',
@@ -603,6 +697,7 @@ async function updateOrganization(id: number, data: {
     max_students?: number;
     school_year?: string;
     semester?: string;
+    timezone?: string;
 }): Promise<Organization> {
     return apiClient(`organizations/${id}`, {
         method: 'PATCH',
@@ -1006,6 +1101,7 @@ export {
     getUser,
     login,
     logout,
+    deleteAccount,
     forgotPassword,
     sendContactMessage,
     sendConsultationRequest,
@@ -1013,6 +1109,18 @@ export {
     createLead,
     getLeadPreferences,
     unsubscribeLead,
+    getMyEmailLists,
+    updateMyEmailList,
+    getNewsletterIssues,
+    getNewsletterIssue,
+    previewNewsletterFile,
+    importNewsletterFile,
+    countNewsletterRecipients,
+    sendNewsletterTest,
+    approveNewsletterIssue,
+    sendNewsletterIssue,
+    getNewsletterArchive,
+    getNewsletterMetrics,
     getLeadsAdmin,
     leadsCsvUrl,
     sendMarketingBroadcast,

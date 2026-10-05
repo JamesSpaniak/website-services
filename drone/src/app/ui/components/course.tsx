@@ -54,7 +54,14 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
 
     const handleUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
         const updatedUnit = await updateUnitProgress(courseId, unitId, newStatus);
-        setCourse(prev => updateUnitInState(prev, updatedUnit));
+        setCourse(prev => {
+            let next = updateUnitInState(prev, updatedUnit);
+            // Finishing the last lesson completes its parents / the course (PTD3).
+            for (const ref of updatedUnit.auto_completed ?? []) {
+                next = updateUnitInState(next, { id: ref, status: ProgressStatus.COMPLETED } as UnitData);
+            }
+            return updatedUnit.course_status ? { ...next, status: updatedUnit.course_status } : next;
+        });
     };
 
     return (

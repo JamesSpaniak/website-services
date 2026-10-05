@@ -9,6 +9,7 @@ import {
   IsString,
   Min,
   ArrayMinSize,
+  IsTimeZone,
   ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -48,6 +49,13 @@ export class CreateOrganizationDto {
   @IsOptional()
   @IsString()
   semester?: string;
+  @ApiPropertyOptional({
+    description:
+      'IANA time zone, e.g. "America/Chicago". Sets the day boundary for teacher views. Default America/New_York.',
+  })
+  @IsOptional()
+  @IsTimeZone()
+  timezone?: string;
 }
 
 export class UpdateOrganizationDto {
@@ -72,6 +80,13 @@ export class UpdateOrganizationDto {
   @IsOptional()
   @IsString()
   semester?: string;
+  @ApiPropertyOptional({
+    description:
+      'IANA time zone, e.g. "America/Chicago". Sets the day boundary for teacher views. Default America/New_York.',
+  })
+  @IsOptional()
+  @IsTimeZone()
+  timezone?: string;
 }
 
 export class GenerateInviteCodeDto {
@@ -214,6 +229,7 @@ export class OrganizationResponse {
   manager_count: number;
   school_year: string | null;
   semester: string | null;
+  timezone: string;
   course_count: number;
   created_at: Date;
 }

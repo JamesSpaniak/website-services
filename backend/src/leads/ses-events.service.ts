@@ -5,18 +5,37 @@ import {
   parseSnsMessage,
   verifySnsSignature,
 } from '../email/sns-message';
+import { DataSource } from 'typeorm';
 import { LeadsService } from './leads.service';
 
-interface SesEvent {
+export interface SesEvent {
   /** Configuration-set event publishing uses eventType; identity notifications use notificationType. */
   eventType?: string;
   notificationType?: string;
+  mail?: {
+    timestamp?: string;
+    messageId?: string;
+    destination?: string[];
+    /** Our SES message tags, e.g. { kind: ['newsletter'], issue: ['2026-11'] }. */
+    tags?: Record<string, string[]>;
+  };
   bounce?: {
     bounceType?: string;
     bouncedRecipients?: { emailAddress?: string }[];
+    timestamp?: string;
   };
-  complaint?: { complainedRecipients?: { emailAddress?: string }[] };
+  complaint?: {
+    complainedRecipients?: { emailAddress?: string }[];
+    timestamp?: string;
+  };
+  delivery?: { timestamp?: string };
+  open?: { timestamp?: string };
+  click?: { timestamp?: string; link?: string };
+  reject?: unknown;
 }
+
+/** Clicks this soon after sending are mail scanners, not people (school / corporate gateways). */
+const BOT_CLICK_WINDOW_MS = 30_000;
 
 /**
  * SES → SNS → `POST /email/ses-events` (launch plan Z2). SES already
@@ -36,6 +55,7 @@ export class SesEventsService {
 
   constructor(
     private readonly leads: LeadsService,
+    private readonly dataSource: DataSource,
     config: ConfigService,
   ) {
     this.topicArn = config.get<string>('SES_EVENTS_TOPIC_ARN') ?? '';
@@ -106,7 +126,70 @@ export class SesEventsService {
         `SES complaint: ${emails.length} recipient(s), ${n} lead row(s) unsubscribed`,
       );
     }
-    // Delivery / Open / Click / Reject: no lead state to change.
+    // Delivery / Open / Click / Reject change no lead state; newsletter
+    // events of every type feed the per-issue metrics.
+    await this.recordNewsletterEvent(type, event).catch((err) =>
+      this.logger.error(
+        `newsletter event not recorded: ${(err as Error).message}`,
+      ),
+    );
+  }
+
+  /**
+   * Per-issue metrics (NL14). Only messages tagged kind=newsletter (test
+   * sends and waitlist mail are skipped). Clicks keep the recipient and link;
+   * opens are stored without the recipient (decided Oct 4 2026 — Apple Mail
+   * Privacy Protection makes per-person opens meaningless). No IP / UA.
+   */
+  async recordNewsletterEvent(
+    type: string | undefined,
+    event: SesEvent,
+  ): Promise<void> {
+    const tags = event.mail?.tags ?? {};
+    if (tags.kind?.[0] !== 'newsletter' || !tags.issue?.[0]) return;
+    const kind = (
+      {
+        Delivery: 'delivery',
+        Open: 'open',
+        Click: 'click',
+        Bounce: 'bounce',
+        Complaint: 'complaint',
+        Reject: 'reject',
+      } as Record<string, string>
+    )[type ?? ''];
+    const messageId = event.mail?.messageId;
+    if (!kind || !messageId) return;
+
+    const sentAt = Date.parse(event.mail?.timestamp ?? '');
+    const at =
+      event.click?.timestamp ??
+      event.open?.timestamp ??
+      event.delivery?.timestamp ??
+      event.bounce?.timestamp ??
+      event.complaint?.timestamp ??
+      event.mail?.timestamp;
+    const occurredAt =
+      at && !Number.isNaN(Date.parse(at)) ? new Date(at) : new Date();
+    const recipient =
+      event.mail?.destination?.[0]?.trim().toLowerCase() ?? null;
+    const likelyBot =
+      kind === 'click' &&
+      !Number.isNaN(sentAt) &&
+      occurredAt.getTime() - sentAt < BOT_CLICK_WINDOW_MS;
+
+    await this.dataSource.query(
+      `INSERT INTO newsletter_events (issue_id, message_id, event_type, email, link, likely_bot, occurred_at)
+       SELECT id, $2, $3, $4, $5, $6, $7 FROM newsletter_issues WHERE slug = $1`,
+      [
+        tags.issue[0],
+        messageId.slice(0, 128),
+        kind,
+        kind === 'open' ? null : recipient,
+        kind === 'click' ? (event.click?.link ?? '').slice(0, 2000) : null,
+        likelyBot,
+        occurredAt,
+      ],
+    );
   }
 
   private async fetchCert(url: string): Promise<string> {

@@ -4,6 +4,7 @@ import {
   Get,
   Header,
   HttpCode,
+  Patch,
   Post,
   Query,
   Request,
@@ -12,6 +13,7 @@ import {
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Roles } from '../users/role.decorator';
 import { RolesGuard } from '../users/role.guard';
 import { Role } from '../users/types/role.enum';
@@ -22,6 +24,7 @@ import {
   ListLeadsQueryDto,
   MarketingBroadcastDto,
   UnsubscribeDto,
+  UpdateMySubscriptionDto,
 } from './types/lead.dto';
 
 @ApiTags('Leads')
@@ -33,9 +36,34 @@ export class LeadsController {
   @Post()
   @HttpCode(202)
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
-  async create(@Body() dto: CreateLeadDto) {
-    await this.leads.capture(dto);
+  @UseGuards(OptionalJwtAuthGuard)
+  async create(@Body() dto: CreateLeadDto, @Request() req) {
+    // Signed-in students (org members) are silently skipped in the service.
+    await this.leads.capture(dto, req.user?.userId);
     return { ok: true };
+  }
+
+  @ApiOperation({ summary: "Signed-in user's email lists (profile)" })
+  @ApiBearerAuth()
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async mine(@Request() req) {
+    return this.leads.myPreferences(req.user.userId);
+  }
+
+  @ApiOperation({
+    summary: 'Subscribe to / leave one email list from the profile',
+  })
+  @ApiBearerAuth()
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async updateMine(@Request() req, @Body() dto: UpdateMySubscriptionDto) {
+    return this.leads.setMySubscription(
+      req.user.userId,
+      dto.interest,
+      dto.subscribed,
+    );
   }
 
   @ApiOperation({ summary: 'Lists an unsubscribe token belongs to (public)' })

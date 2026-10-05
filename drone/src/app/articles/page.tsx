@@ -6,6 +6,7 @@ import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import ArticlePreviewComponent from '../ui/components/article-preview';
 import PageShell from '../ui/components/page-shell';
+import NewsletterSignup from '../ui/components/newsletter-signup';
 import { ArticleSlim } from '../lib/types/article';
 
 export default function ArticlesPage() {
@@ -36,6 +37,7 @@ export default function ArticlesPage() {
       subtitle="Drone technology, regulations, and practice."
       maxWidthClass="max-w-6xl"
     >
+      <NewsletterSignup variant="band" className="mb-8" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
           <ArticlePreviewComponent key={article.id} article={article} />

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -26,6 +27,9 @@ import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/types/audit-action.enum';
 import { EntitlementService } from '../commerce/entitlement.service';
 import { ProductEventsService } from '../product-events/product-events.service';
+import { OrgRole } from '../organizations/types/org-role.enum';
+import { EmailService } from '../email/email.service';
+import { Stripe } from 'stripe';
 
 @Injectable()
 export class UsersService {
@@ -40,6 +44,8 @@ export class UsersService {
     private auditService: AuditService,
     private entitlements: EntitlementService,
     private productEvents: ProductEventsService,
+    private emailService: EmailService,
+    @Inject('STRIPE_CLIENT') private stripe: Stripe,
   ) {}
   private readonly logger = new Logger(UsersService.name);
 
@@ -371,11 +377,7 @@ export class UsersService {
     if (user.role === Role.Admin)
       throw new ForbiddenException('Admin accounts cannot be deleted here.');
 
-    await this.dataSource.query(
-      `DELETE FROM "exam_attempts" WHERE "user_id" = $1`,
-      [id],
-    );
-    await this.userRepository.delete(id);
+    await this.purgeAccount(user);
     this.auditService.log(actingAdminId, AuditAction.USER_DELETED, {
       targetUserId: id,
       username: user.username,
@@ -387,13 +389,65 @@ export class UsersService {
   }
 
   /**
+   * Self-service deletion (App Store 5.1.1(v), privacy § 9). Requires the
+   * current password. Refused for admins, and for students in a school
+   * account — the school controls those accounts under its agreement.
+   * Teachers (org managers) may delete their own account.
+   */
+  async deleteOwnAccount(userId: number, password: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) throw new NotFoundException('User not found.');
+    if (user.role === Role.Admin) {
+      throw new ForbiddenException('Admin accounts cannot be self-deleted.');
+    }
+    const membership = await this.orgMemberRepository.findOneBy({ userId });
+    if (membership?.role === OrgRole.Member) {
+      throw new ForbiddenException(
+        'Your school manages this account. Ask your teacher, or email us to delete it.',
+      );
+    }
+    if (!(await UsersService.comparePassword(password, user.password))) {
+      // 400, not 401: the web client treats 401 as an expired session and refreshes.
+      throw new BadRequestException('Incorrect password.');
+    }
+
+    await this.purgeAccount(user);
+    // Null actor: audit rows cascade-delete with their user (privacy § 7).
+    this.auditService.log(null, AuditAction.USER_SELF_DELETED, {
+      targetUserId: userId,
+      username: user.username,
+      email: user.email,
+    });
+    this.logger.log(`User ${userId} deleted their own account`);
+  }
+
+  /**
+   * Shared by admin and self-service deletion so both remove the same data.
+   * Database first (one transaction), then the Stripe customer: if the
+   * database step fails nothing is touched in Stripe; if Stripe fails the
+   * account is still gone and the admin is alerted to finish it by hand.
+   */
+  private async purgeAccount(user: User): Promise<void> {
+    await this.deleteUser(user.id);
+    if (user.stripe_customer_id) {
+      await this.deleteStripeCustomer(user.id, user.stripe_customer_id);
+    }
+  }
+
+  /**
    * Deletes the account and everything keyed on it. FK cascades cover
-   * progress, entitlements, video_progress, memberships; the analytics tables
-   * below are partitioned / FK-less by design, so they are cleared explicitly
-   * (privacy notice § 7 promises this — the S3 archive is out of scope, PD23).
+   * progress, entitlements, video_progress, memberships, comments, sessions
+   * and the user's own audit rows; `orders` keep the row with `user_id` set
+   * to NULL (tax / dispute retention, privacy § 7). The tables below have no
+   * FK to users by design (partitioned or legacy), so they are cleared
+   * explicitly. Waitlist / newsletter `leads` are keyed by email, not user,
+   * and go too so a deleted user is never mailed again (NL-A1). The S3
+   * analytics archive holds no user ids (PD23).
    */
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.manager.transaction(async (tx) => {
+      const user = await tx.getRepository(User).findOneBy({ id });
+      if (!user) return;
       await tx.query(`DELETE FROM product_events WHERE user_id = $1`, [id]);
       await tx.query(`DELETE FROM product_events_daily WHERE user_id = $1`, [
         id,
@@ -401,8 +455,50 @@ export class UsersService {
       await tx.query(`DELETE FROM exam_attempt_history WHERE user_id = $1`, [
         id,
       ]);
+      await tx.query(`DELETE FROM exam_attempts WHERE user_id = $1`, [id]);
+      await tx.query(
+        `UPDATE exams SET created_by_user_id = NULL WHERE created_by_user_id = $1`,
+        [id],
+      );
+      if (user.email) {
+        const email = user.email.trim().toLowerCase();
+        await tx.query(`DELETE FROM leads WHERE email = $1`, [email]);
+        await tx.query(`DELETE FROM newsletter_sends WHERE email = $1`, [
+          email,
+        ]);
+        await tx.query(`DELETE FROM newsletter_events WHERE email = $1`, [
+          email,
+        ]);
+      }
       await tx.getRepository(User).delete(id);
     });
+  }
+
+  /**
+   * Deleting a Stripe customer also cancels its subscriptions immediately
+   * (no refund — Pro is cancel-anytime, no partial months). The resulting
+   * customer.subscription.deleted webhook finds no user and is a no-op.
+   */
+  private async deleteStripeCustomer(
+    userId: number,
+    customerId: string,
+  ): Promise<void> {
+    try {
+      await this.stripe.customers.del(customerId);
+    } catch (err) {
+      const message = (err as Error).message;
+      this.logger.error(
+        `Stripe customer ${customerId} for deleted user ${userId} not removed: ${message}`,
+      );
+      await this.emailService
+        .sendAdminAlert(
+          'Account deletion: Stripe customer needs manual removal',
+          `User ${userId} deleted their Drone Edge account, but deleting Stripe customer ${customerId} failed:\n\n${message}\n\nIn the Stripe Dashboard, cancel any active subscription for this customer and delete the customer.`,
+        )
+        .catch((e) =>
+          this.logger.error(`Admin alert failed: ${(e as Error).message}`),
+        );
+    }
   }
 
   async incrementTokenVersion(userId: number): Promise<void> {

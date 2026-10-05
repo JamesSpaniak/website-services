@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { currentEventOrigin, deterministicUuid } from './event-origin';
 import { metrics } from '@opentelemetry/api';
 import { DataSource } from 'typeorm';
 import {
@@ -10,13 +11,20 @@ import {
   ServerEventInput,
   VideoResume,
 } from './types/product-event.dto';
+import { isVideoWatched } from './video-completion';
 
-/** Below this share of the video, "resume" is not offered; above 95 % we restart. */
-export const VIDEO_COMPLETE_PCT = 90;
 const RANGE_CAP = 200;
 const CONTEXT_TTL_MS = 5 * 60_000;
 const CONTEXT_CACHE_MAX = 20_000;
-const CLOCK_SKEW_MS = 5 * 60_000;
+/** Client clocks may run this far ahead; later timestamps are pulled back to now. */
+const FUTURE_SKEW_MS = 5 * 60_000;
+/**
+ * How old a client event may be and still keep its own timestamp. Keeping the
+ * true time (not a clamp relative to "now") makes `(event_id, occurred_at)`
+ * identical on every retry, so late retries dedupe (R5). Older events are
+ * dropped as `stale` — the rollup has already closed those days.
+ */
+const MAX_EVENT_AGE_MS = 24 * 60 * 60_000;
 const HEARTBEAT_MINUTES = 0.5;
 
 interface EventContext {
@@ -82,6 +90,11 @@ export class ProductEventsService {
   );
 
   constructor(private readonly dataSource: DataSource) {}
+
+  /** Lets the controller count events it rejected before recordBatch. */
+  countDropped(reason: 'invalid', n = 1): void {
+    if (n > 0) this.dropped.add(n, { reason });
+  }
 
   /** Lets the controller count a whole-batch failure without owning a meter. */
   countFailure(
@@ -153,6 +166,12 @@ export class ProductEventsService {
         continue;
       }
 
+      const occurredAt = this.eventTime(ev.occurredAt, now);
+      if (!occurredAt) {
+        this.dropped.add(1, { reason: 'stale' });
+        continue;
+      }
+
       rows.push({
         user_id: userId,
         anonymous_id: userId == null ? anonymousId : stitchId,
@@ -160,7 +179,7 @@ export class ProductEventsService {
         organization_id: ctx?.organizationId ?? null,
         class_id: ctx?.classId ?? null,
         event_name: ev.event,
-        occurred_at: this.clampTime(ev.occurredAt, now),
+        occurred_at: occurredAt,
         course_id: ev.courseId ?? null,
         unit_ref: ev.unitRef ?? null,
         entitlement_source: ev.courseId
@@ -216,6 +235,15 @@ export class ProductEventsService {
   /** Fire-and-forget server-side event; never throws into business logic. */
   async record(input: ServerEventInput): Promise<void> {
     try {
+      // Inside a webhook delivery: stable id + provider time, so a redelivery
+      // is a no-op (PA42). Course id is part of the key because one delivery
+      // can emit the same event name for several courses (bundle lines).
+      const origin = currentEventOrigin();
+      const eventId = origin
+        ? deterministicUuid(
+            `${origin.key}:${input.event}:${input.courseId ?? ''}`,
+          )
+        : null;
       let ctx: EventContext | null = null;
       if (
         input.userId != null &&
@@ -232,7 +260,7 @@ export class ProductEventsService {
           organization_id: input.organizationId ?? ctx?.organizationId ?? null,
           class_id: input.classId ?? ctx?.classId ?? null,
           event_name: input.event,
-          occurred_at: input.occurredAt ?? new Date(),
+          occurred_at: input.occurredAt ?? origin?.occurredAt ?? new Date(),
           course_id: input.courseId ?? null,
           unit_ref: input.unitRef ?? null,
           entitlement_source:
@@ -240,7 +268,7 @@ export class ProductEventsService {
             (input.courseId ? (ctx?.entitlementSource ?? null) : null),
           properties: input.properties ?? {},
           source: 'server',
-          event_id: null,
+          event_id: eventId,
         },
       ]);
       this.accepted.add(1, { source: 'server' });
@@ -426,15 +454,14 @@ export class ProductEventsService {
     return ctx;
   }
 
-  private clampTime(iso: string | undefined, nowMs: number): Date {
+  /** Client time within [now − 24 h, now]; future skew → now; older → null (drop). */
+  private eventTime(iso: string | undefined, nowMs: number): Date | null {
     if (!iso) return new Date(nowMs);
     const t = new Date(iso).getTime();
     if (Number.isNaN(t)) return new Date(nowMs);
-    const clamped = Math.min(
-      Math.max(t, nowMs - CLOCK_SKEW_MS),
-      nowMs + CLOCK_SKEW_MS,
-    );
-    return new Date(clamped);
+    if (t > nowMs + FUTURE_SKEW_MS) return new Date(nowMs);
+    if (t < nowMs - MAX_EVENT_AGE_MS) return null;
+    return new Date(t);
   }
 
   private pickProperties(ev: AnalyticsEventDto): Record<string, unknown> {
@@ -455,77 +482,96 @@ export class ProductEventsService {
   /**
    * Merges the client's watched-range delta into video_progress and recomputes
    * % watched as the union of ranges over duration — not max position, so a
-   * learner who scrubs to the end shows ~0 %.
+   * learner who scrubs to the end shows ~0 %. `completed` comes only from the
+   * ranges via the completion rule (video-completion.ts); the event name is
+   * ignored, so `ended` after a scrub never earns the ✓ (R2).
+   *
+   * Runs under a per-video advisory lock so two batches for the same video
+   * (heartbeat + milestone from two requests) cannot drop each other's
+   * ranges (R8).
    */
   private async applyVideoUpdate(
     userId: number,
     ev: AnalyticsEventDto,
   ): Promise<void> {
     if (!ev.courseId || !ev.unitRef) return;
-    const existing: {
-      watched_ranges: number[][];
-      duration_seconds: number | null;
-      max_position_seconds: number;
-      play_count: number;
-    }[] = await this.dataSource.query(
-      `SELECT watched_ranges, duration_seconds, max_position_seconds, play_count
-       FROM video_progress WHERE user_id = $1 AND course_id = $2 AND unit_ref = $3`,
-      [userId, ev.courseId, ev.unitRef],
-    );
-    const cur = existing[0];
-    const duration =
-      ev.duration && ev.duration > 0
-        ? Math.round(ev.duration)
-        : (cur?.duration_seconds ?? null);
-    const position = Math.max(0, Math.round(ev.position ?? 0));
-    const merged = mergeRanges([
-      ...(cur?.watched_ranges ?? []),
-      ...sanitizeRanges(ev.ranges, duration),
-    ]);
-    const watched = merged.reduce((s, [a, b]) => s + (b - a), 0);
-    const pct =
-      duration && duration > 0
-        ? Math.min(100, Math.round((100 * watched) / duration))
-        : 0;
-    const completed =
-      pct >= VIDEO_COMPLETE_PCT || ev.event === 'video_completed';
-    const maxPos = Math.max(cur?.max_position_seconds ?? 0, position);
-    const started = ev.event === 'video_started';
-
-    await this.dataSource.query(
-      `INSERT INTO video_progress
-         (user_id, course_id, unit_ref, position_seconds, max_position_seconds, watched_ranges,
-          duration_seconds, percent_watched, completed, play_count, first_played_at, last_played_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10, now(), now(), now())
-       ON CONFLICT (user_id, course_id, unit_ref) DO UPDATE SET
-         position_seconds     = EXCLUDED.position_seconds,
-         max_position_seconds = GREATEST(video_progress.max_position_seconds, EXCLUDED.max_position_seconds),
-         watched_ranges       = EXCLUDED.watched_ranges,
-         duration_seconds     = COALESCE(EXCLUDED.duration_seconds, video_progress.duration_seconds),
-         percent_watched      = GREATEST(video_progress.percent_watched, EXCLUDED.percent_watched),
-         completed            = video_progress.completed OR EXCLUDED.completed,
-         play_count           = video_progress.play_count + $11,
-         last_played_at       = now(),
-         updated_at           = now()`,
-      [
+    const courseId = ev.courseId;
+    const unitRef = ev.unitRef;
+    await this.dataSource.transaction(async (manager) => {
+      await manager.query(`SELECT pg_advisory_xact_lock($1, hashtext($2))`, [
         userId,
-        ev.courseId,
-        ev.unitRef,
-        position,
-        maxPos,
-        JSON.stringify(merged),
-        duration,
-        pct,
-        completed,
-        started ? 1 : 0,
-        started ? 1 : 0,
-      ],
-    );
+        `video:${courseId}:${unitRef}`,
+      ]);
+      const existing: {
+        watched_ranges: number[][] | null;
+        duration_seconds: number | null;
+        max_position_seconds: number | null;
+        outro: number | null;
+      }[] = await manager.query(
+        `SELECT vp.watched_ranges, vp.duration_seconds, vp.max_position_seconds,
+                cu.video_outro_seconds AS outro
+         FROM (SELECT 1) one
+         LEFT JOIN video_progress vp
+           ON vp.user_id = $1 AND vp.course_id = $2 AND vp.unit_ref = $3
+         LEFT JOIN course_units cu
+           ON cu.course_id = $2 AND cu.ref = $3`,
+        [userId, courseId, unitRef],
+      );
+      const cur = existing[0];
+      const duration =
+        ev.duration && ev.duration > 0
+          ? Math.round(ev.duration)
+          : (cur?.duration_seconds ?? null);
+      const position = Math.max(0, Math.round(ev.position ?? 0));
+      const merged = mergeRanges([
+        ...(cur?.watched_ranges ?? []),
+        ...sanitizeRanges(ev.ranges, duration),
+      ]);
+      const watched = merged.reduce((s, [a, b]) => s + (b - a), 0);
+      const pct =
+        duration && duration > 0
+          ? Math.min(100, Math.round((100 * watched) / duration))
+          : 0;
+      const completed = isVideoWatched(merged, duration, cur?.outro);
+      const maxPos = Math.max(cur?.max_position_seconds ?? 0, position);
+      const started = ev.event === 'video_started';
+
+      await manager.query(
+        `INSERT INTO video_progress
+           (user_id, course_id, unit_ref, position_seconds, max_position_seconds, watched_ranges,
+            duration_seconds, percent_watched, completed, play_count, first_played_at, last_played_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10, now(), now(), now())
+         ON CONFLICT (user_id, course_id, unit_ref) DO UPDATE SET
+           position_seconds     = EXCLUDED.position_seconds,
+           max_position_seconds = GREATEST(video_progress.max_position_seconds, EXCLUDED.max_position_seconds),
+           watched_ranges       = EXCLUDED.watched_ranges,
+           duration_seconds     = COALESCE(EXCLUDED.duration_seconds, video_progress.duration_seconds),
+           percent_watched      = GREATEST(video_progress.percent_watched, EXCLUDED.percent_watched),
+           completed            = video_progress.completed OR EXCLUDED.completed,
+           play_count           = video_progress.play_count + $11,
+           last_played_at       = now(),
+           updated_at           = now()`,
+        [
+          userId,
+          courseId,
+          unitRef,
+          position,
+          maxPos,
+          JSON.stringify(merged),
+          duration,
+          pct,
+          completed,
+          started ? 1 : 0,
+          started ? 1 : 0,
+        ],
+      );
+    });
   }
 
   /**
    * Creates the progress row if missing (as opening the unit would) and bumps
-   * last_activity_at at most once a minute per row.
+   * last_activity_at at most once a minute per row. ON CONFLICT rather than
+   * WHERE NOT EXISTS: two batches racing for a new row must not 500 (R4).
    */
   private async touchProgress(userId: number, courseId: number): Promise<void> {
     await this.dataSource.query(
@@ -533,7 +579,7 @@ export class ProductEventsService {
                              unit_completed_at, last_activity_at, created_at, updated_at)
        SELECT $1, $2, '{}'::jsonb, 'IN_PROGRESS',
               (SELECT COUNT(*) FROM course_units WHERE course_id = $2), 0, '{}'::jsonb, now(), now(), now()
-       WHERE NOT EXISTS (SELECT 1 FROM progress WHERE "userId" = $1 AND "courseId" = $2)`,
+       ON CONFLICT ("userId", "courseId") DO NOTHING`,
       [userId, courseId],
     );
     await this.dataSource.query(

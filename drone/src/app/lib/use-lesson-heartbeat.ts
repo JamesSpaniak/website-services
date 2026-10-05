@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { anyVideoPlaying, flushAnalytics, readVideoState, track } from './analytics';
+import { anyVideoPlaying, flushAnalytics, listVideoStates, readVideoState, track } from './analytics';
 
 const HEARTBEAT_MS = 30_000;
 const IDLE_CUTOFF_MS = 5 * 60_000;
@@ -11,7 +11,10 @@ const IDLE_CUTOFF_MS = 5 * 60_000;
  * lesson is actually being consumed: tab visible AND (user input in the last
  * 5 min OR a video is playing). Each tick = 0.5 min of engaged time in the
  * rollups. Video position / ranges ride the heartbeat when a player for this
- * unit is registered (see publishVideoState).
+ * unit is registered (see publishVideoState); section videos playing on the
+ * same page get their own `video_position` on the same tick (R9).
+ * At most one heartbeat per 30 s per page — the server also collapses
+ * heartbeats from several windows into one 30 s bucket.
  *
  * Pass `enabled=false` for guests / redacted units — nothing is sent.
  */
@@ -44,6 +47,17 @@ export function useLessonHeartbeat(courseId: number, unitRef: string, enabled = 
                     ranges: video.takeRanges(),
                 }),
             });
+            for (const [ref, state] of listVideoStates()) {
+                if (ref === unitRef || !state.playing) continue;
+                track('video_position', {
+                    courseId,
+                    unitRef: ref,
+                    position: Math.round(state.position),
+                    duration: Math.round(state.duration) || undefined,
+                    playing: true,
+                    ranges: state.takeRanges(),
+                });
+            }
         };
         const timer = setInterval(tick, HEARTBEAT_MS);
 

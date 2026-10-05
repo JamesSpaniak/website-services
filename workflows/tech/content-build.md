@@ -39,7 +39,7 @@ Bulk image insertion (map folder → review → upload → merge): [`course-imag
 |------|--------|
 | Record | One video per unit/section (or agreed granularity) |
 | Upload | `./scripts/bulk-upload-videos.sh <video-dir> --bucket droneedge-dev-raw-video`, or the reviewed Part 107 mapping script below |
-| Wire course | Set `video_url` on each node in `assets/courses/faa-107/faa_107_course.json` |
+| Wire course | Set `video_url` on each node in `assets/courses/faa-107/faa_107_course.json`. If the video ends with credits / an end card longer than ~10 s, also set `video_outro_seconds` (integer seconds) so learners get the ✓ without watching it ([`progress-tracking-accuracy.md`](../../docs/tech/progress-tracking-accuracy.md) § 3) |
 | Publish | Admin course save or API; invalidate CDN if needed |
 | Captions | Plan transcripts/captions track — WCAG (see TODO) |
 

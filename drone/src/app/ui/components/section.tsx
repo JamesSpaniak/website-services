@@ -41,7 +41,7 @@ export default function SectionComponent({
   questionCounts,
 }: SectionProps) {
   const router = useRouter();
-  const { id, title, description, text_content, video_url, status, sub_units } = section;
+  const { id, title, description, text_content, video_url, video_outro_seconds, status, sub_units } = section;
   const sectionImages = mergeCourseImages(section);
   const isFocused = focusUnitId != null && String(id) === String(focusUnitId);
   const containsFocus =
@@ -142,6 +142,7 @@ export default function SectionComponent({
                       courseId={courseId}
                       unitId={String(id)}
                       videoUrl={video_url}
+                      outroSeconds={video_outro_seconds}
                       title={title}
                     />
                 </div>

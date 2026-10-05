@@ -1,4 +1,4 @@
-import { SITE_ASSETS } from '@/app/lib/site-assets';
+import { SITE_ASSETS, SOCIAL_PROFILES } from '@/app/lib/site-assets';
 
 interface JsonLdProps {
   data: Record<string, unknown>;
@@ -26,7 +26,7 @@ export function organizationJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     logo: ORG_LOGO_URL,
-    sameAs: [],
+    sameAs: Object.values(SOCIAL_PROFILES),
   };
 }
 

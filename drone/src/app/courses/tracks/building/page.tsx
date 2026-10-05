@@ -102,7 +102,7 @@ export default function DroneBuildingPage() {
         <p className="mt-1 mb-4 text-sm text-[var(--brand-muted)]">
           Join the waitlist and we&apos;ll email you when Drone Building opens. No payment, no commitment.
         </p>
-        <WaitlistForm interest="building" />
+        <WaitlistForm interest="building" offerNewsletter />
       </section>
 
       {/* What you build */}

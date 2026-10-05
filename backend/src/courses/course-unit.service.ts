@@ -44,6 +44,7 @@ export class CourseUnitService {
         position: f.position,
         title: f.title.slice(0, 512),
         has_video: f.hasVideo,
+        video_outro_seconds: f.videoOutroSeconds ?? null,
       }),
     );
     await repo.save(rows);

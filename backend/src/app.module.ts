@@ -24,6 +24,7 @@ import { ProductEventsModule } from './product-events/product-events.module';
 import { CommerceModule } from './commerce/commerce.module';
 import { ReportingModule } from './reporting/reporting.module';
 import { LeadsModule } from './leads/leads.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { LeadsModule } from './leads/leads.module';
     CourseModule,
     EmailModule,
     LeadsModule,
+    NewsletterModule,
     QuestionModule,
     TypeOrmModule.forRoot({
       ...defaultConnection,

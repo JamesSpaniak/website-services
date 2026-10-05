@@ -21,6 +21,7 @@ import { AuditAction } from 'src/audit/types/audit-action.enum';
 import { EntitlementService } from 'src/commerce/entitlement.service';
 import { OrderService } from 'src/commerce/order.service';
 import { ProductEventsService } from 'src/product-events/product-events.service';
+import { withEventOrigin } from 'src/product-events/event-origin';
 
 const PRODUCT_COURSE = 'course';
 const PRODUCT_PRO = 'pro_membership';
@@ -462,6 +463,16 @@ export class PurchaseService {
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
     }
+    void this.productEvents.record({
+      userId,
+      event: 'checkout_started',
+      courseId,
+      properties: {
+        price_cents: Math.round(Number(course.price) * 100),
+        promo_code: promoCode ?? null,
+        promo_applied: !!session.discounts?.length,
+      },
+    });
     return { url: session.url };
   }
 
@@ -597,6 +608,15 @@ export class PurchaseService {
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
     }
+    void this.productEvents.record({
+      userId,
+      event: 'pro_checkout_started',
+      properties: {
+        duration,
+        promo_code: promoCode ?? null,
+        promo_applied: !!session.discounts?.length,
+      },
+    });
     return { url: session.url };
   }
 
@@ -666,6 +686,7 @@ export class PurchaseService {
       customer: user.stripe_customer_id,
       return_url: `${this.frontendBaseUrl()}${this.sanitizePath(returnPath)}`,
     });
+    void this.productEvents.record({ userId, event: 'billing_portal_opened' });
     return { url: session.url };
   }
 
@@ -745,6 +766,21 @@ export class PurchaseService {
    * run more than once for the same event.
    */
   async processEvent(
+    event: Stripe.Event,
+  ): Promise<{ received: true; ignored?: string }> {
+    // Product events emitted below get a stable id from (Stripe event, name)
+    // and Stripe's own timestamp, so redeliveries and replays don't double
+    // count (PA42). Orders / entitlements were already idempotent.
+    return withEventOrigin(
+      {
+        key: `stripe:${event.id}`,
+        occurredAt: new Date((event.created ?? Date.now() / 1000) * 1000),
+      },
+      () => this.dispatchEvent(event),
+    );
+  }
+
+  private async dispatchEvent(
     event: Stripe.Event,
   ): Promise<{ received: true; ignored?: string }> {
     this.logger.log(`Received Stripe event: ${event.type} (${event.id})`);

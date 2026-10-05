@@ -125,6 +125,7 @@ export class ProgressController {
       courseId,
       unitId,
       updateProgressDto.status,
+      { auto: updateProgressDto.auto },
     );
   }
 }

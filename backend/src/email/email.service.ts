@@ -121,6 +121,20 @@ export class EmailService {
     };
   }
 
+  /** Plain-text operational alert to ADMIN_EMAIL (e.g. a Stripe cleanup that needs a manual step). */
+  async sendAdminAlert(subject: string, text: string): Promise<void> {
+    if (!this.emailEnabled || !this.transporter) {
+      this.logger.warn(`Email disabled; skipping admin alert: ${subject}`);
+      return;
+    }
+    await this.transporter.sendMail({
+      from: this.defaultFrom,
+      to: this.configService.get<string>('ADMIN_EMAIL'),
+      subject,
+      text,
+    });
+  }
+
   async sendPasswordResetEmail(user: User, resetLink: string): Promise<void> {
     if (!this.emailEnabled || !this.transporter) {
       this.logger.warn(

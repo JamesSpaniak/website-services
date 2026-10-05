@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CheckCircleIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import { ApiError, createLead } from '@/app/lib/api-client';
 import { leadAttributionFields } from '@/app/lib/attribution';
+import { useAuth } from '@/app/lib/auth-context';
 import type { LeadInterest } from '@/app/lib/types/lead';
 
 /** What the consent line says we'll email about, per interest. */
@@ -12,7 +13,7 @@ const CONSENT_TOPIC: Record<LeadInterest, string> = {
   building: 'Drone Building early access',
   part107: 'the Part 107 course',
   schools: 'Drone Edge for schools and programs',
-  newsletter: 'the Drone Edge newsletter',
+  newsletter: 'Drone Edge Field Notes, once a month',
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +25,10 @@ interface WaitlistFormProps {
   /** Submit button label (default "Join the waitlist"). */
   ctaLabel?: string;
   className?: string;
+  /** Tighter consent line for inline placements (article end, footer, bands). */
+  compact?: boolean;
+  /** Adds an unchecked "also send me Field Notes" box; ticking it creates a second `newsletter` lead. */
+  offerNewsletter?: boolean;
 }
 
 /**
@@ -33,13 +38,27 @@ interface WaitlistFormProps {
  * server answers 202 `{ ok: true }` for any valid input — it never reveals
  * whether an email was already on the list — and records `lead_captured`
  * server-side.
+ *
+ * Never shown to students in a school account (privacy § 3–4): marketing
+ * signups are adults-only and the backend ignores them from org members too.
  */
-export default function WaitlistForm({ interest, heading, ctaLabel = 'Join the waitlist', className = '' }: WaitlistFormProps) {
+export default function WaitlistForm({
+  interest,
+  heading,
+  ctaLabel = 'Join the waitlist',
+  className = '',
+  compact = false,
+  offerNewsletter = false,
+}: WaitlistFormProps) {
   const id = useId();
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
+  const [alsoNewsletter, setAlsoNewsletter] = useState(false);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [error, setError] = useState<string | null>(null);
+
+  if (user?.organization?.role === 'member') return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,13 +70,11 @@ export default function WaitlistForm({ interest, heading, ctaLabel = 'Join the w
     setError(null);
     setStatus('submitting');
     try {
-      await createLead({
-        ...leadAttributionFields(),
-        email: trimmed,
-        interest,
-        website,
-        source_path: window.location.pathname,
-      });
+      const base = { ...leadAttributionFields(), email: trimmed, website, source_path: window.location.pathname };
+      await createLead({ ...base, interest });
+      if (offerNewsletter && alsoNewsletter && interest !== 'newsletter') {
+        await createLead({ ...base, interest: 'newsletter' });
+      }
       setStatus('success');
     } catch (err) {
       setStatus('idle');
@@ -148,8 +165,24 @@ export default function WaitlistForm({ interest, heading, ctaLabel = 'Join the w
         </p>
       )}
 
-      <p className="mt-3 text-xs text-[var(--brand-muted)] leading-relaxed">
-        We&apos;ll email you about {CONSENT_TOPIC[interest]}. Unsubscribe anytime. See our{' '}
+      {offerNewsletter && interest !== 'newsletter' && (
+        <label className="mt-3 flex items-start gap-2 text-xs text-[var(--brand-muted)] leading-relaxed">
+          <input
+            type="checkbox"
+            checked={alsoNewsletter}
+            onChange={(e) => setAlsoNewsletter(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand-primary)]"
+          />
+          <span>
+            Also send me <strong className="text-[var(--brand-foreground)]">Field Notes</strong>, the monthly
+            newsletter (adults 18+).
+          </span>
+        </label>
+      )}
+
+      <p className={`${compact ? 'mt-2' : 'mt-3'} text-xs text-[var(--brand-muted)] leading-relaxed`}>
+        We&apos;ll email you about {CONSENT_TOPIC[interest]}.
+        {interest === 'newsletter' && ' For adults 18+.'} Unsubscribe anytime. See our{' '}
         <Link href="/privacy" className="text-[var(--brand-primary)] underline underline-offset-2 hover:opacity-80">
           Privacy Notice
         </Link>

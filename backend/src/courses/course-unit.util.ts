@@ -14,6 +14,8 @@ export interface FlatCourseUnit {
   position: number;
   title: string;
   hasVideo: boolean;
+  /** Payload `video_outro_seconds` — credits the learner need not watch. */
+  videoOutroSeconds?: number | null;
 }
 
 const MAX_REF_LENGTH = 64;
@@ -58,6 +60,11 @@ export function legacyIdFromRef(id: string | number): number | null {
   return m ? parseInt(m[1], 10) : null;
 }
 
+function outroSeconds(value: unknown): number | null {
+  const n = Math.round(Number(value));
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 3600) : null;
+}
+
 /**
  * Normalizes every unit id in the payload to its canonical string ref
  * (mutating the payload in place) and returns the flattened tree.
@@ -99,6 +106,7 @@ export function normalizeAndFlattenUnits(
         position,
         title: unit.title ?? '',
         hasVideo: !!(unit.video_url && String(unit.video_url).trim()),
+        videoOutroSeconds: outroSeconds(unit.video_outro_seconds),
       });
       walk(unit.sub_units, ref, path, depth + 1);
     });

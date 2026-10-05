@@ -211,6 +211,55 @@ describe('LeadsService', () => {
     expect(msg.bodyMarkdown).toContain('January 2027');
   });
 
+  it('silently ignores signups from a signed-in student (org member)', async () => {
+    query.mockResolvedValueOnce([{ '?column?': 1 }]); // isSchoolStudent
+    await service.capture(
+      { email: 'kid@school.org', interest: 'newsletter' },
+      12,
+    );
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(String(query.mock.calls[0][0])).toContain('organization_members');
+    expect(mailer.send).not.toHaveBeenCalled();
+    expect(productEvents.record).not.toHaveBeenCalled();
+  });
+
+  it('accepts a signed-in adult who is not an org member', async () => {
+    query.mockResolvedValueOnce([]); // isSchoolStudent → no
+    query.mockResolvedValueOnce([{ id: 8, inserted: true, bounced_at: null }]);
+    query.mockResolvedValueOnce([]); // confirmation_sent_at
+    await service.capture(
+      { email: 'teacher@school.org', interest: 'newsletter' },
+      3,
+    );
+    const msg = mailer.send.mock.calls[0][0];
+    expect(msg.subject).toContain('Field Notes');
+    expect(msg.bodyMarkdown).toContain('first Tuesday');
+  });
+
+  it('profile toggle: unsubscribe leaves only that list', async () => {
+    query
+      .mockResolvedValueOnce([]) // isSchoolStudent
+      .mockResolvedValueOnce([{ email: 'Me@Example.com' }])
+      .mockResolvedValueOnce([]) // UPDATE
+      .mockResolvedValueOnce([
+        { interest: 'newsletter', unsubscribed_at: new Date() },
+        { interest: 'building', unsubscribed_at: null },
+      ]);
+    const prefs = await service.setMySubscription(4, 'newsletter', false);
+    expect(query.mock.calls[2][1]).toEqual(['me@example.com', 'newsletter']);
+    expect(prefs.interests).toEqual([
+      { interest: 'newsletter', subscribed: false },
+      { interest: 'building', subscribed: true },
+    ]);
+  });
+
+  it('profile toggle: refuses school accounts', async () => {
+    query.mockResolvedValueOnce([{ '?column?': 1 }]);
+    await expect(service.myPreferences(12)).rejects.toThrow(
+      'not available for school accounts',
+    );
+  });
+
   it('does not re-send to an address already on the list', async () => {
     query.mockResolvedValueOnce([]); // ON CONFLICT … WHERE matched nothing
     await service.capture({ email: 'a@b.co', interest: 'part107' });
@@ -257,6 +306,9 @@ describe('LeadsService', () => {
       status: 'counted',
       ready: true,
     });
+    expect(String(query.mock.calls[0][0])).toMatch(
+      /NOT EXISTS[\s\S]*organization_members[\s\S]*'member'/,
+    );
     expect(mailer.send).not.toHaveBeenCalled();
   });
 
@@ -279,12 +331,69 @@ describe('SesEventsService.apply', () => {
     markBounced: jest.fn(async () => 1),
     markComplained: jest.fn(async () => 1),
   };
+  const dsQuery = jest.fn<Promise<unknown[]>, [string, unknown[]]>(
+    async () => [],
+  );
   const svc = new SesEventsService(
     leads as never,
+    { query: dsQuery } as never,
     { get: () => 'arn' } as never,
   );
 
   beforeEach(() => jest.clearAllMocks());
+
+  const mail = (kind = 'newsletter') => ({
+    timestamp: '2026-11-03T15:00:00.000Z',
+    messageId: 'msg-1',
+    destination: ['Teacher@School.org'],
+    tags: { kind: [kind], issue: ['2026-11'] },
+  });
+
+  it('records a human newsletter click with recipient + link', async () => {
+    await svc.apply({
+      eventType: 'Click',
+      mail: mail(),
+      click: {
+        timestamp: '2026-11-03T16:00:00.000Z',
+        link: 'https://thedroneedge.com/consultation?utm_content=segment',
+      },
+    });
+    const [sql, params] = dsQuery.mock.calls[0];
+    expect(sql).toContain('INSERT INTO newsletter_events');
+    expect(params.slice(0, 6)).toEqual([
+      '2026-11',
+      'msg-1',
+      'click',
+      'teacher@school.org',
+      'https://thedroneedge.com/consultation?utm_content=segment',
+      false,
+    ]);
+  });
+
+  it('flags scanner clicks within 30 s of sending', async () => {
+    await svc.apply({
+      eventType: 'Click',
+      mail: mail(),
+      click: { timestamp: '2026-11-03T15:00:05.000Z', link: 'https://x.co' },
+    });
+    expect(dsQuery.mock.calls[0][1][5]).toBe(true);
+  });
+
+  it('stores opens without the recipient', async () => {
+    await svc.apply({
+      eventType: 'Open',
+      mail: mail(),
+      open: { timestamp: '2026-11-03T15:10:00.000Z' },
+    });
+    expect(dsQuery.mock.calls[0][1][2]).toBe('open');
+    expect(dsQuery.mock.calls[0][1][3]).toBeNull();
+  });
+
+  it('ignores test sends and non-newsletter mail', async () => {
+    await svc.apply({ eventType: 'Click', mail: mail('newsletter_test') });
+    await svc.apply({ eventType: 'Delivery', mail: mail('broadcast') });
+    expect(dsQuery).not.toHaveBeenCalled();
+  });
 
   it('marks permanent bounces only', async () => {
     await svc.apply({

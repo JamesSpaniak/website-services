@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
-import { createUser, getInviteCodeInfo, getSignupLinkInfo } from '@/app/lib/api-client';
+import { createLead, createUser, getInviteCodeInfo, getSignupLinkInfo } from '@/app/lib/api-client';
+import { leadAttributionFields } from '@/app/lib/attribution';
+import { track } from '@/app/lib/analytics';
 import ErrorComponent from '@/app/ui/components/error';
 import LoadingComponent from '@/app/ui/components/loading';
 import type { InviteCodeInfo } from '@/app/lib/types/organization';
@@ -64,12 +66,30 @@ function RegisterPageInner() {
     const [error, setError] = useState<string | null>(null);
     const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    /** Field Notes opt-in (NL4). Unchecked by default; never offered on school invites. */
+    const [newsletterOptIn, setNewsletterOptIn] = useState(false);
     /** Set while handleSubmit signs the new account in, so it (not the effect below) picks the destination. */
     const autoSigningIn = useRef(false);
 
     useEffect(() => {
         if (redirect) stashPostAuthRedirect(redirect);
     }, [redirect]);
+
+    // Funnel top (T3 / PA37): once per visit by a signed-out visitor. Stored
+    // for anonymous visitors too (first-party anonymous id); signup_completed
+    // is recorded server-side.
+    const signupStartedSent = useRef(false);
+    useEffect(() => {
+        if (authLoading || user || signupStartedSent.current) return;
+        signupStartedSent.current = true;
+        track('signup_started', {
+            path: '/register',
+            properties: {
+                via: inviteCode ? 'org_invite' : signupCode ? 'signup_link' : 'direct',
+                purchase_intent: purchaseIntent,
+            },
+        });
+    }, [authLoading, user, inviteCode, signupCode, purchaseIntent]);
 
     useEffect(() => {
         if (!authLoading && user && !autoSigningIn.current) {
@@ -153,6 +173,18 @@ function RegisterPageInner() {
             setError(err instanceof Error ? err.message : 'Registration failed.');
             setLoading(false);
             return;
+        }
+
+        // One unsubscribe system: the opt-in is a `leads` row like any other form.
+        // Best effort — a failure here must not block the new account.
+        if (newsletterOptIn && !inviteCode) {
+            await createLead({
+                ...leadAttributionFields(),
+                email: formData.email.trim(),
+                interest: 'newsletter',
+                website: '',
+                source_path: '/register',
+            }).catch(() => undefined);
         }
 
         // Sign straight in — email verification is not required to buy or to
@@ -361,6 +393,21 @@ function RegisterPageInner() {
                         <p className="text-xs text-red-500 mt-1">{validationErrors.password._errors[0]}</p>
                     )}
                 </div>
+
+                {!inviteCode && (
+                    <label className="mb-6 flex items-start gap-2 text-sm text-[var(--brand-muted)] leading-relaxed">
+                        <input
+                            type="checkbox"
+                            checked={newsletterOptIn}
+                            onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                            className="mt-1 h-4 w-4 shrink-0 accent-[var(--brand-primary)]"
+                        />
+                        <span>
+                            Send me <strong className="text-[var(--brand-foreground)]">Field Notes</strong>, the monthly
+                            newsletter (adults 18+). Unsubscribe anytime.
+                        </span>
+                    </label>
+                )}
 
                 <button
                     type="submit"

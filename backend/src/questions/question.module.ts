@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuditModule } from '../audit/audit.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Question } from './types/question.entity';
 import { Exam } from './types/exam.entity';
@@ -33,6 +34,7 @@ import { ProgressModule } from '../progress/progress.module';
     ]),
     CourseModule, // provides CourseService for access-control checks
     ProgressModule, // provides ProgressService for ensureProgress
+    AuditModule, // EXAM_SUBMITTED audit rows (T2)
   ],
   controllers: [QuestionController, ExamController],
   providers: [

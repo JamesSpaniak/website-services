@@ -10,6 +10,7 @@ Monorepo-wide rules: [`docs/AGENTS.md`](../docs/AGENTS.md).
 |------|---------|----------------|
 | [`courses/`](courses/) | One folder per course: course JSON, `questions/`, `outlines/`, `images/`, `reference/`, `videos/` | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md), [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) |
 | [`articles/`](articles/) | Site articles: `drafts/` (txt), `import/` (JSON payloads), `images/` | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
+| [`newsletter/`](newsletter/) | Field Notes issues, one `YYYY-MM.md` per send, from `_template.md` | [`workflows/marketing/newsletter.md`](../workflows/marketing/newsletter.md) |
 | [`visuals/`](visuals/) | Brand kit | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 | [`media/`](media/) | Marketing flight masters + snips (gitignored binaries; tracked manifests) | [`media/README.md`](media/README.md), [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 

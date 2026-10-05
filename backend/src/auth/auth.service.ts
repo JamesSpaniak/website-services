@@ -6,6 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ProductEventsService } from '../product-events/product-events.service';
 import { UsersService } from '../users/user.service';
 import { SignupLinkService } from '../users/signup-link.service';
 import { JwtService } from '@nestjs/jwt';
@@ -40,6 +41,7 @@ export class AuthService {
     private organizationService: OrganizationService,
     private auditService: AuditService,
     private analyticsService: AnalyticsService,
+    private productEvents: ProductEventsService,
   ) {}
 
   async validateUser(identifier: string, pass: string): Promise<User> {
@@ -72,6 +74,7 @@ export class AuthService {
       `Login validated successfully for user="${user.username}" (id=${user.id})`,
     );
     this.auditService.log(user.id, AuditAction.LOGIN);
+    void this.productEvents.record({ userId: user.id, event: 'login' });
     return user;
   }
 
@@ -175,6 +178,17 @@ export class AuthService {
       username: payload.username,
       email: payload.email,
     });
+    void this.productEvents.record({
+      userId: user.id,
+      event: 'signup_completed',
+      properties: {
+        via: payload.invite_code
+          ? 'org_invite'
+          : payload.signup_code
+            ? 'signup_link'
+            : 'direct',
+      },
+    });
     return { message: 'Registration successful. Please verify your email.' };
   }
 
@@ -209,6 +223,10 @@ export class AuthService {
       `Email verified successfully for user="${user.username}" (id=${user.id})`,
     );
     this.auditService.log(user.id, AuditAction.VERIFY_EMAIL);
+    void this.productEvents.record({
+      userId: user.id,
+      event: 'email_verified',
+    });
     return { message: 'Email verified successfully.' };
   }
 

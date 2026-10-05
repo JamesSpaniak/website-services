@@ -70,6 +70,7 @@ Each step lists what to do, what to **expect**, and when to **stop**. Record res
 
 - Refund the Pro test charge in Stripe if you want a clean ledger. This doesn't change access; Pro follows the subscription, not the refund.
 - **SES events, second step:** set `ses_events_subscription_enabled = true` in `terraform/env/dev.tfvars` and run `./pipeline.sh --env dev`. In the SNS console the subscription should show **Confirmed**.
+- **Branded click-tracking domain, second step** (`terraform/ses_tracking.tf`): after the first apply, wait until SES → Identities shows `click.news.thedroneedge.com` **Verified** and `curl --head https://click.news.thedroneedge.com/favicon.ico` returns `x-amz-ses-region: us-east-1` and `x-amz-ses-request-protocol: https`. Then set `ses_custom_tracking_domain_enabled = true` and run the pipeline again. Check: a newsletter **test send** has links starting `https://click.news.thedroneedge.com/CL0/…` that land on the right page.
 
 ## Results table (paste back)
 

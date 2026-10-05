@@ -9,7 +9,7 @@ export const LEAD_INTEREST_LABELS: Record<LeadInterest, string> = {
     building: 'Drone Building early access',
     part107: 'Part 107 course news',
     schools: 'Schools & programs',
-    newsletter: 'Drone Edge newsletter',
+    newsletter: 'Field Notes (monthly newsletter)',
 };
 
 export function leadInterestLabel(interest: string): string {

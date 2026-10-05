@@ -69,8 +69,9 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong className="text-[var(--brand-foreground)]">Waitlist and mailing lists:</strong> your email address,
-              which list you joined (for example Drone Building early access), the page you signed up on, the campaign
-              link that first brought you to the site (if any), and when you consented, confirmed, or unsubscribed.
+              which list you joined (for example Drone Building early access or our monthly Field Notes newsletter), the
+              page you signed up on, the campaign link that first brought you to the site (if any), and when you
+              consented, confirmed, or unsubscribed. The newsletter is for adults 18 and over.
             </li>
           </ul>
         </section>
@@ -86,7 +87,8 @@ export default function PrivacyPage() {
             <li>Communicate about the service, respond to inquiries, and send transactional messages;</li>
             <li>
               Send the waitlist and marketing emails you asked for. Every one has an unsubscribe link that works in one
-              click, and we never send marketing email to school or organization members because of their enrollment;
+              click. We never send marketing email to school or organization members because of their enrollment, and
+              students using a school account cannot join our mailing lists;
             </li>
             <li>Comply with law and enforce our agreements.</li>
           </ul>
@@ -150,6 +152,15 @@ export default function PrivacyPage() {
             checkout.
           </p>
           <p className="mt-3">
+            <strong className="text-[var(--brand-foreground)]">Newsletter emails.</strong> Links in our Field Notes
+            newsletter pass through our tracking address (<code>click.news.thedroneedge.com</code>) before opening the
+            page, and each email contains a small image that may report when it is opened. We record which links each
+            subscriber clicks, so we know which sections are useful and can follow up with educators who ask about
+            school programs; opens are counted only in total, not per person. We do not record your IP address or device
+            for this, and we keep click records for 12 months. We keep these records only for the newsletter, not for
+            waitlist confirmations or account emails.
+          </p>
+          <p className="mt-3">
             We do not currently use third-party advertising pixels or cross-site tracking. If that changes, we will update
             this Notice and, where required, ask for your consent first. We also collect aggregate, non-identifying
             operational metrics (request counts, response times, error rates) to keep the service running.
@@ -163,7 +174,11 @@ export default function PrivacyPage() {
             and enforce our agreements. Account and course-progress records are kept while your account exists. Detailed
             activity records (individual page views, video heartbeats, and similar events) are kept in our active systems
             for approximately 12 months, after which only aggregated summaries remain available in the product. When an
-            account is deleted at your request, its progress, exam, and activity records are deleted with it.
+            account is deleted, its profile, progress, exam, comment, and activity records are deleted with it, along with
+            any waitlist or newsletter signups for its email address, and our payment processor&apos;s customer record
+            (which cancels any active subscription). Order and payment records are kept only as long as tax and dispute
+            rules require, without a link to the deleted account. Activity records older than 12 months that we archive
+            contain no account or device identifiers.
           </p>
         </section>
 
@@ -186,8 +201,15 @@ export default function PrivacyPage() {
             to make a request. We may need to verify your identity before responding.
           </p>
           <p className="mt-3">
-            To stop waitlist or marketing emails, use the unsubscribe link at the bottom of any of them. You can drop one
-            list or all of them, and it takes effect immediately.
+            You can delete your account yourself at any time: sign in, open your Profile, and choose{' '}
+            <strong className="text-[var(--brand-foreground)]">Delete account</strong>. Deletion is immediate and cannot be
+            undone. If your account was created by a school or other organization, ask your teacher or administrator, or
+            email us.
+          </p>
+          <p className="mt-3">
+            To stop waitlist or marketing emails, use the unsubscribe link at the bottom of any of them, or, if you have an
+            account, the Email preferences on your Profile. You can drop one list or all of them, and it takes effect
+            immediately.
           </p>
         </section>
 

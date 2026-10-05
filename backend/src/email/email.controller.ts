@@ -5,6 +5,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ProductEventsService } from '../product-events/product-events.service';
 import { EmailService } from './email.service';
 import { ContactDto } from './types/contact.dto';
 import { ConsultationDto } from './types/consultation.dto';
@@ -14,7 +15,10 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('email')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly productEvents: ProductEventsService,
+  ) {}
 
   @ApiOperation({ summary: 'Handle public contact form submission' })
   @ApiResponse({
@@ -30,7 +34,15 @@ export class EmailController {
   @ApiResponse({ status: 201, description: 'Consultation request received.' })
   @Post('consultation')
   async handleConsultationRequest(@Body() consultationDto: ConsultationDto) {
-    return this.emailService.sendConsultationRequest(consultationDto);
+    const result =
+      await this.emailService.sendConsultationRequest(consultationDto);
+    // Funnel count only (T3) — no name, email or free text in the event.
+    void this.productEvents.record({
+      userId: null,
+      event: 'consultation_submitted',
+      properties: { has_student_count: !!consultationDto.student_count },
+    });
+    return result;
   }
 
   // Marketing broadcast moved to POST /email/marketing/broadcast (SES, leads

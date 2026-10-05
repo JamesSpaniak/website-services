@@ -29,5 +29,7 @@ import { AuditModule } from 'src/audit/audit.module';
       inject: [ConfigService],
     },
   ],
+  // Account deletion (UsersService) removes the Stripe customer.
+  exports: ['STRIPE_CLIENT'],
 })
 export class PurchaseModule {}

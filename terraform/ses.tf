@@ -93,9 +93,10 @@ resource "aws_route53_record" "ses_marketing_dmarc" {
 }
 
 # --- Configuration set + event destination ------------------------------------
-# No tracking_options block: it requires a custom redirect domain (and its own
-# HTTPS cert). Without it SES open/click tracking uses the AWS-owned domain,
-# which still produces OPEN / CLICK events below.
+# tracking_options: links and the open pixel use the branded click.news.…
+# domain once ses_tracking.tf is verified and ses_custom_tracking_domain_enabled
+# is true (two-step, see that file). Until then SES uses the AWS-owned
+# awstrack.me domain, which produces the same OPEN / CLICK events.
 
 resource "aws_sesv2_configuration_set" "marketing" {
   configuration_set_name = "${var.project_name}-marketing"
@@ -110,6 +111,14 @@ resource "aws_sesv2_configuration_set" "marketing" {
 
   suppression_options {
     suppressed_reasons = ["BOUNCE", "COMPLAINT"]
+  }
+
+  dynamic "tracking_options" {
+    for_each = var.ses_custom_tracking_domain_enabled ? [1] : []
+    content {
+      custom_redirect_domain = local.ses_tracking_domain
+      https_policy           = "REQUIRE"
+    }
   }
 }
 

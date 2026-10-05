@@ -3,6 +3,7 @@ import {
   ArrayMaxSize,
   ArrayUnique,
   IsArray,
+  IsBoolean,
   IsEmail,
   IsIn,
   IsOptional,
@@ -71,6 +72,15 @@ export class UnsubscribeDto {
   @ArrayMaxSize(LEAD_INTERESTS.length)
   @IsIn(LEAD_INTERESTS, { each: true })
   interests?: LeadInterest[];
+}
+
+/** Profile email preferences: subscribe to or leave one list. */
+export class UpdateMySubscriptionDto {
+  @IsIn(LEAD_INTERESTS)
+  interest: LeadInterest;
+
+  @IsBoolean()
+  subscribed: boolean;
 }
 
 export class ListLeadsQueryDto {

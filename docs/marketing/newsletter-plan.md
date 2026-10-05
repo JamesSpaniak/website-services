@@ -1,6 +1,6 @@
 # Newsletter plan — Drone Edge Field Notes (draft)
 
-**Status:** draft, 2026-10-04. **NL-D1 decided** (Field Notes) and **NL-D8 decided** (free for all, Pro members section); other decisions in § 9 are open.
+**Status:** 2026-10-04 — **Phase 1 code done** (NL1–NL8, plus NL16b profile preferences and the org-member guards from § 7 pulled forward); ships with the next deploy. **NL-D1 decided** (Field Notes) and **NL-D8 decided** (free for all, Pro members section); NL-D2–D7 open.
 
 What the monthly newsletter is, who it is for, what each issue contains, how often it goes out, how it maps to the money model, what it looks like on the site and in the inbox, and the build steps. Builds on infrastructure shipped in launch batch 1 ([`../tech/launch-website-plan.md`](../tech/launch-website-plan.md) § 4 Email: W3, Z1–Z5).
 
@@ -305,8 +305,8 @@ The newsletter is compliant as built. Nothing here blocks Phase 1. Items marked 
 
 | # | Item | When |
 |---|------|------|
-| NL-A1 | Account deletion also deletes (or unsubscribes) every `leads` row for that email — otherwise a deleted user keeps getting issues. Part of **AS4** | With AS1–AS4 |
-| NL-A2 | **Email preferences** toggle on `/profile` for registered users (newsletter on/off, same `leads` row). Opt-in is in-product, so opt-out should be too; reviewers look for it | Phase 2 |
+| NL-A1 | Account deletion also deletes (or unsubscribes) every `leads` row for that email — otherwise a deleted user keeps getting issues. Part of **AS4** | ✅ Done Oct 4 2026 — rows are deleted in the purge transaction |
+| NL-A2 | **Email preferences** toggle on `/profile` for registered users (newsletter on/off, same `leads` row). Opt-in is in-product, so opt-out should be too; reviewers look for it | ✅ Done Oct 4 2026 (NL16b) |
 | NL-A3 | **App** — App Privacy label: Email Address, linked to identity, purposes *App Functionality* + *Developer's Advertising or Marketing* (**AS10**) | Before submit |
 | NL-A4 | **App** — App Tracking Transparency (5.1.2): sending app-captured email or click IDs (`gclid` / `fbclid`) to Meta CAPI or Google for ad attribution is "tracking" and needs the ATT prompt. Default: exclude app-sourced leads from CAPI (M7) | Before CAPI covers app signups |
 | NL-A5 | **App** — marketing push ("new issue out") needs its own opt-in and an in-app opt-out (4.5.4); lesson reminders do not | With push (T20 / APNs) |
@@ -335,7 +335,9 @@ The newsletter is compliant as built. Nothing here blocks Phase 1. Items marked 
 | NL0.2 | Flip `ses_events_subscription_enabled = true` and apply | You | Already on the launch checklist; required before any bulk send |
 | NL0.3 | Confirm `marketing_postal_address` in tfvars | You | CAN-SPAM footer |
 
-### Phase 1 — first issue with no new backend (target: issue #1, Tue Nov 3 2026) · ~2 days
+### Phase 1 — first issue with no new backend (target: issue #1, Tue Nov 3 2026) · ~2 days — ✅ code done Oct 4 2026
+
+Shipped beyond the table: NL16b profile email preferences (`GET`/`PATCH /leads/me`), `POST /leads` ignores signed-in org members, the broadcast excludes org-member addresses, the Building waitlist offers an unchecked Field Notes box, privacy § 2/§ 3/§ 9 updated. Still open for issue #1: write `assets/newsletter/2026-11.md`, apply the SES events flag (NL0.2), decide NL-D4 (reply-to inbox).
 
 Uses the existing `POST /leads` + admin broadcast (`dry_run` / `test` / `send`, markdown body, target by interest).
 
@@ -352,22 +354,45 @@ Uses the existing `POST /leads` + admin broadcast (`dry_run` / `test` / `send`, 
 
 Docs to update when Phase 1 ships: [`../tech/frontend-data.md`](../tech/frontend-data.md) (`/newsletter`), [`../tech/legal-and-privacy-site-sync.md`](../tech/legal-and-privacy-site-sync.md) (newsletter use of email), [`utm-links.md`](utm-links.md), [`../SKILLS.md`](../SKILLS.md) (task "send the newsletter").
 
-**Known Phase 1 gap:** the broadcast has no per-recipient send log, so a send that fails halfway cannot be safely retried without double-sending. Acceptable while the list is in the hundreds (one `send` call); fix in NL10 before it grows.
+~~**Known Phase 1 gap:** no per-recipient send log.~~ Closed Oct 4 2026 by the Newsletter tab (NL10): sends are logged per address and resumable.
+
+### Publishing and updates — who does what, where (built Oct 4 2026)
+
+**Today (Phase 1):** draft `assets/newsletter/YYYY-MM.md` locally, paste the body into **prod** Admin → Leads → Broadcast, count, test to yourself, send. Gaps: nothing records *what* was sent (only logs), there is no way to see the rendered email locally (SES is unconfigured there, so nothing sends — safe, but blind), a send can't be scheduled or safely resumed, and there is no web archive to link or correct.
+
+**Proposal: the repo file is the draft, the database is the record.**
+
+| Step | Where | Who | What happens |
+|------|-------|-----|--------------|
+| 1. Draft | Local repo (`assets/newsletter/YYYY-MM.md`, front matter: `slug`, `subject`, `preheader`, `lists`, `send_at`) | You (+ Claude) | Git history is the edit history. Nothing touches prod |
+| 2. Preview | Local admin → **Newsletter** tab (same UI as prod) → *Import .md* → rendered email + web view | You | `POST /newsletter/preview` runs the real `renderEmail` (no SES needed), so local shows exactly what subscribers get. Links resolve to the local site |
+| 3. Publish draft | **Prod** admin → Newsletter → *Import .md* (upload the same file) | You or admin | Upserts `newsletter_issues` by `slug` with `status = draft`. Re-importing replaces the draft — edit in the repo, import again. No new credentials: it's the existing admin login, and the same flow works on local and prod |
+| 4. Review | Prod admin: preview, *Send test* (to any admin), recipient count | Admin | Editing or re-importing after approval **resets approval** |
+| 5. Approve + schedule | Prod admin: *Approve* (records who/when), optional `send_at` (default first Tuesday 10:00 ET) | Admin | NL11 cron sends only `approved` issues whose `send_at` has passed. Never auto-sends a draft |
+| 6. Send | Cron or *Send now* | System | Per-recipient `newsletter_sends` rows (NL10): resumable, never double-sends, status per address |
+| 7. After send | Prod admin: metrics (NL14); web archive at `/newsletter/<slug>` after 7 days (NL13) | Admin | The **email** is immutable once sent. The **web** version can be corrected: edit → saved with an "Updated <date>: <what changed>" note shown on the page; corrections logged |
+| 8. Record | Repo | You | Commit the final `.md` with the send date + count in its header (runbook § 5) |
+
+**Why not repo-only (a CLI that sends from the laptop)?** It needs an API credential outside the admin login, puts prod sends on whatever machine runs it, and still needs a database record for the archive, send log and schedule. **Why not admin-only (write in the prod editor)?** You lose git history and local AI drafting, and drafts would live only in prod. The hybrid keeps both: write locally, publish by import.
+
+**Corrections policy:** typo in a sent email → fix the web archive only, no resend. Factual error (rule date, price) → web correction plus a one-line correction at the top of next month's issue. Never send a "correction blast" unless the error could cause harm (e.g. a wrong safety rule); that counts as the month's one dispatch.
+
+**Built Oct 4 2026** (simple version): Admin → **Newsletter** tab — upload / paste, *Check (no save)*, Email / Web page / Plain text preview (phone width toggle), test send, Approve / Back to draft, Count, Send, Resume; `newsletter_issues` + `newsletter_sends` (migration `1765000010000`); `/newsletter/<slug>` web copy (View in browser target, noindex + unlisted for 7 days) and *Recent issues* on `/newsletter`. **Not built:** scheduled send (NL11 cron — you press Send on the day), per-interest segment blocks (NL12), per-issue metrics (NL14). The Leads → Broadcast panel stays for one-off waitlist announcements. Steps: [`../../workflows/marketing/newsletter.md`](../../workflows/marketing/newsletter.md).
 
 ### Phase 2 — proper issues, archive and segments (Dec 2026 – Jan 2027) · ~4 days
 
 | # | Item | Notes |
 |---|------|-------|
-| NL9 | `newsletter_issues` table (`slug`, `subject`, `preheader`, `body_md`, `segment_blocks` JSON, `status` draft/scheduled/sent, `scheduled_at`, `sent_at`) + admin Newsletter tab (edit, preview, test, schedule) | Replaces pasting into the broadcast panel |
-| NL10 | Per-recipient send log (`newsletter_sends`: issue × lead email, status, SES message id); idempotent resume | Share the send-log design with sequences (Z6) |
+| NL9 | ✅ Oct 4 2026 (upload instead of an in-browser editor) — `newsletter_issues` table (`slug`, `subject`, `preheader`, `body_md`, `segment_blocks` JSON, `status` draft/scheduled/sent, `scheduled_at`, `sent_at`) + admin Newsletter tab (edit, preview, test, schedule) | Replaces pasting into the broadcast panel |
+| NL10 | ✅ Oct 4 2026 — Per-recipient send log (`newsletter_sends`: issue × lead email, status, SES message id); idempotent resume | Share the send-log design with sequences (Z6) |
 | NL11 | Scheduled send (Nest `@Cron`, first Tuesday 10:00 ET) with a manual "approve" gate | Never auto-sends an unapproved issue |
 | NL12 | Per-interest segment block at render time (§ 5 table); one email per address even with several interests | Dedupe by email |
-| NL13 | Public archive `/newsletter/[slug]` (web version, "view in browser"); canonical to itself, links out to the full articles. **Segment block is not rendered on the web version** | Archive lags send by 7 days so subscribers see it first (**NL-D6**). Teachers share these URLs with students |
-| NL13b | "Share with your class" card on the manager dashboard (teachers only); no newsletter link, banner or form anywhere a student can see; `POST /leads` refuses `newsletter` for org members | Depends on NL13 |
-| NL14 | Admin metrics per issue: sent, delivered, bounced, complaints, unique clicks by section, unsubscribes, attributed consultations / purchases / waitlist joins | SES events + `product_events` |
+| NL13 | ✅ Oct 4 2026 — Public archive `/newsletter/[slug]` (web version, "view in browser"); canonical to itself, links out to the full articles. **Segment block is not rendered on the web version** | Archive lags send by 7 days so subscribers see it first (**NL-D6**). Teachers share these URLs with students |
+| NL13b | "Share with your class" card on the manager dashboard (teachers only); no newsletter link, banner or form anywhere a student can see | Depends on NL13. The `POST /leads` org-member guard already shipped in Phase 1 (all lists, not just `newsletter`) |
+| NL14 | ✅ Oct 4 2026 — Admin metrics per issue (Newsletter → Results): sent, delivered, bounced, complaints, people who clicked + click rate, clicks by section (`utm_content`), unsubscribes within 7 days, scanner clicks separated, who-clicked list (admin-only). Opens shown but flagged unreliable. Attributed signups/purchases stay in the SQL queries (§ 1.1b) | SES events (`newsletter_events`) + send log. Decided: per-person clicks yes, per-person opens no, 12-month retention; branded tracking domain `click.news.…` (`terraform/ses_tracking.tf`, two-step) |
 | NL15 | Attribution fix: record **session-touch** UTM on events, not only first touch. Today W5 keeps first touch for 90 days, so a newsletter click from an existing lead is credited to the original source and the newsletter looks like it earns nothing | `drone/src/middleware.ts`, `lib/attribution.ts` |
 | NL16 | Opt-in invite for existing waitlist leads (if **NL-D3** = yes) | One send, one-click add |
-| NL16b | Email preferences toggle on `/profile` (**NL-A2**, § 7c) | Reuses `leads` + unsubscribe service |
+| NL16b | Email preferences toggle on `/profile` (**NL-A2**, § 7c) | ✅ Done Oct 4 2026 (pulled into Phase 1) |
 
 ### Phase 3 — continuity and growth (2027, after Pro pricing and Building launch)
 

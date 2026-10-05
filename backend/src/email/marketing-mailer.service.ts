@@ -12,6 +12,8 @@ export interface MarketingMessage {
   unsubscribePageUrl: string;
   /** RFC 8058 one-click target (List-Unsubscribe header): `${FRONTEND_URL}/api/leads/unsubscribe?t=…`. */
   oneClickUrl: string;
+  /** Newsletter web copy (`/newsletter/<slug>`), rendered as "View in browser". */
+  viewInBrowserUrl?: string;
   /** SES message tags — show up on every event SES publishes for this send. */
   tags?: Record<string, string>;
 }
@@ -88,6 +90,26 @@ export class MarketingMailerService {
     return this.enabled && this.missingConfig().length === 0;
   }
 
+  /**
+   * Exactly what `send` would put in the message, without sending — the admin
+   * newsletter preview. Works locally where SES is not configured.
+   */
+  renderPreview(
+    msg: Pick<
+      MarketingMessage,
+      'bodyMarkdown' | 'preheader' | 'unsubscribePageUrl' | 'viewInBrowserUrl'
+    >,
+  ): { html: string; text: string } {
+    return renderEmail({
+      bodyMarkdown: msg.bodyMarkdown,
+      preheader: msg.preheader,
+      unsubscribeUrl: msg.unsubscribePageUrl,
+      postalAddress: this.postalAddress || '[MARKETING_POSTAL_ADDRESS not set]',
+      siteUrl: this.siteUrl,
+      viewInBrowserUrl: msg.viewInBrowserUrl,
+    });
+  }
+
   async send(msg: MarketingMessage): Promise<MarketingSendResult> {
     if (!this.enabled) return { sent: false, reason: 'disabled' };
     if (this.missingConfig().length) {
@@ -100,6 +122,7 @@ export class MarketingMailerService {
       unsubscribeUrl: msg.unsubscribePageUrl,
       postalAddress: this.postalAddress,
       siteUrl: this.siteUrl,
+      viewInBrowserUrl: msg.viewInBrowserUrl,
     });
 
     try {

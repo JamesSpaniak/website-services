@@ -133,7 +133,7 @@ Extends the marketing taxonomy in [`analytics-and-attribution.md`](analytics-and
 | **Store** | `product_viewed`, `variant_selected`, `add_to_cart`, `remove_from_cart`, `cart_viewed`, `shipping_info_added`, `cart_abandoned`, `outbound_vendor_click` |
 | **Fulfillment** | `order_shipped`, `order_delivered`, `return_requested`, `return_received`, `warranty_claim_filed`, `warranty_part_shipped` |
 | **Money model** | `upsell_shown` / `_accepted` / `_declined`, `downsell_shown` / `_accepted` / `_declined`, `kit_lead`, `parts_list_downloaded`, `referral_clicked` — each carrying an `offer_id` **and a `placement`** |
-| **B2B** | `invite_sent`, `invite_redeemed`, `manager_dashboard_viewed`, `org_progress_exported`, `class_created` |
+| **B2B** | `consultation_submitted` (server, anonymous, no PII), `invite_sent`, `invite_redeemed`, `manager_dashboard_viewed`, `org_progress_exported`, `class_created` |
 | **Feature** | `feature_used` with a `feature` property — mock exam generator, sectional viewer, outline sidebar, search |
 
 The money-model group is called out explicitly in [`money-model.md`](../sales/money-model.md) § 6 as the thing without which "the ladder cannot be tuned." An `offer_id` on every offer event is what makes an upsell A/B test possible later.

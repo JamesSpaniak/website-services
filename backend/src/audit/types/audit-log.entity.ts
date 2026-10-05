@@ -15,9 +15,10 @@ export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
+  /** Null only for USER_SELF_DELETED — the actor no longer exists. */
   @Index()
-  @Column({ name: 'user_id' })
-  userId: number;
+  @Column({ name: 'user_id', type: 'int', nullable: true })
+  userId: number | null;
 
   @Index()
   @Column({ type: 'varchar' })

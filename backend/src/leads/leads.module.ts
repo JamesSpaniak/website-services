@@ -13,5 +13,6 @@ import { SesEventsService } from './ses-events.service';
   imports: [ConfigModule, EmailModule],
   controllers: [LeadsController, MarketingEmailController],
   providers: [LeadsService, SesEventsService],
+  exports: [LeadsService],
 })
 export class LeadsModule {}

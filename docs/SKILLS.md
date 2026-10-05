@@ -64,6 +64,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | SEO & GEO strategy | [`docs/marketing/seo-geo-strategy.md`](marketing/seo-geo-strategy.md) | — |
 | Paid ads strategy (funnels, VSL, proof, 70/20/10) | [`docs/marketing/paid-acquisition.md`](marketing/paid-acquisition.md) | — |
 | Launch / optimize a paid campaign | [`workflows/marketing/paid-ads.md`](../workflows/marketing/paid-ads.md) | Ad platform consoles |
+| Send the Field Notes newsletter (draft → approve → broadcast) | [`workflows/marketing/newsletter.md`](../workflows/marketing/newsletter.md) · plan [`docs/marketing/newsletter-plan.md`](marketing/newsletter-plan.md) | `assets/newsletter/_template.md`, Admin → Leads → Broadcast |
 | Ad tracking, pixels, attribution | [`docs/tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) | `drone/src/middleware.ts`, `backend/src/purchases/` |
 | Content calendar & promotion | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | — |
 | Publish news article to JSON | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/build_news_article_json.py`, `assets/articles/` |

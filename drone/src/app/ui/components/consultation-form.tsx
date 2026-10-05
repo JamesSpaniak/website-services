@@ -98,6 +98,13 @@ export default function ConsultationForm() {
           We&apos;ll reach out within one business day to confirm a time. Check your inbox for a
           confirmation email.
         </p>
+        <p className="mt-4 text-sm text-[#525252]">
+          While you wait:{' '}
+          <a href="/newsletter" className="text-[#4a6b2f] font-medium underline underline-offset-2">
+            get Field Notes monthly
+          </a>
+          .
+        </p>
       </div>
     );
   }

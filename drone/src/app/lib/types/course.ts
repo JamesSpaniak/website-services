@@ -49,6 +49,8 @@ interface UnitData {
     description?: string;
     text_content?: string;
     video_url?: string;
+    /** Seconds of credits / end card that never need to be watched for the video ✓. */
+    video_outro_seconds?: number;
     /** Same as course-level: ordered list of image URLs for galleries. */
     images_url?: string[];
     sub_units?: UnitData[]; // Can have optional nested subunits defined
@@ -57,8 +59,18 @@ interface UnitData {
     free_preview?: boolean;
 }
 
+/**
+ * PATCH unit response. Completing the last child completes its parent(s) and,
+ * when every top-level unit is done, the course (PTD3).
+ */
+interface UnitProgressUpdate extends UnitData {
+    auto_completed?: string[];
+    course_status?: ProgressStatus;
+}
+
 export type {
     CourseData,
     UnitData,
+    UnitProgressUpdate,
     QuestionCounts,
 }

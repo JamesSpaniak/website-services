@@ -54,6 +54,14 @@ Launch promo code (E8, batch 2): when it exists, append `&promo=CODE` to the pri
 | School email — curriculum | `https://thedroneedge.com/schools/curriculum?utm_source=outreach&utm_medium=email&utm_campaign=schools-fall26` |
 | School email — book a call | `https://thedroneedge.com/consultation?utm_source=outreach&utm_medium=email&utm_campaign=schools-fall26` |
 
+### Field Notes newsletter (monthly)
+
+Every link in an issue: `utm_source=newsletter&utm_medium=email&utm_campaign=nl-YYYY-MM&utm_content=<section>`, sections `lead` · `rules` · `bench` · `practice-q` · `classroom` · `segment`. The forward-to-a-teacher link uses `utm_source=newsletter-forward&utm_content=forward`. The template has them pre-filled: [`assets/newsletter/_template.md`](../../assets/newsletter/_template.md). Results: [`../tech/analytics-queries.md`](../tech/analytics-queries.md) § 1.1b.
+
+| Use | Link |
+|-----|------|
+| Signup page (bios, talks, email signatures) | `https://thedroneedge.com/newsletter?utm_source=<where>&utm_medium=<channel>&utm_campaign=newsletter-signup` |
+
 ## Checking results
 
 Admin → **Leads** tab (filter by interest, CSV export) or run the "Leads by source and campaign" query in [`../tech/analytics-queries.md`](../tech/analytics-queries.md) § 1.1a.
