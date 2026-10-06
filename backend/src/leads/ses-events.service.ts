@@ -100,11 +100,12 @@ export class SesEventsService {
       );
       return { ok: true };
     }
-    await this.apply(event);
+    await this.apply(event, msg.MessageId);
     return { ok: true };
   }
 
-  async apply(event: SesEvent): Promise<void> {
+  /** snsMessageId: same on every SNS retry of one message — dedupes metrics. */
+  async apply(event: SesEvent, snsMessageId?: string): Promise<void> {
     const type = event.eventType ?? event.notificationType;
     if (type === 'Bounce') {
       // Transient bounces (mailbox full, throttling) are retried by SES and
@@ -128,7 +129,7 @@ export class SesEventsService {
     }
     // Delivery / Open / Click / Reject change no lead state; newsletter
     // events of every type feed the per-issue metrics.
-    await this.recordNewsletterEvent(type, event).catch((err) =>
+    await this.recordNewsletterEvent(type, event, snsMessageId).catch((err) =>
       this.logger.error(
         `newsletter event not recorded: ${(err as Error).message}`,
       ),
@@ -144,6 +145,7 @@ export class SesEventsService {
   async recordNewsletterEvent(
     type: string | undefined,
     event: SesEvent,
+    snsMessageId?: string,
   ): Promise<void> {
     const tags = event.mail?.tags ?? {};
     if (tags.kind?.[0] !== 'newsletter' || !tags.issue?.[0]) return;
@@ -177,9 +179,11 @@ export class SesEventsService {
       !Number.isNaN(sentAt) &&
       occurredAt.getTime() - sentAt < BOT_CLICK_WINDOW_MS;
 
+    // ON CONFLICT: an SNS retry of a message already stored is skipped.
     await this.dataSource.query(
-      `INSERT INTO newsletter_events (issue_id, message_id, event_type, email, link, likely_bot, occurred_at)
-       SELECT id, $2, $3, $4, $5, $6, $7 FROM newsletter_issues WHERE slug = $1`,
+      `INSERT INTO newsletter_events (issue_id, message_id, event_type, email, link, likely_bot, occurred_at, sns_message_id)
+       SELECT id, $2, $3, $4, $5, $6, $7, $8 FROM newsletter_issues WHERE slug = $1
+       ON CONFLICT DO NOTHING`,
       [
         tags.issue[0],
         messageId.slice(0, 128),
@@ -188,6 +192,7 @@ export class SesEventsService {
         kind === 'click' ? (event.click?.link ?? '').slice(0, 2000) : null,
         likelyBot,
         occurredAt,
+        snsMessageId?.slice(0, 100) ?? null,
       ],
     );
   }

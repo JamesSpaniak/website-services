@@ -70,6 +70,16 @@ RULES = [
         "CloudWatch /ecs/droneedge-dev/api-server (search 'Received Stripe event').",
     ),
     (
+        "Stripe config error",
+        f'sum(increase(stripe_config_errors_total{{{SVC}}}[1h])) or vector(0)',
+        "gt", 0, "0s", "critical",
+        "The API started with a Stripe price that doesn't exist in its key's mode.",
+        "Usually the live cutover left the sandbox price_ in tfvars (or the "
+        "reverse). Pro checkout fails until fixed. Check CloudWatch for "
+        "'StripeConfigService', fix stripe_pro_price_id_monthly in tfvars, redeploy. "
+        "Runbook: docs/tech/stripe-sandbox-test-plan.md section 8.",
+    ),
+    (
         "Order or access write failed",
         "(sum(increase(orders_record_failures_total[1h])) or vector(0))"
         " + (sum(increase(entitlements_write_failures_total[1h])) or vector(0))",
@@ -105,6 +115,25 @@ RULES = [
         "Stripe retries the card and emails the customer automatically. Look at "
         "Stripe Dashboard -> Subscriptions (past_due). Pro access is kept while "
         "past_due and removed if Stripe finally cancels.",
+    ),
+    (
+        "Tracking data check failed",
+        "max(progress_tracking_violations) or vector(0)",
+        "gt", 0, "0s", "warning",
+        "A nightly progress-tracking check found rows teachers would see wrong.",
+        "The check label says which: minutes_over_cap, units_completed_drift, "
+        "rollup_drift or silent_learners. Sample rows are in analytics_reconciliation "
+        "(check = 'tracking_<name>'). Runbook: docs/tech/progress-tracking-accuracy.md Phase 4.",
+    ),
+    (
+        "Learner events dropped",
+        'sum(increase(product_events_dropped_total{reason=~"course_scoped_anonymous|stale"}[1h]))'
+        " or vector(0)",
+        "gt", 20, "0s", "warning",
+        "More than 20 learner events in 1 h were dropped as logged-out or stale.",
+        "Usually sessions expiring mid-lesson (course_scoped_anonymous) or a client "
+        "replaying an old offline queue (stale): teachers will see missing minutes. "
+        "Check the latest frontend deploy and CloudWatch for 401s on /api/analytics/event.",
     ),
 ]
 

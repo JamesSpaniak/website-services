@@ -140,6 +140,17 @@ SQL checks run after the rollup; any non-zero count alerts:
 - Active users with lesson events but zero heartbeats for > 60 min (missed sends)
 - `product_events.dropped{reason}` — chart; alert on `course_scoped_anonymous` or `stale` spikes during school hours
 
+**Implemented 2026-10-05 (PTA6)** — `AnalyticsMaintenanceService.trackingChecks()`, nightly step `tracking_checks` (after the rollup, so day − 2 is closed in every time zone). Each check writes its count and up to 50 sample rows to `analytics_reconciliation` as `tracking_<check>` and sets the `progress.tracking_violations{check}` gauge:
+
+| Check | Rows counted |
+|---|---|
+| `minutes_over_cap` | user × course × day in the last 3 days with `minutes_engaged` > 600 |
+| `units_completed_drift` | `progress` rows written in the last 2 days whose `units_completed` ≠ recount of `COMPLETED` refs in `course_units` |
+| `rollup_drift` | user × course where the day − 2 rollup ≠ a recount from raw events (minutes, lessons viewed, units completed; org-local day) |
+| `silent_learners` | users with ≥ 3 `lesson_viewed` and zero heartbeats in the last 24 h |
+
+Alerts (`scripts/grafana_alerts.py`, both `warning`, **not applied yet**): "Tracking data check failed" (any violation) and "Learner events dropped" (> 20 `course_scoped_anonymous` + `stale` drops in 1 h, any time of day). Not built: the `video_progress.completed` check (PTD2 kept old ✓s, so it would flag legacy rows forever) and heartbeat-vs-wall-clock buckets (`minutes_over_cap` catches the same double counting). Covered by the "Phase 4" test in `progress-tracking.e2e-spec.ts`.
+
 ### Phase 5 — classroom pilot
 One teacher (Chichester Edgemont), 3–4 students keep a one-week log (lessons, videos, rough minutes). Compare to the dashboard and publish the measured accuracy internally before quoting it to schools.
 
@@ -159,6 +170,7 @@ One teacher (Chichester Edgemont), 3–4 students keep a one-week log (lessons, 
 
 | Date | Change |
 |---|---|
+| 2026-10-05 | Phase 4 (PTA6): four nightly tracking checks, `progress.tracking_violations` gauge, two Grafana warning rules (not applied). 1 new e2e test |
 | 2026-10-04 | Decisions: PTD1 ✓, PTD2 no recompute (R18 accepted), PTD3 ✓ implemented, PTD6 ✓ implemented, PTD7 keep manual. 3 new e2e tests (derived completion ×2, reset); backend 101 unit + 80 e2e, frontend 24 — green |
 | 2026-10-04 | Phases 1b + 2: PTD4/PTD5 decided and implemented; `teacher-views.e2e-spec.ts` (9), R10 e2e test, Vitest client suite (24); fixes R9–R12, R14, R15, R17, R21. Backend 97 unit + 77 e2e, frontend 24 — all green. Both new e2e specs stop the scheduler (the hourly rollup cron could otherwise race their TRUNCATEs) |
 | 2026-10-04 | Plan written. Phase 1: fixes for R1–R8, R20; `progress-tracking.e2e-spec.ts` (14) + `video-completion.spec.ts` (10). All 14 e2e tests were run against the pre-fix code (HEAD `851cf1c`) and each failed for its intended reason; all pass after the fixes. Full suites green (84 unit, 67 e2e). Note: e2e migrations load from `dist/` — run `npm run build` before `test:e2e` after adding a migration |

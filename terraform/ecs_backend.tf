@@ -290,6 +290,9 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "CLOUDFRONT_KEY_PAIR_ID", value = aws_cloudfront_public_key.video_signing.id },
         { name = "CLOUDFRONT_DISTRIBUTION_ID", value = aws_cloudfront_distribution.media_distribution.id },
         { name = "SEED_TEST_DATA", value = tostring(var.seed_test_data) },
+        # Lets the API refuse to boot when the publishable and secret keys are
+        # in different modes (StripeConfigService).
+        { name = "STRIPE_PUBLISHABLE_KEY", value = var.stripe_publishable_key },
         { name = "STRIPE_PRO_PRICE_ID_MONTHLY", value = var.stripe_pro_price_id_monthly },
         { name = "STRIPE_PRO_PRICE_ID_YEARLY", value = var.stripe_pro_price_id_yearly },
         # Hourly replay of Stripe events whose webhook delivery failed
@@ -313,6 +316,7 @@ resource "aws_ecs_task_definition" "api_server" {
   depends_on = [
     aws_secretsmanager_secret_version.test_user_password,
     aws_secretsmanager_secret_version.stripe_webhook_secret,
+    aws_secretsmanager_secret_version.stripe_secret_key,
     aws_secretsmanager_secret_version.leads_unsubscribe_secret,
   ]
 

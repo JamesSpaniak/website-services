@@ -39,6 +39,7 @@ suffix rules changed twice in 2025.
 | `product_events.failures` | counter | `stage` = `batch` \| `insert` \| `video_progress` \| `progress_touch` \| `server` | `ProductEventsService`, `AnalyticsController` |
 | `orders.record_failures` | counter | — | `PurchaseService.recordCourseOrder` |
 | `stripe.webhook.failures` | counter | `stage` = `signature` \| `processing`; `type` = Stripe event type (8 fixed, only on `processing`) | `PurchaseService.handleWebhookEvent` (added 2026-10-03) |
+| `stripe.config_errors` | counter | `check` = `pro_price` | `StripeConfigService` at boot (added 2026-10-04): configured Pro price missing, inactive, or in the other mode than the key |
 | `stripe.webhook.replays` | counter | `result` = `processed` \| `failed` \| `dead` \| `skipped` | `StripeEventReplayService`, hourly at :15 |
 | `stripe.webhook.dead_events` | gauge | — | same: unresolved events that failed 5 replays (latest run) |
 | `stripe.payments_failed` | counter | `kind` = `renewal` \| `other` | `PurchaseService` on `invoice.payment_failed` (added 2026-10-03; live after the next deploy) |
@@ -47,6 +48,7 @@ suffix rules changed twice in 2025.
 | `analytics.maintenance.failures` | counter | `step` | same |
 | `analytics.maintenance.lock_skipped` | counter | — | same (a second instance hit the advisory lock) |
 | `analytics.reconcile.mismatches` | gauge | `check` (7 fixed names, see `backend-data.md`) | same, refreshed nightly |
+| `progress.tracking_violations` | gauge | `check` = `minutes_over_cap` \| `units_completed_drift` \| `rollup_drift` \| `silent_learners` | same, nightly step `tracking_checks` (added 2026-10-05; see `progress-tracking-accuracy.md` Phase 4). Empty until the first nightly run after a restart |
 | `page.view` | counter | `route` (template, e.g. `/courses/:id/units/:id`), `channel` = `direct` \| `internal` \| `search` \| `social` \| `other` | `AnalyticsService` |
 | `article.view`, `course.view` | counter | `article_id` / `course_id` (catalog-bounded) | `AnalyticsService` |
 | `auth.login`, `auth.login_failed`, `auth.token_refresh`, `auth.registration` | counter | — | `AnalyticsService` |
@@ -127,7 +129,10 @@ Folder **DroneEdge**, group `droneedge-critical`, evaluated every 1 m. All of th
 | Order or access write failed | critical | any `orders_record_failures` / `entitlements_write_failures` in 1 h | A2 |
 | API error rate high | critical | 5xx > 5 % of requests **and** ≥ 5 errors, for 10 m | A8, tightened |
 | API not reporting | critical | no `target_info` sample for 15 m, for 5 m | replaces A15's 3 h window |
+| Stripe config error | critical | any `stripe_config_errors` in 1 h (boot-time price check) | new 2026-10-04 — **not applied yet**: run `scripts/grafana_alerts.py apply` after the next deploy |
 | Pro payment failed | warning | any `stripe_payments_failed` in 1 h | A16 (new) |
+| Tracking data check failed | warning | `max(progress_tracking_violations) > 0` (nightly checks) | PTA6 — new 2026-10-05, **not applied yet** |
+| Learner events dropped | warning | > 20 `product_events_dropped` with `reason` `course_scoped_anonymous` or `stale` in 1 h | PTA6 — new 2026-10-05, **not applied yet** |
 
 Phase 2, not created yet: A1, A3–A6 and A9–A12 below. Add them by appending to `RULES` in the script.
 

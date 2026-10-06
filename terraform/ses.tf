@@ -88,7 +88,7 @@ resource "aws_route53_record" "ses_marketing_dmarc" {
   type    = "TXT"
   ttl     = 3600
   records = [
-    "v=DMARC1; p=quarantine; rua=mailto:${var.admin_email}; pct=100; adkim=r; aspf=r"
+    "v=DMARC1; p=quarantine; rua=mailto:${local.dmarc_report_email}; pct=100; adkim=r; aspf=r"
   ]
 }
 
@@ -195,6 +195,23 @@ resource "aws_sns_topic_subscription" "ses_events_backend" {
   endpoint               = local.ses_events_webhook_url
   raw_message_delivery   = false
   endpoint_auto_confirms = false
+
+  # SNS's default HTTPS policy is 3 retries 20 s apart, so a backend outage
+  # longer than ~1 minute drops events. This retries for ~50 minutes:
+  # 2 tries at 20 s, 5 exponential backoff steps up to 300 s, then 8 at 300 s
+  # (AWS caps the total at 3600 s / 100 retries). Retries reuse the SNS
+  # MessageId, which the backend dedupes on (newsletter_events.sns_message_id).
+  delivery_policy = jsonencode({
+    healthyRetryPolicy = {
+      numRetries         = 15
+      numNoDelayRetries  = 0
+      minDelayTarget     = 20
+      maxDelayTarget     = 300
+      numMinDelayRetries = 2
+      numMaxDelayRetries = 8
+      backoffFunction    = "exponential"
+    }
+  })
 }
 
 # --- Account-level suppression list ------------------------------------------

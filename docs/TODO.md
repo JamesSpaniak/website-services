@@ -24,6 +24,18 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | 6 · Newsletter metrics + tracking domain | NL14 · `click.news.thedroneedge.com` | ✅ **Code done Oct 4 2026** — SES events for newsletter messages stored (`newsletter_events`; per-person clicks, aggregate opens, no IP/UA, 12-month prune, deleted with the account), Results panel per issue, privacy § 6 updated. Terraform `ses_tracking.tf` (SES identity, ACM, CloudFront → `r.us-east-1.awstrack.me`, alias) — **two-step apply**: apply, wait for Verified + `curl` check, then `ses_custom_tracking_domain_enabled = true` (`workflows/tech/post-deploy-smoke-test.md`). Not applied |
 | Ops (you) | Apply `ses_events_subscription_enabled = true` (NL0.2) · **PA41** webhook secret · **PA39** contact-point Test | Deploys production |
 
+### Batch 3 — Stripe go-live week (planned Oct 5 2026; live Stripe moved up to **Oct 8**)
+
+*Prep code (done locally Oct 4–5, uncommitted): `StripeConfigService` boot checks + `stripe_mode` on `/api/health`, Terraform-managed secret key, `./pipeline.sh --rotate-stripe`, "Stripe config error" alert, **PTA6** tracking checks + 2 alerts. Runbook: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8 (G4–G8, rollback § 8.4).*
+
+| Day | Build / ops | You |
+|-----|-------------|-----|
+| **Mon Oct 5** | Commit prep; post-deploy smoke test; **PTA2** `rollupDaily(35)`; SES click-domain step 2; `scripts/grafana_alerts.py apply` | Run `./pipeline.sh --env dev`; sandbox rehearsal of the cutover (`--rotate-stripe` with test keys) |
+| **Tue Oct 6** | — | **G4–G6**: decisions sign-off, live account + Pro price, live webhook + keys; live coupon/promo codes incl. single-use `OWNERTEST` ($1 total) |
+| **Wed Oct 7** | Smoke § L (agent never pays) | **G7** cutover via `--rotate-stripe` (your terminal) · **G8** real-money $1 purchase + refund; roll the sandbox key pasted in chat |
+| **Thu Oct 8** | Watch alerts, orders, webhooks | **Live** + Announcement 1 |
+| **Fri–Sun Oct 9–11** | **PTA5** Playwright student scenarios · PR `launch-batch1` → `main` · **PTA8** outro seconds | Review PR |
+
 ---
 
 ## P0 — Product & course delivery
@@ -328,7 +340,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **PTA3** | Phase 1b — golden teacher-endpoint fixtures + PTD4 (org time zone) + PTD5 (students × assigned courses) + R17 exam races; `backend/test/teacher-views.e2e-spec.ts` (9 tests) | Build | **Done locally 2026-10-04 — uncommitted, not deployed** |
 | **PTA4** | Phase 2 — Vitest client suite (24 tests, `cd drone && npm test`) + fixes R9 (section video ranges), R10 (per-event validation), R11 (beacon all + in-flight persistence), R12 (offline), R21 | Build | **Done locally 2026-10-04 — uncommitted, not deployed** |
 | **PTA5** | Phase 3 — Playwright scripted-student scenarios (§ 5 table), incl. ad-blocker check (R16) | Build | Not started |
-| **PTA6** | Phase 4 — nightly invariant SQL checks + Grafana alerts on `product_events.dropped{reason}` | Build | Not started |
+| **PTA6** | Phase 4 — nightly invariant SQL checks + Grafana alerts on `product_events.dropped{reason}` | Build | **Done locally 2026-10-05 — uncommitted, not deployed.** After deploy: `scripts/grafana_alerts.py apply` (2 new warning rules) |
 | **PTA7** | Phase 5 — one-week classroom pilot log vs dashboard (Chichester Edgemont) | Ops | Not started |
 | **PTA8** | Set `video_outro_seconds` on Part 107 videos that end with credits / end cards > 10 s | Content | Not started |
 
@@ -420,6 +432,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | Item | Status | Source |
 |------|--------|--------|
 | **Verify prod video signing end-to-end** — smoke-test HLS after first video | Open | Wave 2 · P0 recordings |
+| **SES multi-region** (Oct 5 2026) — SES is single-region (`var.aws_region`, us-east-1): identity, configuration set, events topic, reputation, production access and the `click.news` tracking origin (`r.us-east-1.awstrack.me`) are all per region, and the backend's SES client follows `AWS_REGION`. Moving or adding servers in another region does **not** double-send, but running this stack there as-is would (a) send from an unverified sandbox region and (b) collide on `click.news` / `bounce.news` / `_dmarc.news` DNS. Simplest plan: pin SES to us-east-1 with a separate `SES_REGION` env var regardless of where servers run. True multi-region sending needs per-region identity + DKIM, MAIL FROM, config set, SNS topic, tracking subdomain (`click-<region>.news…`) + CloudFront, and a production-access request per region | Open — revisit before any second region | `terraform/ses.tf` · `terraform/ses_tracking.tf` header · `backend/src/email/marketing-mailer.service.ts` |
 | **Classroom / shared-IP rate limits** — WAF raised to 20k/5 min (Sep 17 2026) after Chichester NAT `50.227.29.34` got 403s. Nest still keys anonymous login/register/`POST /logs` by IP (30/min global, 10/min logs). A 30-student lab on one NAT will 429 at bell (login) and at the hour-mark (expired access JWT → IP fallback); quiet video playback is fine (per-user after login). **Proposed Nest pass first** (do not raise the global 30; do not start with a school IP-set): (1) `UserThrottlerGuard` verify with `ignoreExpiration: true` so expired cookies still key `user:${sub}`; (2) login/register **120/min/IP** plus **8/10 min per normalized username-or-email**, refresh **120/min/IP**; (3) stop shipping expected 401/429 to `/logs` (optionally raise `/logs` to 30/min once per-user). WAF path exclusions / school allowlist stay later — coffee shops and 1:1 NAT are the same class of problem. Do **not** just "tighten `/logs`" (M4). Detail below. | Open | Sep 17 classroom 403 review · `terraform/cloudfront_frontend.tf` · `UserThrottlerGuard` · `logging.controller.ts` |
 | **Tighten `POST /logs`** — DTO done; throttle is **not** "make it stricter" (see classroom rate-limits row). Remaining: fold into that item — expired-JWT user key + don't POST expected 401/429; keep payload cap; auth on `/logs` still deferred | Open | Wave 1 · **M4** · classroom rate limits |
 | **Analytics, pixels, attribution, PWA** — see **P1 — Paid acquisition build** above (T1–T20, D1–D12) | Sequenced | [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) · [`tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) |

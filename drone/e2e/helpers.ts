@@ -27,7 +27,12 @@ export async function signUpAndLogIn(page: Page, prefix: string) {
 
 /** Fills Stripe's hosted Checkout page and submits it. */
 export async function payOnStripe(page: Page, card: string) {
-    await page.waitForURL(/checkout\.stripe\.com/, { timeout: 30_000 });
+    // Stripe's page "load" can stall on third-party scripts; the form is what matters.
+    await page.waitForURL(/checkout\.stripe\.com/, { timeout: 30_000, waitUntil: 'domcontentloaded' });
+    await page
+        .locator('#cardNumber, [data-testid="card-accordion-item-button"]')
+        .first()
+        .waitFor({ state: 'attached', timeout: 30_000 });
 
     // Checkout lists several methods (Card, Cash App, Klarna); pick Card.
     const cardNumber = page.locator('#cardNumber');
@@ -86,7 +91,8 @@ export async function approve3DS(page: Page) {
 /** Reloads /profile and checks the user is still signed in (no bounce to /login). */
 export async function expectStillSignedIn(page: Page) {
     await page.goto('/profile');
-    await expect(page.getByRole('button', { name: /Upgrade to Pro|Manage billing/ })).toBeVisible();
+    // Profile Pro card: "Go Pro" for non-members, "Manage billing" for Pro.
+    await expect(page.getByRole('button', { name: /^(Go Pro|Manage billing)$/ })).toBeVisible();
     expect(page.url()).not.toContain('/login');
 }
 

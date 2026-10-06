@@ -1,6 +1,6 @@
 # =============================================================================
 # Branded open/click tracking domain for marketing email — click.news.…
-# (newsletter plan § 5 metrics; docs/tech/marketing-email-metrics in backend-data)
+# (newsletter plan § 5 metrics; docs/tech/backend-data.md "Newsletter — /newsletter")
 #
 # SES rewrites every link in marketing mail (and adds an open pixel) so it can
 # publish CLICK / OPEN events. Without this file those links point at the
@@ -16,11 +16,24 @@
 #   - an ACM cert (us-east-1) covers the subdomain;
 #   - the configuration set's TrackingOptions name the domain, HttpsPolicy REQUIRE.
 #
+# --- Regions -------------------------------------------------------------------
+# SES is regional: the identity, configuration set, tracking origin and events
+# all live in var.aws_region, and the origin MUST be that region's awstrack.me
+# (a tracking domain only works for mail sent from the same region). Each
+# email is sent once, by whichever region the backend's SES client calls
+# (AWS_REGION in ecs_backend.tf) — servers elsewhere do not cause double sends.
+# This stack is single-region: a second regional copy would collide on the
+# click.news / bounce.news / _dmarc.news DNS names. See docs/TODO.md
+# ("SES multi-region") before running the stack in another region.
+#
 # --- Two-step apply (same pattern as the SNS subscription in ses.tf) ---------
 #   1. Apply with ses_custom_tracking_domain_enabled = false (default): creates
 #      the identity, DKIM records, cert, distribution and alias. Wait until SES
-#      shows click.news.… as "Verified" and this returns x-amz-ses-region:
+#      shows click.news.… as "Verified" and this returns 200 with both
+#      x-amz-ses-region: <var.aws_region> and x-amz-ses-request-protocol: https:
 #        curl --head https://click.news.<domain>/favicon.ico
+#      A 502 means CloudFront rejected the origin TLS (see the Host header note
+#      below) — leave the flag off; tracking keeps working via awstrack.me.
 #   2. Set ses_custom_tracking_domain_enabled = true and run the pipeline again
 #      — the configuration set starts wrapping links with the branded domain.
 # =============================================================================
@@ -89,8 +102,11 @@ data "aws_cloudfront_cache_policy" "caching_disabled" {
 }
 
 # Forwards the viewer Host header (click.news.…) so SES can match the link to
-# the configuration set. TLS to the origin still validates against the origin
-# domain (awstrack.me), which its certificate covers.
+# the configuration set — AWS's SES doc requires this. Unconfirmed: CloudFront
+# normally validates a custom origin's certificate against the forwarded Host
+# rather than the origin domain, and SES's docs don't say how awstrack.me
+# satisfies that for a verified tracking domain. The step-1 curl check is the
+# proof; a 502 there means this does not hold.
 data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name = "Managed-AllViewer"
 }

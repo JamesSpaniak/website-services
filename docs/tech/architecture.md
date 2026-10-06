@@ -182,7 +182,7 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 | `media.thedroneedge.com` | Media CloudFront |
 | MX | Google Workspace |
 | TXT SPF | Google + NAT EIP |
-| TXT DMARC | Quarantine + RUA to admin email |
+| TXT DMARC | Quarantine + RUA to `dmarc@thedroneedge.com` (Workspace alias, Gmail filter → "DMARC" label); `_dmarc.news` uses the same address |
 | ACM validation | CNAMEs per SAN |
 
 DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
@@ -229,6 +229,7 @@ Separate roles: MediaConvert, transcode Lambdas, VPC flow logs.
 | Budget | `droneedge-dev-monthly-budget` — $150/mo alerts to `admin_email` |
 | SNS `droneedge-dev-ops-alerts` | CloudWatch alarm emails to `admin_email` (`james@thedroneedge.com`). Confirm the AWS subscription mail once. |
 | Alarm `droneedge-dev-nat-no-egress` | NAT `ConnectionEstablishedCount` = 0 for 2 hours. Console: CloudWatch → Alarms. Recreate a stuck NAT with `./pipeline.sh --env dev --replace aws_nat_gateway.nat`. |
+| Alarms `droneedge-dev-ses-bounce-rate` / `-ses-complaint-rate` | SES account `Reputation.BounceRate` ≥ 2.5% / `Reputation.ComplaintRate` ≥ 0.05% (half of AWS's 5% / 0.1% review levels). On alarm: stop marketing sends and clean the list before the next one. |
 
 ### App autoscaling
 

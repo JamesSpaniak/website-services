@@ -66,6 +66,19 @@ Each step lists what to do, what to **expect**, and when to **stop**. Record res
 | S6 | Profile → **Upgrade / Go Pro** → test badge check → ask the owner → `4242…` | `/profile?pro=success`, shown as Pro, every course opens. Webhooks show `customer.subscription.created` and `invoice.paid` with 200 | — |
 | S7 | Profile → **Manage billing** → Cancel subscription → return | Back on `/profile`; still Pro until the period ends. Webhook `customer.subscription.updated` 200 | Portal errors (check customer portal activation, U5) |
 
+## L. Live Stripe (after the live cutover — the agent never pays)
+
+Run instead of section S once live keys are deployed. The agent may check L1–L2 and must **stop at the Checkout page** (rule 1 — there is no test badge in live mode). The owner does L3–L6 with their own card.
+
+| # | Who | Do | Expect | Stop if |
+|---|-----|----|--------|---------|
+| L1 | Agent | `curl -s https://thedroneedge.com/api/health` | `"stripe_mode":"live"` | `test` or `unset` — the cutover didn't take; roll back (stripe-sandbox-test-plan.md § 8.4) |
+| L2 | Agent | Grafana → Alerting: **Stripe config error** | Normal (not firing) | Firing: the Pro price in tfvars isn't a live price |
+| L3 | Owner | Part 107 → Buy → enter promo `OWNERTEST` ($1) → pay with your card | Course unlocks; receipt email; statement descriptor `DRONEEDGE`; Admin shows the $1 order with the promo | Locked after 30 s, or any webhook non-200 |
+| L4 | Owner | Stripe (live) → Payments → refund it | `charge.refunded` 200; course locked again after reload | Access still open |
+| L5 | Owner | Go Pro (full price or a Pro test code) → Manage billing → cancel → refund the invoice | Pro on, then "Pro until …"; webhooks 200 | Portal error (live portal settings, U5) |
+| L6 | Owner | Stripe (live) → Webhooks → endpoint | Every delivery 200 | Any 400 = wrong live `whsec_` → re-run `--rotate-stripe` with the right one |
+
 ## Afterwards (owner)
 
 - Refund the Pro test charge in Stripe if you want a clean ledger. This doesn't change access; Pro follows the subscription, not the refund.

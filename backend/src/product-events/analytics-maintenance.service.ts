@@ -67,6 +67,7 @@ export class AnalyticsMaintenanceService {
     { description: 'Runs skipped because another instance held the lock' },
   );
   private readonly lastMismatches = new Map<string, number>();
+  private readonly lastTrackingViolations = new Map<string, number>();
 
   constructor(private readonly dataSource: DataSource) {
     this.meter
@@ -76,6 +77,16 @@ export class AnalyticsMaintenanceService {
       })
       .addCallback((result) => {
         for (const [check, n] of this.lastMismatches) {
+          result.observe(n, { check });
+        }
+      });
+    this.meter
+      .createObservableGauge('progress.tracking_violations', {
+        description:
+          'Rows breaking a progress-tracking invariant (latest nightly run) — docs/tech/progress-tracking-accuracy.md Phase 4',
+      })
+      .addCallback((result) => {
+        for (const [check, n] of this.lastTrackingViolations) {
           result.observe(n, { check });
         }
       });
@@ -143,6 +154,7 @@ export class AnalyticsMaintenanceService {
       ['pro_expiry', () => this.expireProEntitlements()],
       ['views', () => this.refreshViews()],
       ['reconcile', () => this.reconcile()],
+      ['tracking_checks', () => this.trackingChecks()],
       ['archive', () => this.archiveOldPartitions()],
     ];
     for (const [name, fn] of steps) {
@@ -420,6 +432,99 @@ export class AnalyticsMaintenanceService {
         [c.name, rows.length, JSON.stringify(rows.slice(0, 50))],
       );
       this.lastMismatches.set(c.name, rows.length);
+      summary.push(`${c.name}=${rows.length}`);
+    }
+    return summary.join(' ');
+  }
+
+  /**
+   * Phase 4 of docs/tech/progress-tracking-accuracy.md: invariants on what
+   * teachers are shown. Each check returns offending rows; counts go to the
+   * `progress.tracking_violations{check}` gauge (Grafana "Tracking data
+   * check failed") and, with up to 50 sample rows, to analytics_reconciliation
+   * as `tracking_<check>`. Runs after the rollup, so day − 2 is closed in
+   * every time zone.
+   */
+  async trackingChecks(): Promise<string> {
+    const checks: { name: string; sql: string }[] = [
+      {
+        // More than 10 h engaged in one day on one course — heartbeats are
+        // being double counted or a client is misbehaving.
+        name: 'minutes_over_cap',
+        sql: `SELECT user_id, course_id, day, minutes_engaged FROM product_events_daily
+              WHERE day >= CURRENT_DATE - 2 AND minutes_engaged > 600`,
+      },
+      {
+        // The stored % complete disagrees with the statuses it summarises.
+        // Recent writes only: a course restructure legitimately leaves old
+        // snapshots stale until the learner's next write.
+        name: 'units_completed_drift',
+        sql: `SELECT p.id, p."userId" AS user_id, p."courseId" AS course_id,
+                     p.units_completed, r.recount
+              FROM progress p
+              CROSS JOIN LATERAL (
+                SELECT COUNT(*)::int AS recount FROM course_units cu
+                WHERE cu.course_id = p."courseId"
+                  AND p.unit_statuses ->> cu.ref = 'COMPLETED'
+              ) r
+              WHERE p.updated_at >= now() - interval '2 days'
+                AND p.units_completed <> r.recount`,
+      },
+      {
+        // The rollup for a closed day no longer matches a recount from the
+        // raw events with the same definitions (ENGAGEMENT_SQL, org-local day).
+        name: 'rollup_drift',
+        sql: `WITH ev AS (
+                SELECT pe.*,
+                       (pe.occurred_at AT TIME ZONE COALESCE(o.timezone, 'UTC'))::date AS local_day
+                FROM product_events pe
+                LEFT JOIN organizations o ON o.id = pe.organization_id
+                WHERE pe.user_id IS NOT NULL AND pe.course_id IS NOT NULL
+                  AND pe.occurred_at >= (CURRENT_DATE - 4)::timestamptz
+                  AND pe.occurred_at <  (CURRENT_DATE)::timestamptz
+              ), recount AS (
+                SELECT pe.user_id, pe.course_id,
+                       ${ENGAGEMENT_SQL.minutes} AS minutes,
+                       ${ENGAGEMENT_SQL.lessonsViewed} AS lessons_viewed,
+                       ${ENGAGEMENT_SQL.unitsCompleted} AS units_completed
+                FROM ev pe WHERE pe.local_day = CURRENT_DATE - 2
+                GROUP BY pe.user_id, pe.course_id
+              )
+              SELECT COALESCE(r.user_id, d.user_id) AS user_id,
+                     COALESCE(r.course_id, d.course_id) AS course_id,
+                     d.minutes_engaged, r.minutes
+              FROM recount r
+              FULL OUTER JOIN (
+                SELECT * FROM product_events_daily WHERE day = CURRENT_DATE - 2
+              ) d ON d.user_id = r.user_id AND d.course_id = r.course_id
+              WHERE d.user_id IS NULL OR r.user_id IS NULL
+                 OR d.minutes_engaged <> r.minutes
+                 OR d.lessons_viewed <> r.lessons_viewed
+                 OR d.units_completed <> r.units_completed`,
+      },
+      {
+        // Opened several lessons in the last day but no heartbeat ever
+        // arrived — the signature of missed sends (blocked endpoint, expired
+        // session before R1, broken client). A warning, not proof.
+        name: 'silent_learners',
+        sql: `SELECT user_id, COUNT(*) FILTER (WHERE event_name = 'lesson_viewed')::int AS lessons_opened
+              FROM product_events
+              WHERE occurred_at >= now() - interval '24 hours' AND user_id IS NOT NULL
+                AND event_name IN ('lesson_viewed', 'lesson_heartbeat')
+              GROUP BY user_id
+              HAVING COUNT(*) FILTER (WHERE event_name = 'lesson_viewed') >= 3
+                 AND COUNT(*) FILTER (WHERE event_name = 'lesson_heartbeat') = 0`,
+      },
+    ];
+    const summary: string[] = [];
+    for (const c of checks) {
+      const rows: unknown[] = await this.dataSource.query(c.sql);
+      await this.dataSource.query(
+        `INSERT INTO analytics_reconciliation (check_name, mismatches, detail)
+         VALUES ($1, $2, $3::jsonb)`,
+        [`tracking_${c.name}`, rows.length, JSON.stringify(rows.slice(0, 50))],
+      );
+      this.lastTrackingViolations.set(c.name, rows.length);
       summary.push(`${c.name}=${rows.length}`);
     }
     return summary.join(' ');

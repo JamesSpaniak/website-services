@@ -687,6 +687,43 @@ describe('Progress tracking accuracy (e2e)', () => {
       expect(await dailyRow(user.id, day)).toEqual(first);
     });
 
+    it('Phase 4: nightly tracking checks are zero on clean data and catch each kind of corruption', async () => {
+      const { user, token } = await learner();
+      const courseId = await createCourse(token);
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setUTCDate(twoDaysAgo.getUTCDate() - 2);
+      twoDaysAgo.setUTCHours(12, 0, 0, 0);
+      await insertEvents(user.id, courseId, messySession(twoDaysAgo));
+      await patchUnit(token, courseId, 'u11', ProgressStatus.COMPLETED).expect(
+        200,
+      );
+      await maintenance.rollupDaily(5);
+
+      const clean = await maintenance.trackingChecks();
+      expect(clean).toBe(
+        'minutes_over_cap=0 units_completed_drift=0 rollup_drift=0 silent_learners=0',
+      );
+
+      await dataSource.query(
+        `UPDATE product_events_daily SET minutes_engaged = 999
+         WHERE user_id = $1 AND day = CURRENT_DATE - 2`,
+        [user.id],
+      );
+      await dataSource.query(
+        `UPDATE progress SET units_completed = 4 WHERE "userId" = $1`,
+        [user.id],
+      );
+      const now = Date.now();
+      await insertEvents(user.id, courseId, [
+        { name: 'lesson_viewed', ref: 'u2', at: new Date(now - 60_000) },
+        { name: 'lesson_viewed', ref: 'u3', at: new Date(now - 50_000) },
+        { name: 'lesson_viewed', ref: 'u13', at: new Date(now - 40_000) },
+      ]);
+      expect(await maintenance.trackingChecks()).toBe(
+        'minutes_over_cap=1 units_completed_drift=1 rollup_drift=1 silent_learners=1',
+      );
+    });
+
     it('R7: backfills every day since the last successful rollup', async () => {
       const { user, token } = await learner();
       const courseId = await createCourse(token);

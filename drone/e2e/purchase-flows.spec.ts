@@ -32,7 +32,7 @@ test('T5 cancelling Checkout returns to the course without access', async ({ pag
     await signUpAndLogIn(page, 'cancel');
     await page.goto(`/courses/${COURSE_ID}?purchase=1`);
     await page.getByRole('button', { name: /Buy this course — \$/ }).click();
-    await page.waitForURL(/checkout\.stripe\.com/);
+    await page.waitForURL(/checkout\.stripe\.com/, { waitUntil: 'domcontentloaded' });
 
     await page.getByRole('link', { name: /^Back to / }).click();
 
@@ -69,20 +69,20 @@ test('T3 3D Secure card completes after the challenge', async ({ page }) => {
 test('T6 Pro upgrade + T8 billing portal cancel at period end', async ({ page }) => {
     await signUpAndLogIn(page, 'pro');
     await page.goto('/profile');
-    await page.getByRole('button', { name: 'Upgrade to Pro (monthly)' }).click();
+    await page.getByRole('button', { name: 'Go Pro', exact: true }).click();
 
     await payOnStripe(page, CARDS.success);
 
     await page.waitForURL(/\/profile/, { timeout: 60_000 });
     // The page polls, then falls back to confirm-pro-checkout if the webhook is late.
     await expect(page.getByText('Pro is active — every course is unlocked.')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByText(/Pro \(active until/)).toBeVisible();
+    await expect(page.getByText(/Every course is unlocked until/)).toBeVisible();
     expect((await getCourse(page)).has_access).toBe(true);
     await expectStillSignedIn(page);
 
     // T8: cancel at period end in the Customer Portal, then come back.
     await page.getByRole('button', { name: 'Manage billing' }).click();
-    await page.waitForURL(/billing\.stripe\.com/, { timeout: 30_000 });
+    await page.waitForURL(/billing\.stripe\.com/, { timeout: 30_000, waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /Drone Edge Pro/ }).click();
     await page.getByRole('button', { name: /cancel (subscription|plan)/i }).first().click();
     // Confirm in the dialog / confirmation page.
@@ -94,7 +94,7 @@ test('T6 Pro upgrade + T8 billing portal cancel at period end', async ({ page })
 
     await page.waitForURL(/localhost.*\/profile/, { timeout: 30_000 });
     // Pro stays until the period ends.
-    await expect(page.getByText(/Pro \(active until/)).toBeVisible();
+    await expect(page.getByText(/Every course is unlocked until/)).toBeVisible();
     expect((await getCourse(page)).has_access).toBe(true);
     await expectStillSignedIn(page);
 });

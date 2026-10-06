@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { z } from 'zod';
 import { sendConsultationRequest } from '@/app/lib/api-client';
@@ -100,9 +101,9 @@ export default function ConsultationForm() {
         </p>
         <p className="mt-4 text-sm text-[#525252]">
           While you wait:{' '}
-          <a href="/newsletter" className="text-[#4a6b2f] font-medium underline underline-offset-2">
+          <Link href="/newsletter" className="text-[#4a6b2f] font-medium underline underline-offset-2">
             get Field Notes monthly
-          </a>
+          </Link>
           .
         </p>
       </div>

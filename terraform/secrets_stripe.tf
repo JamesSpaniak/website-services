@@ -6,6 +6,22 @@ resource "aws_secretsmanager_secret" "stripe_webhook_secret" {
   name = "${var.project_name}-stripe-webhook-secret"
 }
 
+# Live cutover / key rotation without the AWS CLI (Terraform owns the value):
+# created once from TF_VAR_stripe_secret_key when stripe_secret_key_managed is
+# on, ignored afterwards so routine deploys never need the key, and replaced by
+# `./pipeline.sh --rotate-stripe`. create_before_destroy: the new value becomes
+# AWSCURRENT before the old version is retired, so the secret is never empty.
+resource "aws_secretsmanager_secret_version" "stripe_secret_key" {
+  count         = var.stripe_secret_key_managed ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.stripe_secret_key.id
+  secret_string = var.stripe_secret_key
+
+  lifecycle {
+    ignore_changes        = [secret_string]
+    create_before_destroy = true
+  }
+}
+
 # Value is set once, from TF_VAR_stripe_webhook_secret, when the webhook is
 # enabled. ignore_changes keeps later deploys (which don't pass the var) from
 # blanking it; pipeline.sh refuses the first apply if the var is missing.
@@ -15,7 +31,8 @@ resource "aws_secretsmanager_secret_version" "stripe_webhook_secret" {
   secret_string = var.stripe_webhook_secret
 
   lifecycle {
-    ignore_changes = [secret_string]
+    ignore_changes        = [secret_string]
+    create_before_destroy = true
   }
 }
 

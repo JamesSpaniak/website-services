@@ -59,6 +59,24 @@ variable "stripe_pro_price_id_yearly" {
   default     = ""
 }
 
+variable "stripe_secret_key_managed" {
+  description = "Manage the value of the <project>-stripe-secret-key secret in Terraform (set from TF_VAR_stripe_secret_key on first apply, replaced with ./pipeline.sh --rotate-stripe). False keeps the value that was set by hand before this existed. Turn on at the live cutover (docs/tech/stripe-sandbox-test-plan.md § 8)."
+  type        = bool
+  default     = false
+}
+
+variable "stripe_secret_key" {
+  description = "Stripe secret key (sk_live_/sk_test_ or restricted rk_). Pass at apply time with TF_VAR_stripe_secret_key — never put it in tfvars or chat. Only read when the secret version is created or replaced (--rotate-stripe)."
+  type        = string
+  default     = ""
+  sensitive   = true
+
+  validation {
+    condition     = var.stripe_secret_key == "" || can(regex("^(sk|rk)_(live|test)_", var.stripe_secret_key))
+    error_message = "stripe_secret_key must start with sk_live_, sk_test_, rk_live_ or rk_test_."
+  }
+}
+
 variable "stripe_webhook_enabled" {
   description = "Inject STRIPE_WEBHOOK_SECRET into the API task. Set true only after the Stripe webhook endpoint exists and its signing secret has been stored in the <project>-stripe-webhook-secret Secrets Manager secret — ECS refuses to start a task whose referenced secret has no value."
   type        = bool

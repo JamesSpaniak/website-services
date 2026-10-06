@@ -154,7 +154,7 @@ For day-to-day development, **Postgres-only Docker + native npm** is simpler.
 ## Running tests
 
 - Unit tests: `cd backend && npm test` (no DB needed).
-- E2E tests: `cd backend && npm run test:e2e` — runs against the **`blog_test`** database (set via `DB_NAME` in the script), so your dev `blog` data is safe. The suite truncates all tables in its target DB before each test; never point it at `blog`.
+- E2E tests: `cd backend && npm run test:e2e` — suites run in parallel, each Jest worker on its own copy of **`blog_test`** (`blog_test_1`, `blog_test_2`, …; created from `blog_test` as a template on first use, then migrated — `test/jest-e2e.db-*.ts`), so your dev `blog` data is safe and suites can't truncate each other's tables. `blog_test` must exist and nothing may be connected to it while a worker DB is first created. After a schema change, run `npm run build` first (migrations load from `dist/`); the worker DBs pick up new migrations automatically. To start fresh, drop the `blog_test_N` databases. Never point `DB_NAME` at `blog` (the setup refuses).
 
 ## Manual migrations (debugging only)
 

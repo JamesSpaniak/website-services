@@ -370,6 +370,13 @@ describe('SesEventsService.apply', () => {
     ]);
   });
 
+  it('keys rows on the SNS MessageId so retries are skipped', async () => {
+    await svc.apply({ eventType: 'Delivery', mail: mail() }, 'sns-1');
+    const [sql, params] = dsQuery.mock.calls[0];
+    expect(sql).toContain('ON CONFLICT DO NOTHING');
+    expect(params[7]).toBe('sns-1');
+  });
+
   it('flags scanner clicks within 30 s of sending', async () => {
     await svc.apply({
       eventType: 'Click',

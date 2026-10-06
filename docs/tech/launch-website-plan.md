@@ -141,9 +141,10 @@ High-priority items from [`../sales/`](../sales/) and [`money-model.md`](../sale
 |------|--------------|-----|
 | **Oct 3–5** (Fri–Sun) | Z1, W1, W2, W6, W7, start W3 + Z3–Z5 | **Request SES production access (Oct 3)** · apply Z1 Terraform · Stripe sandbox run · E3–E4 decisions · create social accounts |
 | **Oct 6–7** | finish W3 + Z3–Z5, W4, W5, Z2, W8, Z6 (stretch) → **deploy Oct 7** (W9) | Post first social content · send UTM links to organizers |
-| **Oct 8** | — | **Announcement 1** · watch leads + utm view |
+| **Oct 5–7** | X0 prep (boot checks, `--rotate-stripe`) → deploy; cutover Oct 7 — week plan in [`../TODO.md`](../TODO.md) *Batch 3* | X0: live account, keys, coupons, `OWNERTEST` $1 purchase + refund |
+| **Oct 8** | — | **X0 live Stripe** (moved up from Oct 13–15 on Oct 5) · **Announcement 1** · watch leads + utm view |
 | **Oct 8–12** | X3, X4, X6, X1 draft | E5, E7, E8, E9, E10 decisions · price bands · F1 by Oct 10 |
-| **Oct 13–15** | X0 live Stripe, X1 final, X2, X7 (X5 if chosen) → **deploy Oct 15** (X8) | Live card purchase + refund |
+| **Oct 13–15** | X1 final, X2, X7 (X5 if chosen) → **deploy Oct 15** (X8) | — |
 | **Oct 16** | — | **Announcement 2** |
 | **Oct 17–21** | Y1, Y2 → freeze | One-pager PDF, kit one-pager, rehearse |
 | **Oct 23–25** | Hotfix only | Talk |

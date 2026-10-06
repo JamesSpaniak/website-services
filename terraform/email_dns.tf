@@ -20,13 +20,20 @@ resource "aws_route53_record" "spf" {
 }
 
 # --- DMARC Record ---
+# Reports go to a Workspace alias (filtered to a "DMARC" label), not
+# admin_email: DMARC records are public DNS, and the brand never names a
+# person. Shared with the news.… record in ses.tf.
+locals {
+  dmarc_report_email = "dmarc@${var.domain_name}"
+}
+
 resource "aws_route53_record" "dmarc" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "_dmarc.${var.domain_name}"
   type    = "TXT"
   ttl     = 3600
   records = [
-    "v=DMARC1; p=quarantine; rua=mailto:${var.admin_email}; pct=100; adkim=r; aspf=r"
+    "v=DMARC1; p=quarantine; rua=mailto:${local.dmarc_report_email}; pct=100; adkim=r; aspf=r"
   ]
 }
 
