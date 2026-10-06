@@ -28,7 +28,14 @@ describe('PurchaseService — hosted Checkout', () => {
         retrieve: jest.fn(),
       },
     },
-    customers: { create: jest.fn(async () => ({ id: 'cus_new' })) },
+    customers: {
+      create: jest.fn(async () => ({ id: 'cus_new' })),
+      retrieve: jest.fn(
+        async (id: string): Promise<{ id: string; deleted?: boolean }> => ({
+          id,
+        }),
+      ),
+    },
     promotionCodes: {
       list: jest.fn(async () => ({ data: [] as { id: string }[] })),
     },
@@ -148,6 +155,40 @@ describe('PurchaseService — hosted Checkout', () => {
       await service.createCourseCheckoutSession(7, 3);
       expect(stripe.customers.create).toHaveBeenCalled();
       expect(sessionParams().customer).toBe('cus_new');
+    });
+
+    it('replaces a stored customer that does not exist under this key (sandbox → live)', async () => {
+      stripe.customers.retrieve.mockRejectedValueOnce(
+        Object.assign(new Error('No such customer'), {
+          code: 'resource_missing',
+        }),
+      );
+      await service.createCourseCheckoutSession(7, 3);
+      expect(stripe.customers.retrieve).toHaveBeenCalledWith('cus_existing');
+      expect(stripe.customers.create).toHaveBeenCalled();
+      expect(sessionParams().customer).toBe('cus_new');
+      expect(userRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ stripe_customer_id: 'cus_new' }),
+      );
+    });
+
+    it('replaces a stored customer deleted in the Dashboard', async () => {
+      stripe.customers.retrieve.mockResolvedValueOnce({
+        id: 'cus_existing',
+        deleted: true,
+      });
+      await service.createCourseCheckoutSession(7, 3);
+      expect(sessionParams().customer).toBe('cus_new');
+    });
+
+    it('does not swallow other Stripe errors on the customer lookup', async () => {
+      stripe.customers.retrieve.mockRejectedValueOnce(
+        Object.assign(new Error('rate limited'), { code: 'rate_limit' }),
+      );
+      await expect(service.createCourseCheckoutSession(7, 3)).rejects.toThrow(
+        'rate limited',
+      );
+      expect(stripe.customers.create).not.toHaveBeenCalled();
     });
 
     it('rejects a course the user already owns', async () => {

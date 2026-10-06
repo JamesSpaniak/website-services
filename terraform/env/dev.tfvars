@@ -3,13 +3,15 @@ project_name           = "droneedge-dev"
 domain_name            = "thedroneedge.com"
 api_subdomain          = "api"
 frontend_subdomain     = "app"
-stripe_publishable_key = "pk_test_51T1cg92Rw6cpyMyJI6BOeozOuntx5b1qpgz6yyKfiJZpJMQCclii0IRATMtCQhRknFkJ52JnG2dRSX7CKsYDet8S00WqOUxzWc"
+stripe_publishable_key = "pk_live_51T1cg0ED26jRI2iYeDheL0YXqbKrfjHmbLetq3Ts5Hkk0544zQYwm5CeAtiqUshQ9GEnMGf1yc7iF7kk3pPg0YQz00ZP3XKRho"
 # Create recurring Prices in Stripe Dashboard, then paste price_... IDs here (same mode as secret key).
-# Drone Edge sandbox: Drone Edge Pro $35/mo. Swap for the live price at cutover.
-stripe_pro_price_id_monthly = "price_1ULulr2Rw6cpyMyJcc0cCqmA"
+# Drone Edge LIVE: Drone Edge Pro $35/mo (sandbox was price_1ULulr2Rw6cpyMyJcc0cCqmA).
+stripe_pro_price_id_monthly = "price_1ULth0ED26jRI2iYMe34d13Y"
 stripe_pro_price_id_yearly  = ""
 # Stripe as merchant of record (PD9). Rehearsed on sandbox keys; stays on at the live cutover.
 stripe_managed_payments = true
+# Live cutover (Oct 2026): secret key value held by Terraform; rotate with ./pipeline.sh --rotate-stripe.
+stripe_secret_key_managed = true
 # PA41 — first apply needs TF_VAR_stripe_webhook_secret=whsec_... (pipeline.sh checks).
 stripe_webhook_enabled = true
 email_enabled          = true

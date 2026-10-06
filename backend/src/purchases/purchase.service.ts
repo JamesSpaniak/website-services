@@ -670,10 +670,21 @@ export class PurchaseService {
         'No Stripe billing profile yet. Subscribe to Pro first.',
       );
     }
-    const session = await this.stripe.billingPortal.sessions.create({
-      customer: user.stripe_customer_id,
-      return_url: `${this.frontendBaseUrl()}${this.sanitizePath(returnPath)}`,
-    });
+    let session: Stripe.BillingPortal.Session;
+    try {
+      session = await this.stripe.billingPortal.sessions.create({
+        customer: user.stripe_customer_id,
+        return_url: `${this.frontendBaseUrl()}${this.sanitizePath(returnPath)}`,
+      });
+    } catch (err) {
+      // Customer from the other Stripe mode (pre-cutover sandbox) or deleted.
+      if ((err as { code?: string }).code === 'resource_missing') {
+        throw new BadRequestException(
+          'No billing profile yet. Subscribe to Pro first.',
+        );
+      }
+      throw err;
+    }
     void this.productEvents.record({ userId, event: 'billing_portal_opened' });
     return { url: session.url };
   }
@@ -1270,7 +1281,21 @@ export class PurchaseService {
   }
 
   private async ensureStripeCustomer(user: User): Promise<string> {
-    if (user.stripe_customer_id) return user.stripe_customer_id;
+    if (user.stripe_customer_id) {
+      // A customer saved under the other Stripe mode (sandbox before the live
+      // cutover) or deleted in the Dashboard does not exist for this key.
+      try {
+        const existing = await this.stripe.customers.retrieve(
+          user.stripe_customer_id,
+        );
+        if (!existing.deleted) return user.stripe_customer_id;
+      } catch (err) {
+        if ((err as { code?: string }).code !== 'resource_missing') throw err;
+      }
+      this.logger.warn(
+        `Stripe customer ${user.stripe_customer_id} missing for user ${user.id}; creating a new one`,
+      );
+    }
     const customer = await this.stripe.customers.create({
       email: user.email,
       name:
