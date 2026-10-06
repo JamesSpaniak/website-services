@@ -152,6 +152,7 @@ Source: `faa-107` `u1` registration/RID leaves. Link FAA pages; re-check at auth
 
 **Sessions 4–5 — Drone power and battery mechanics**
 - Thrust-to-weight and hover current from a real motor chart; KV / prop / cell-count matching
+- *To look at:* hover RPM ≈ max RPM ÷ √(T/W) — why high T/W alone doesn't slow the blades (weight and prop size do); Base kit worked example and class exercises in [`hover-rpm-and-twr.md`](../reference/hover-rpm-and-twr.md)
 - Battery mechanics: cell voltage window, series cells, capacity vs C vs internal resistance, sag, energy vs power density, temperature, care; LiPo vs Li-ion as a use-case choice; one line that other chemistries exist. *Optional teacher note for chemistry class.*
 - Hands-on: pack voltage before/after a bench run → Wh used
 

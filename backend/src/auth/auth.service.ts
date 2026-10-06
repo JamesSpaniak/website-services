@@ -6,6 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ProductEventsService } from '../product-events/product-events.service';
 import { UsersService } from '../users/user.service';
 import { SignupLinkService } from '../users/signup-link.service';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +18,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from './types/session.entity';
 import { Repository } from 'typeorm';
 import { AuditService } from '../audit/audit.service';
+import { maskEmail } from '../common/pii';
 import { AuditAction } from '../audit/types/audit-action.enum';
 import { AnalyticsService } from '../analytics/analytics.service';
 import * as crypto from 'crypto';
@@ -39,6 +41,7 @@ export class AuthService {
     private organizationService: OrganizationService,
     private auditService: AuditService,
     private analyticsService: AnalyticsService,
+    private productEvents: ProductEventsService,
   ) {}
 
   async validateUser(identifier: string, pass: string): Promise<User> {
@@ -47,13 +50,13 @@ export class AuthService {
     const user = await this.usersService.findForLogin(identifier);
     if (!user) {
       this.logger.warn(
-        `Login failed: no user found with identifier="${identifier}"`,
+        `Login failed: no user found with identifier="${maskEmail(identifier)}"`,
       );
       throw new UnauthorizedException(LOGIN_USER_NOT_FOUND);
     }
 
     this.logger.debug(
-      `User found: id=${user.id}, email=${user.email}, verified=${user.is_email_verified}, role=${user.role}`,
+      `User found: id=${user.id}, verified=${user.is_email_verified}, role=${user.role}`,
     );
 
     const passwordMatch = await UsersService.comparePassword(
@@ -71,6 +74,7 @@ export class AuthService {
       `Login validated successfully for user="${user.username}" (id=${user.id})`,
     );
     this.auditService.log(user.id, AuditAction.LOGIN);
+    void this.productEvents.record({ userId: user.id, event: 'login' });
     return user;
   }
 
@@ -85,7 +89,7 @@ export class AuthService {
     signup_code?: string;
   }): Promise<{ message: string }> {
     this.logger.debug(
-      `registerUser called: username="${payload.username}", email="${payload.email}", hasInviteCode=${!!payload.invite_code}, hasSignupCode=${!!payload.signup_code}`,
+      `registerUser called: username="${payload.username}", email="${maskEmail(payload.email)}", hasInviteCode=${!!payload.invite_code}, hasSignupCode=${!!payload.signup_code}`,
     );
 
     const existingUsername = await this.usersService.getUserByUsername(
@@ -100,7 +104,7 @@ export class AuthService {
     const existingEmail = await this.usersService.getUserByEmail(payload.email);
     if (existingEmail) {
       this.logger.warn(
-        `Registration rejected: email="${payload.email}" already registered`,
+        `Registration rejected: email="${maskEmail(payload.email)}" already registered`,
       );
       throw new BadRequestException('Email is already registered.');
     }
@@ -174,6 +178,17 @@ export class AuthService {
       username: payload.username,
       email: payload.email,
     });
+    void this.productEvents.record({
+      userId: user.id,
+      event: 'signup_completed',
+      properties: {
+        via: payload.invite_code
+          ? 'org_invite'
+          : payload.signup_code
+            ? 'signup_link'
+            : 'direct',
+      },
+    });
     return { message: 'Registration successful. Please verify your email.' };
   }
 
@@ -208,6 +223,10 @@ export class AuthService {
       `Email verified successfully for user="${user.username}" (id=${user.id})`,
     );
     this.auditService.log(user.id, AuditAction.VERIFY_EMAIL);
+    void this.productEvents.record({
+      userId: user.id,
+      event: 'email_verified',
+    });
     return { message: 'Email verified successfully.' };
   }
 
@@ -288,7 +307,7 @@ export class AuthService {
 
   async refreshAccessToken(
     token: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{ access_token: string; refresh_token?: string }> {
     const [selector, verifier] = token.split(':');
     if (!selector || !verifier) {
       this.logger.warn('Refresh token rejected: invalid format');
@@ -331,10 +350,16 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token.');
     }
 
+    // Rotate only if no parallel refresh with the same cookie got there first.
+    // The losers still get an access token but no new refresh token, so the
+    // browser keeps the winner's cookie — the only one matching the DB.
     const new_verifier = crypto.randomBytes(32).toString('hex');
     const new_hashed_verifier = await UsersService.hashPassword(new_verifier);
-    session.hashed_verifier = new_hashed_verifier;
-    await this.sessionRepository.save(session);
+    const rotation = await this.sessionRepository.update(
+      { id: session.id, hashed_verifier: session.hashed_verifier },
+      { hashed_verifier: new_hashed_verifier },
+    );
+    const rotated = rotation.affected === 1;
 
     const user = session.user;
     const payload = {
@@ -346,15 +371,13 @@ export class AuthService {
     };
 
     this.logger.debug(
-      `Token refreshed for user="${user.username}" (id=${user.id})`,
+      `Token refreshed for user="${user.username}" (id=${user.id})${rotated ? '' : ' — concurrent refresh, verifier kept'}`,
     );
     this.analyticsService.recordTokenRefresh();
 
-    const new_refresh_token = `${selector}:${new_verifier}`;
-
     return {
       access_token: this.jwtService.sign(payload),
-      refresh_token: new_refresh_token,
+      refresh_token: rotated ? `${selector}:${new_verifier}` : undefined,
     };
   }
 
@@ -397,7 +420,7 @@ export class AuthService {
 
     if (!user) {
       this.logger.warn(
-        `Password reset attempt for non-existent email: ${email}`,
+        `Password reset attempt for non-existent email: ${maskEmail(email)}`,
       );
       return {
         message:
@@ -411,7 +434,8 @@ export class AuthService {
       // env vars are absent (they are not wired into the ECS task definition;
       // an undefined expiresIn makes jsonwebtoken throw and 500s this route).
       secret: this.resetTokenSecret(),
-      expiresIn: this.configService.get<string>('JWT_RESET_EXPIRES_IN') || '15m',
+      expiresIn:
+        this.configService.get<string>('JWT_RESET_EXPIRES_IN') || '15m',
     });
 
     const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${token}`;

@@ -90,6 +90,7 @@ reconcile_secrets() {
     "jwt-secret:aws_secretsmanager_secret.jwt_secret"
     "admin-seed-password:aws_secretsmanager_secret.admin_seed_password"
     "test-user-password:aws_secretsmanager_secret.test_user_password"
+    "leads-unsubscribe-secret:aws_secretsmanager_secret.leads_unsubscribe_secret"
     "grafana-otel-headers:aws_secretsmanager_secret.grafana_otel_headers"
     "cloudfront-signing-private-key:aws_secretsmanager_secret.cloudfront_signing_private_key"
   )

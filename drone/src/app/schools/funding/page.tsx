@@ -162,8 +162,8 @@ export default function SchoolsFundingPage() {
                 follows that year&apos;s scoring rubric and allowable costs.
               </p>
               <p className="mt-4">
-                Drone Edge supplies the instructional backbone: ACS-aligned Part 107 prep, practice exams, optional video
-                and AI tracks, and org-level progress reporting. You still map those pieces to the outcomes and
+                Drone Edge supplies the instructional backbone: ACS-aligned Part 107 prep, practice exams, and
+                org-level progress reporting. You still map those pieces to the outcomes and
                 partnerships your funder asks for (employer letters, equity goals, evaluation, equipment vs. curriculum
                 split, etc.).
               </p>

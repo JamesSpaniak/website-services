@@ -8,6 +8,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 |------|------------|----------------|
 | Run app locally | [`docs/tech/local-dev.md`](tech/local-dev.md) | `docker compose`, `backend/`, `drone/` |
 | Deploy to AWS | [`workflows/tech/deploy.md`](../workflows/tech/deploy.md) | `./pipeline.sh --env dev` |
+| Smoke-test the site after a deploy (browser agent or by hand) | [`workflows/tech/post-deploy-smoke-test.md`](../workflows/tech/post-deploy-smoke-test.md) | Claude in Chrome · Stripe test cards |
 | Deploy from a cloud session / phone | [`workflows/tech/deploy-from-cloud.md`](../workflows/tech/deploy-from-cloud.md) | `scripts/deploy-preflight.sh`, `scripts/cloud-setup.sh` |
 | Rehearse migrations on a prod clone / get prod-shaped data locally | [`workflows/tech/prod-db-clone.md`](../workflows/tech/prod-db-clone.md) | `scripts/prod-db-clone.sh dump && …/prod-db-clone.sh restore` |
 
@@ -63,6 +64,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | SEO & GEO strategy | [`docs/marketing/seo-geo-strategy.md`](marketing/seo-geo-strategy.md) | — |
 | Paid ads strategy (funnels, VSL, proof, 70/20/10) | [`docs/marketing/paid-acquisition.md`](marketing/paid-acquisition.md) | — |
 | Launch / optimize a paid campaign | [`workflows/marketing/paid-ads.md`](../workflows/marketing/paid-ads.md) | Ad platform consoles |
+| Send the Field Notes newsletter (draft → approve → broadcast) | [`workflows/marketing/newsletter.md`](../workflows/marketing/newsletter.md) · plan [`docs/marketing/newsletter-plan.md`](marketing/newsletter-plan.md) | `assets/newsletter/_template.md`, Admin → Leads → Broadcast |
 | Ad tracking, pixels, attribution | [`docs/tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) | `drone/src/middleware.ts`, `backend/src/purchases/` |
 | Content calendar & promotion | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | — |
 | Publish news article to JSON | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) | `scripts/build_news_article_json.py`, `assets/articles/` |

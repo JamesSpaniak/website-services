@@ -6,6 +6,8 @@ export interface Organization {
     manager_count: number;
     school_year: string | null;
     semester: string | null;
+    /** IANA zone — the school's day boundary in every teacher view. */
+    timezone: string;
     course_count: number;
     created_at: string;
 }

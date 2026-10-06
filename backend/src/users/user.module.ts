@@ -10,6 +10,7 @@ import { UsersService } from './user.service';
 import { SignupLinkService } from './signup-link.service';
 import { EmailModule } from '../email/email.module';
 import { AuditModule } from '../audit/audit.module';
+import { PurchaseModule } from '../purchases/purchase.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuditModule } from '../audit/audit.module';
     ConfigModule,
     EmailModule,
     AuditModule,
+    PurchaseModule,
   ],
   providers: [UsersService, SignupLinkService],
   controllers: [UsersController],

@@ -1,0 +1,11 @@
+apiVersion: 1
+contactPoints:
+    - orgId: 1
+      name: admin-email
+      receivers:
+        - uid: cg057ncrvaneoc
+          type: email
+          settings:
+            addresses: james@thedroneedge.com
+            singleEmail: false
+          disableResolveMessage: false

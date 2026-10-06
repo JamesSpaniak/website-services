@@ -10,7 +10,6 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "assets" / "articles" / "images"
-PUBLIC_DIR = ROOT / "drone" / "public" / "images" / "articles"
 ICON_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Icon" / "IconWhite.svg"
 LOGO_SVG = ROOT / "assets" / "visuals" / "Logo" / "SVG" / "Logo" / "LogoWhite.svg"
 ICON_PNG = OUT_DIR / "icon-white.png"
@@ -183,8 +182,6 @@ def main() -> None:
         out = compose(src, title, subtitle, wordmark, spectral, footer_h)
         dest.parent.mkdir(parents=True, exist_ok=True)
         out.save(dest, "PNG", optimize=True)
-        PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
-        out.save(PUBLIC_DIR / out_name, "PNG", optimize=True)
         print(f"ok {out_name}" + (" +spectral" if spectral else ""))
 
 

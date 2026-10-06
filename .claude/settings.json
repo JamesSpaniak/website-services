@@ -1,4 +1,20 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(rclone lsf *)",
+      "Bash(rclone lsd *)",
+      "Bash(rclone ls *)",
+      "Bash(rclone lsl *)",
+      "Bash(rclone lsjson *)",
+      "Bash(rclone check *)",
+      "Bash(rclone listremotes)",
+      "Bash(git fetch *)",
+      "Bash(git fetch)",
+      "Bash(npx jest *)",
+      "Bash(npx eslint *)",
+      "Bash(npm run test:e2e*)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

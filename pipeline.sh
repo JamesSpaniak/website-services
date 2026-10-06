@@ -36,6 +36,7 @@ DOCKER_NO_CACHE=false
 DOCKER_PROGRESS="${DOCKER_PROGRESS:-auto}"
 TERRAFORM_APPLY=true
 TF_REPLACE_ARGS=()
+ROTATE_STRIPE=false
 WAIT_TIMEOUT_SECONDS="${WAIT_TIMEOUT_SECONDS:-900}"
 WAIT_INTERVAL_SECONDS="${WAIT_INTERVAL_SECONDS:-10}"
 
@@ -43,7 +44,7 @@ WAIT_INTERVAL_SECONDS="${WAIT_INTERVAL_SECONDS:-10}"
 
 usage() {
   cat <<'EOF'
-Usage: ./pipeline.sh [--backend-only|--frontend-only] [--env <dev|prod>] [--tfvars <path>] [--no-cache] [--plan-only] [--replace <addr>]
+Usage: ./pipeline.sh [--backend-only|--frontend-only] [--env <dev|prod>] [--tfvars <path>] [--no-cache] [--plan-only] [--replace <addr>] [--rotate-stripe]
 
 Flags:
   --backend-only   Build/deploy backend only
@@ -55,6 +56,11 @@ Flags:
   --replace ADDR   Pass -replace=ADDR to terraform (repeatable). Use for stuck
                    resources that look healthy in AWS but are dead (e.g.
                    aws_nat_gateway.nat). Do not run terraform apply by hand.
+  --rotate-stripe  Replace the Stripe secret key AND webhook secret values from
+                   TF_VAR_stripe_secret_key / TF_VAR_stripe_webhook_secret
+                   (live cutover, rollback, key roll). Refuses if the secret
+                   key's mode (live/test) differs from stripe_publishable_key
+                   in the tfvars. Needs stripe_secret_key_managed = true.
   -h, --help       Show help
 
 Env overrides:
@@ -79,6 +85,7 @@ while [[ $# -gt 0 ]]; do
     --frontend-only) BUILD_BACKEND=false;  shift ;;
     --no-cache)      DOCKER_NO_CACHE=true; shift ;;
     --plan-only)     TERRAFORM_APPLY=false; shift ;;
+    --rotate-stripe) ROTATE_STRIPE=true; shift ;;
     --replace)
       TF_REPLACE_ARGS+=("-replace=${2:?--replace requires a resource address}")
       shift 2 ;;
@@ -243,6 +250,72 @@ log_service_state "pre-terraform" "${FRONTEND_ECS_CLUSTER}" "${FRONTEND_ECS_SERV
     reconcile_secrets
     reconcile_cloudfront_signing_key
     CF_PUBLIC_KEY_PEM="$(cat "${CF_PUBLIC_KEY_FILE}")"
+  fi
+
+  # The webhook secret version is created once from TF_VAR_stripe_webhook_secret
+  # (ignore_changes afterwards). Creating it empty would ship a task that
+  # rejects every Stripe delivery, so refuse the first apply without it.
+  if [[ "${TERRAFORM_APPLY}" == "true" && -f "${TFVARS_FILE}" ]] \
+    && grep -Eq '^[[:space:]]*stripe_webhook_enabled[[:space:]]*=[[:space:]]*true' "${TFVARS_FILE}" \
+    && ! terraform state show 'aws_secretsmanager_secret_version.stripe_webhook_secret[0]' >/dev/null 2>&1 \
+    && [[ -z "${TF_VAR_stripe_webhook_secret:-}" ]]; then
+    echo "Error: stripe_webhook_enabled = true but the webhook secret is not stored yet." >&2
+    echo "  Re-run with: TF_VAR_stripe_webhook_secret=whsec_... ./pipeline.sh --env ${ENVIRONMENT}" >&2
+    echo "  (Stripe Dashboard -> Developers -> Webhooks -> endpoint -> Signing secret)" >&2
+    exit 1
+  fi
+
+  # ── Stripe secret key (live cutover / rotation) ──
+  # The <project>-stripe-secret-key value is Terraform-managed once
+  # stripe_secret_key_managed = true (created from TF_VAR_stripe_secret_key,
+  # ignored afterwards). --rotate-stripe replaces it and the webhook secret.
+  # A variable missing from the tfvars is "" — `|| true` because under
+  # set -euo pipefail grep's no-match exit would silently end this subshell.
+  tfvar_value() {
+    { grep -E "^[[:space:]]*$1[[:space:]]*=" "${TFVARS_FILE}" 2>/dev/null || true; } | head -1 \
+      | sed -E 's/^[^=]*=[[:space:]]*"?([^"#]*)"?.*/\1/' | tr -d '[:space:]'
+  }
+  stripe_key_mode() {
+    case "$1" in
+      sk_live_*|rk_live_*|pk_live_*) echo live ;;
+      sk_test_*|rk_test_*|pk_test_*) echo test ;;
+      *) echo unset ;;
+    esac
+  }
+  STRIPE_SK_MANAGED="$(tfvar_value stripe_secret_key_managed)"
+  if [[ "${TERRAFORM_APPLY}" == "true" && "${STRIPE_SK_MANAGED}" == "true" ]] \
+    && ! terraform state show 'aws_secretsmanager_secret_version.stripe_secret_key[0]' >/dev/null 2>&1 \
+    && [[ -z "${TF_VAR_stripe_secret_key:-}" ]]; then
+    echo "Error: stripe_secret_key_managed = true but Terraform does not hold the key yet." >&2
+    echo "  Re-run with: TF_VAR_stripe_secret_key=sk_... ./pipeline.sh --env ${ENVIRONMENT}" >&2
+    exit 1
+  fi
+  if [[ -n "${TF_VAR_stripe_secret_key:-}" ]]; then
+    SK_MODE="$(stripe_key_mode "${TF_VAR_stripe_secret_key}")"
+    PK_MODE="$(stripe_key_mode "$(tfvar_value stripe_publishable_key)")"
+    if [[ "${PK_MODE}" != "unset" && "${SK_MODE}" != "${PK_MODE}" ]]; then
+      echo "Error: TF_VAR_stripe_secret_key is ${SK_MODE} but stripe_publishable_key in ${TFVARS_FILE} is ${PK_MODE}." >&2
+      echo "  Checkout would fail for every buyer. Put both keys in the same mode." >&2
+      exit 1
+    fi
+  fi
+  if [[ "${ROTATE_STRIPE}" == "true" ]]; then
+    if [[ "${STRIPE_SK_MANAGED}" != "true" ]]; then
+      echo "Error: --rotate-stripe needs stripe_secret_key_managed = true in ${TFVARS_FILE}." >&2
+      exit 1
+    fi
+    if [[ -z "${TF_VAR_stripe_secret_key:-}" || -z "${TF_VAR_stripe_webhook_secret:-}" ]]; then
+      echo "Error: --rotate-stripe needs both TF_VAR_stripe_secret_key and TF_VAR_stripe_webhook_secret." >&2
+      echo "  Rotating one without the other leaves the API and the webhook in different Stripe modes." >&2
+      exit 1
+    fi
+    for addr in 'aws_secretsmanager_secret_version.stripe_secret_key[0]' \
+                'aws_secretsmanager_secret_version.stripe_webhook_secret[0]'; do
+      if terraform state show "${addr}" >/dev/null 2>&1; then
+        TF_REPLACE_ARGS+=("-replace=${addr}")
+      fi
+    done
+    echo "Rotating Stripe secrets (mode: $(stripe_key_mode "${TF_VAR_stripe_secret_key}"))." >&2
   fi
 
   COMMON_VARS=(

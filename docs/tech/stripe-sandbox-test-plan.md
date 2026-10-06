@@ -220,11 +220,13 @@ Tests: e2e cases for create-course-checkout guards (owned course, active Pro, un
 - [`purchase-flows.md`](purchase-flows.md) Flow A after C2 ships.
 - [`../sales/pricing-model.md`](../sales/pricing-model.md) / [`../sales/packages.md`](../sales/packages.md): Pro = **$35/mo** once signed off (currently "$29–49 draft").
 
-### C5 — Terraform edits (CODE now, applied in Phase 3)
+### C5 — Terraform edits ✅ written Oct 2 2026 (applied in Phase 3)
 
-Write but do not apply:
-- `terraform/env/dev.tfvars`: `stripe_pro_price_id_monthly = "price_1ULulr2Rw6cpyMyJcc0cCqmA"`; `stripe_publishable_key` unchanged (already the sandbox key).
-- PA41 pattern: sensitive `stripe_webhook_secret` variable + `aws_secretsmanager_secret_version` on the existing `stripe_webhook_secret` secret (same as `test_user_password`), then `stripe_webhook_enabled = true`. Secret value passed with `-var` at apply time, never committed.
+- `terraform/env/dev.tfvars`: `stripe_pro_price_id_monthly = "price_1ULulr2Rw6cpyMyJcc0cCqmA"`, `stripe_webhook_enabled = true`; `stripe_publishable_key` unchanged (already the sandbox key).
+- `stripe_webhook_secret` sensitive variable (must start `whsec_`) + `aws_secretsmanager_secret_version.stripe_webhook_secret` (`count` on `stripe_webhook_enabled`, `ignore_changes = [secret_string]`). Value comes from `TF_VAR_stripe_webhook_secret` on the **first** apply only; later deploys don't need it. `pipeline.sh` refuses the first apply if it is missing. Rotate (e.g. live cutover) with `TF_VAR_stripe_webhook_secret=whsec_… ./pipeline.sh --env dev --replace 'aws_secretsmanager_secret_version.stripe_webhook_secret[0]'`.
+- **CloudFront fix:** the `/api/*` behavior forwarded only an allow-list of headers, so `Stripe-Signature` never reached the API and every deployed delivery would have failed with 400 even with a correct secret. Added to the list in `cloudfront_frontend.tf`. (The Next.js `/api/[...path]` proxy forwards all headers and the body text unchanged.)
+- Preflight `--plan` (Oct 2) shows exactly: CloudFront in-place update, secret version create, API task definition replace (new revision for the env/secret change — expected, though preflight flags any replace).
+- Prod `droneedge-dev-stripe-secret-key` already holds the sandbox `sk_test_51T1cg92…` key — O1 not needed.
 
 ---
 
@@ -252,7 +254,7 @@ Any future expiry, any CVC, any ZIP.
 
 ### Test matrix
 
-**Results of the Oct 1 2026 local run, sample payloads and field map: [`stripe-webhook-payloads.md`](stripe-webhook-payloads.md).** All rows pass except the browser-only parts of T4, T5, T6, T8 (hosted Checkout / Portal clicks) — do those next (§ 5.1).
+**Results of the Oct 1 2026 local run, sample payloads and field map: [`stripe-webhook-payloads.md`](stripe-webhook-payloads.md).** All rows pass. The browser-only parts of T3, T4, T5, T6, T8 passed on **Oct 3 2026** as automated Playwright tests (§ 5.1). Not automated: paying with Link / Apple Pay (T4) and updating the card in the Portal (T8). Check those by hand on the deployed sandbox (O5).
 
 Verify each with the checks below. "Access" = `GET /courses/:id` `has_access`.
 
@@ -300,9 +302,21 @@ SELECT id, course_id, source, product_sku, ends_at, revoked_at, revoke_reason FR
 
 ---
 
-### 5.1 Browser click-through (you, ~15 min)
+### 5.1 Browser click-through (automated, ~1.5 min)
 
-Everything server-side is verified; this checks what a buyer sees. Stack: Postgres (`docker compose up postgres -d`), API on 3000, frontend on 8080, **one** `stripe listen` (L3).
+Everything server-side is verified; this checks what a buyer sees. Stack: Postgres (`docker compose up postgres -d`), API on 3000 started with `EMAIL_ENABLED=false` (otherwise register returns 500 because the placeholder SMTP host can't be resolved), frontend on 8080, **one** `stripe listen` (L3). Use Node ≥ 18 (`nvm use 20`).
+
+```bash
+cd drone && npm run test:e2e   # first time: npx playwright install chromium
+```
+
+[`drone/e2e/purchase-flows.spec.ts`](../../drone/e2e/purchase-flows.spec.ts) covers T4, T5, T3 decline, T3 3DS, and T6 + T8 (cancel at period end in the Portal). Each test uses a fresh non-admin user made through the API. After every purchase it reloads `/profile` to check the user is still signed in. **Oct 5 2026: 5/5 pass** against Batch 2 + go-live prep (18 webhooks, all 2xx). That run updated the selectors for the Batch 2 profile Pro card ("Go Pro" / "Manage billing", "Every course is unlocked until …") and stopped waiting for Stripe's full page `load` (it can stall on third-party scripts). **Oct 3 2026: 5/5 pass.** All 35 webhook deliveries returned 2xx, and access came from the webhook (the `confirm-checkout` fallback was never called). Notes from the run:
+
+- T5 cancel returns to `/courses/:id?purchase=1` (the purchase screen), not `?purchase=canceled`.
+- Stripe's hosted page changes its markup without notice, so if a test can't find a field, look at the failure screenshot in `drone/test-results/` first. Selectors live in [`drone/e2e/helpers.ts`](../../drone/e2e/helpers.ts).
+- Backend side of "stays signed in": `backend/test/app.e2e-spec.ts` › `purchase session refresh`. It found and now guards a real logout bug: parallel refreshes with one cookie each rotated it, and the browser could keep a cookie the DB no longer matched. Fixed in `auth.service.ts` (conditional rotation) and `api-client.tsx` (single-flight refresh).
+
+Manual steps, kept for the deployed run (O5) and for anything not automated:
 
 1. Register a fresh user at `http://localhost:8080/register` (email sending fails locally — the account is still created; set `EMAIL_ENABLED=false` in `backend/.env` to silence it).
 2. **T4** — open a paid course → *Purchase* → **Buy this course** → Stripe page shows your logo/colors, Apple Pay / Link options → pay `4242 4242 4242 4242` → lands on the course with "Payment received — unlocking…" then full access.
@@ -319,10 +333,9 @@ The site already runs on `pk_test_`, so this is a sandbox test on the production
 
 | # | Type | Do |
 |---|------|----|
-| O1 | OPS | If U1 found a new sandbox: put its `sk_test_` into Secrets Manager `<project>-stripe-secret-key` and its `pk_test_` into `stripe_publishable_key`. |
+| O1 | — | ✅ Not needed — prod secret key is already the sandbox `sk_test_51T1cg92…` (checked Oct 2). |
 | U12 | UI | Developers → Webhooks → Add endpoint `https://thedroneedge.com/api/purchases/webhook`, events: `payment_intent.succeeded`, `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`. Copy the signing secret. |
-| O2 | OPS | Apply C5: price ID in tfvars, webhook secret stored (Terraform `-var`), `stripe_webhook_enabled = true`. |
-| O3 | OPS | Merge the C1–C4 PR, run the pipeline. |
+| O2+O3 | OPS | One deploy: `TF_VAR_stripe_webhook_secret=whsec_… ./pipeline.sh --env dev` (C5 is already in tfvars). Ships C1–C4, the raw-body fix, the CloudFront header fix and migration `1765000004000` (sets PRO_MONTHLY to 3500 + the price ID from the env var — runs once, so the price ID must be in the same deploy). |
 | O4 | UI | Portal default return URL → `https://thedroneedge.com/profile` (if not set in U5). |
 | O5 | Test | Repeat T1/T4, T6, T8, T9, T12, T14 on the site with test cards and a throwaway account. Dashboard → Webhooks → endpoint shows delivery status; all 200. |
 | O6 | Clean up | Refund/cancel test purchases; deactivate the throwaway account so test orders stay out of analytics (or tag them). |
@@ -342,17 +355,26 @@ The site already runs on `pk_test_`, so this is a sandbox test on the production
 
 | Step | Where | What |
 |------|-------|------|
-| G1 | Local | § 5.1 browser click-through passes. |
+| G1 | Local | § 5.1 browser click-through passes. **Done Oct 3 2026** (automated, 5/5). |
 | G2 | PR | Commit C1–C4 + fixes; review; merge. |
 | G3 | Site, **sandbox** (Phase 3) | U12 endpoint, O2 tfvars (`stripe_pro_price_id_monthly = price_1ULulr2Rw6cpyMyJcc0cCqmA`, webhook secret, `stripe_webhook_enabled = true`), deploy. Repeat § 5.1 on thedroneedge.com with test cards; Dashboard → Webhooks shows only 2xx. **This is the real dress rehearsal** — same infra as live, only the keys change after it. |
 | G4 | Decisions | Refund / access policy text (**D9**) on the site and in Stripe (Settings → Public details → terms/refund URL); prices signed off (Pro $35, course $129, **D10 / MM1**); tax position (**PD9**). |
 | G5 | Stripe **live** account (switch out of the sandbox) | Finish account activation / identity checks if prompted; Settings → Public details: statement descriptor (e.g. `DRONEEDGE`), support email + URL; Radar default rules on. Repeat **U2–U7 in live** (sandbox settings do not carry over). Create **Drone Edge Pro** $35/mo in live → new `price_…`. |
 | G6 | Stripe live | Webhooks → endpoint `https://thedroneedge.com/api/purchases/webhook`, same eight events → live `whsec_…`. Developers → API keys → live `pk_live_…` / `sk_live_…`. **Never paste live keys in chat or files** — straight into Secrets Manager / the Terraform `-var`. |
-| G7 | OPS (explicit go) | Secrets Manager: `sk_live_`, live `whsec_`; tfvars: `stripe_publishable_key = pk_live_…`, `stripe_pro_price_id_monthly = <live price>`; deploy. Roll (revoke) the sandbox secret key that was pasted in chat. |
+| G7 | OPS (explicit go) | tfvars: `stripe_publishable_key = pk_live_…`, `stripe_pro_price_id_monthly = <live price>`, `stripe_secret_key_managed = true`. Then, from your own terminal (keys never in chat or files): `TF_VAR_stripe_secret_key=sk_live_… TF_VAR_stripe_webhook_secret=whsec_… ./pipeline.sh --env dev --rotate-stripe`. The pipeline refuses if the secret key's mode differs from the publishable key; the API refuses to boot on a mismatch (old tasks keep serving) and reports `stripe_mode` on `GET /api/health`. Then smoke test § L of `workflows/tech/post-deploy-smoke-test.md`. Roll (revoke) the sandbox secret key that was pasted in chat. |
 | G8 | Real-money smoke (you) | § 8.2. |
 | G9 | Watch | First week: Dashboard → Webhooks (all 2xx), Payments, failed renewals; nightly `analytics_reconciliation` clean; Grafana alerts (**T5 / PA39**) if built. |
 
-Rollback: point tfvars back at the sandbox keys and redeploy — no data migration involved; live orders already recorded stay recorded.
+### 8.4 Rollback
+
+Put `stripe_publishable_key` and `stripe_pro_price_id_monthly` back to the sandbox values in tfvars, then `TF_VAR_stripe_secret_key=sk_test_… TF_VAR_stripe_webhook_secret=<sandbox whsec_> ./pipeline.sh --env dev --rotate-stripe`. No data migration; live orders already recorded stay recorded, and `GET /api/health` reports `"stripe_mode":"test"` again. Live customers' Pro subscriptions keep renewing in Stripe live — their webhooks fail signature checks until you roll forward again (Stripe retries for 3 days, then the hourly replay picks them up once live keys are back).
+
+### 8.5 Guards (added 2026-10-04)
+
+- **Terraform owns the secret key value** once `stripe_secret_key_managed = true` (`aws_secretsmanager_secret_version.stripe_secret_key`, like the webhook secret) — no AWS CLI. `--rotate-stripe` replaces both values together; refuses unless both `TF_VAR_`s are set.
+- **Mode mismatch:** pipeline (secret key vs tfvars publishable key) and API boot (`StripeConfigService`, `STRIPE_PUBLISHABLE_KEY` env) both refuse.
+- **Wrong-mode price:** at boot the API retrieves the configured Pro price(s); not found / wrong mode / inactive → `stripe.config_errors` → Grafana **Stripe config error** (critical). The `products` PRO_* rows are pointed at the configured price ids.
+- **Visibility:** `GET /api/health` → `{"status":"ok","stripe_mode":"live|test|unset"}`.
 
 ### 8.2 Real-money smoke test (your own card)
 

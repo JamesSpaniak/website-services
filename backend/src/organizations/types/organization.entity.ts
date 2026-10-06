@@ -32,6 +32,14 @@ export class Organization {
   @Column({ type: 'varchar', nullable: true })
   semester: string | null;
 
+  /**
+   * IANA time zone of the school. Defines "today" and the daily buckets in
+   * every teacher view and in the product_events_daily rollup for its
+   * members (PTD4, docs/tech/progress-tracking-accuracy.md).
+   */
+  @Column({ type: 'varchar', length: 64, default: 'America/New_York' })
+  timezone: string;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 

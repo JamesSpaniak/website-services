@@ -1,14 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/app/lib/auth-context';
-import { resendVerificationEmail } from '@/app/lib/api-client';
+import { getProfile, resendVerificationEmail } from '@/app/lib/api-client';
 
 const DISMISS_KEY = 'verifyEmailBannerDismissed';
 
 export default function VerifyEmailBanner() {
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
+    const needsCheck = !!user && !user.email_verified;
+
+    // The verify link usually opens in another tab; re-check when the user
+    // comes back to this one so the banner clears without a reload.
+    useEffect(() => {
+        if (!needsCheck) return;
+        const onFocus = () => {
+            if (document.visibilityState !== 'visible') return;
+            getProfile()
+                .then((fresh) => { if (fresh.email_verified) setUser(fresh); })
+                .catch(() => {});
+        };
+        document.addEventListener('visibilitychange', onFocus);
+        window.addEventListener('focus', onFocus);
+        return () => {
+            document.removeEventListener('visibilitychange', onFocus);
+            window.removeEventListener('focus', onFocus);
+        };
+    }, [needsCheck, setUser]);
     const [dismissed, setDismissed] = useState(() => {
         if (typeof window === 'undefined') return false;
         return sessionStorage.getItem(DISMISS_KEY) === '1';

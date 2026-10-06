@@ -499,7 +499,7 @@ Open items this plan needs answered; recorded in `TODO.md` alongside the existin
 | **PD1** | Backfill orders from Stripe or start clean? | Backfill — the script is small and historical activation/refund rates are worth having |
 | **PD7** | Contractual "active seat" | **Decided 2026-09-12.** Any learning event or progress write in the last **30 days**; login alone does not count. Teacher view uses **7 days** (**MPD3**). One query (`v_org_utilization.members_engaged_30d` / `_7d`), two constants. Shown as "Active seats (30d)" (manager Overview, admin Organizations) and "Active this week". **Track only** — no email or offer is attached (**MM9**) |
 | **MPD1** | Auto-complete on video ≥ 90 %? | No — show watch % beside declared completion |
-| **PD23** | Archive org-member raw events to S3 or delete at the retention boundary? | **Delete** unless the DPA explicitly covers the archive and the deletion path reaches S3. Archive B2C partitions; rollups (aggregate per user-day) are kept for all users and cascade on user deletion |
+| **PD23** | Archive org-member raw events to S3 or delete at the retention boundary? | **Decided Oct 4 2026:** delete org-member rows; archive B2C rows **with `user_id` and `anonymous_id` removed**, so the archive is non-identifying and user deletion never has to reach S3 (no `deleted_user_ids` purge job). Rollups (aggregate per user-day) are kept for all users and cascade on user deletion |
 
 ---
 
@@ -589,7 +589,7 @@ Monthly cron step, after the rollup:
 3. `ALTER TABLE product_events DETACH PARTITION …; DROP TABLE …`.
 4. **Org-member rows follow PD23** — deleted at the boundary, not archived, unless the DPA covers it.
 
-`product_events_daily` is never archived; it is the counter that keeps activation, utilization, and hours-engaged continuous past 12 months. User deletion cascades to rollups (indexed delete) and, for archived B2C rows, to a quarterly S3 purge job driven by a `deleted_user_ids` table.
+`product_events_daily` is never archived; it is the counter that keeps activation, utilization, and hours-engaged continuous past 12 months. User deletion cascades to rollups (indexed delete). Archived B2C rows carry no `user_id` or `anonymous_id` (PD23), so there is nothing in S3 for a deletion to reach.
 
 Querying the archive: only if a question ever needs raw history older than a year — then a Glue table + Athena over the NDJSON prefix, no re-import. Do not set that up in advance.
 

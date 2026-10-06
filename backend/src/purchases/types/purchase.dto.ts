@@ -4,12 +4,22 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
 } from 'class-validator';
 
 export class PurchaseCourseDto {
   @IsNumber()
   @IsNotEmpty()
   courseId: number;
+}
+
+/** Stripe promotion code from a `?promo=` landing link; unknown codes fall back to manual entry. */
+const PROMO_CODE_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+
+export class CreateCourseCheckoutDto extends PurchaseCourseDto {
+  @IsOptional()
+  @Matches(PROMO_CODE_PATTERN)
+  promoCode?: string;
 }
 
 export class ConfirmPurchaseDto {
@@ -50,6 +60,10 @@ export class CreateProCheckoutDto extends StripeReturnUrlsDto {
   @IsOptional()
   @IsEnum(ProMembershipDuration)
   duration?: ProMembershipDuration;
+
+  @IsOptional()
+  @Matches(PROMO_CODE_PATTERN)
+  promoCode?: string;
 }
 
 /**

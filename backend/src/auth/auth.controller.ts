@@ -38,6 +38,7 @@ import { LoginCredentialsDto } from './types/login-credentials.dto';
 import { RefreshTokenDto } from './types/refresh-token.dto';
 import { RegisterDto } from './types/register.dto';
 import { VerifyEmailDto } from './types/verify-email.dto';
+import { DeleteAccountDto } from './types/delete-account.dto';
 import { AnalyticsService } from '../analytics/analytics.service';
 
 /** Auth cookies are HttpOnly so tokens are unreachable from page JavaScript (XSS). */
@@ -68,12 +69,15 @@ export class AuthController {
 
   private setAuthCookies(
     res: Response,
-    tokens: { access_token: string; refresh_token: string },
+    tokens: { access_token: string; refresh_token?: string },
   ) {
     res.cookie(ACCESS_TOKEN_COOKIE, tokens.access_token, {
       ...baseCookieOptions(),
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
     });
+    // Absent when a parallel refresh already rotated the session: keep the
+    // browser's existing refresh cookie.
+    if (!tokens.refresh_token) return;
     res.cookie(REFRESH_TOKEN_COOKIE, tokens.refresh_token, {
       ...baseCookieOptions(),
       maxAge: REFRESH_TOKEN_MAX_AGE_MS,
@@ -241,6 +245,37 @@ export class AuthController {
     }
     this.clearAuthCookies(res);
     return { message: 'Logged out successfully' };
+  }
+
+  @ApiOperation({
+    summary: 'Delete the signed-in account',
+    description:
+      'Self-service deletion (App Store 5.1.1(v)). Requires the current password. Removes progress, exam history, comments, course access, waitlist signups and the Stripe customer (cancelling Pro). Order records are kept without the user link. Refused for admins and for students in a school account.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Account deleted; cookies cleared.',
+  })
+  @ApiResponse({ status: 400, description: 'Incorrect password.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Admin account, or a school-managed student account.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('delete-account')
+  @HttpCode(HttpStatus.OK)
+  async deleteAccount(
+    @Request() req,
+    @Body() dto: DeleteAccountDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.usersService.deleteOwnAccount(req.user.userId, dto.password);
+    // Sessions cascade with the user; the JWT strategy rejects the old
+    // access token because the user no longer exists.
+    this.clearAuthCookies(res);
+    return { message: 'Your account has been deleted.' };
   }
 
   @ApiOperation({ summary: 'Request a password reset' })

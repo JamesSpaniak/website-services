@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, DataSource } from 'typeorm';
+import { Repository, In, DataSource, EntityManager } from 'typeorm';
 import { ProductEventsService } from '../product-events/product-events.service';
 import { ProgressService } from '../progress/progress.service';
 import { ProgressStatus } from '../courses/types/course.dto';
@@ -21,6 +21,8 @@ import { Progress } from '../progress/types/progress.entity';
 import { User } from '../users/types/user.entity';
 import { OrganizationMember } from '../organizations/types/organization-member.entity';
 import { CourseUnit } from '../courses/types/course-unit.entity';
+import { AuditService } from '../audit/audit.service';
+import { AuditAction } from '../audit/types/audit-action.enum';
 import {
   SubmitExamAttemptDto,
   ExamAttemptResultDto,
@@ -53,6 +55,7 @@ export class ExamAttemptService {
     private dataSource: DataSource,
     private productEvents: ProductEventsService,
     private progressService: ProgressService,
+    private auditService: AuditService,
   ) {}
 
   // ── Submission ─────────────────────────────────────────────────────────────
@@ -123,22 +126,41 @@ export class ExamAttemptService {
       exam.course_id,
     );
 
-    // Upsert: delete existing then insert fresh so updated_at reflects now
-    await this.attemptRepository.delete({ user_id: userId, exam_id: examId });
-    const attempt = this.attemptRepository.create({
-      user_id: userId,
-      exam_id: examId,
-      answers: scoredAnswers,
-      score,
-      section_breakdown: breakdown,
-    });
-    const saved = await this.attemptRepository.save(attempt);
+    // One submit per user × exam at a time (R17): two tabs submitting
+    // together would otherwise collide on the unique (user, exam) row and
+    // compute the same attempt_no. Delete + insert so completed_at is fresh.
+    const { saved, attemptNo } = await this.dataSource.transaction(
+      async (manager) => {
+        await manager.query(`SELECT pg_advisory_xact_lock($1, hashtext($2))`, [
+          userId,
+          `exam:${examId}`,
+        ]);
+        const repo = manager.getRepository(this.attemptRepository.target);
+        await repo.delete({ user_id: userId, exam_id: examId });
+        const saved = await repo.save(
+          repo.create({
+            user_id: userId,
+            exam_id: examId,
+            answers: scoredAnswers,
+            score,
+            section_breakdown: breakdown,
+          }),
+        );
+        // Append-only history (PA9) — exam_attempts stays latest-only.
+        const attemptNo = await this.insertHistory(
+          manager,
+          userId,
+          exam,
+          score,
+          breakdown,
+        );
+        return { saved, attemptNo };
+      },
+    );
 
     // Denormalize latest score into progress.exam_scores
     await this.updateProgressExamScores(userId, exam, score, breakdown);
-
-    // Append-only history (PA9) — exam_attempts stays latest-only.
-    await this.appendHistory(userId, exam, score, breakdown);
+    this.recordSubmitEvents(userId, exam, score, breakdown, attemptNo);
 
     // Passing a lesson quiz is the strongest "I finished this" signal we have.
     // Full-course practice/finals stay independent of unit completion (MPD1).
@@ -315,71 +337,97 @@ export class ExamAttemptService {
   }
 
   /**
-   * Inserts an exam_attempt_history row with the next attempt_no and emits
-   * the exam_submitted product event (+ per-section category scores).
-   * Non-fatal: the attempt is already saved.
+   * Inserts an exam_attempt_history row with the next attempt_no inside the
+   * submit transaction (under the per user × exam lock, so attempt_no cannot
+   * repeat). Non-fatal: returns null and the attempt stays saved.
    */
-  private async appendHistory(
+  private async insertHistory(
+    manager: EntityManager,
     userId: number,
     exam: Exam,
     score: number,
     breakdown: SectionBreakdown[],
-  ): Promise<void> {
+  ): Promise<number | null> {
     try {
-      const rows: { attempt_no: number }[] = await this.dataSource.query(
-        `INSERT INTO exam_attempt_history
-           (user_id, exam_id, course_id, scope, scope_refs, exam_pool, attempt_no, score, section_breakdown)
-         VALUES ($1, $2, $3, $4, $5, $6,
-                 COALESCE((SELECT MAX(attempt_no) FROM exam_attempt_history WHERE user_id = $1 AND exam_id = $2), 0) + 1,
-                 $7, $8::jsonb)
-         RETURNING attempt_no`,
-        [
-          userId,
-          exam.id,
-          exam.course_id,
-          exam.scope,
-          exam.scope_refs ?? [],
-          exam.exam_pool ?? null,
-          score,
-          JSON.stringify(breakdown ?? []),
-        ],
-      );
-      const attemptNo = rows[0]?.attempt_no ?? 1;
-      void this.productEvents.record({
-        userId,
-        event: 'exam_submitted',
-        courseId: exam.course_id,
-        unitRef: exam.scope_refs?.[0] ?? null,
-        properties: {
-          exam_id: exam.id,
-          scope: exam.scope,
-          exam_pool: exam.exam_pool ?? null,
-          score,
-          attempt_no: attemptNo,
-          passed: score >= 70,
-        },
+      // Savepoint so a history failure (non-fatal) leaves the attempt saved.
+      return await manager.transaction(async (inner) => {
+        const rows: { attempt_no: number }[] = await inner.query(
+          `INSERT INTO exam_attempt_history
+             (user_id, exam_id, course_id, scope, scope_refs, exam_pool, attempt_no, score, section_breakdown)
+           VALUES ($1, $2, $3, $4, $5, $6,
+                   COALESCE((SELECT MAX(attempt_no) FROM exam_attempt_history WHERE user_id = $1 AND exam_id = $2), 0) + 1,
+                   $7, $8::jsonb)
+           RETURNING attempt_no`,
+          [
+            userId,
+            exam.id,
+            exam.course_id,
+            exam.scope,
+            exam.scope_refs ?? [],
+            exam.exam_pool ?? null,
+            score,
+            JSON.stringify(breakdown ?? []),
+          ],
+        );
+        return rows[0]?.attempt_no ?? 1;
       });
-      for (const s of breakdown ?? []) {
-        void this.productEvents.record({
-          userId,
-          event: 'exam_category_scored',
-          courseId: exam.course_id,
-          unitRef: s.sub_unit_ref ?? s.unit_ref ?? null,
-          properties: {
-            exam_id: exam.id,
-            attempt_no: attemptNo,
-            unit_ref: s.unit_ref,
-            unit_title: s.unit_title ?? null,
-            correct: s.correct,
-            total: s.total,
-            score_percent: s.score_percent,
-          },
-        });
-      }
     } catch (err) {
       this.logger.error(
         `Failed to append exam history for user ${userId}: ${(err as Error).message}`,
       );
+      return null;
+    }
+  }
+
+  /** exam_submitted + per-section category scores, after the attempt commits. */
+  private recordSubmitEvents(
+    userId: number,
+    exam: Exam,
+    score: number,
+    breakdown: SectionBreakdown[],
+    attemptNo: number | null,
+  ): void {
+    if (attemptNo == null) return;
+    // T2 / PA5b: the audit ledger row admin SQL and the activity feed expect.
+    void this.auditService.log(userId, AuditAction.EXAM_SUBMITTED, {
+      examId: exam.id,
+      courseId: exam.course_id,
+      scope: exam.scope,
+      examPool: exam.exam_pool ?? null,
+      score,
+      attemptNo,
+      passed: score >= 70,
+    });
+    void this.productEvents.record({
+      userId,
+      event: 'exam_submitted',
+      courseId: exam.course_id,
+      unitRef: exam.scope_refs?.[0] ?? null,
+      properties: {
+        exam_id: exam.id,
+        scope: exam.scope,
+        exam_pool: exam.exam_pool ?? null,
+        score,
+        attempt_no: attemptNo,
+        passed: score >= 70,
+      },
+    });
+    for (const s of breakdown ?? []) {
+      void this.productEvents.record({
+        userId,
+        event: 'exam_category_scored',
+        courseId: exam.course_id,
+        unitRef: s.sub_unit_ref ?? s.unit_ref ?? null,
+        properties: {
+          exam_id: exam.id,
+          attempt_no: attemptNo,
+          unit_ref: s.unit_ref,
+          unit_title: s.unit_title ?? null,
+          correct: s.correct,
+          total: s.total,
+          score_percent: s.score_percent,
+        },
+      });
     }
   }
 
@@ -422,55 +470,62 @@ export class ExamAttemptService {
     breakdown: SectionBreakdown[],
   ): Promise<void> {
     try {
-      const progress = await this.progressRepository.findOne({
-        where: { userId, courseId: exam.course_id },
+      await this.dataSource.transaction(async (manager) => {
+        const progress = await manager.getRepository(Progress).findOne({
+          where: { userId, courseId: exam.course_id },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!progress) return;
+
+        const snapshot: ExamScoreSnapshot = {
+          exam_id: exam.id,
+          scope: exam.scope,
+          scope_refs: exam.scope_refs ?? [],
+          exam_pool: exam.exam_pool ?? 'scoped',
+          score,
+          section_breakdown: breakdown,
+          taken_at: new Date().toISOString(),
+        };
+
+        const existing = progress.exam_scores ?? [];
+        // Replace snapshot for same exam_id; for full_course also drop older same-pool rows
+        let filtered = existing.filter((s) => s.exam_id !== exam.id);
+        if (exam.scope === 'full_course' && exam.exam_pool) {
+          filtered = filtered.filter(
+            (s) =>
+              !(s.scope === 'full_course' && s.exam_pool === exam.exam_pool),
+          );
+        }
+        const updated = [...filtered, snapshot];
+
+        // Cap unit/sub_unit entries to prevent unbounded JSONB growth.
+        // Group by (scope, exam_pool, scope_ids key), keep only the 10 most recent per group.
+        const groups = new Map<string, ExamScoreSnapshot[]>();
+        for (const s of updated) {
+          const key = `${s.scope}:${s.exam_pool ?? 'scoped'}:${(s.scope_refs ?? []).join(',')}`;
+          const arr = groups.get(key) ?? [];
+          arr.push(s);
+          groups.set(key, arr);
+        }
+        const capped: ExamScoreSnapshot[] = [];
+        for (const arr of groups.values()) {
+          arr.sort(
+            (a, b) =>
+              new Date(b.taken_at).getTime() - new Date(a.taken_at).getTime(),
+          );
+          capped.push(...arr.slice(0, 10));
+        }
+        // Column-scoped update: a full save() would write back this request's
+        // stale copy of unit_statuses over a concurrent unit write (R3/R17).
+        await manager
+          .getRepository(Progress)
+          .update(
+            { id: progress.id },
+            exam.scope === 'full_course' && exam.exam_pool === 'final_only'
+              ? { exam_scores: capped, latest_exam_score: score }
+              : { exam_scores: capped },
+          );
       });
-      if (!progress) return;
-
-      const snapshot: ExamScoreSnapshot = {
-        exam_id: exam.id,
-        scope: exam.scope,
-        scope_refs: exam.scope_refs ?? [],
-        exam_pool: exam.exam_pool ?? 'scoped',
-        score,
-        section_breakdown: breakdown,
-        taken_at: new Date().toISOString(),
-      };
-
-      const existing = progress.exam_scores ?? [];
-      // Replace snapshot for same exam_id; for full_course also drop older same-pool rows
-      let filtered = existing.filter((s) => s.exam_id !== exam.id);
-      if (exam.scope === 'full_course' && exam.exam_pool) {
-        filtered = filtered.filter(
-          (s) => !(s.scope === 'full_course' && s.exam_pool === exam.exam_pool),
-        );
-      }
-      const updated = [...filtered, snapshot];
-
-      // Cap unit/sub_unit entries to prevent unbounded JSONB growth.
-      // Group by (scope, exam_pool, scope_ids key), keep only the 10 most recent per group.
-      const groups = new Map<string, ExamScoreSnapshot[]>();
-      for (const s of updated) {
-        const key = `${s.scope}:${s.exam_pool ?? 'scoped'}:${(s.scope_refs ?? []).join(',')}`;
-        const arr = groups.get(key) ?? [];
-        arr.push(s);
-        groups.set(key, arr);
-      }
-      const capped: ExamScoreSnapshot[] = [];
-      for (const arr of groups.values()) {
-        arr.sort(
-          (a, b) =>
-            new Date(b.taken_at).getTime() - new Date(a.taken_at).getTime(),
-        );
-        capped.push(...arr.slice(0, 10));
-      }
-      progress.exam_scores = capped;
-
-      if (exam.scope === 'full_course' && exam.exam_pool === 'final_only') {
-        progress.latest_exam_score = score;
-      }
-
-      await this.progressRepository.save(progress);
     } catch (err) {
       // Non-fatal — the attempt is already saved; progress denormalization
       // failing should not roll back the score submission.

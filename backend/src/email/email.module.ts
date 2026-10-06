@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailController } from './email.controller';
 import { EmailService } from './email.service';
+import { MarketingMailerService } from './marketing-mailer.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { EmailService } from './email.service';
     }),
   ],
   controllers: [EmailController],
-  providers: [EmailService],
-  exports: [EmailService],
+  providers: [EmailService, MarketingMailerService],
+  exports: [EmailService, MarketingMailerService],
 })
 export class EmailModule {}

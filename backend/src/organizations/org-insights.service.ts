@@ -10,8 +10,28 @@ import {
   OrgEngagementResponse,
   OrgUtilizationResponse,
 } from './types/organization.dto';
+import {
+  ENGAGEMENT_SQL,
+  localDayOf,
+  localDayStart,
+  localToday,
+  orgCoursesSql,
+  RAW_RECENT_DAYS,
+} from '../product-events/engagement-sql';
 
-const HEARTBEAT_MINUTES = 0.5;
+/**
+ * A window of `days` local days ending today, split at RAW_RECENT_DAYS:
+ * `rolledDays` is the SQL condition on product_events_daily.day, `rawFrom`
+ * the local-day offset raw product_events are read from.
+ */
+function windowSplit(days: number, tz: string) {
+  const rawBack = Math.min(days, RAW_RECENT_DAYS) - 1;
+  return {
+    rolledDays: (col: string) =>
+      `${col} >= ${localToday(tz)} - ${days - 1} AND ${col} < ${localToday(tz)} - ${rawBack}`,
+    rawFrom: localDayStart(tz, rawBack),
+  };
+}
 
 /**
  * Manager-facing engagement reads (docs/tech/manager-progress-visibility.md § 6).
@@ -21,21 +41,38 @@ const HEARTBEAT_MINUTES = 0.5;
  * partition — never the nightly materialized views — so a teacher sees what
  * happened in class this morning. All queries are scoped by organization id
  * and the caller has already passed OrgManagerGuard.
+ *
+ * Days are the organization's local days (organizations.timezone, PTD4).
+ * Local today and yesterday are read raw and aggregated per user × course ×
+ * local day with ENGAGEMENT_SQL — the exact definitions the rollup uses —
+ * so a day's number does not change when it moves into the rollup. Only
+ * org-assigned courses count, and only `member` rows are students (PTD5).
  */
 @Injectable()
 export class OrgInsightsService {
   constructor(private readonly dataSource: DataSource) {}
+
+  async orgTimezone(orgId: number): Promise<string> {
+    const rows: { timezone: string }[] = await this.dataSource.query(
+      `SELECT timezone FROM organizations WHERE id = $1`,
+      [orgId],
+    );
+    return rows[0]?.timezone ?? 'UTC';
+  }
 
   /**
    * Adds minutes_7d / videos / exams to the summary rows in two set queries
    * (one per source) rather than one query per member × course.
    */
   async enrichSummary(
+    orgId: number,
     rows: MemberCourseProgressSummary[],
   ): Promise<MemberCourseProgressSummary[]> {
     if (!rows.length) return rows;
     const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
     const courseIds = Array.from(new Set(rows.map((r) => r.course_id)));
+    const timezone = await this.orgTimezone(orgId);
+    const week = windowSplit(7, '$3::text');
 
     const [minutes, videos, videoTotals, exams] = await Promise.all([
       this.dataSource.query(
@@ -43,15 +80,15 @@ export class OrgInsightsService {
            SELECT user_id, course_id, minutes_engaged AS minutes
            FROM product_events_daily
            WHERE user_id = ANY($1::int[]) AND course_id = ANY($2::int[])
-             AND day >= CURRENT_DATE - 6 AND day < CURRENT_DATE
+             AND ${week.rolledDays('day')}
            UNION ALL
-           SELECT user_id, course_id, COUNT(*) * $3::numeric
-           FROM product_events
-           WHERE user_id = ANY($1::int[]) AND course_id = ANY($2::int[])
-             AND event_name = 'lesson_heartbeat' AND occurred_at >= CURRENT_DATE::timestamptz
-           GROUP BY user_id, course_id
+           SELECT pe.user_id, pe.course_id, ${ENGAGEMENT_SQL.minutes}
+           FROM product_events pe
+           WHERE pe.user_id = ANY($1::int[]) AND pe.course_id = ANY($2::int[])
+             AND pe.event_name = 'lesson_heartbeat' AND pe.occurred_at >= ${week.rawFrom}
+           GROUP BY pe.user_id, pe.course_id, ${localDayOf('pe.occurred_at', '$3::text')}
          ) m GROUP BY user_id, course_id`,
-        [userIds, courseIds, HEARTBEAT_MINUTES],
+        [userIds, courseIds, timezone],
       ) as Promise<{ user_id: number; course_id: number; minutes: string }[]>,
       this.dataSource.query(
         `SELECT user_id, course_id, COUNT(*) FILTER (WHERE completed)::int AS completed
@@ -252,7 +289,11 @@ export class OrgInsightsService {
     days: number,
     classId?: number,
   ): Promise<OrgEngagementResponse> {
-    const d = Math.min(Math.max(days, 1), 90);
+    const d = Math.min(Math.max(Math.floor(days) || 1, 1), 90);
+    const timezone = await this.orgTimezone(orgId);
+    const tz = '$3::text';
+    const win = windowSplit(d, tz);
+    const orgCourses = orgCoursesSql('$1');
     const members: MemberEngagementRow[] = await this.dataSource.query(
       `WITH mem AS (
          SELECT m.user_id, m.class_id, u.username, u.first_name, u.last_name
@@ -270,21 +311,33 @@ export class OrgInsightsService {
                 COUNT(DISTINCT d.day)      AS active_days
          FROM product_events_daily d
          WHERE d.user_id IN (SELECT user_id FROM mem)
-           AND d.day >= CURRENT_DATE - ($3::int - 1) AND d.day < CURRENT_DATE
+           AND d.course_id IN ${orgCourses}
+           AND ${win.rolledDays('d.day')}
          GROUP BY d.user_id
        ),
-       today AS (
-         SELECT pe.user_id,
-                COUNT(*) FILTER (WHERE event_name = 'lesson_heartbeat') * $4::numeric AS minutes,
-                COUNT(*) FILTER (WHERE event_name = 'lesson_viewed')     AS lessons_viewed,
-                COUNT(*) FILTER (WHERE event_name = 'video_completed')   AS videos_completed,
-                COUNT(*) FILTER (WHERE event_name IN ('unit_completed', 'lesson_completed')) AS units_completed,
-                COUNT(*) FILTER (WHERE event_name = 'exam_submitted')    AS exams_submitted,
-                CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END                 AS active_days
-         FROM product_events pe
-         WHERE pe.user_id IN (SELECT user_id FROM mem)
-           AND pe.occurred_at >= CURRENT_DATE::timestamptz
-         GROUP BY pe.user_id
+       recent AS (
+         SELECT t.user_id,
+                SUM(t.minutes)            AS minutes,
+                SUM(t.lessons_viewed)     AS lessons_viewed,
+                SUM(t.videos_completed)   AS videos_completed,
+                SUM(t.units_completed)    AS units_completed,
+                SUM(t.exams_submitted)    AS exams_submitted,
+                COUNT(DISTINCT t.day)     AS active_days
+         FROM (
+           SELECT pe.user_id,
+                  ${localDayOf('pe.occurred_at', tz)} AS day,
+                  ${ENGAGEMENT_SQL.minutes}         AS minutes,
+                  ${ENGAGEMENT_SQL.lessonsViewed}   AS lessons_viewed,
+                  ${ENGAGEMENT_SQL.videosCompleted} AS videos_completed,
+                  ${ENGAGEMENT_SQL.unitsCompleted}  AS units_completed,
+                  ${ENGAGEMENT_SQL.examsSubmitted}  AS exams_submitted
+           FROM product_events pe
+           WHERE pe.user_id IN (SELECT user_id FROM mem)
+             AND pe.course_id IN ${orgCourses}
+             AND pe.occurred_at >= ${win.rawFrom}
+           GROUP BY pe.user_id, pe.course_id, 2
+         ) t
+         GROUP BY t.user_id
        )
        SELECT mem.user_id, mem.username, mem.first_name, mem.last_name, mem.class_id,
               ROUND(COALESCE(r.minutes, 0) + COALESCE(t.minutes, 0), 1)::float AS minutes,
@@ -293,35 +346,38 @@ export class OrgInsightsService {
               (COALESCE(r.units_completed, 0) + COALESCE(t.units_completed, 0))::int AS units_completed,
               (COALESCE(r.exams_submitted, 0) + COALESCE(t.exams_submitted, 0))::int AS exams_submitted,
               (COALESCE(r.active_days, 0) + COALESCE(t.active_days, 0))::int AS active_days,
-              (SELECT MAX(p.last_activity_at) FROM progress p WHERE p."userId" = mem.user_id) AS last_activity_at
+              (SELECT MAX(p.last_activity_at) FROM progress p
+                WHERE p."userId" = mem.user_id AND p."courseId" IN ${orgCourses}) AS last_activity_at
        FROM mem
        LEFT JOIN rolled r ON r.user_id = mem.user_id
-       LEFT JOIN today  t ON t.user_id = mem.user_id
+       LEFT JOIN recent t ON t.user_id = mem.user_id
        ORDER BY minutes DESC, mem.username`,
-      [orgId, classId ?? null, d, HEARTBEAT_MINUTES],
+      [orgId, classId ?? null, timezone],
     );
 
     const series: { day: string; minutes: number; active_members: number }[] =
       await this.dataSource.query(
         `SELECT to_char(day, 'YYYY-MM-DD') AS day,
                 ROUND(SUM(minutes), 1)::float AS minutes,
-                COUNT(DISTINCT user_id)::int AS active_members
+                COUNT(DISTINCT user_id) FILTER (WHERE minutes > 0)::int AS active_members
          FROM (
            SELECT d.day, d.user_id, d.minutes_engaged AS minutes
            FROM product_events_daily d
            JOIN organization_members m ON m.user_id = d.user_id AND m.organization_id = $1 AND m.role = 'member'
-           WHERE d.day >= CURRENT_DATE - ($2::int - 1) AND d.day < CURRENT_DATE
-             AND ($3::int IS NULL OR m.class_id = $3)
+           WHERE ${win.rolledDays('d.day')}
+             AND d.course_id IN ${orgCourses}
+             AND ($2::int IS NULL OR m.class_id = $2)
            UNION ALL
-           SELECT CURRENT_DATE, pe.user_id, COUNT(*) * $4::numeric
+           SELECT ${localDayOf('pe.occurred_at', tz)}, pe.user_id, ${ENGAGEMENT_SQL.minutes}
            FROM product_events pe
            JOIN organization_members m ON m.user_id = pe.user_id AND m.organization_id = $1 AND m.role = 'member'
-           WHERE pe.event_name = 'lesson_heartbeat' AND pe.occurred_at >= CURRENT_DATE::timestamptz
-             AND ($3::int IS NULL OR m.class_id = $3)
-           GROUP BY pe.user_id
+           WHERE pe.event_name = 'lesson_heartbeat' AND pe.occurred_at >= ${win.rawFrom}
+             AND pe.course_id IN ${orgCourses}
+             AND ($2::int IS NULL OR m.class_id = $2)
+           GROUP BY pe.user_id, pe.course_id, 1
          ) s
          GROUP BY day ORDER BY day`,
-        [orgId, d, classId ?? null, HEARTBEAT_MINUTES],
+        [orgId, classId ?? null, timezone],
       );
 
     return { days: d, members, series };
@@ -371,8 +427,9 @@ export class OrgInsightsService {
          ) mp ON true
          LEFT JOIN LATERAL (
            SELECT SUM(minutes_engaged) AS minutes_total,
-                  SUM(minutes_engaged) FILTER (WHERE day >= CURRENT_DATE - 30) AS minutes_30d
-           FROM product_events_daily d WHERE d.organization_id = o.id
+                  SUM(minutes_engaged) FILTER (WHERE day >= ${localToday('o.timezone')} - 29) AS minutes_30d
+           FROM product_events_daily d
+           WHERE d.organization_id = o.id AND d.course_id IN ${orgCoursesSql('o.id')}
          ) hrs ON true
          WHERE o.id = $1`,
         [orgId],
@@ -395,6 +452,7 @@ export class OrgInsightsService {
        LEFT JOIN course_units cu ON cu.course_id = pe.course_id AND cu.ref = pe.unit_ref
        WHERE pe.user_id = $2 AND pe.occurred_at >= now() - interval '30 days'
          AND pe.event_name <> 'lesson_heartbeat'
+         AND pe.course_id IN ${orgCoursesSql('$1')}
        ORDER BY pe.occurred_at DESC
        LIMIT $3`,
       [orgId, userId, Math.min(limit, 500)],
@@ -414,7 +472,11 @@ export class OrgInsightsService {
        WHERE organization_id = $1 AND user_id = $2 LIMIT 1`,
       [orgId, userId],
     );
-    if (!member) throw new NotFoundException('Member not found in this organization.');
+    if (!member)
+      throw new NotFoundException('Member not found in this organization.');
+    const timezone = await this.orgTimezone(orgId);
+    const week = windowSplit(7, '$3::text');
+    const orgCourses = orgCoursesSql('$2');
 
     const lessonTitleSql = `COALESCE(
       NULLIF((
@@ -439,32 +501,37 @@ export class OrgInsightsService {
          FROM exam_attempt_history h
          LEFT JOIN exams e ON e.id = h.exam_id
          LEFT JOIN courses c ON c.id = h.course_id
-         WHERE h.user_id = $1
+         WHERE h.user_id = $1 AND h.course_id IN ${orgCourses}
          ORDER BY h.submitted_at DESC`,
-        [userId],
+        [userId, orgId],
       ) as Promise<MemberQuizAttempt[]>,
       this.dataSource.query(
         `SELECT
            COUNT(*) FILTER (WHERE pe.event_name IN ('exam_start', 'exam_started'))::int AS starts,
            COUNT(*) FILTER (WHERE pe.event_name IN ('exam_submit', 'exam_submitted'))::int AS submits
          FROM product_events pe
-         WHERE pe.user_id = $1 AND pe.occurred_at >= now() - interval '30 days'`,
-        [userId],
+         WHERE pe.user_id = $1 AND pe.occurred_at >= now() - interval '30 days'
+           AND pe.course_id IN ${orgCourses}`,
+        [userId, orgId],
       ) as Promise<{ starts: number; submits: number }[]>,
       this.dataSource.query(
         `SELECT COALESCE(SUM(minutes), 0)::float AS minutes FROM (
            SELECT minutes_engaged AS minutes FROM product_events_daily
-           WHERE user_id = $1 AND day >= CURRENT_DATE - 6 AND day < CURRENT_DATE
+           WHERE user_id = $1 AND course_id IN ${orgCourses}
+             AND ${week.rolledDays('day')}
            UNION ALL
-           SELECT COUNT(*) * $2::numeric FROM product_events
-           WHERE user_id = $1 AND event_name = 'lesson_heartbeat'
-             AND occurred_at >= CURRENT_DATE::timestamptz
+           SELECT ${ENGAGEMENT_SQL.minutes} FROM product_events pe
+           WHERE pe.user_id = $1 AND pe.event_name = 'lesson_heartbeat'
+             AND pe.course_id IN ${orgCourses}
+             AND pe.occurred_at >= ${week.rawFrom}
+           GROUP BY pe.course_id, ${localDayOf('pe.occurred_at', '$3::text')}
          ) s`,
-        [userId, HEARTBEAT_MINUTES],
+        [userId, orgId, timezone],
       ) as Promise<{ minutes: number }[]>,
       this.dataSource.query(
-        `SELECT MAX(last_activity_at) AS last_activity_at FROM progress WHERE "userId" = $1`,
-        [userId],
+        `SELECT MAX(last_activity_at) AS last_activity_at FROM progress
+         WHERE "userId" = $1 AND "courseId" IN ${orgCourses}`,
+        [userId, orgId],
       ) as Promise<{ last_activity_at: Date | null }[]>,
     ]);
 
@@ -476,25 +543,27 @@ export class OrgInsightsService {
       list.push(a);
       byKey.set(k, list);
     }
-    const quizzes: MemberQuizSummary[] = Array.from(byKey.values()).map((list) => {
-      const newest = list[0];
-      const oldest = list[list.length - 1];
-      const scores = list.map((x) => Number(x.score));
-      return {
-        course_id: newest.course_id,
-        course_title: newest.course_title,
-        scope: newest.scope,
-        exam_pool: newest.exam_pool,
-        scope_ref: newest.scope_refs?.[0] || '',
-        title: newest.title,
-        attempts: list.length,
-        best: Math.max(...scores),
-        latest: Number(newest.score),
-        first: Number(oldest.score),
-        passed: list.some((x) => x.passed),
-        last_submitted_at: newest.submitted_at,
-      };
-    });
+    const quizzes: MemberQuizSummary[] = Array.from(byKey.values()).map(
+      (list) => {
+        const newest = list[0];
+        const oldest = list[list.length - 1];
+        const scores = list.map((x) => Number(x.score));
+        return {
+          course_id: newest.course_id,
+          course_title: newest.course_title,
+          scope: newest.scope,
+          exam_pool: newest.exam_pool,
+          scope_ref: newest.scope_refs?.[0] || '',
+          title: newest.title,
+          attempts: list.length,
+          best: Math.max(...scores),
+          latest: Number(newest.score),
+          first: Number(oldest.score),
+          passed: list.some((x) => x.passed),
+          last_submitted_at: newest.submitted_at,
+        };
+      },
+    );
     quizzes.sort(
       (a, b) =>
         new Date(b.last_submitted_at).getTime() -
@@ -503,18 +572,22 @@ export class OrgInsightsService {
 
     const startsRow = starts[0] ?? { starts: 0, submits: 0 };
     const minutes7d = Math.round((Number(minutes[0]?.minutes) || 0) * 10) / 10;
-    const lastAt = activity[0]?.last_activity_at ?? attempts[0]?.submitted_at ?? null;
+    const lastAt =
+      activity[0]?.last_activity_at ?? attempts[0]?.submitted_at ?? null;
     const best = quizzes.reduce((m, q) => Math.max(m, Number(q.best) || 0), 0);
     const taken = attempts.length;
     const chronological = [...attempts].sort(
-      (a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime(),
+      (a, b) =>
+        new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime(),
     );
 
     return {
       effort: quizEffort({
         best_exam_score: taken ? best : null,
         exams_taken: taken,
-        first_exam_score: chronological[0] ? Number(chronological[0].score) : null,
+        first_exam_score: chronological[0]
+          ? Number(chronological[0].score)
+          : null,
         latest_exam_score: chronological.length
           ? Number(chronological[chronological.length - 1].score)
           : null,
@@ -596,7 +669,10 @@ export class OrgInsightsService {
   }
 }
 
-function isRecent(iso: Date | string | null | undefined, days: number): boolean {
+function isRecent(
+  iso: Date | string | null | undefined,
+  days: number,
+): boolean {
   if (!iso) return false;
   const t = new Date(iso).getTime();
   if (!Number.isFinite(t)) return false;
@@ -624,7 +700,8 @@ export function quizEffort(r: {
     r.first_exam_score != null &&
     r.latest_exam_score != null &&
     r.latest_exam_score > r.first_exam_score;
-  if (r.exams_taken >= 2 && !improving) return recent ? 'struggling' : 'stopped';
+  if (r.exams_taken >= 2 && !improving)
+    return recent ? 'struggling' : 'stopped';
   if (!recent) return 'stopped';
   return 'trying';
 }

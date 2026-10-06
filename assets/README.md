@@ -20,6 +20,7 @@ assets/
 │   ├── drafts/         Editorial text drafts (.txt)
 │   ├── import/         Import JSON payloads for the admin editor / API
 │   └── images/         Hero + inline article images
+├── newsletter/         Field Notes issues (YYYY-MM.md) + _template.md
 ├── visuals/            Brand kit from the designer (logo, colors, fonts, mockups, social)
 ├── media/              Marketing drone flight footage — masters + edits (mostly gitignored)
 ├── archive/            Ad-hoc logs and scratch files (not product content)
@@ -29,6 +30,7 @@ assets/
 |--------|----------------|
 | [`courses/`](courses/) | [`workflows/tech/content-build.md`](../workflows/tech/content-build.md) · [`workflows/tech/course-images.md`](../workflows/tech/course-images.md) |
 | [`articles/`](articles/) | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
+| [`newsletter/`](newsletter/) | [`workflows/marketing/newsletter.md`](../workflows/marketing/newsletter.md) |
 | [`visuals/`](visuals/) | [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) · merch: [`docs/marketing/merch.md`](../docs/marketing/merch.md) |
 | [`media/`](media/) | [`media/README.md`](media/README.md) · [`docs/marketing/brand-assets.md`](../docs/marketing/brand-assets.md) |
 

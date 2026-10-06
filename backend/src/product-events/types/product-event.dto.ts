@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
@@ -13,7 +13,7 @@ import {
   IsUUID,
   MaxLength,
   Min,
-  ValidateNested,
+  validateSync,
 } from 'class-validator';
 
 /**
@@ -25,6 +25,8 @@ export const MARKETING_EVENTS = [
   'article_view',
   'course_view',
   'pricing_viewed',
+  /** Waitlist / email capture — recorded server-side by POST /leads only. */
+  'lead_captured',
 ] as const;
 
 export const LEARNING_EVENTS = [
@@ -86,6 +88,8 @@ export const LIFECYCLE_EVENTS = [
 ] as const;
 
 export const B2B_EVENTS = [
+  /** Recorded server-side by POST /email/consultation (anonymous, no PII). */
+  'consultation_submitted',
   'invite_sent',
   'invite_redeemed',
   'manager_dashboard_viewed',
@@ -179,12 +183,15 @@ export class AnalyticsEventDto {
  * event using the AnalyticsEventDto fields directly (legacy helpers).
  */
 export class AnalyticsPayloadDto extends AnalyticsEventDto {
+  /**
+   * Validated per event in the controller (validateAnalyticsEvents), not here:
+   * one malformed event must cost only itself, not the 19 heartbeats batched
+   * with it (R10, docs/tech/progress-tracking-accuracy.md).
+   */
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(50)
-  @ValidateNested({ each: true })
-  @Type(() => AnalyticsEventDto)
-  events?: AnalyticsEventDto[];
+  events?: unknown[];
 
   /**
    * First-party anonymous id (random UUID in localStorage). Carried in the body
@@ -211,4 +218,29 @@ export interface VideoResume {
   position_seconds: number;
   percent_watched: number;
   completed: boolean;
+}
+
+/**
+ * Validates each raw batch item on its own, whitelisting unknown fields.
+ * Returns the valid events and how many were rejected.
+ */
+export function validateAnalyticsEvents(raw: unknown[]): {
+  valid: AnalyticsEventDto[];
+  invalid: number;
+} {
+  const valid: AnalyticsEventDto[] = [];
+  let invalid = 0;
+  for (const item of raw) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      invalid += 1;
+      continue;
+    }
+    const ev = plainToInstance(AnalyticsEventDto, item);
+    if (validateSync(ev, { whitelist: true }).length) {
+      invalid += 1;
+      continue;
+    }
+    valid.push(ev);
+  }
+  return { valid, invalid };
 }

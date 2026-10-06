@@ -68,6 +68,8 @@ has_access(course) =
 
 ## B2B — School packages (structure)
 
+**Public floor (decided 2026-10-03):** **starting at $79/seat** — shown on `/pricing` with "many options available — book a call". No quote goes below $79/seat; tier prices below stay per-quote above that floor.
+
 Fill **seat cap**, **term**, and **price** on each quote. Suggested naming:
 
 ### Pilot

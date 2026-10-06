@@ -14,6 +14,8 @@ Initial **build / assembly** course intake. Not in the catalog. No `*_course.jso
 | [`reference/build-steps-joe-v1.md`](reference/build-steps-joe-v1.md) | **build v1, Sep 12** | Joe's bench build of the v4 electronics, transcribed. First build rather than a plan: confirms the 20-joint tally and the Pre-soldered SKU boundary; adds a **fault-isolation tree** Unit 6 lacks. Conflicts C1–C7 (Tony 5 frame, XT60 pigtail, assembly order) in § 3; parts to confirm in § 4; photo/diagram shot list in § 7. Figures: [`reference/build-figures/`](reference/build-figures/README.md) — **vendor art, internal only** |
 | [`reference/soldering-lab.md`](reference/soldering-lab.md) | research note, Sep 9 | Classroom soldering station cost (budget/standard/top-up tiers), class sizing, safety and published guidance, iron time, kit options A–D with the Pre-soldered SKU derivation, and the **course 2 "Drone Repair and Custom Builds" proposal (not locked)** |
 | [`reference/cad-sim-extensions.md`](reference/cad-sim-extensions.md) | research note, Sep 16 | Print vs CNC, DXF vs CAM blocker, canopy materials, kit-pack markup context, Isaac Lab vs FreeCAD vs Betaflight SITL (shared plant, not shared brain), Unit 5/8 / course 2 hooks; continue from § 8 |
+| [`reference/quiet-drone-research.md`](reference/quiet-drone-research.md) | research note, Oct 2 | Bladeless-fan lift (poor), drone noise sources and limits, Tier 0–3 quieting path, printing props (resin vs FDM, safety), thrust-stand + mic kit and equal-thrust test protocol; possible lab |
+| [`reference/hover-rpm-and-twr.md`](reference/hover-rpm-and-twr.md) | Unit 4 note, Oct 4 (to look at) | Hover RPM ≈ max RPM ÷ √(T/W); why T/W alone doesn't slow the blades; Base kit worked example (7:1, ~15,100 rpm hover); class exercises |
 | [`reference/parts-list-draft-v1.md`](reference/parts-list-draft-v1.md) | parts v1 (superseded for parts) | Still current: frame material table, Part 107 module rules, goggles options, material-choice mechanism, v1 desk check |
 | [`reference/getfpv-quote-2026-09-08.pdf`](reference/getfpv-quote-2026-09-08.pdf) | source | Joe's quote (six lines, $364.91) |
 | [`reference/parts-list-template.md`](reference/parts-list-template.md) | template | Blank parts list for future kit revisions |
@@ -25,4 +27,4 @@ Superseded files removed Sep 8 2026 (in git history at `8183817`): v0 `joe-drone
 
 Open work is tracked in [`docs/TODO.md`](../../../docs/TODO.md) § Drone-building course.
 
-Do not publish or add a homepage track from this folder. Part 107 remains canonical in [`faa-107/`](../faa-107/).
+Do not publish course JSON from this folder yet. Since Oct 2026 the site has a marketing-only **early-access page** (`/courses/tracks/building`, "January 2027", waitlist — launch plan W2) and a home-page card pointing to it; any copy change there must stay consistent with the outline and parts list here. Part 107 remains canonical in [`faa-107/`](../faa-107/).

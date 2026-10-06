@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { confirmCourseCheckout, getCourseById } from '@/app/lib/api-client';
+import { confirmCourseCheckout, confirmProCheckout, getCourseById } from '@/app/lib/api-client';
 import { trackCourseView } from '@/app/lib/analytics';
 import CourseComponent from '@/app/ui/components/course';
 import LoadingComponent from '@/app/ui/components/loading';
@@ -24,9 +24,10 @@ function SingleCoursePage() {
     const openPurchase = searchParams.get(PURCHASE_QUERY) === '1';
     // Return from Stripe Checkout: course purchase (?purchase=success&session_id=…) or Pro (?pro=success).
     // Snapshotted once: the URL is cleaned below, which would otherwise re-run the effect mid-poll.
-    const [{ returnedFromCheckout, checkoutSessionId }] = useState(() => ({
+    const [{ returnedFromCheckout, checkoutSessionId, proCheckout }] = useState(() => ({
         returnedFromCheckout: searchParams.get(PURCHASE_QUERY) === 'success' || searchParams.get('pro') === 'success',
         checkoutSessionId: searchParams.get('session_id'),
+        proCheckout: searchParams.get('pro') === 'success',
     }));
     const [course, setCourse] = useState<CourseData | null>(null);
     const [error, setError] = useState<Error | null>(null);
@@ -49,7 +50,11 @@ function SingleCoursePage() {
             for (let attempt = 1; attempt <= POLL_ATTEMPTS && !latest.has_access && !cancelled; attempt++) {
                 if (attempt === CONFIRM_AFTER_ATTEMPT && checkoutSessionId) {
                     try {
-                        await confirmCourseCheckout(checkoutSessionId);
+                        if (proCheckout) {
+                            await confirmProCheckout(checkoutSessionId);
+                        } else {
+                            await confirmCourseCheckout(checkoutSessionId);
+                        }
                     } catch (e) {
                         console.warn('confirm-checkout fallback failed', e);
                     }
@@ -97,7 +102,7 @@ function SingleCoursePage() {
         return () => {
             cancelled = true;
         };
-    }, [courseId, returnedFromCheckout, checkoutSessionId]);
+    }, [courseId, returnedFromCheckout, checkoutSessionId, proCheckout]);
 
     if (loading) {
         return <LoadingComponent />;

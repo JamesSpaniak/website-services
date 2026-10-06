@@ -13,7 +13,7 @@ export type ProductEventName =
     | 'checkout_started' | 'purchase_completed' | 'pro_checkout_started' | 'billing_portal_opened'
     | 'upsell_shown' | 'upsell_accepted' | 'upsell_declined'
     | 'downsell_shown' | 'downsell_accepted' | 'downsell_declined'
-    | 'kit_lead' | 'parts_list_downloaded' | 'outbound_vendor_click' | 'referral_clicked'
+    | 'kit_lead' | 'parts_list_downloaded' | 'outbound_vendor_click' | 'referral_clicked' | 'lead_captured'
     | 'signup_started' | 'signup_completed' | 'login' | 'email_verified' | 'identified'
     | 'invite_sent' | 'invite_redeemed' | 'manager_dashboard_viewed' | 'org_progress_exported' | 'class_created'
     | 'feature_used';

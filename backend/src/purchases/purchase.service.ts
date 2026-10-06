@@ -21,6 +21,7 @@ import { AuditAction } from 'src/audit/types/audit-action.enum';
 import { EntitlementService } from 'src/commerce/entitlement.service';
 import { OrderService } from 'src/commerce/order.service';
 import { ProductEventsService } from 'src/product-events/product-events.service';
+import { withEventOrigin } from 'src/product-events/event-origin';
 
 const PRODUCT_COURSE = 'course';
 const PRODUCT_PRO = 'pro_membership';
@@ -40,6 +41,19 @@ export class PurchaseService {
     .getMeter('droneedge')
     .createCounter('orders.record_failures', {
       description: 'Stripe course payments granted without an orders row',
+    });
+  /** Pro invoice payments that failed (invoice.payment_failed for a known user). */
+  private readonly paymentFailures = metrics
+    .getMeter('droneedge')
+    .createCounter('stripe.payments_failed', {
+      description: 'Pro subscription invoice payments that failed',
+    });
+  /** Webhook deliveries answered non-2xx (Stripe will retry). */
+  private readonly webhookFailures = metrics
+    .getMeter('droneedge')
+    .createCounter('stripe.webhook.failures', {
+      description:
+        'Stripe webhook deliveries rejected or failed while processing',
     });
 
   constructor(
@@ -408,6 +422,7 @@ export class PurchaseService {
   async createCourseCheckoutSession(
     userId: number,
     courseId: number,
+    promoCode?: string,
   ): Promise<{ url: string }> {
     const { course, user } = await this.assertCoursePurchasable(
       userId,
@@ -421,31 +436,43 @@ export class PurchaseService {
       courseId: String(courseId),
       productType: PRODUCT_COURSE,
     };
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'payment',
-      customer: customerId,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'usd',
-            unit_amount: Math.round(Number(course.price) * 100),
-            product_data: { name: course.title },
+    const session = await this.createCheckoutSessionWithPromo(
+      {
+        mode: 'payment',
+        customer: customerId,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'usd',
+              unit_amount: Math.round(Number(course.price) * 100),
+              product_data: { name: course.title },
+            },
           },
-        },
-      ],
-      success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
-      client_reference_id: String(userId),
-      metadata,
-      payment_intent_data: { metadata },
-      billing_address_collection: 'auto',
-      allow_promotion_codes: false,
-    });
+        ],
+        success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
+        client_reference_id: String(userId),
+        metadata,
+        payment_intent_data: { metadata },
+        billing_address_collection: 'auto',
+      },
+      promoCode,
+    );
 
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
     }
+    void this.productEvents.record({
+      userId,
+      event: 'checkout_started',
+      courseId,
+      properties: {
+        price_cents: Math.round(Number(course.price) * 100),
+        promo_code: promoCode ?? null,
+        promo_applied: !!session.discounts?.length,
+      },
+    });
     return { url: session.url };
   }
 
@@ -480,6 +507,47 @@ export class PurchaseService {
   }
 
   /**
+   * Pro counterpart of confirmCheckoutSession: after the Checkout redirect,
+   * activates Pro from the session itself if the webhook hasn't yet (same
+   * code path as checkout.session.completed, so repeating it is harmless).
+   */
+  async confirmProCheckoutSession(
+    userId: number,
+    sessionId: string,
+  ): Promise<{ active: boolean }> {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    if (session.mode !== 'subscription') {
+      throw new BadRequestException('Not a Pro checkout session.');
+    }
+    const owner = session.metadata?.userId ?? session.client_reference_id;
+    if (String(owner) !== String(userId)) {
+      throw new ForbiddenException(
+        'This payment belongs to a different account.',
+      );
+    }
+    if (session.status !== 'complete') {
+      throw new BadRequestException('Payment has not completed yet.');
+    }
+    // Already activated (webhook or an earlier call): skip the re-sync, which
+    // would bump token_version and force another session refresh for nothing.
+    const subscriptionId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id;
+    const current = await this.userRepository.findOneBy({ id: userId });
+    if (
+      current &&
+      this.isActivePro(current) &&
+      current.stripe_subscription_id === subscriptionId
+    ) {
+      return { active: true };
+    }
+    await this.fulfillProCheckoutSession(session);
+    const user = await this.userRepository.findOneBy({ id: userId });
+    return { active: !!user && this.isActivePro(user) };
+  }
+
+  /**
    * Monthly (or yearly) Pro subscription via Stripe Checkout.
    * Active Pro grants access to all courses until the subscription ends.
    */
@@ -488,6 +556,7 @@ export class PurchaseService {
     duration: ProMembershipDuration = ProMembershipDuration.Monthly,
     successPath = '/profile?pro=success',
     cancelPath = '/profile?pro=canceled',
+    promoCode?: string,
   ): Promise<{ url: string }> {
     const priceId = this.proPriceIdFor(duration);
     if (!priceId) {
@@ -509,33 +578,96 @@ export class PurchaseService {
 
     const customerId = await this.ensureStripeCustomer(user);
     const frontend = this.frontendBaseUrl();
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'subscription',
-      customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${frontend}${this.sanitizePath(successPath)}`,
-      cancel_url: `${frontend}${this.sanitizePath(cancelPath)}`,
-      client_reference_id: String(userId),
-      metadata: {
-        userId: String(userId),
-        productType: PRODUCT_PRO,
-        duration,
-      },
-      subscription_data: {
+    const success = this.sanitizePath(successPath);
+    const session = await this.createCheckoutSessionWithPromo(
+      {
+        mode: 'subscription',
+        customer: customerId,
+        line_items: [{ price: priceId, quantity: 1 }],
+        // session_id lets the return page call confirm-pro-checkout if the webhook is late.
+        success_url: `${frontend}${success}${success.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontend}${this.sanitizePath(cancelPath)}`,
+        client_reference_id: String(userId),
         metadata: {
           userId: String(userId),
           productType: PRODUCT_PRO,
           duration,
         },
+        subscription_data: {
+          metadata: {
+            userId: String(userId),
+            productType: PRODUCT_PRO,
+            duration,
+          },
+        },
+        billing_address_collection: 'auto',
       },
-      billing_address_collection: 'auto',
-      allow_promotion_codes: false,
-    });
+      promoCode,
+    );
 
     if (!session.url) {
       throw new BadRequestException('Stripe did not return a Checkout URL.');
     }
+    void this.productEvents.record({
+      userId,
+      event: 'pro_checkout_started',
+      properties: {
+        duration,
+        promo_code: promoCode ?? null,
+        promo_applied: !!session.discounts?.length,
+      },
+    });
     return { url: session.url };
+  }
+
+  /**
+   * Launch promo codes (T21). A `?promo=` code that matches an active Stripe
+   * promotion code is pre-applied; otherwise Checkout shows its own "Add
+   * promotion code" field. Stripe rejects `discounts` together with
+   * `allow_promotion_codes`, so a session gets one or the other.
+   */
+  private async createCheckoutSessionWithPromo(
+    params: Stripe.Checkout.SessionCreateParams,
+    promoCode?: string,
+  ): Promise<Stripe.Checkout.Session> {
+    const promotionCodeId = promoCode
+      ? await this.findPromotionCodeId(promoCode)
+      : null;
+    if (promotionCodeId) {
+      try {
+        return await this.stripe.checkout.sessions.create({
+          ...params,
+          discounts: [{ promotion_code: promotionCodeId }],
+        });
+      } catch (err) {
+        // e.g. a Pro-only coupon on a course checkout: sell without it rather than fail.
+        if ((err as { type?: string }).type !== 'StripeInvalidRequestError') {
+          throw err;
+        }
+        this.logger.warn(
+          `Promo code ${promoCode} not applied: ${(err as Error).message}`,
+        );
+      }
+    }
+    return this.stripe.checkout.sessions.create({
+      ...params,
+      allow_promotion_codes: true,
+    });
+  }
+
+  /** Active promotion code id for a customer-facing code (Stripe matches case-insensitively). */
+  private async findPromotionCodeId(code: string): Promise<string | null> {
+    try {
+      const { data } = await this.stripe.promotionCodes.list({
+        code,
+        active: true,
+        limit: 1,
+      });
+      return data[0]?.id ?? null;
+    } catch (err) {
+      this.logger.warn(`Promo code lookup failed: ${(err as Error).message}`);
+      return null;
+    }
   }
 
   /** Stripe Customer Portal — cancel / update payment method for Pro. */
@@ -554,6 +686,7 @@ export class PurchaseService {
       customer: user.stripe_customer_id,
       return_url: `${this.frontendBaseUrl()}${this.sanitizePath(returnPath)}`,
     });
+    void this.productEvents.record({ userId, event: 'billing_portal_opened' });
     return { url: session.url };
   }
 
@@ -613,10 +746,62 @@ export class PurchaseService {
       this.logger.error(
         `Webhook signature verification failed: ${err.message}`,
       );
+      this.webhookFailures.add(1, { stage: 'signature' });
       throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
 
-    this.logger.log(`Received Stripe event: ${event.type}`);
+    try {
+      return await this.processEvent(event);
+    } catch (err) {
+      // Non-2xx → Stripe retries; StripeEventReplayService picks up whatever
+      // is still undelivered after that.
+      this.webhookFailures.add(1, { stage: 'processing', type: event.type });
+      throw err;
+    }
+  }
+
+  /**
+   * Fulfils one Stripe event. Shared by the webhook and the hourly replay of
+   * undelivered events (StripeEventReplayService), so it must stay safe to
+   * run more than once for the same event.
+   */
+  async processEvent(
+    event: Stripe.Event,
+  ): Promise<{ received: true; ignored?: string }> {
+    // Product events emitted below get a stable id from (Stripe event, name)
+    // and Stripe's own timestamp, so redeliveries and replays don't double
+    // count (PA42). Orders / entitlements were already idempotent.
+    return withEventOrigin(
+      {
+        key: `stripe:${event.id}`,
+        occurredAt: new Date((event.created ?? Date.now() / 1000) * 1000),
+      },
+      () => this.dispatchEvent(event),
+    );
+  }
+
+  private async dispatchEvent(
+    event: Stripe.Event,
+  ): Promise<{ received: true; ignored?: string }> {
+    this.logger.log(`Received Stripe event: ${event.type} (${event.id})`);
+
+    // The sandbox account is shared by every environment (local dev and the
+    // site both use it), so each receives the others' events. Customers are
+    // created per environment and stored on the user, so an event whose
+    // customer no user here owns belongs elsewhere — ignore it rather than
+    // grant access to whichever local user has the same id.
+    const customerId = this.customerIdOf(event);
+    if (
+      customerId &&
+      !(await this.userRepository.findOneBy({
+        stripe_customer_id: customerId,
+      }))
+    ) {
+      this.logger.warn(
+        `Ignoring ${event.type} ${event.id}: customer ${customerId} is not from this environment`,
+      );
+      return { received: true, ignored: 'foreign_customer' };
+    }
 
     switch (event.type) {
       case 'payment_intent.succeeded': {
@@ -690,6 +875,13 @@ export class PurchaseService {
         const invoice = event.data.object as Stripe.Invoice;
         const userId = await this.userIdFromInvoice(invoice);
         if (userId != null) {
+          // Grafana emails on this (observability.md A16); Stripe retries the card itself.
+          this.paymentFailures.add(1, {
+            kind:
+              invoice.billing_reason === 'subscription_cycle'
+                ? 'renewal'
+                : 'other',
+          });
           void this.productEvents.record({
             userId,
             event: 'pro_payment_failed',
@@ -711,6 +903,13 @@ export class PurchaseService {
     }
 
     return { received: true };
+  }
+
+  private customerIdOf(event: Stripe.Event): string | null {
+    const customer = (
+      event.data.object as { customer?: string | { id: string } | null }
+    ).customer;
+    return typeof customer === 'string' ? customer : (customer?.id ?? null);
   }
 
   private async fulfillProCheckoutSession(

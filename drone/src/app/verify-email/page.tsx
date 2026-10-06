@@ -3,7 +3,8 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { verifyEmail } from '@/app/lib/api-client';
+import { getProfile, verifyEmail } from '@/app/lib/api-client';
+import { useAuth } from '@/app/lib/auth-context';
 import PageShell from '@/app/ui/components/page-shell';
 import { loginHref, readStashedPostAuthRedirect } from '@/app/lib/auth-redirect';
 import LoadingComponent from '@/app/ui/components/loading';
@@ -13,6 +14,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const { setUser } = useAuth();
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState<string>('');
   const redirect = readStashedPostAuthRedirect();
@@ -32,6 +34,8 @@ function VerifyEmailInner() {
         if (!isMounted) return;
         setStatus('success');
         setMessage(response.message || 'Email verified successfully.');
+        // Refresh the signed-in user so the verify banner clears without a reload.
+        getProfile().then(setUser).catch(() => {});
       })
       .catch((error: Error) => {
         if (!isMounted) return;
@@ -42,7 +46,7 @@ function VerifyEmailInner() {
     return () => {
       isMounted = false;
     };
-  }, [token]);
+  }, [token, setUser]);
 
   const subtitle =
     status === 'success'

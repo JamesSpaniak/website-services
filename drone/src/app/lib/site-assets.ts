@@ -11,6 +11,12 @@ export const SITE_ASSETS = {
   wordmark: '/logo.svg',
 } as const;
 
+/** Official brand social profiles — footer icons and Organization JSON-LD `sameAs`. */
+export const SOCIAL_PROFILES = {
+  linkedin: 'https://www.linkedin.com/company/143938880/',
+  instagram: 'https://www.instagram.com/thedroneedge',
+} as const;
+
 /** Theme colors aligned with `globals.css` (SSR / browser chrome; in-app theme still uses `data-theme`). */
 export const THEME_COLOR = {
   dark: '#0d0d0d',

@@ -7,6 +7,10 @@ import {
   IsEnum,
   ValidateNested,
   IsArray,
+  IsBoolean,
+  IsInt,
+  Max,
+  Min,
   registerDecorator,
   ValidationOptions,
 } from 'class-validator';
@@ -91,6 +95,17 @@ export class UnitData {
   @IsOptional()
   @IsString()
   video_url?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Seconds of credits / end card at the end of video_url that never need to be watched for the video ✓ (docs/tech/progress-tracking-accuracy.md § 3).',
+  })
+  @Expose({ groups: ['COURSE_DETAILS'] })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(3600)
+  video_outro_seconds?: number;
 
   @ApiPropertyOptional({
     type: [String],
@@ -214,4 +229,12 @@ export class UpdateProgressDto {
   })
   @IsEnum(ProgressStatus)
   status: ProgressStatus;
+
+  @ApiPropertyOptional({
+    description:
+      'Set by automatic writes (opening a lesson). The status only applies when the unit has no status yet, so a stale tab can never downgrade COMPLETED.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  auto?: boolean;
 }

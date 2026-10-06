@@ -18,6 +18,8 @@ import { OrgRole } from '../src/organizations/types/org-role.enum';
 import { Exam } from '../src/questions/types/exam.entity';
 import { ClassExam } from '../src/questions/types/class-exam.entity';
 import { Question } from '../src/questions/types/question.entity';
+import { PurchaseService } from '../src/purchases/purchase.service';
+import { ProMembershipDuration } from '../src/purchases/types/purchase.dto';
 import { webcrypto } from 'crypto';
 
 describe('API (e2e)', () => {
@@ -60,11 +62,22 @@ describe('API (e2e)', () => {
   });
 
   const truncateAll = async () => {
-    await dataSource.query(
-      'TRUNCATE TABLE "sessions", "progress", "user_courses_purchased", "courses", "course_units", "users", "articles", ' +
-        '"organizations", "organization_members", "exams", "exam_attempts", "class_exams", "questions" ' +
-        'RESTART IDENTITY CASCADE;',
-    );
+    // Fire-and-forget writes (audit log, product events) from the previous
+    // test can still hold locks, so TRUNCATE may deadlock — retry briefly.
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await dataSource.query(
+          'TRUNCATE TABLE "sessions", "progress", "user_courses_purchased", "courses", "course_units", "users", "articles", ' +
+            '"organizations", "organization_members", "exams", "exam_attempts", "class_exams", "questions" ' +
+            'RESTART IDENTITY CASCADE;',
+        );
+        return;
+      } catch (error) {
+        const deadlock = (error as { code?: string }).code === '40P01';
+        if (!deadlock || attempt >= 5) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
+      }
+    }
   };
 
   const createUser = async (role: Role, username: string, email: string) => {
@@ -1001,6 +1014,131 @@ describe('API (e2e)', () => {
         .expect(200);
 
       expect(response.body.username).toBe('beareruser');
+    });
+  });
+
+  describe('purchase session refresh', () => {
+    // A purchase bumps users.token_version, which invalidates the current
+    // access token. The client recovers with a cookie refresh; these tests
+    // check that path keeps the user signed in with the new entitlements.
+    const getCookies = (response: request.Response): string[] =>
+      ([] as string[]).concat(response.headers['set-cookie'] ?? []);
+
+    // Decoded: express URL-encodes the selector:verifier separator.
+    const cookieValue = (cookies: string[], name: string) => {
+      const cookie = cookies.find((c) => c.startsWith(`${name}=`));
+      const raw = cookie?.split(';')[0].split('=').slice(1).join('=');
+      return raw === undefined ? undefined : decodeURIComponent(raw);
+    };
+
+    const loginWithCookies = async (username: string) => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username, password })
+        .expect(200);
+      const cookies = getCookies(response);
+      return {
+        access: cookieValue(cookies, 'access_token') as string,
+        refresh: cookieValue(cookies, 'refresh_token') as string,
+      };
+    };
+
+    const refreshWith = (refreshToken: string) =>
+      request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', `refresh_token=${refreshToken}`)
+        .send({});
+
+    it('stays signed in as Pro after an upgrade', async () => {
+      const user = await createUser(
+        Role.User,
+        'probuyer',
+        'probuyer@example.com',
+      );
+      const { access, refresh } = await loginWithCookies('probuyer');
+
+      await app
+        .get(PurchaseService)
+        .upgradeToPro(user.id, ProMembershipDuration.Monthly);
+
+      // The pre-purchase access token is now stale.
+      await request(app.getHttpServer())
+        .get('/auth/profile')
+        .set('Cookie', `access_token=${access}`)
+        .expect(401);
+
+      const refreshResponse = await refreshWith(refresh).expect(200);
+      const newAccess = cookieValue(
+        getCookies(refreshResponse),
+        'access_token',
+      );
+
+      const profile = await request(app.getHttpServer())
+        .get('/auth/profile')
+        .set('Cookie', `access_token=${newAccess}`)
+        .expect(200);
+      expect(profile.body.role).toBe(Role.Pro);
+      expect(profile.body.pro_membership_expires_at).toBeTruthy();
+    });
+
+    it('stays signed in with course access after a course purchase', async () => {
+      const course = await createCourse('Bought Course');
+      const user = await createUser(
+        Role.User,
+        'coursebuyer',
+        'coursebuyer@example.com',
+      );
+      const { access, refresh } = await loginWithCookies('coursebuyer');
+
+      await app.get(PurchaseService).purchaseCourse(user.id, course.id);
+
+      await request(app.getHttpServer())
+        .get(`/courses/${course.id}`)
+        .set('Cookie', `access_token=${access}`)
+        .expect(401);
+
+      const refreshResponse = await refreshWith(refresh).expect(200);
+      const newAccess = cookieValue(
+        getCookies(refreshResponse),
+        'access_token',
+      );
+
+      const detail = await request(app.getHttpServer())
+        .get(`/courses/${course.id}`)
+        .set('Cookie', `access_token=${newAccess}`)
+        .expect(200);
+      expect(detail.body.has_access).toBe(true);
+    });
+
+    it('keeps the session usable after parallel refreshes with one cookie', async () => {
+      // After checkout several requests 401 at once and each refreshes with
+      // the same cookie. Whichever refresh cookie the browser keeps, the next
+      // refresh must still work, or the user is silently logged out.
+      await createUser(Role.User, 'racer', 'racer@example.com');
+      const { refresh } = await loginWithCookies('racer');
+
+      const responses = await Promise.all(
+        [1, 2, 3].map(() => refreshWith(refresh)),
+      );
+      responses.forEach((r) => expect(r.status).toBe(200));
+
+      const issued = responses
+        .map((r) => cookieValue(getCookies(r), 'refresh_token'))
+        .filter((t): t is string => !!t);
+      expect(issued.length).toBeGreaterThan(0);
+
+      // Every refresh cookie handed out must match the stored verifier.
+      // (Checked against the hash directly: using one would rotate it.)
+      const [session] = await dataSource.query(
+        'SELECT hashed_verifier FROM sessions WHERE selector = $1',
+        [refresh.split(':')[0]],
+      );
+      for (const token of issued) {
+        const verifier = token.split(':')[1];
+        expect(
+          await UsersService.comparePassword(verifier, session.hashed_verifier),
+        ).toBe(true);
+      }
     });
   });
 

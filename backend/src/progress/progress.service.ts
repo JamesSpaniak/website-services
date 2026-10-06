@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Progress } from './types/progress.entity';
 import { Course } from '../courses/types/course.entity';
 import { CourseUnit } from '../courses/types/course-unit.entity';
@@ -26,6 +26,14 @@ import { ProductEventsService } from '../product-events/product-events.service';
  * fresh from `courses` and statuses are overlaid at request time, so course
  * restructuring can never orphan or reset a user's progress.
  */
+/** PATCH unit response: the unit's status plus anything completed with it (PTD3). */
+export type UnitProgressUpdate = UnitData & {
+  /** Ancestor refs completed automatically because all their children are. */
+  auto_completed: string[];
+  /** Present when this write completed the whole course. */
+  course_status?: ProgressStatus;
+};
+
 @Injectable()
 export class ProgressService {
   constructor(
@@ -41,27 +49,37 @@ export class ProgressService {
 
   // ── Row lifecycle ────────────────────────────────────────────────────────
 
+  /**
+   * Returns the user's progress row, creating it on first touch. Creation is
+   * `INSERT … ON CONFLICT DO NOTHING`, so parallel first requests (course page
+   * + auto IN_PROGRESS + heartbeat) never 500 and `course_started` is recorded
+   * exactly once — by whichever request actually inserted.
+   */
   private async getOrCreateProgress(
     userId: number,
     courseId: number,
   ): Promise<Progress> {
-    let progress = await this.progressRepository.findOne({
+    const existing = await this.progressRepository.findOne({
       where: { userId, courseId },
     });
+    if (existing) return existing;
 
-    if (!progress) {
-      const course = await this.courseRepository.findOne({
-        where: { id: courseId },
-      });
-      if (!course) {
-        throw new NotFoundException(`Course with ID ${courseId} not found`);
-      }
+    const course = await this.courseRepository.findOne({
+      where: { id: courseId },
+    });
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${courseId} not found`);
+    }
 
-      const unitsTotal = await this.courseUnitRepository.count({
-        where: { course_id: courseId },
-      });
+    const unitsTotal = await this.courseUnitRepository.count({
+      where: { course_id: courseId },
+    });
 
-      progress = this.progressRepository.create({
+    const result = await this.progressRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Progress)
+      .values({
         userId,
         courseId,
         unit_statuses: {},
@@ -71,8 +89,12 @@ export class ProgressService {
         units_completed: 0,
         last_activity_at: new Date(),
         completed_at: null,
-      });
-      await this.progressRepository.save(progress);
+      })
+      .orIgnore()
+      .returning(['id'])
+      .execute();
+
+    if ((result.raw as unknown[]).length > 0) {
       this.auditService.log(userId, AuditAction.COURSE_STARTED, { courseId });
       void this.productEvents.record({
         userId,
@@ -80,7 +102,33 @@ export class ProgressService {
         courseId,
       });
     }
-    return progress;
+    return this.progressRepository.findOneOrFail({
+      where: { userId, courseId },
+    });
+  }
+
+  /**
+   * Runs `fn` on the progress row under `SELECT … FOR UPDATE`, so concurrent
+   * writes for the same user × course apply one after another instead of the
+   * last read-modify-write silently erasing the other (R3).
+   */
+  private async withLockedProgress<T>(
+    userId: number,
+    courseId: number,
+    fn: (progress: Progress, manager: EntityManager) => Promise<T>,
+  ): Promise<T> {
+    await this.getOrCreateProgress(userId, courseId);
+    return this.progressRepository.manager.transaction(async (manager) => {
+      const progress = await manager.getRepository(Progress).findOne({
+        where: { userId, courseId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!progress) {
+        // Reset raced with this write.
+        throw new NotFoundException(`No progress for course ${courseId}`);
+      }
+      return fn(progress, manager);
+    });
   }
 
   /** Ensures a progress row exists before exam generate/submit (used by the exam API). */
@@ -156,10 +204,16 @@ export class ProgressService {
     courseId: number,
     status: ProgressStatus,
   ): Promise<{ status: ProgressStatus }> {
-    const progress = await this.getOrCreateProgress(userId, courseId);
-    const wasCompleted = progress.status === ProgressStatus.COMPLETED;
-    progress.status = status;
-    await this.saveWithSummary(progress);
+    const { wasCompleted, unitsTotal } = await this.withLockedProgress(
+      userId,
+      courseId,
+      async (progress, manager) => {
+        const wasCompleted = progress.status === ProgressStatus.COMPLETED;
+        progress.status = status;
+        await this.saveWithSummary(progress, manager);
+        return { wasCompleted, unitsTotal: progress.units_total };
+      },
+    );
 
     if (status === ProgressStatus.COMPLETED && !wasCompleted) {
       this.auditService.log(userId, AuditAction.COURSE_COMPLETED, { courseId });
@@ -167,18 +221,24 @@ export class ProgressService {
         userId,
         event: 'course_completed',
         courseId,
-        properties: { units_total: progress.units_total },
+        properties: { units_total: unitsTotal },
       });
     }
     return { status };
   }
 
+  /**
+   * Sets one unit's status. `auto` writes (opening a lesson) only apply when
+   * the unit has no status yet — a stale tab must never turn COMPLETED back
+   * into IN_PROGRESS. Explicit writes (kebab menu) may still go backwards.
+   */
   async updateUnitProgress(
     userId: number,
     courseId: number,
     unitRef: string,
     status: ProgressStatus,
-  ): Promise<UnitData> {
+    { auto = false }: { auto?: boolean } = {},
+  ): Promise<UnitProgressUpdate> {
     const unit = await this.courseUnitRepository.findOne({
       where: { course_id: courseId, ref: unitRef },
     });
@@ -188,54 +248,168 @@ export class ProgressService {
       );
     }
 
-    const progress = await this.getOrCreateProgress(userId, courseId);
-    const statuses = { ...(progress.unit_statuses ?? {}) };
-    const completedAt = { ...(progress.unit_completed_at ?? {}) };
-    const previous = statuses[unitRef];
-    if (status === ProgressStatus.NOT_STARTED) {
-      delete statuses[unitRef];
-      delete completedAt[unitRef];
-    } else {
-      statuses[unitRef] = status;
-      if (status === ProgressStatus.COMPLETED) {
-        completedAt[unitRef] ??= new Date().toISOString();
-      } else {
-        delete completedAt[unitRef];
-      }
-    }
-    progress.unit_statuses = statuses;
-    progress.unit_completed_at = completedAt;
-    if (progress.status === ProgressStatus.NOT_STARTED) {
-      progress.status = ProgressStatus.IN_PROGRESS;
-    }
-    await this.saveWithSummary(progress);
+    const outcome = await this.withLockedProgress(
+      userId,
+      courseId,
+      async (progress, manager) => {
+        const statuses = { ...(progress.unit_statuses ?? {}) };
+        const completedAt = { ...(progress.unit_completed_at ?? {}) };
+        const previous = statuses[unitRef];
+        if (auto && previous) {
+          return {
+            previous,
+            status: previous,
+            summary: null,
+            autoCompleted: [] as CourseUnit[],
+            courseCompleted: false,
+          };
+        }
+        if (status === ProgressStatus.NOT_STARTED) {
+          delete statuses[unitRef];
+          delete completedAt[unitRef];
+        } else {
+          statuses[unitRef] = status;
+          if (status === ProgressStatus.COMPLETED) {
+            completedAt[unitRef] ??= new Date().toISOString();
+          } else {
+            delete completedAt[unitRef];
+          }
+        }
+        const tree = await manager.getRepository(CourseUnit).find({
+          where: { course_id: courseId },
+          select: ['ref', 'parent_ref', 'depth', 'title'],
+        });
+        const autoCompleted =
+          status === ProgressStatus.COMPLETED
+            ? this.completeFinishedAncestors(
+                unitRef,
+                tree,
+                statuses,
+                completedAt,
+              )
+            : [];
+        progress.unit_statuses = statuses;
+        progress.unit_completed_at = completedAt;
+        if (progress.status === ProgressStatus.NOT_STARTED) {
+          progress.status = ProgressStatus.IN_PROGRESS;
+        }
+        // PTD3: every top-level unit complete → the course is complete.
+        const topLevel = tree.filter((u) => !u.parent_ref);
+        const courseCompleted =
+          status === ProgressStatus.COMPLETED &&
+          progress.status !== ProgressStatus.COMPLETED &&
+          topLevel.length > 0 &&
+          topLevel.every((u) => statuses[u.ref] === ProgressStatus.COMPLETED);
+        if (courseCompleted) progress.status = ProgressStatus.COMPLETED;
+        await this.saveWithSummary(progress, manager);
+        return {
+          previous,
+          status,
+          summary: {
+            units_completed: progress.units_completed,
+            units_total: progress.units_total,
+          },
+          autoCompleted,
+          courseCompleted,
+        };
+      },
+    );
 
-    if (status === ProgressStatus.COMPLETED && previous !== status) {
+    const summary = outcome.summary;
+    const recordCompleted = (u: Pick<CourseUnit, 'ref' | 'depth'>) => {
       this.auditService.log(userId, AuditAction.UNIT_COMPLETED, {
         courseId,
-        unitId: unitRef,
+        unitId: u.ref,
       });
       void this.productEvents.record({
         userId,
-        event: unit.depth === 0 ? 'unit_completed' : 'lesson_completed',
+        event: u.depth === 0 ? 'unit_completed' : 'lesson_completed',
         courseId,
-        unitRef,
-        properties: {
-          depth: unit.depth,
-          units_completed: progress.units_completed,
-          units_total: progress.units_total,
-        },
+        unitRef: u.ref,
+        properties: { depth: u.depth, ...summary },
+      });
+    };
+    if (
+      summary &&
+      outcome.status === ProgressStatus.COMPLETED &&
+      outcome.previous !== ProgressStatus.COMPLETED
+    ) {
+      recordCompleted(unit);
+    }
+    outcome.autoCompleted.forEach(recordCompleted);
+    if (outcome.courseCompleted) {
+      this.auditService.log(userId, AuditAction.COURSE_COMPLETED, { courseId });
+      void this.productEvents.record({
+        userId,
+        event: 'course_completed',
+        courseId,
+        properties: { units_total: summary?.units_total, auto: true },
       });
     }
-    return { id: unitRef, title: unit.title, status } as UnitData;
+    return {
+      id: unitRef,
+      title: unit.title,
+      status: outcome.status,
+      auto_completed: outcome.autoCompleted.map((u) => u.ref),
+      ...(outcome.courseCompleted && {
+        course_status: ProgressStatus.COMPLETED,
+      }),
+    } as UnitProgressUpdate;
   }
 
+  /**
+   * PTD3: after `ref` is completed, walk up the tree and complete every
+   * ancestor whose children are now all COMPLETED. Only ever adds ✓s — the
+   * learner can still change any unit by hand. Mutates the maps; returns
+   * the ancestors it completed (nearest first).
+   */
+  private completeFinishedAncestors(
+    ref: string,
+    tree: Pick<CourseUnit, 'ref' | 'parent_ref' | 'depth'>[],
+    statuses: Record<string, ProgressStatus>,
+    completedAt: Record<string, string>,
+  ): Pick<CourseUnit, 'ref' | 'parent_ref' | 'depth'>[] {
+    const byRef = new Map(tree.map((u) => [u.ref, u]));
+    const done: Pick<CourseUnit, 'ref' | 'parent_ref' | 'depth'>[] = [];
+    let parentRef = byRef.get(ref)?.parent_ref ?? null;
+    while (parentRef) {
+      const children = tree.filter((u) => u.parent_ref === parentRef);
+      if (
+        !children.every((c) => statuses[c.ref] === ProgressStatus.COMPLETED)
+      ) {
+        break;
+      }
+      const parent = byRef.get(parentRef);
+      if (!parent) break;
+      if (statuses[parentRef] !== ProgressStatus.COMPLETED) {
+        statuses[parentRef] = ProgressStatus.COMPLETED;
+        completedAt[parentRef] ??= new Date().toISOString();
+        done.push(parent);
+      }
+      parentRef = parent.parent_ref;
+    }
+    return done;
+  }
+
+  /** Also clears the user's video state (PTD6) — a reset is a fresh start. */
   async resetAllProgress(userId: number): Promise<void> {
     await this.progressRepository.delete({ userId });
+    await this.progressRepository.manager.query(
+      `DELETE FROM video_progress WHERE user_id = $1`,
+      [userId],
+    );
   }
 
+  /**
+   * Fresh start on one course (PTD6): progress row and video state go; the
+   * event history and exam attempts stay (they record what happened).
+   */
   async resetCourseProgress(userId: number, courseId: number): Promise<void> {
     await this.progressRepository.delete({ userId, courseId });
+    await this.progressRepository.manager.query(
+      `DELETE FROM video_progress WHERE user_id = $1 AND course_id = $2`,
+      [userId, courseId],
+    );
     this.auditService.log(userId, AuditAction.PROGRESS_RESET, { courseId });
   }
 
@@ -282,8 +456,13 @@ export class ProgressService {
    * Note: latest_exam_score is deliberately NOT written here — the exam
    * submission path (ExamAttemptService) owns that column.
    */
-  private async saveWithSummary(progress: Progress): Promise<void> {
-    const units = await this.courseUnitRepository.find({
+  private async saveWithSummary(
+    progress: Progress,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const unitRepo =
+      manager?.getRepository(CourseUnit) ?? this.courseUnitRepository;
+    const units = await unitRepo.find({
       where: { course_id: progress.courseId },
       select: ['ref'],
     });
@@ -303,7 +482,9 @@ export class ProgressService {
       progress.completed_at = null;
     }
 
-    await this.progressRepository.save(progress);
+    await (manager?.getRepository(Progress) ?? this.progressRepository).save(
+      progress,
+    );
   }
 
   private buildExamSummary(

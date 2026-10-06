@@ -1,13 +1,21 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1790905192,
+  "created": 1791028789,
   "data": {
     "object": {
       "allowed_payment_method_types": null,
       "amount": 2900,
       "amount_capturable": 0,
       "amount_details": {
+        "shipping": {
+          "amount": 0,
+          "from_postal_code": null,
+          "to_postal_code": null
+        },
+        "tax": {
+          "total_tax_amount": 0
+        },
         "tip": {}
       },
       "amount_received": 2900,
@@ -19,15 +27,15 @@
       "capture_method": "automatic_async",
       "client_secret": "REDACTED",
       "confirmation_method": "automatic",
-      "created": 1790905192,
+      "created": 1791028784,
       "currency": "usd",
-      "customer": "cus_VMelUyrNOrB1Sm",
+      "customer": "cus_VNBzceAJtrpnII",
       "customer_account": null,
       "description": null,
       "excluded_payment_method_types": null,
-      "id": "pi_3ULvS02Rw6cpyMyJ0kTqr2RV",
+      "id": "pi_3UMRbQ2Rw6cpyMyJ17w0KIqE",
       "last_payment_error": null,
-      "latest_charge": "ch_3ULvS02Rw6cpyMyJ0z678XKk",
+      "latest_charge": "ch_3UMRbQ2Rw6cpyMyJ1uYQZWmk",
       "livemode": false,
       "managed_payments": {
         "enabled": false
@@ -35,12 +43,16 @@
       "metadata": {
         "courseId": "1",
         "productType": "course",
-        "userId": "2"
+        "userId": "28"
       },
       "next_action": null,
       "object": "payment_intent",
       "on_behalf_of": null,
-      "payment_method": "pm_1ULvS02Rw6cpyMyJshaL6Z3x",
+      "payment_details": {
+        "customer_reference": null,
+        "order_reference": "cs_test_a1hUf37is7m5cm8hiTXeNShilxVesSl4QZKFVYboYcYGHfGrelUC5sdgfh"
+      },
+      "payment_method": "pm_1UMRbP2Rw6cpyMyJXx6YSbhk",
       "payment_method_configuration_details": null,
       "payment_method_options": {
         "card": {
@@ -68,13 +80,13 @@
       "transfer_group": null
     }
   },
-  "id": "evt_3ULvS02Rw6cpyMyJ0Gt5P6yL",
+  "id": "evt_3UMRbQ2Rw6cpyMyJ18OENz0l",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
-    "id": "req_v0Rtc3TZ6cv89P",
-    "idempotency_key": "8ecdee9f-646c-4178-a4fa-b2275bc15736"
+    "id": null,
+    "idempotency_key": "pi_3UMRbQ2Rw6cpyMyJ17w0KIqE-payatt_3UMRbQ2Rw6cpyMyJ1zpbEfzp"
   },
   "type": "payment_intent.succeeded"
 }

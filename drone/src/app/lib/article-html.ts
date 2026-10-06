@@ -18,7 +18,19 @@ export function prepareArticleBodyHtml(raw: string): string {
   s = s.replace(/\\t/g, '\t');
   s = s.replace(/\\"/g, '"');
 
-  return s;
+  return stripLegacySeoBlock(s);
+}
+
+/**
+ * The old importer appended an "<h2>Topics & related search terms</h2><p>…</p>"
+ * keyword list to every article with `seo_phrases`. Strip it at render so live
+ * articles stop serving it without editing each one in the CMS.
+ */
+const LEGACY_SEO_BLOCK =
+  /\s*<h2[^>]*>\s*Topics (?:&|&amp;) related search terms\s*<\/h2>\s*<p>[\s\S]*?<\/p>/gi;
+
+function stripLegacySeoBlock(html: string): string {
+  return html.replace(LEGACY_SEO_BLOCK, '');
 }
 
 function extractHtmlFromAccidentalJsonPaste(s: string): string {

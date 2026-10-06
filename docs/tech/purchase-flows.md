@@ -23,6 +23,8 @@ Logged-in account (email verification **not** required)
   → GET /courses/:id has_access=true
 ```
 
+**Promo codes (T21, Oct 4 2026):** a `?promo=CODE` link on any page sets the `de_promo` cookie (30 days, latest code wins); both `create-course-checkout` and `create-pro-checkout` send it as `promoCode`. The backend looks it up with `stripe.promotionCodes.list({ code, active: true })` and pre-applies it via `discounts`; an unknown code, a lookup failure, or a code Stripe rejects for that product falls back to `allow_promotion_codes: true` (Checkout's own "Add promotion code" field) — a bad code never blocks a sale. Codes are created in the Stripe Dashboard (coupon + promotion code, expiry, max redemptions); list prices never change. Order rows record the amount actually paid. **Never make a course code 100% off:** a $0 payment-mode Checkout creates no PaymentIntent, and course fulfilment keys off `payment_intent.succeeded` — use a signup link (admin) to give a course away instead.
+
 The course page polls `has_access` and calls `POST /purchases/confirm-checkout { sessionId }` if the webhook is slow (resolves the session's PaymentIntent → same order/entitlement path, idempotent). Legacy `create-payment-intent` + `confirm-payment` (Card Element) stay one release.
 
 **Refund:** `charge.refunded` → `OrderService.applyRefund` — `order_items.refunded_amount_cents`, `orders.payment_status = refunded | partially_refunded`; a **full** refund revokes that line's entitlements (`revoke_reason = refund`), deletes the legacy `user_courses_purchased` row, bumps `token_version`, audits `REFUND_ISSUED`, emits `refund_issued` (**PD18**). Partial refunds change only the money.
@@ -38,6 +40,8 @@ Logged-in account (email verification **not** required)
   → entitlements(course_id NULL, source=pro, ends_at = period end) via EntitlementService.syncPro
   → invoice.paid → orders (PRO_MONTHLY / PRO_YEARLY line, idempotent on invoice id) + pro_started | pro_renewed
   → invoice.payment_failed → pro_payment_failed · cancel_at_period_end → pro_cancel_scheduled
+  → if the webhook is late: return page (/profile or /courses/:id ?pro=success&session_id=…)
+    calls POST /purchases/confirm-pro-checkout { sessionId } → same path as checkout.session.completed
   → has_access true for every course until cancel/expire
 ```
 
@@ -72,6 +76,19 @@ Access rule: `has_access(course) = admin OR active Pro (role=pro AND expires_at 
 | Purchase completes | `token_version` bump → in-flight JWT refreshes (see callouts) | ✅ — confirm no forced logout in the browser run |
 
 ---
+
+### When a webhook fails: retries and fallbacks
+
+There are four layers, each limited, and every one goes through the same idempotent code:
+
+| Layer | Covers | Limit |
+|-------|--------|-------|
+| Stripe's own retries | Any non-2xx from `/purchases/webhook` (bad signature, a 500 while processing) | Live: about 3 days with growing gaps. Sandbox: a few tries over hours |
+| Return-page confirm | The buyer is waiting: `confirm-checkout` (course) and `confirm-pro-checkout` (Pro), called after a few polls | Once per page visit |
+| Hourly replay (`StripeEventReplayService`) | Anything still undelivered after 1 hour, for example renewals, cancels and refunds where nobody is on a page | 5 tries per event, then `dead` |
+| Dead-event alert | `stripe_events_dead` in admin health, the `stripe.webhook.dead_events` gauge, and an error log | Stays flagged until a person fixes it and sets `stripe_event_replays.resolved_at` |
+
+**Shared sandbox:** local dev and the site use the same Stripe sandbox, so each receives the other's events. `processEvent` ignores any event whose customer isn't stored on a user in this database. Customers are created per environment, so this stops a local test purchase from granting access to the prod user with the same id.
 
 ## Config
 
@@ -117,7 +134,7 @@ Access rule: `has_access(course) = admin OR active Pro (role=pro AND expires_at 
 | Surface | Course one-time | Pro monthly | Enterprise |
 |---------|-----------------|-------------|------------|
 | `PurchaseFlow` | Hosted Checkout | Upsell → Checkout | — |
-| `/profile` Membership | — | Upgrade / Manage billing | Consult link |
+| `/profile` Membership card (top of page) | — | Go Pro ($35/mo) / Manage billing | Consult link (Settings) |
 | Admin API | `POST /purchases/course` | `POST /purchases/pro-membership` | Org admin UI |
 
 ---

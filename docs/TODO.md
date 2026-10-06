@@ -8,8 +8,33 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 ### Pickup next
 
+- **Launch website plan (Oct 8 / Oct 16 announcements, Oct 23 talk)** — batched build of site, pricing, waitlist, UTM, Stripe go-live, promo codes: [`tech/launch-website-plan.md`](tech/launch-website-plan.md). Rows below (S2/S3/S5/S6/S7/S11, T1/T3/T21, PA39/PA41, L1) are scheduled there.
 - **Finish the other two course tracks before initial launch** — Video & Photography (`/courses/tracks/video`) and AI & Drones (`/courses/tracks/ai`) are stub "coming soon" pages today; home page track cards link to them. Ship full course content + catalog entries before launch so the three-path hero is accurate. Part 107 remains P0 for recordings first.
 - **Home page join CTAs** (after Part 107 content) — hero primary should be "Try Unit 1 free" / register; secondary purchase or preview; header Sign up — see B2C conversion backlog below.
+
+### Batch 2 (planned Oct 4 2026 — code only, no deploy)
+
+| Group | Items | Notes |
+|-------|-------|-------|
+| 1 · Launch blockers | **T21** promo codes · remove `mergeSeoPhrasesIntoBody` keyword block · commit the profile Pro card + verify-banner refresh | ✅ **Committed Oct 4 2026** (`851cf1c`). Remaining: create the Stripe coupon + promotion code (sandbox, then live) |
+| 2 · Account deletion | **AS1, AS2, AS3, AS4 (+ NL-A1), AS5, AS9** | ✅ **Code done Oct 4 2026** — `POST /auth/delete-account`, Profile → Delete account, `/account-deleted`, shared `purgeAccount` for admin + self, migration `1765000007000`, privacy § 7/§ 9. Decisions: keep `orders` email (tax/dispute); `USER_SELF_DELETED` audit row keeps the email with a null actor; Stripe customer deleted (cancels Pro, no refund); PD23 archive drops `user_id` + `anonymous_id`. AS9 Terms clause deferred with AS6–AS8 (the Terms page is the B2B Sales Agreement). Ships with the next deploy |
+| 3 · Newsletter Phase 1 | **NL1–NL8** + **NL16b** (profile email preferences) | ✅ **Code done Oct 4 2026** — `/newsletter`, signup on articles / `/articles` / footer / register / Building waitlist, Field Notes confirmation copy, profile Email preferences (`GET`/`PATCH /leads/me`), org-member guards (forms hidden, `POST /leads` ignores, broadcast excludes), issue template, runbook `workflows/marketing/newsletter.md`, NL8 queries, privacy § 2/§ 3/§ 9. Still to do for issue #1 (Nov 3): write `assets/newsletter/2026-11.md`, NL-D2–D4, apply NL0.2. Ships with the next deploy |
+| 4 · Measurement | **T1**, **T2**, **T3 / PA37 / PA7** funnel events, **PA42** idempotent webhook events | ✅ **Code done Oct 4 2026** — T1 was already working; T2 audit row; lifecycle + funnel events server-side; `consultation_submitted` added; webhook product events deduplicated. Open: `preview_started`, upsell/downsell events (need their UI). Ships with the next deploy |
+| 5 · Newsletter publishing | NL9 / NL10 / NL13 (simple version) | ✅ **Code done Oct 4 2026** — Admin → Newsletter: upload the repo `.md`, preview Email / Web / Text, test, approve, count, send with a resumable per-address log; `/newsletter/<slug>` web copy (View in browser), corrections after send, *Recent issues* after 7 days. Not built: scheduled send (NL11), per-interest segments (NL12), metrics (NL14). Ships with the next deploy |
+| 6 · Newsletter metrics + tracking domain | NL14 · `click.news.thedroneedge.com` | ✅ **Code done Oct 4 2026** — SES events for newsletter messages stored (`newsletter_events`; per-person clicks, aggregate opens, no IP/UA, 12-month prune, deleted with the account), Results panel per issue, privacy § 6 updated. Terraform `ses_tracking.tf` (SES identity, ACM, CloudFront → `r.us-east-1.awstrack.me`, alias) — **two-step apply**: apply, wait for Verified + `curl` check, then `ses_custom_tracking_domain_enabled = true` (`workflows/tech/post-deploy-smoke-test.md`). Not applied |
+| Ops (you) | Apply `ses_events_subscription_enabled = true` (NL0.2) · **PA41** webhook secret · **PA39** contact-point Test | Deploys production |
+
+### Batch 3 — Stripe go-live week (planned Oct 5 2026; live Stripe moved up to **Oct 8**)
+
+*Prep code (done locally Oct 4–5, uncommitted): `StripeConfigService` boot checks + `stripe_mode` on `/api/health`, Terraform-managed secret key, `./pipeline.sh --rotate-stripe`, "Stripe config error" alert, **PTA6** tracking checks + 2 alerts. Runbook: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8 (G4–G8, rollback § 8.4).*
+
+| Day | Build / ops | You |
+|-----|-------------|-----|
+| **Mon Oct 5** | Commit prep; post-deploy smoke test; **PTA2** `rollupDaily(35)`; SES click-domain step 2; `scripts/grafana_alerts.py apply` | Run `./pipeline.sh --env dev`; sandbox rehearsal of the cutover (`--rotate-stripe` with test keys) |
+| **Tue Oct 6** | — | **G4–G6**: decisions sign-off, live account + Pro price, live webhook + keys; live coupon/promo codes incl. single-use `OWNERTEST` ($1 total) |
+| **Wed Oct 7** | Smoke § L (agent never pays) | **G7** cutover via `--rotate-stripe` (your terminal) · **G8** real-money $1 purchase + refund; roll the sandbox key pasted in chat |
+| **Thu Oct 8** | Watch alerts, orders, webhooks | **Live** + Announcement 1 |
+| **Fri–Sun Oct 9–11** | **PTA5** Playwright student scenarios · PR `launch-batch1` → `main` · **PTA8** outro seconds | Review PR |
 
 ---
 
@@ -98,6 +123,10 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **First outreach campaign** — 100 contacts, tracker, reply/objection log | Not started | [`workflows/sales/outreach.md`](../workflows/sales/outreach.md) |
 | **UTM params on consultation links** when CRM ready | Open | [`sales/go-to-market-review.md`](sales/go-to-market-review.md) |
 | **Quote/contract package docs** (`review-1year.md`, Appendix A templates in repo) | Not in repo | [`workflows/sales/outreach.md`](../workflows/sales/outreach.md) |
+| **Teacher training offer** — price/packaging, trainers (Part 107 + PA clearances), insurance, test the 2-day hybrid at first school (T1–T6) | Draft design | [`sales/teacher-training.md`](sales/teacher-training.md) |
+| **Grant toolkit for `/schools/funding`** — full-cost budget template, evaluation template, narrative paragraph (D2) | Idea | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §5.3–5.4 |
+| **Counsel check: 2 CFR 200.319(b)** — where grant-narrative help becomes drafting specs on federal-funds deals (D4) | Open | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §5.3 |
+| **Lateral channels** — inter-school challenge, student peer teaching, clubs, shared design gallery (ideas only) | Idea | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §2.9 |
 
 ### Money model — offer ladder decisions and surfaces
 
@@ -143,8 +172,15 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Resources block on `/schools`** — link P0 articles after prod import | Not started | [`workflows/marketing/outreach-content-calendar.md`](../workflows/marketing/outreach-content-calendar.md) |
 | **Expand & publish P1 school articles** — pilot vs full-year, kits vs curriculum, hybrid/async | Draft JSON in repo | [`marketing/article-inventory.md`](marketing/article-inventory.md) |
 | **Expand & publish B2C articles** — study guide (A), practice questions (B), **rewrite C at $129** (draft still titled $29 vs ground school) | Draft JSON in repo; C stale | [`marketing/article-inventory.md`](marketing/article-inventory.md) |
-| **Resolve Hidden "AI & Drones" article** in prod — publish, merge, or retire | Open | Prod admin · [`marketing/article-inventory.md`](marketing/article-inventory.md) |
+| **Resolve Hidden "AI & Drones" article** in prod — publish, merge, or retire | Open — review Oct 3 2026 says **retire**; move `ai_drones.json` / `video_photo.json` (course payloads) out of `import/` | Prod admin · [`marketing/article-review-2026-10.md`](marketing/article-review-2026-10.md) |
+| **Article review Oct 2026: act on it** — strip leaked editor notes (advance-01 live), swap advance-01 targeting hero, unpublish story-01 + advance-06, retire/merge 10 stubs, rewrite 9 | Open | [`marketing/article-review-2026-10.md`](marketing/article-review-2026-10.md) § 5 |
+| **Apply Oct 2026 article paste batch** (edits #40/#39, new school-02 + gap-01/02/03) | Open | [`../assets/articles/import/paste-2026-10/README.md`](../assets/articles/import/paste-2026-10/README.md) |
+| **Review + publish gap articles 1–3** (jobs/hobby/building · education by level · 2026 funding); gap-01 waits on launch W2 building page | Draft (repo) | [`marketing/article-inventory.md`](marketing/article-inventory.md) · [`marketing/article-stats-2026-10.md`](marketing/article-stats-2026-10.md) |
+| **Check Drone Building kit parts against the FCC Covered List** (Dec 22 2025: all foreign-produced drones + critical components incl. FCs, radios, motors; new authorizations frozen) before quoting kits | Open | [`marketing/article-stats-2026-10.md`](marketing/article-stats-2026-10.md) § 5 |
 | **Replace `hero-default.svg`** on older story/advance articles where still default | Open | [`assets/articles/import/manifest.json`](../assets/articles/import/manifest.json) |
+| **Long-form keynote decisions** — venue/slot, naming Chichester project, kit prices, civic partner, talk format (V1–V6) | Open | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §9 |
+| **Verify keynote quotes and history** — 🟡 quotes in §2.7, Extension/4-H wording, ARM phone claim, theory citations in §2.10 | Open | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) |
+| **First civic partner** for the runoff project (township / conservation district) (D3) | Open | [`marketing/keynote-vision-two-gaps.md`](marketing/keynote-vision-two-gaps.md) §5.4 |
 | **SEO/GEO cadence** — Search Console, monthly GEO query log | Ongoing | [`workflows/marketing/content-and-seo.md`](../workflows/marketing/content-and-seo.md) |
 
 ### Paid acquisition — creative & campaign work
@@ -184,13 +220,12 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **G5** | YouTube channel for drone footage | Signup | Not started |
 | **M1** | Facebook Page (mandatory — ads run *from* a Page) | Signup | Not started |
 | **M2** | Meta Business Manager; claim Page + ad account into it | Signup | Not started |
-| **M3** | Instagram business account linked to the Page | Signup | Not started |
+| **M3** | Instagram business account linked to the Page | Signup | Account created Oct 4 2026 ([@thedroneedge](https://www.instagram.com/thedroneedge)); switch to business + link once **M1** exists |
 | **M4** | Meta ad account + payment method + account-level spend cap | Signup | Not started |
 | **M5** | Meta dataset/Pixel in Events Manager; record pixel ID | Signup | Not started |
 | **M6** | Meta domain verification for `thedroneedge.com` — **TXT record via Terraform Route 53, not the console** | Build | Not started |
 | **M7** | Meta for Developers app + System User + CAPI token → Secrets Manager via Terraform. **This is the only "app" Meta needs — not a mobile app** | Build | Not started |
 | **M8** | Aggregated Event Measurement — rank the 8 web events (purchase → signup → preview → checkout → rest) | Config | Not started |
-| **O1** | LinkedIn company Page (B2B credibility) | Signup | Not started |
 | **O2** | Named Reddit / Discord identities for community participation | Signup | Not started |
 
 ### Phase 1 — close the measurement gaps
@@ -199,18 +234,18 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | # | Item | Type | Status |
 |---|------|------|--------|
-| **T1** | Handle `exam_start` / `exam_submit` in `AnalyticsController` — currently sent by the client and silently dropped | Build | Open |
-| **T2** | Write the `EXAM_SUBMITTED` audit row — enum and admin SQL exist, nothing calls `auditService.log` | Build | Open |
-| **T3** | Add funnel events: `signup_started`, `signup_completed`, `preview_started`, `checkout_started`, `purchase_completed`, `consultation_submitted` (**S10**) | Build | Open |
+| **T1** | Handle `exam_start` / `exam_submit` in `AnalyticsController` — currently sent by the client and silently dropped | Build | **Done (verified Oct 4 2026)** — the client already maps to `exam_started` / `exam_submitted`, `recordBatch` stores them (course-scoped), and `exam_submitted` is also written server-side on submit. Close with the next TODO sweep |
+| **T2** | Write the `EXAM_SUBMITTED` audit row — enum and admin SQL exist, nothing calls `auditService.log` | Build | **Code done Oct 4 2026** — `EXAM_SUBMITTED` audit row in `ExamAttemptService.recordSubmitEvents`. Ships with the next deploy |
+| **T3** | Add funnel events: `signup_started`, `signup_completed`, `preview_started`, `checkout_started`, `purchase_completed`, `consultation_submitted` (**S10**) | Build | **Mostly done Oct 4 2026** — `signup_started` (register page), `signup_completed`, `checkout_started` / `pro_checkout_started`, `consultation_submitted` recorded; `purchase_completed` already was. **`preview_started` still open** (no preview event yet). Funnel query: `analytics-queries.md` § 1.1c |
 | **T4** | Harden `POST /analytics/event` + `POST /logs` (**M4**) — spoofed conversions poison ad bidding | Build | Open |
-| **T5** | Grafana alerts: zero `purchase_completed` during active spend; Stripe webhook error rate; 5xx on paid landing routes | Build | Not started |
+| **T5** | Grafana alerts: zero `purchase_completed` during active spend; Stripe webhook error rate; 5xx on paid landing routes | Build | Not started. Metrics exist since Oct 3 2026; only the alert rules are missing: `stripe.webhook.failures{stage}`, `stripe.webhook.replays{result}`, and `stripe.webhook.dead_events` (alert on > 0) |
 
 ### Phase 2 — attribution plumbing (before the first ad dollar)
 
 | # | Item | Type | Status |
 |---|------|------|--------|
 | **T6** | Consent banner + Google Consent Mode v2, default denied; sync `drone/src/app/privacy/page.tsx` | Build | Not started |
-| **T7** | Click-ID / UTM capture in `drone/src/middleware.ts` → first-party `HttpOnly` cookie (first-touch wins, ~90d) | Build | Not started |
+| **T7** | Click-ID / UTM capture in `drone/src/middleware.ts` → first-party `HttpOnly` cookie (first-touch wins, ~90d) | Build | **Code done Oct 3 2026 (launch W5)** — `de_attr` cookie (not HttpOnly: the waitlist form reads it), first touch wins, 90 d; saved on `leads` + signed-in `page_view`. Ships with the W9 deploy. Register attribution still open (X4/T8) |
 | **T8** | `marketing_attribution` table + persist on register / checkout / consultation | Build | Not started |
 | **T9** | GA4 via `@next/third-parties/google`, consent-gated, `afterInteractive` | Build | Not started |
 | **T10** | Meta Pixel, consent-gated, sharing one `eventId` per event with the server-side call | Build | Not started |
@@ -230,11 +265,12 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | # | Item | Type | Status |
 |---|------|------|--------|
 | **T16** | **Three-course bundle SKU in Stripe** — blocked on **D10 / MM1**. Price **must exceed $129**; $69–79 draft retired | Build | Not started |
-| **T17** | Productize `PRO_UPGRADE` as purchasable monthly Stripe subscription | Build | **Partial** — sandbox Pro $35/mo `price_1ULulr2Rw6cpyMyJcc0cCqmA`, Dashboard setup done, end-to-end tested locally Oct 1 2026 (subscribe, renew, fail, cancel, refund). Remaining: browser click-through, PA41 deploy, live price |
+| **T17** | Productize `PRO_UPGRADE` as purchasable monthly Stripe subscription | Build | **Partial** — sandbox Pro $35/mo `price_1ULulr2Rw6cpyMyJcc0cCqmA`, Dashboard setup done, end-to-end tested locally Oct 1 2026 (subscribe, renew, fail, cancel, refund); browser click-through automated and passing Oct 3 2026 (`drone/e2e/`). Remaining: PA41 deploy, live price |
 | **T18** | PWA manifest (`app/manifest.ts`) + maskable icons from the brand kit | Build | Not started |
 | **T19** | PWA service worker (Serwist) — **exclude signed media domain and `/api/*` from caching**; keep protected routes out of precache | Build | Not started |
 | **T20** | Install prompt for logged-in learners only (do not prompt paid traffic mid-conversion) | Build | Not started |
-| **T21** | **Launch promo codes** — set `allow_promotion_codes: true` on both Checkout sessions (or apply a code server-side from a `?promo=` link via `discounts`), create the coupon + promotion code in Stripe (expiry, max redemptions; Pro `duration: once` or `repeating`). Keep list prices unchanged. Rationale: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8.3 | Build | Not started |
+| **T21** | **Launch promo codes** — set `allow_promotion_codes: true` on both Checkout sessions (or apply a code server-side from a `?promo=` link via `discounts`), create the coupon + promotion code in Stripe (expiry, max redemptions; Pro `duration: once` or `repeating`). Keep list prices unchanged. Rationale: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) § 8.3 | Build | **Code done Oct 4 2026** — `?promo=CODE` → `de_promo` cookie (30 d, latest wins) → sent with both checkouts; an active Stripe promotion code is pre-applied via `discounts`, otherwise Checkout shows its own code field. Remaining: create the coupon + promotion code in the Stripe sandbox, then live (E8: `EDGE25`); **never 100% off a course** (no PaymentIntent → no fulfilment). Ships with the next deploy · [`tech/purchase-flows.md`](tech/purchase-flows.md) |
+| **T22** | **App Store compliance (Guidelines 5.1.1(v) + 1.2)** — no self-serve account deletion (`deleteUser` exists but unrouted; admin delete skips analytics tables); comments lack report, block, and filter. Items **AS1–AS10**; AS1–AS5 also close the privacy-notice § 7/§ 9 gap on the web | Build | **AS1–AS5 + AS9 (privacy) code done Oct 4 2026**; AS6–AS8, AS9 Terms clause and AS10 wait for a native-app decision — [`tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) § App Store compliance |
 
 *Prerequisites already tracked elsewhere:* free Unit 1 without verify friction (**S6**), public pricing page (**S2**), home join CTAs (**S3**), email capture / lead magnet (**S5**), dead social links (**S7**), P0 course video.
 
@@ -248,9 +284,9 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **D4** | Can the free Unit 1 work offline for anonymous users (PWA as top-of-funnel)? | T19 scope | Open |
 | **D5** | Keyword volume and CPC for B2B CTE terms (Google Keyword Planner) — is there enough search volume to spend $900 against? | Google Search test | Open |
 | **D6** | Meta audience size and cost estimate for the B2C targeting | Meta test sizing | Open |
-| **D7** | Email sending for marketing sequences — reuse existing transactional setup or separate ESP/subdomain? **Do not send marketing from the transactional domain**; deliverability damage hits password resets and verification | **S5** lead magnet, nurture sequence, **PA13** | Open |
-| **D8** | Consent banner — build in-house vs. off-the-shelf CMP | T6 | Open |
-| **D9** | Refund / access policy wording — required for paid-traffic trust and for Stripe disputes | Paid launch | Open |
+| **D7** | Email sending for marketing sequences — reuse existing transactional setup or separate ESP/subdomain? **Do not send marketing from the transactional domain**; deliverability damage hits password resets and verification | **S5** lead magnet, nurture sequence, **PA13** | **Decided Oct 3 2026: Amazon SES** on `news.thedroneedge.com` (Terraform), built in launch batch 1 (by Oct 7) — [`tech/launch-website-plan.md`](tech/launch-website-plan.md) § 4 Email |
+| **D8** | Consent banner — build in-house vs. off-the-shelf CMP | T6 | **Decided Oct 3 2026: in-house** bottom-strip banner, GA4 on public marketing routes only — launch plan X5 |
+| **D9** | Refund / access policy wording — required for paid-traffic trust and for Stripe disputes | Paid launch | **Decided Oct 3 2026** — 30-day full refund if you completed the first 3 units + one practice exam but not more than half the course or the final exam; 14-day refund if not past free Unit 1; Pro cancel anytime, no partial months; lifetime access = for as long as Drone Edge offers the course; individual purchases only. Full text at `/refunds` (`drone/src/app/refunds/page.tsx`); `/pricing` shows taglines only. Still to do: mirror into Terms of Service (X2) |
 | **D10** | Bundle price — **must sit above the $129 single course**. Old $69/$79 options were the $29-era leftover and would undercut the live SKU. Also: does a correctly priced bundle cannibalize singles? | T16 / MM1 | Open |
 | **D11** | Public marketing video hosting — reuse signed CloudFront HLS or a separate public path? Signed URLs expire and break social embeds | Creative distribution | Open |
 | **D12** | Attach-rate reality check — validate the 20% / 10% course-2/course-3 assumptions once there is data | All CAC targets · **PA10** | Open |
@@ -267,13 +303,13 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | # | Item | Type | Status |
 |---|------|------|--------|
-| **PA41** | **Enable Stripe webhooks** — Stripe dashboard → add endpoint `https://thedroneedge.com/api/purchases/webhook` with `payment_intent.succeeded`, `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`; store the signing secret via Terraform (add a `stripe_webhook_secret` sensitive var + `aws_secretsmanager_secret_version`, same pattern as `test_user_password` — not `put-secret-value`); set `stripe_webhook_enabled = true`; deploy. Until then: one-time course purchases work (server-side `confirm-payment`), but Pro checkout never fulfils, renewals/failed payments/refunds are not recorded, and `/purchases/webhook` answers 400. Also blocks any Pro launch (`STRIPE_PRO_PRICE_ID_*` are empty in tfvars) **Code side fixed Oct 1 2026:** the global JSON body parser was eating the raw body, so signature verification failed on *every* webhook regardless of secret — raw parser for `/purchases/webhook` added in `main.ts` (ships with the next deploy). Endpoint events also need `customer.subscription.created/updated/deleted`. Step-by-step: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) U12 / O2 | Ops | Code ready — endpoint + secret + deploy pending |
-| **PA42** | **Product events idempotent per Stripe event** — redelivered / repeated `customer.subscription.updated` re-emits `pro_cancel_scheduled`, duplicate `customer.subscription.deleted` emits `pro_cancelled` twice (orders/entitlements are already idempotent). Key the webhook-driven events on `event.id` (product_events has `event_id`) or emit only on state change. Found in sandbox run: [`tech/stripe-webhook-payloads.md`](tech/stripe-webhook-payloads.md) | Build | Not started |
+| **PA41** | **Enable Stripe webhooks** — Stripe dashboard → add endpoint `https://thedroneedge.com/api/purchases/webhook` with `payment_intent.succeeded`, `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`; store the signing secret via Terraform (add a `stripe_webhook_secret` sensitive var + `aws_secretsmanager_secret_version`, same pattern as `test_user_password` — not `put-secret-value`); set `stripe_webhook_enabled = true`; deploy. Until then: one-time course purchases work (server-side `confirm-payment`), but Pro checkout never fulfils, renewals/failed payments/refunds are not recorded, and `/purchases/webhook` answers 400. Also blocks any Pro launch (`STRIPE_PRO_PRICE_ID_*` are empty in tfvars) **Code side fixed Oct 1 2026:** the global JSON body parser was eating the raw body, so signature verification failed on *every* webhook regardless of secret — raw parser for `/purchases/webhook` added in `main.ts` (ships with the next deploy). Endpoint events also need `customer.subscription.created/updated/deleted`. **Terraform written Oct 2 2026:** price ID + `stripe_webhook_enabled` in tfvars, secret version via `TF_VAR_stripe_webhook_secret`, and CloudFront `/api/*` now forwards `Stripe-Signature` (it was stripped — a second cause of 400s). Step-by-step: [`tech/stripe-sandbox-test-plan.md`](tech/stripe-sandbox-test-plan.md) U12 / O2+O3 | Ops | Code + Terraform ready; sandbox endpoint `we_1UMRxw2Rw6cpyMyJJbwwf3HU` created Oct 3 2026 — deploy with its secret |
+| **PA42** | **Product events idempotent per Stripe event** — redelivered / repeated `customer.subscription.updated` re-emits `pro_cancel_scheduled`, duplicate `customer.subscription.deleted` emits `pro_cancelled` twice (orders/entitlements are already idempotent). Key the webhook-driven events on `event.id` (product_events has `event_id`) or emit only on state change. Found in sandbox run: [`tech/stripe-webhook-payloads.md`](tech/stripe-webhook-payloads.md) | Build | **Code done Oct 4 2026** — `processEvent` runs inside an event origin (`product-events/event-origin.ts`); `record()` derives `event_id` from (Stripe event id, event name, course) and uses Stripe's `created` as `occurred_at`, so the unique index drops redeliveries/replays |
 | **PA43** | **Disputes / chargebacks** — handle `charge.dispute.created` (flag order, alert) and `charge.dispute.closed` lost (revoke like a full refund). Today access survives a chargeback; low volume, manual until then | Build | Not started |
-| **PA39** | **Create the Grafana alert rules A1–A12, contact point, notification policy and health dashboard** per [`tech/observability.md`](tech/observability.md) (click-ops runbook § 6, ~45 min, after PA34 so the metrics exist). Free tier verified sufficient (10k series; we use ≈5–6k); first step is reading actual active series in Billing → Usage. Then export rule group + dashboard JSON to `docs/tech/grafana/` | Ops | Doc ready — PA34 shipped 2026-09-12, metrics now flowing; do now |
-| **PA7** | Money-model offer events `upsell_*` / `downsell_*` / `kit_lead` / `pricing_viewed` / `checkout_started` from the purchase flow and pricing pages via `track()` (names are already in the allow-list; only the call sites are missing) (**T3**) | Build | Not started |
-| **PA5b** | Remaining audit rows: `EXAM_SUBMITTED` is still only a product event, not an `audit_logs` row (**T2**). Pro cancel / expiry audit rows shipped | Build | Not started |
-| **PA37** | Wire `signup_started` / `signup_completed` / `login` / `email_verified` / `invite_sent` / `invite_redeemed` / `class_created` product events from their server paths (today only audit rows exist for these) | Build | Not started |
+| **PA39** | **Create the Grafana alert rules A1–A15 (A13–A15 = Stripe webhook dead/signature/replay, added Oct 3 2026), contact point, notification policy and health dashboard** per [`tech/observability.md`](tech/observability.md) (click-ops runbook § 6, ~45 min, after PA34 so the metrics exist). Free tier verified sufficient (10k series; we use ≈5–6k); first step is reading actual active series in Billing → Usage. Then export rule group + dashboard JSON to `docs/tech/grafana/` | Ops | **Phase 1 live 2026-10-03:** 7 severe-only rules (Stripe dead/signature/5xx, order/access writes, API errors, API silent, Pro payment failed) → `admin-email`, plus new dashboard `droneedge-health` (scripts `grafana_alerts.py` / `grafana_dashboard.py`, exports in `docs/tech/grafana/`). Remaining: click **Test** on the contact point, phase-2 rules, usage alert at 8k series (we use ~430), delete old broken `DroneEdge` dashboard |
+| **PA7** | Money-model offer events `upsell_*` / `downsell_*` / `kit_lead` / `pricing_viewed` / `checkout_started` from the purchase flow and pricing pages via `track()` (names are already in the allow-list; only the call sites are missing) (**T3**) | Build | **Partial Oct 4 2026** — `checkout_started` / `pro_checkout_started` / `pricing_viewed` live; `upsell_*` / `downsell_*` / `kit_lead` wait for the offer surfaces themselves (no upsell or downsell UI exists yet) |
+| **PA5b** | Remaining audit rows: `EXAM_SUBMITTED` is still only a product event, not an `audit_logs` row (**T2**). Pro cancel / expiry audit rows shipped | Build | **Code done Oct 4 2026** — see **T2** |
+| **PA37** | Wire `signup_started` / `signup_completed` / `login` / `email_verified` / `invite_sent` / `invite_redeemed` / `class_created` product events from their server paths (today only audit rows exist for these) | Build | **Code done Oct 4 2026** — `signup_started` (client), `signup_completed`, `login`, `email_verified`, `invite_sent` (single + bulk, with count), `invite_redeemed`, `class_created` (server) |
 | **PA38** | Sort manager progress table quietest-first by default and add the watch-% ring in the summary row (the lesson grid shows % per unit already) | Build | Not started |
 
 ### Manager progress visibility — follow-ups
@@ -287,11 +323,26 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | # | Question | Blocks | Status |
 |---|----------|--------|--------|
-| **MPD1** | Auto-complete a section at 90% video watched, or keep completion a learner action and show watch % beside it? Recommendation: manual for v1 — "watched but not completed" is a signal, not noise | MP4 | Open |
+| **MPD1** | Auto-complete a section at 90% video watched, or keep completion a learner action and show watch % beside it? — **Decided 2026-10-04 (PTD7): keep manual**; revisit after the classroom pilot | MP4 | Closed |
 | **MPD2** | Instrument embedded YouTube/Vimeo players? — **Decided 2026-09-12: nothing needed.** Content is self-hosted; embeds would only ever be free/marketing clips and get `lesson_viewed` + heartbeats like any page | MP8 | Closed |
 | **MPD3** | Teacher "inactive" threshold — **Decided 2026-09-12 with PD7:** 7 days for the classroom view ("Active this week"), 30 days contractual ("Active seats (30d)"); same query, two constants | MP5 | Closed |
 | **MPD4** | Present heartbeat minutes to teachers rounded ("~20 min in course") or hide until **PD4** is settled? | MP5 | Open |
 | **MPD5** | Do we need a class-scoped teacher role before the second multi-teacher school? | MP9 | Open |
+
+### Progress tracking accuracy (teacher trust)
+
+*Plan, metric contract, risk register (R1–R21) and decisions (PTD1–PTD7): [`tech/progress-tracking-accuracy.md`](tech/progress-tracking-accuracy.md). Started 2026-10-04.*
+
+| # | Item | Type | Status |
+|---|------|------|--------|
+| **PTA1** | Phase 1 — backend fixes R1–R8, R20 + `backend/test/progress-tracking.e2e-spec.ts` (14 tests) + `video-completion.spec.ts`; video completion rule with `video_outro_seconds` | Build | **Done locally 2026-10-04 — uncommitted, not deployed** |
+| **PTA2** | After deploy: run `rollupDaily(35)` once so the last 35 days of engagement numbers use the distinct definitions **and org-local days** (rebuilds `product_events_daily` only — no progress, ✓ or video state changes; PTD2 decided: no video recompute). Before deploy: set `timezone` on any non-Eastern org (current school is Eastern — nothing to do) | Ops | Needs approval |
+| **PTA3** | Phase 1b — golden teacher-endpoint fixtures + PTD4 (org time zone) + PTD5 (students × assigned courses) + R17 exam races; `backend/test/teacher-views.e2e-spec.ts` (9 tests) | Build | **Done locally 2026-10-04 — uncommitted, not deployed** |
+| **PTA4** | Phase 2 — Vitest client suite (24 tests, `cd drone && npm test`) + fixes R9 (section video ranges), R10 (per-event validation), R11 (beacon all + in-flight persistence), R12 (offline), R21 | Build | **Done locally 2026-10-04 — uncommitted, not deployed** |
+| **PTA5** | Phase 3 — Playwright scripted-student scenarios (§ 5 table), incl. ad-blocker check (R16) | Build | Not started |
+| **PTA6** | Phase 4 — nightly invariant SQL checks + Grafana alerts on `product_events.dropped{reason}` | Build | **Done locally 2026-10-05 — uncommitted, not deployed.** After deploy: `scripts/grafana_alerts.py apply` (2 new warning rules) |
+| **PTA7** | Phase 5 — one-week classroom pilot log vs dashboard (Chichester Edgemont) | Ops | Not started |
+| **PTA8** | Set `video_outro_seconds` on Part 107 videos that end with credits / end cards > 10 s | Content | Not started |
 
 ### Phase 4 — act on it
 
@@ -345,7 +396,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **PD20** | Materialize org seats as `entitlements` rows, or derive from members × org courses in the view? Recommendation: derive — avoids fan-out writes when a course is attached to an org | PA27 | Open |
 | **PD21** | Bundle revenue allocation per course — proportional to standalone price (recommended) or equal split? Computed at grant time, never recomputed | PA27, T16 | Open |
 | **PD22** | When does `hasAccess` switch to `entitlements`? — **Decided:** behind `ENTITLEMENTS_AUTHORITATIVE`, enabled in the PA34 deploy (14-night wait waived on the strength of the prod-clone trace; `access_diff` keeps running nightly as the post-hoc gate). Granting access is unaffected: purchase, admin grant, signup link, Pro and org seats all keep working (they already write the ledger); only the *read* changes | PA27 | Decided → PA36 |
-| **PD23** | Archive org-member raw events to S3 at the 12-month boundary, or delete? Recommendation: **delete** unless the DPA covers the archive and user deletion reaches S3; archive B2C partitions; keep rollups for everyone with cascade-on-delete | PA31, PD2 | Open |
+| **PD23** | Archive org-member raw events to S3 at the 12-month boundary, or delete? | PA31, PD2 | **Decided Oct 4 2026:** org-member rows deleted (as built); B2C rows archived **without `user_id` / `anonymous_id`**, so the archive identifies no one and account deletion never has to reach S3. Rollups kept for everyone, cascade on delete. Code change ships with AS5 (Batch 2) |
 
 ---
 
@@ -364,14 +415,13 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | Item | Status | Source |
 |------|--------|--------|
-| **Public pricing page** (`/pricing`) | Not started | **S2** · GTM review |
-| **Reduce signup friction for freemium** — defer email verify for Unit 1 preview only | Open | **S6** (partial) · Wave 2 |
-| **Home page join CTAs** — Try Unit 1 free primary, purchase/preview secondary, header Sign up | Not started | **S3** · Wave 2 |
+| **Public pricing page** (`/pricing`) | **Code done Oct 3 2026 (launch X1, pulled into batch 1)** — free Unit 1 → $129 → Pro $35/mo → Schools from $79/seat; refund taglines link to the full `/refunds` policy (E7 decided). Ships with the W9 deploy | **S2** · GTM review |
+| **Reduce signup friction for freemium** — defer email verify for Unit 1 preview only | **Code done Oct 3 2026 (launch X6)** — backend never required verification for checkout or Unit 1; register now signs the user in right away and continues to checkout / the intended page (no "verify before checkout" copy). Ships with the W9 deploy | **S6** (partial) · Wave 2 |
+| **Home page join CTAs** — Try Unit 1 free primary, purchase/preview secondary, header Sign up | **Code done Oct 3 2026** — hero CTAs already live; header Sign up added (launch W6). Ships with the W9 deploy | **S3** · Wave 2 |
 | **Testimonials / social proof** | Not started | **S4** |
-| **Email capture / lead magnet** (e.g. free practice exam) | Not started | **S5** |
-| **Fix or remove dead social links** (footer `#` hrefs; JSON-LD `sameAs`) | Open | **S7** |
-| **Conversion funnel analytics** — signup_started, purchase_completed, consultation_submitted | Partial | **S10** — exam events sent but dropped by backend; signup/purchase missing · [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) Phase 1 |
-| **Creative / STEM tracks** | **Pre-launch** — finish both tracks (P0) | **S11** (partial — track stubs exist) |
+| **Email capture / lead magnet** (e.g. free practice exam) | **Capture half code done Oct 3 2026 (launch W3 + Z1–Z5)** — `leads` table, `POST /leads`, waitlist form, SES confirmation, one-click unsubscribe, admin Leads tab + CSV, SES broadcast. Lead magnet itself not started. Ships with the W9 deploy; needs `marketing_postal_address` set + SES production access | **S5** |
+| **Conversion funnel analytics** — signup_started, purchase_completed, consultation_submitted | **Code done Oct 4 2026** (Batch 2 group 4) — all three recorded; query in `analytics-queries.md` § 1.1c. `preview_started` still open | **S10** · [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) Phase 1 |
+| **Creative / STEM tracks** | **Oct 3 2026 (launch W1):** removed from home, footer and funding page; `/courses/tracks/video` + `/ai` 308 → `/courses`; kept on `/schools/curriculum` as **Planned** (AI possibly step 2 of Drone Building — RL). Ships with the W9 deploy | **S11** (partial) |
 
 ---
 
@@ -382,6 +432,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | Item | Status | Source |
 |------|--------|--------|
 | **Verify prod video signing end-to-end** — smoke-test HLS after first video | Open | Wave 2 · P0 recordings |
+| **SES multi-region** (Oct 5 2026) — SES is single-region (`var.aws_region`, us-east-1): identity, configuration set, events topic, reputation, production access and the `click.news` tracking origin (`r.us-east-1.awstrack.me`) are all per region, and the backend's SES client follows `AWS_REGION`. Moving or adding servers in another region does **not** double-send, but running this stack there as-is would (a) send from an unverified sandbox region and (b) collide on `click.news` / `bounce.news` / `_dmarc.news` DNS. Simplest plan: pin SES to us-east-1 with a separate `SES_REGION` env var regardless of where servers run. True multi-region sending needs per-region identity + DKIM, MAIL FROM, config set, SNS topic, tracking subdomain (`click-<region>.news…`) + CloudFront, and a production-access request per region | Open — revisit before any second region | `terraform/ses.tf` · `terraform/ses_tracking.tf` header · `backend/src/email/marketing-mailer.service.ts` |
 | **Classroom / shared-IP rate limits** — WAF raised to 20k/5 min (Sep 17 2026) after Chichester NAT `50.227.29.34` got 403s. Nest still keys anonymous login/register/`POST /logs` by IP (30/min global, 10/min logs). A 30-student lab on one NAT will 429 at bell (login) and at the hour-mark (expired access JWT → IP fallback); quiet video playback is fine (per-user after login). **Proposed Nest pass first** (do not raise the global 30; do not start with a school IP-set): (1) `UserThrottlerGuard` verify with `ignoreExpiration: true` so expired cookies still key `user:${sub}`; (2) login/register **120/min/IP** plus **8/10 min per normalized username-or-email**, refresh **120/min/IP**; (3) stop shipping expected 401/429 to `/logs` (optionally raise `/logs` to 30/min once per-user). WAF path exclusions / school allowlist stay later — coffee shops and 1:1 NAT are the same class of problem. Do **not** just "tighten `/logs`" (M4). Detail below. | Open | Sep 17 classroom 403 review · `terraform/cloudfront_frontend.tf` · `UserThrottlerGuard` · `logging.controller.ts` |
 | **Tighten `POST /logs`** — DTO done; throttle is **not** "make it stricter" (see classroom rate-limits row). Remaining: fold into that item — expired-JWT user key + don't POST expected 401/429; keep payload cap; auth on `/logs` still deferred | Open | Wave 1 · **M4** · classroom rate limits |
 | **Analytics, pixels, attribution, PWA** — see **P1 — Paid acquisition build** above (T1–T20, D1–D12) | Sequenced | [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) · [`tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) |
@@ -410,7 +461,7 @@ WAF 20k/5 min is already live. Remaining pain is **Nest IP buckets** on a shared
 
 1. **`UserThrottlerGuard`:** `verify` with `ignoreExpiration: true` (signature still required). Expired access cookie stays `user:${sub}` — fixes hour-mark stampede and most `/logs` IP collapse.
 2. **Login/register** `@Throttle` **120/min/IP** (not the global 30) + **8/10 min per normalized username-or-email** (same `findForLogin` key). Stops one-account spray without punishing the lab. Keep login UI: disable submit while loading; existing shared-network 429 copy.
-3. **`POST /auth/refresh` 120/min/IP** (refresh has no access JWT by design). Optional: single-flight refresh in `api-client`; proactive refresh at ~50 min later.
+3. **`POST /auth/refresh` 120/min/IP** (refresh has no access JWT by design). Single-flight refresh in `api-client` done Oct 3 2026 (plus race-safe rotation on the backend); proactive refresh at ~50 min still optional, later.
 4. **`POST /logs`:** do not ship expected classroom noise (login 401, "Session expired", 429). Optionally raise to 30/min once per-user. Keep 8 KB context cap. Requiring auth on `/logs` stays deferred (login-page errors still useful).
 
 **Defer:** school IP-set allowlist and WAF path exclusions (`/api/logs`, `/api/analytics/event`, `/_next/static`, favicon). Same class of problem exists off-campus; Nest pass is enough for 30.
@@ -440,7 +491,7 @@ The plan is to rotate **into prod** rather than in place — a `--env prod` stac
 | **M2** | Unlimited exam retries; answer key via `GET …/attempt` | **Partial** — `sanitizeAnswers` strips keys on read; unlimited retries remain |
 | **M3** | `GET /users/:username` returns email + role to any logged-in user | **Open** — return `UserSlim` or restrict to self/admin |
 | **M4** | Unauthenticated `/logs` + `/analytics/event` ingestion | **Partial** — analytics DTO validated; `/logs` DTO exists; throttle still IP-keyed at 10/min (classroom 429s Sep 17 — see **Classroom / shared-IP rate limits**) |
-| **L1** | SQL logging in prod; PII in logs; open Swagger `/api` | **Open** |
+| **L1** | SQL logging in prod; PII in logs; open Swagger `/api` | **Code done Oct 3 2026 (launch W7)** — Swagger off when `NODE_ENV=production` (`ENABLE_SWAGGER=true` override); emails masked in auth/signup-link logs (`common/pii.ts`); TypeORM CLI logs errors only in prod (the app connection never logged SQL). Ships with the W9 deploy |
 | **H2** | Orphaned question links in bulk JSON | **Partial** — import validates refs against `course_units`; reconcile bulk artifact orphans |
 | **L1** | `Exam.question_ids` silent filter; deprecated `image_url` | **Partial** — `images_url` migration done; silent filter still by design |
 | **A4** | Videos without captions/transcripts | **Open** — also P0 |

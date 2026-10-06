@@ -26,11 +26,11 @@ Sync from prod as of July 2026. Fill **Prod ID** when known (check admin or URL 
 
 | Title | Prod status | Image | Prod date | Prod ID | Repo slug |
 |-------|-------------|-------|-----------|---------|-----------|
-| Drone Careers in 2026: Agriculture, Fire, Delivery, and Beyond the Hobby | Published | Yes | 5/21/2026 | _fill_ | `story-11-drone-careers` |
-| FPV Drones and the Rewriting of Land Warfare: What Changed After 2022 | Published | Yes | 5/20/2026 | _fill_ | `story-01-ukraine-fpv-warfare` |
-| Ukraine's Drone Industrial Push: How a Country Scaled Small UAS Production | Published | Yes | 5/2/2026 | _fill_ | `advance-06-ukraine-mass-drone-production` |
-| Batteries, Motors, and Endurance: The Physics Ceiling on Electric Drones | Published | Yes | 3/29/2026 | _fill_ | `advance-05-energy-propulsion` |
-| Onboard AI and Computer Vision on Small Drones: From Obstacle Avoidance to Edge Inference | Published | Yes | 3/29/2026 | _fill_ | `advance-01-onboard-ml-computer-vision` |
+| Drone Careers in 2026: Agriculture, Fire, Delivery, and Beyond the Hobby | Published | Yes | 5/21/2026 | 39 | `story-11-drone-careers` |
+| FPV Drones and the Rewriting of Land Warfare: What Changed After 2022 | Published | Yes | 5/20/2026 | 38 | `story-01-ukraine-fpv-warfare` |
+| Ukraine's Drone Industrial Push: How a Country Scaled Small UAS Production | Published | Yes | 5/2/2026 | 37 | `advance-06-ukraine-mass-drone-production` |
+| Batteries, Motors, and Endurance: The Physics Ceiling on Electric Drones | Published | Yes | 3/29/2026 | 36 | `advance-05-energy-propulsion` |
+| Onboard AI and Computer Vision on Small Drones: From Obstacle Avoidance to Edge Inference | Published | Yes | 3/29/2026 | 35 | `advance-01-onboard-ml-computer-vision` |
 | AI & Drones | Hidden | Yes (8 blocks) | 2/19/2026 | _fill_ | _legacy CMS — no slug file_ |
 
 ### Other published repo articles (confirm in admin)
@@ -58,8 +58,8 @@ These exist in `assets/articles/import/` — confirm Published/Hidden and dates 
 
 | Priority | Slug | Title | Repo file | Status | Prod ID | Notes |
 |----------|------|-------|-----------|--------|---------|-------|
-| **P0-a** | `school-01-part-107-cte-classroom` | Part 107 in the HS CTE Classroom + Teacher Visibility | `school-01-part-107-cte-classroom.json` | **Ready (repo)** | — | Hero: `/images/articles/school-01-part-107-cte-classroom-hero.png` |
-| **P0-b** | `school-02-funding-drone-programs` | Funding Drone Programs in Schools | `school-02-funding-drone-programs.json` | **Ready (repo)** | — | Hero: `/images/articles/school-02-funding-drone-programs-hero.png` |
+| **P0-a** | `school-01-part-107-cte-classroom` | Part 107 in the HS CTE Classroom + Teacher Visibility | `school-01-part-107-cte-classroom.json` | **Published (prod)** Jul 3 2026 | 40 | Hero: `https://media.thedroneedge.com/articles/school-01-part-107-cte-classroom-hero-7788149f.png` |
+| **P0-b** | `school-02-funding-drone-programs` | Funding Drone Programs in Schools | `school-02-funding-drone-programs.json` | **Ready (repo)** | — | Hero: `https://media.thedroneedge.com/articles/school-02-funding-drone-programs-hero-d35cfca8.png` |
 | P1 | `school-03-pilot-vs-full-year` | Pilot Semester vs Full-Year | `school-03-pilot-vs-full-year.json` | Draft (repo) | — | Expand before publish |
 | P1 | `school-04-kits-vs-curriculum` | Drone Kits vs Curriculum | `school-04-kits-vs-curriculum.json` | Draft (repo) | — | |
 | P1 | `school-05-hybrid-async-prep` | Hybrid and Async Part 107 Prep | `school-05-hybrid-async-prep.json` | Draft (repo) | — | Add screenshots |
@@ -74,6 +74,16 @@ These exist in `assets/articles/import/` — confirm Published/Hidden and dates 
 | B | `b2c-02-practice-questions-prep` | Part 107 Practice Questions: What Good Prep Looks Like | `b2c-02-practice-questions-prep.json` | Draft (repo) | — | Rep objection handler |
 | C | `b2c-03-twenty-nine-vs-ground-school` | $29 Part 107 vs Ground School | `b2c-03-twenty-nine-vs-ground-school.json` | Draft (repo) — **stale** | — | **Rewrite at $129** before publish. Slug and title still say $29 (Jul 2026 price). Course JSON is $129. |
 | D | — | From hobbyist to commercial (90 days) | — | **Not started** | — | Defer; `story-11-drone-careers` covers most |
+
+### Gap series: jobs, hobby, building, education, grants (Oct 2026)
+
+Drafted 2026-10-03 from the keynote thesis ([`keynote-vision-two-gaps.md`](keynote-vision-two-gaps.md)). Stats and sources: [`article-stats-2026-10.md`](article-stats-2026-10.md). Keep/retire decisions for every other article: [`article-review-2026-10.md`](article-review-2026-10.md).
+
+| Slug | Title | Audience | Status | Prod ID | Notes |
+|------|-------|----------|--------|---------|-------|
+| `gap-01-who-gets-to-build-drones` | Who Gets to Build Drones? | Students, hobbyists, makers | **Draft (repo), human review** | — | CTA needs `/courses/tracks/building` (launch W2) live first |
+| `gap-02-drone-education-every-level` | Drone Education in 2026: every level | Parents, teachers, CTE | **Draft (repo), human review** | — | |
+| `gap-03-funding-school-drone-programs-2026` | Funding a School Drone Program in 2026 | CTE directors, grant writers | **Draft (repo), human review** | — | Companion to school-02; talk follow-up link |
 
 ### Non-article assets
 

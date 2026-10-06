@@ -11,6 +11,7 @@ import { loginHref, registerHref, sanitizeRedirect } from '@/app/lib/auth-redire
 const navLinks = [
   { href: '/articles', label: 'Articles' },
   { href: '/courses', label: 'Courses' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/schools', label: 'For Schools' },
   { href: '/contact', label: 'Contact' },
   { href: '/about', label: 'About' },
@@ -70,7 +71,7 @@ function HeaderInner() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide text-[var(--brand-muted)]">
+        <div className="hidden md:flex items-center gap-4 lg:gap-8 text-sm font-medium tracking-wide text-[var(--brand-muted)]">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -83,10 +84,10 @@ function HeaderInner() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Book a Call CTA — always visible on desktop */}
+          {/* Book a Call CTA — lg+ (md is too narrow next to Log in / Sign up; mobile menu has it) */}
           <Link
             href="/consultation"
-            className="hidden md:inline-flex items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-black)] transition-colors"
+            className="hidden lg:inline-flex items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-black)] transition-colors"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Book a Call
@@ -134,18 +135,21 @@ function HeaderInner() {
             </div>
           ) : (
             <>
-              <Link
-                href={registerHrefResolved}
-                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
-                style={{ borderRadius: 'var(--radius-sm)' }}
-              >
-                Get started
-              </Link>
+              {/* Log in (secondary) + Sign up (primary). Sign up stays visible on phones;
+                  Log in moves into the mobile menu below sm. */}
               <Link
                 href={signInHref}
-                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium tracking-wide text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] transition-colors touch-manipulation"
+                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--surface)] transition-colors touch-manipulation"
+                style={{ borderRadius: 'var(--radius-sm)' }}
               >
-                Sign in
+                Log in
+              </Link>
+              <Link
+                href={registerHrefResolved}
+                className="inline-flex items-center justify-center min-h-[44px] px-3 sm:px-4 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
+                style={{ borderRadius: 'var(--radius-sm)' }}
+              >
+                Sign up
               </Link>
             </>
           )}
@@ -185,20 +189,22 @@ function HeaderInner() {
             </Link>
             {!user && (
               <>
-                <Link
-                  href={registerHrefResolved}
-                  className="block min-h-[44px] flex items-center px-3 mt-2 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] touch-manipulation"
-                  style={{ borderRadius: 'var(--radius-sm)' }}
-                >
-                  Get started
-                </Link>
-                <Link
-                  href={signInHref}
-                  className="block min-h-[44px] flex items-center px-3 text-sm font-medium tracking-wide text-[var(--brand-foreground)] touch-manipulation"
-                  style={{ borderRadius: 'var(--radius-sm)' }}
-                >
-                  Sign in
-                </Link>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <Link
+                    href={signInHref}
+                    className="min-h-[44px] flex items-center justify-center px-3 text-sm font-medium tracking-wide border border-[var(--surface-border)] text-[var(--brand-foreground)] touch-manipulation"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href={registerHrefResolved}
+                    className="min-h-[44px] flex items-center justify-center px-3 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] touch-manipulation"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
+                  >
+                    Sign up
+                  </Link>
+                </div>
               </>
             )}
             {user && (

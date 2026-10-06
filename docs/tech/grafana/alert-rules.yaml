@@ -1,0 +1,338 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: droneedge-critical
+      folder: ""
+      interval: 1m
+      rules:
+        - uid: cg057nd9rkglcb
+          title: Stripe events dead
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: max(stripe_webhook_dead_events{service_name="droneedge"}) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: 'Someone''s purchase, renewal, cancel or refund is not recorded. Check stripe_event_replays (status=dead, last_error), fix the cause, run POST /purchases/admin/replay-failed-events, then set resolved_at. Runbook: docs/tech/purchase-flows.md ''When a webhook fails''.'
+            summary: A Stripe event failed Stripe's retries and 5 hourly replays.
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: eg057nd9u2cxsb
+          title: Stripe webhook signature failing
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(increase(stripe_webhook_failures_total{service_name="droneedge",stage="signature"}[1h])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 2
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: Usually a wrong/rotated whsec_ or CloudFront stripping Stripe-Signature. Nothing is recorded until fixed; Stripe keeps retrying. Compare STRIPE_WEBHOOK_SECRET with Stripe Dashboard -> Webhooks. A stray bot hit can cause 1-2; 3+ in an hour is real.
+            summary: Stripe webhook deliveries are being rejected (bad signature).
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: ag057nd9z25mob
+          title: Stripe webhook 5xx
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(increase(http_server_duration_milliseconds_count{service_name="droneedge",http_route="/purchases/webhook",http_status_code=~"5.."}[15m])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: Stripe retries and the hourly replay picks it up, but find the error in CloudWatch /ecs/droneedge-dev/api-server (search 'Received Stripe event').
+            summary: Our webhook handler errored on a Stripe event.
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: fg057nda1k1z4e
+          title: Order or access write failed
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: (sum(increase(orders_record_failures_total[1h])) or vector(0)) + (sum(increase(entitlements_write_failures_total[1h])) or vector(0))
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: 'orders: POST /purchases/admin/backfill-order with the PaymentIntent id. entitlements: re-run the grant (POST /users/:id/courses) — idempotent.'
+            summary: A paid purchase has no order row or no access grant.
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: dg057nda41ybkd
+          title: API error rate high
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: (((sum(rate(http_server_duration_milliseconds_count{service_name="droneedge",http_status_code=~"5.."}[5m])) or vector(0)) / clamp_min(sum(rate(http_server_duration_milliseconds_count{service_name="droneedge"}[5m])), 0.001)) and on() (sum(increase(http_server_duration_milliseconds_count{service_name="droneedge",http_status_code=~"5.."}[10m])) >= 5)) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0.05
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          for: 10m
+          annotations:
+            description: Outage or bad deploy. Check the latest ./pipeline.sh run and CloudWatch logs; roll back by redeploying the previous image if it started with a release.
+            summary: More than 5% of API requests are failing with 5xx (10 min, at least 5 errors).
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: eg057nda6juo0e
+          title: API not reporting
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(count_over_time(target_info{service_name="droneedge"}[15m])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: lt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          for: 5m
+          annotations:
+            description: API down, crash-looping, or the Grafana OTLP export is broken. Check ECS service droneedge-dev-api-server and https://thedroneedge.com/api/health.
+            summary: No telemetry from the API for 15 minutes.
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: fg057nda91r0gf
+          title: Pro payment failed
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(increase(stripe_payments_failed_total[1h])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: Stripe retries the card and emails the customer automatically. Look at Stripe Dashboard -> Subscriptions (past_due). Pro access is kept while past_due and removed if Stripe finally cancels.
+            summary: A Pro subscription payment failed.
+          labels:
+            severity: warning
+            team: core
+          isPaused: false

@@ -173,6 +173,8 @@ Rate budget: events are buffered client-side and flushed as one batch every 30 s
 
 All under `@UseGuards(JwtAuthGuard, OrgManagerGuard)`, all accept `?classId=`.
 
+**Scope and days (2026-10-04, PTD4/PTD5 in [`progress-tracking-accuracy.md`](progress-tracking-accuracy.md)):** every read counts students only (`role = member`) on the org's assigned courses, in the org's local days (`organizations.timezone`). Golden-fixture tests: `backend/test/teacher-views.e2e-spec.ts`.
+
 | Endpoint | Change | Returns |
 |----------|--------|---------|
 | `GET /organizations/:id/progress` | **extend** `MemberCourseProgressSummary` | `+ last_activity_at`, `+ completed_at`, `+ minutes_engaged_7d`, `+ videos_completed`, `+ videos_total` |

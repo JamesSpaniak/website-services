@@ -7,29 +7,6 @@ export type ArticleImportResult = {
   body: string;
 };
 
-const SEO_SECTION_MARKER = 'Topics & related search terms';
-
-/**
- * Appends a short block so `seo_phrases` from imports are always present in the
- * indexable HTML body (in addition to natural use elsewhere).
- */
-export function mergeSeoPhrasesIntoBody(html: string, phrases: string[] | undefined): string {
-  if (!phrases?.length) return html;
-  if (html.includes(SEO_SECTION_MARKER)) return html;
-
-  const parts = phrases.map((p) => `<strong>${escapeHtml(p)}</strong>`).join(', ');
-  const block = `<h2>${SEO_SECTION_MARKER}</h2>\n<p>Topics and queries covered in this piece: ${parts}.</p>`;
-  return `${html.trimEnd()}\n\n${block}`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 /**
  * Parses our `news/articles/*.json` shape (and close variants) from a pasted string.
  * Returns null if the text is not a matching article JSON object.
@@ -67,12 +44,8 @@ function normalizeArticleImportObject(o: Record<string, unknown>): ArticleImport
     (typeof o.image_url === 'string' && o.image_url.trim()) ||
     '';
 
-  const phrases = Array.isArray(o.seo_phrases)
-    ? o.seo_phrases.filter((x): x is string => typeof x === 'string').map((s) => s.trim()).filter(Boolean)
-    : [];
-
-  const bodyPrepared = prepareArticleBodyHtml(rawBody);
-  const body = mergeSeoPhrasesIntoBody(bodyPrepared, phrases);
+  // `seo_phrases` stays metadata only — never appended to the body (keyword stuffing).
+  const body = prepareArticleBodyHtml(rawBody);
 
   return { title, sub_heading, image_url, body };
 }

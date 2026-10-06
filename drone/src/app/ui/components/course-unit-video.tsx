@@ -9,6 +9,8 @@ interface CourseUnitVideoProps {
     courseId: number;
     unitId: string;
     videoUrl?: string;
+    /** Payload `video_outro_seconds` — credits excluded from the completion rule. */
+    outroSeconds?: number;
     title: string;
 }
 
@@ -61,6 +63,7 @@ export default function CourseUnitVideo({
     courseId,
     unitId,
     videoUrl,
+    outroSeconds,
     title,
 }: CourseUnitVideoProps) {
     const needsSigning = needsSignedMediaUrl(videoUrl);
@@ -170,6 +173,7 @@ export default function CourseUnitVideo({
                 courseId={trackable ? courseId : undefined}
                 unitRef={trackable ? unitId : undefined}
                 startPosition={resumeAt}
+                outroSeconds={outroSeconds}
             />
         </div>
     );

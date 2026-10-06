@@ -101,16 +101,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.35,
     },
     {
-      url: `${SITE_URL}/courses/tracks/video`,
+      url: `${SITE_URL}/refunds`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.35,
+    },
+    {
+      url: `${SITE_URL}/courses/tracks/building`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/newsletter`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: `${SITE_URL}/courses/tracks/ai`,
+      url: `${SITE_URL}/pricing`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.8,
     },
   ];
 

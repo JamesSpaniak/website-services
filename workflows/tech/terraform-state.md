@@ -131,6 +131,8 @@ TFI aws_iam_policy.analytics_archive_policy  arn:aws:iam::<account>:policy/drone
 TFI aws_iam_role_policy_attachment.ecs_task_role_analytics_archive_attachment \
     "droneedge-dev-ecs-task-role/arn:aws:iam::<account>:policy/droneedge-dev-analytics-archive-policy"
 TFI aws_cloudwatch_metric_alarm.nat_no_egress droneedge-dev-nat-no-egress
+TFI aws_cloudwatch_metric_alarm.ses_bounce_rate droneedge-dev-ses-bounce-rate
+TFI aws_cloudwatch_metric_alarm.ses_complaint_rate droneedge-dev-ses-complaint-rate
 ```
 
 Most import IDs are the resource's own name or ARN; S3 sub-resources take the

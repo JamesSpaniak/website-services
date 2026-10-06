@@ -108,6 +108,43 @@ Instead: when the caller is a native client, have the media endpoint also return
 
 ---
 
+## App Store compliance — account deletion and comments (audit Oct 4 2026)
+
+Two review guidelines block submission independently of the HLS work. Both are **web changes too** — the Capacitor build ships the same UI, and the privacy notice already promises deletion — so build them before the wrap.
+
+### Current state
+
+| Guideline | Requirement | Status |
+|-----------|-------------|--------|
+| **5.1.1(v)** account deletion | User can **initiate** deletion inside the app (email-only is rejected) | ✅ Oct 4 2026 — Profile → **Delete account** → `POST /auth/delete-account` (password re-entry). Students in a school account are routed to their school / email (the org controls those accounts) |
+| 5.1.1(v) | Deletion removes the account's data, not just deactivates | ✅ Oct 4 2026 — admin and self-service share `purgeAccount`: FK-less analytics + exam tables, `leads` by email, Stripe customer; archive holds no ids (PD23) |
+| **1.2** UGC | Users can remove their own content | ✅ `DELETE /comments/:id` (own or admin) |
+| 1.2 | Filter objectionable material | ❌ None on create/edit |
+| 1.2 | Report offensive content, with timely response | ❌ No endpoint, UI, or admin queue |
+| 1.2 | Block abusive users | ❌ None |
+| 1.2 | Published contact info | ✅ Privacy notice § 9 |
+
+### Build items
+
+| # | Item | Size |
+|---|------|------|
+| **AS1** | ✅ **Done Oct 4 2026** — `POST /auth/delete-account` (not `DELETE /users/me`: the auth controller owns cookie clearing). Password re-entry; wrong password → 400. Refuses admins and org members (students); managers allowed. No `token_version` bump needed — the user row is gone, so the JWT strategy rejects the old token; sessions cascade | S |
+| **AS2** | ✅ **Done Oct 4 2026** — `DeleteAccountSection` at the bottom of `/profile`: what is removed (purchases are not refunded, Pro cancelled with no partial refund), type `DELETE` + password, then a full load of `/account-deleted` | S |
+| **AS3** | ✅ **Done Oct 4 2026** — both paths call `UsersService.purgeAccount`. The admin path previously skipped the analytics tables, and `deleteUser` skipped `exam_attempts` (no FK) — both fixed | XS |
+| **AS4** | ✅ **Done Oct 4 2026** (`stripe.customers.del` cancels the subscription in the same call; a Stripe failure doesn't undo the deletion — admin is emailed) — Purge data held outside the `users` FK graph, inside the same flow: every `leads` row by email, newsletter included (or add to SES suppression) — see [`newsletter-plan.md`](../marketing/newsletter-plan.md) § 7c NL-A1; Stripe customer (`stripe.customers.del` on `stripe_customer_id`); `orders` email columns are **kept** (tax / dispute retention, privacy § 7; `user_id` already `SET NULL`); the `USER_DELETED` audit metadata **keeps the email**, but `audit_logs` rows cascade-delete with the actor, so the self-delete row is written with a null actor (migration: `audit_logs.user_id` is `NOT NULL` today; make it nullable, keep the cascade); an active Pro subscription is **cancelled immediately** before the Stripe customer is deleted. *Decided Oct 4 2026* | S |
+| **AS5** | ✅ **Done Oct 4 2026** — PD23: the archive job drops `user_id` and `anonymous_id` before writing to S3, so deletion never needs to reach the archive | XS |
+| **AS6** | Comment reports — `comment_reports` table (comment, reporter, reason, status), `POST /comments/:id/report`, "Report" in the comment menu, admin queue tab (dismiss / delete comment / delete user). Optional auto-hide at N reports. Email admin on new report so "timely response" is real | M |
+| **AS7** | User blocks — `user_blocks` (blocker, blocked; both `ON DELETE CASCADE`), `POST`/`DELETE /users/:id/block`, "Block user" in the comment menu, `getComments` hides blocked authors for the blocker | M |
+| **AS8** | Objectionable-content filter — word list checked on comment create/edit (reject or hold for review) | S |
+| **AS9** | **Privacy half done Oct 4 2026** (§ 7 what deletion removes/keeps, § 9 in-app deletion). **Terms clause deferred with AS6–AS8**: `/legal` is the B2B Sales Agreement synced to invoice PDFs, so a consumer UGC / zero-tolerance clause needs a separate Terms of Use page or counsel review | XS |
+| **AS10** | Review notes + App Privacy labels in App Store Connect: where deletion lives, how reporting/blocking works, demo account. Label Email Address for *Developer's Advertising or Marketing* (newsletter). If app signups ever feed Meta CAPI / Google, add the ATT prompt (5.1.2) — newsletter plan § 7c NL-A4 | XS |
+
+**Alternative for 1.2:** hide the comments UI in the app build (build flag, like Stripe Elements). AS6–AS8 then become optional for submission. AS1–AS5 are required either way.
+
+**Estimate:** AS1–AS4 ≈ 1 day · AS6–AS8 ≈ 2–3 days · AS9–AS10 ≈ ½ day. Re-check both guidelines at submit time.
+
+---
+
 ## What each change costs the website
 
 Nearly every mobile alignment change is **additive**. There is one thing you must not do, and one genuine tradeoff.
@@ -194,8 +231,9 @@ AI compresses code, not calendar. Budget wall-clock for enrollment, TestFlight, 
 ## Suggested sequence
 
 1. **PWA on the web (1–2 weeks)** — `manifest.ts`, Serwist SW (with media/`/api` exclusions), offline shell, web push. Measure installs and push engagement. Required for Capacitor anyway; nothing wasted if you stop.
-2. **Two additive backend changes (3–5 days)** — native-gated CloudFront cookie values in media JSON; session TTL scoped by client + fix 1-day vs 30-day mismatch; CORS origin for Capacitor if needed.
-3. **Capacitor wrap + submit (3–5 weeks)** — native tab bar/splash; **native video plugin**; offline lesson download; biometrics; APNs; strip in-app card entry → web checkout; TestFlight then submit with explicit reviewer notes on native features. Android is largely free once iOS works.
+2. **App Store compliance (3–5 days)** — self-serve account deletion and comment report/block/filter (**AS1–AS10**, § App Store compliance). Also closes a privacy-notice gap on the web, so worth doing even without an app.
+3. **Two additive backend changes (3–5 days)** — native-gated CloudFront cookie values in media JSON; session TTL scoped by client + fix 1-day vs 30-day mismatch; CORS origin for Capacitor if needed.
+4. **Capacitor wrap + submit (3–5 weeks)** — native tab bar/splash; **native video plugin**; offline lesson download; biometrics; APNs; strip in-app card entry → web checkout; TestFlight then submit with explicit reviewer notes on native features. Android is largely free once iOS works.
 
 ---
 

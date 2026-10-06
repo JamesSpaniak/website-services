@@ -58,4 +58,8 @@ export class CourseUnit {
   /** True when the payload node carries a `video_url` — powers "videos watched x / y". */
   @Column({ type: 'boolean', default: false })
   has_video: boolean;
+
+  /** Trailing credits / end card the learner never has to watch for the video ✓. */
+  @Column({ type: 'smallint', nullable: true })
+  video_outro_seconds: number | null;
 }

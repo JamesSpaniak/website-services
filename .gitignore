@@ -211,3 +211,7 @@ assets/courses/*/images/**
 
 # Article images -> gdrive:marketing/articles/images
 assets/articles/images/
+
+# Playwright output (drone/e2e)
+drone/test-results/
+drone/playwright-report/

@@ -5,7 +5,7 @@ import LoginConversionPanel from './ui/components/login-conversion-panel';
 import BrandLogo from './ui/components/brand-logo';
 import ImageComponent from './ui/components/image';
 import HeroScrollNext from './ui/components/hero-scroll-next';
-import { ArrowRightIcon, AcademicCapIcon, FilmIcon, CpuChipIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, AcademicCapIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
 import { ArticleSlim } from './lib/types/article';
 import ArticlePreviewComponent from './ui/components/article-preview';
 import { FEATURED_COURSE_ID, registerHref } from './lib/auth-redirect';
@@ -45,26 +45,15 @@ const COURSE_TRACKS = [
     cta: 'View course',
   },
   {
-    id: 'photo',
-    Icon: FilmIcon,
-    badge: 'Coming soon',
-    badgeCls: 'bg-violet-100/80 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
-    title: 'Video & Photography',
-    tagline: 'From flight to final cut',
-    desc: 'Camera settings, cinematic composition, and professional editing in DaVinci Resolve. A complete production pipeline for aerial storytelling.',
-    href: '/courses/tracks/video',
-    cta: 'Preview track',
-  },
-  {
-    id: 'ai',
-    Icon: CpuChipIcon,
-    badge: 'Coming soon',
+    id: 'building',
+    Icon: WrenchScrewdriverIcon,
+    badge: 'Early access',
     badgeCls: 'bg-sky-100/80 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
-    title: 'AI & Drones',
-    tagline: 'Machine learning meets autonomous flight',
-    desc: 'Python, computer vision, and autonomous navigation using drones as the hands-on platform. Built for STEM programs and CS classes.',
-    href: '/courses/tracks/ai',
-    cta: 'Preview track',
+    title: 'Drone Building',
+    tagline: 'Build and fly your own drone',
+    desc: 'Design and 3D-print the frame, assemble a 3.5" quad, set it up in Betaflight, and fly it under Part 107 safety rules. Opens for early access January 2027.',
+    href: '/courses/tracks/building',
+    cta: 'Join the waitlist',
   },
 ] as const;
 
@@ -161,7 +150,7 @@ export default async function Home() {
                 Course Tracks
               </p>
               <h2 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--brand-foreground)]">
-                Three paths. One platform.
+                Certify now. Build next.
               </h2>
             </div>
             <Link
@@ -173,7 +162,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {COURSE_TRACKS.map(({ id, Icon, badge, badgeCls, title, tagline, desc, href, cta }) => (
               <Link
                 key={id}

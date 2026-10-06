@@ -1,7 +1,7 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1790906310,
+  "created": 1791028805,
   "data": {
     "object": {
       "account_country": "US",
@@ -13,7 +13,7 @@
       "amount_remaining": 0,
       "amount_shipping": 0,
       "application": null,
-      "attempt_count": 1,
+      "attempt_count": 0,
       "attempted": true,
       "auto_advance": false,
       "automatic_tax": {
@@ -26,14 +26,14 @@
       "automatically_finalizes_at": null,
       "billing_reason": "subscription_create",
       "collection_method": "charge_automatically",
-      "created": 1790906304,
+      "created": 1791028802,
       "currency": "usd",
       "custom_fields": null,
-      "customer": "cus_VMf4Ec17aQglv1",
+      "customer": "cus_VNBzRem9rtRQAq",
       "customer_account": null,
       "customer_address": null,
       "customer_email": "REDACTED",
-      "customer_name": null,
+      "customer_name": "REDACTED",
       "customer_phone": null,
       "customer_shipping": null,
       "customer_tax_exempt": "none",
@@ -44,12 +44,12 @@
       "description": null,
       "discounts": [],
       "due_date": null,
-      "effective_at": 1790906304,
+      "effective_at": 1791028802,
       "ending_balance": 0,
       "footer": null,
       "from_invoice": null,
       "hosted_invoice_url": "REDACTED",
-      "id": "in_1ULvjz2Rw6cpyMyJznqfEPy9",
+      "id": "in_1UMRbi2Rw6cpyMyJfvjZ40zS",
       "invoice_pdf": "REDACTED",
       "issuer": {
         "type": "self"
@@ -65,13 +65,13 @@
             "discount_amounts": [],
             "discountable": true,
             "discounts": [],
-            "id": "il_1ULvjw2Rw6cpyMyJH9YDWOBJ",
-            "invoice": "in_1ULvjz2Rw6cpyMyJznqfEPy9",
+            "id": "il_1UMRbi2Rw6cpyMyJRqK43eVI",
+            "invoice": "in_1UMRbi2Rw6cpyMyJfvjZ40zS",
             "livemode": false,
             "metadata": {
               "duration": "monthly",
               "productType": "pro_membership",
-              "userId": "4"
+              "userId": "29"
             },
             "object": "line_item",
             "parent": {
@@ -83,14 +83,14 @@
                 "proration_details": {
                   "credited_items": null
                 },
-                "subscription": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG",
-                "subscription_item": "si_VMf4AYWofrH7vV"
+                "subscription": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
+                "subscription_item": "si_VNBzc53Ffr6JfS"
               },
               "type": "subscription_item_details"
             },
             "period": {
-              "end": 1793584704,
-              "start": 1790906304
+              "end": 1793707202,
+              "start": 1791028802
             },
             "pretax_credit_amounts": [],
             "pricing": {
@@ -115,7 +115,7 @@
       "livemode": false,
       "metadata": {},
       "next_payment_attempt": null,
-      "number": "DDLRVALT-0001",
+      "number": "C1OXF4P1-0001",
       "object": "invoice",
       "on_behalf_of": null,
       "parent": {
@@ -124,19 +124,34 @@
           "metadata": {
             "duration": "monthly",
             "productType": "pro_membership",
-            "userId": "4"
+            "userId": "29"
           },
-          "subscription": "sub_1ULvjz2Rw6cpyMyJn2uvYrMG"
+          "subscription": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz"
         },
         "type": "subscription_details"
       },
       "payment_settings": {
         "default_mandate": null,
-        "payment_method_options": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "billie": null,
+          "blik": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "payto": null,
+          "pix": null,
+          "sepa_debit": null,
+          "upi": null,
+          "us_bank_account": null
+        },
         "payment_method_types": null
       },
-      "period_end": 1790906304,
-      "period_start": 1790906304,
+      "period_end": 1791028802,
+      "period_start": 1791028802,
       "post_payment_credit_notes_amount": 0,
       "pre_payment_credit_notes_amount": 0,
       "receipt_number": null,
@@ -147,14 +162,14 @@
       "statement_descriptor": null,
       "status": "paid",
       "status_transitions": {
-        "finalized_at": 1790906304,
+        "finalized_at": 1791028802,
         "marked_uncollectible_at": null,
-        "paid_at": 1790906304,
+        "paid_at": 1791028803,
         "voided_at": null
       },
       "subtotal": 3500,
       "subtotal_excluding_tax": 3500,
-      "test_clock": "clock_1ULvjw2Rw6cpyMyJBA9q448d",
+      "test_clock": null,
       "total": 3500,
       "total_discount_amounts": [],
       "total_excluding_tax": 3500,
@@ -163,13 +178,13 @@
       "webhooks_delivered_at": null
     }
   },
-  "id": "evt_1ULvk22Rw6cpyMyJYnuNdo3Z",
+  "id": "evt_1UMRbm2Rw6cpyMyJerIpOxh7",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
-    "id": "req_jdZmgiIko9lYdL",
-    "idempotency_key": "9fac2118-acda-4d7e-a4ae-55b39aff189c"
+    "id": null,
+    "idempotency_key": "1ae19548-05b0-43c5-b667-538da5758ec1"
   },
   "type": "invoice.paid"
 }

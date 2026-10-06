@@ -7,17 +7,20 @@ import {
   Logger,
   Post,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AnalyticsService } from './analytics.service';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
+import { REFRESH_TOKEN_COOKIE } from '../auth/auth.controller';
 import { ProductEventsService } from '../product-events/product-events.service';
 import {
   AnalyticsEventDto,
   AnalyticsPayloadDto,
   isMarketingEvent,
+  validateAnalyticsEvents,
 } from '../product-events/types/product-event.dto';
 
 /**
@@ -28,6 +31,14 @@ import {
  * Accepts a single event body (legacy) or `{ events: [...] }` (≤ 50). Auth is
  * optional: anonymous marketing views still count; anonymous learning events
  * are dropped by ProductEventsService.
+ *
+ * Expired session ≠ guest: the access cookie expires with its JWT (1 h), so a
+ * signed-in learner's batches would otherwise arrive tokenless and their
+ * heartbeats be dropped as anonymous (R1, docs/tech/progress-tracking-accuracy.md).
+ * When the refresh cookie is still present, answer 401 so the client refreshes
+ * and resends the same batch — event ids make the resend idempotent. If the
+ * refresh itself fails (revoked session), the client resends with
+ * `x-analytics-guest: 1` and the batch is handled as a guest's.
  */
 @ApiTags('Analytics')
 @Controller('analytics')
@@ -51,13 +62,18 @@ export class AnalyticsController {
     @Request() req,
     @Body() dto: AnalyticsPayloadDto,
     @Headers('x-anonymous-id') anonymousId?: string,
+    @Headers('x-analytics-guest') asGuest?: string,
   ): Promise<void> {
     const userId: number | null = req.user?.userId ?? null;
-    const events: AnalyticsEventDto[] = dto.events?.length
-      ? dto.events
-      : dto.event
-        ? [dto]
-        : [];
+    if (userId == null && req.cookies?.[REFRESH_TOKEN_COOKIE] && !asGuest) {
+      throw new UnauthorizedException('Session expired — refresh and resend');
+    }
+    let events: AnalyticsEventDto[] = dto.event ? [dto] : [];
+    if (dto.events?.length) {
+      const { valid, invalid } = validateAnalyticsEvents(dto.events);
+      this.productEvents.countDropped('invalid', invalid);
+      events = valid;
+    }
     if (events.length === 0) return;
 
     for (const ev of events) {

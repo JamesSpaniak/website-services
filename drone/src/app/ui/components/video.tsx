@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { debugLog } from '@/app/lib/logger';
-import { publishVideoState, track } from '@/app/lib/analytics';
+import { onBeforeLeave, publishVideoState, track } from '@/app/lib/analytics';
 
 interface VideoComponentProps {
   src: string | undefined | null;
@@ -15,20 +15,55 @@ interface VideoComponentProps {
   unitRef?: string;
   /** Seconds to start from (resume). 0 / undefined = start at the beginning. */
   startPosition?: number;
+  /** Trailing credits / end card excluded from the completion rule. */
+  outroSeconds?: number;
 }
 
 interface TrackingOptions {
   courseId?: number;
   unitRef?: string;
   startPosition?: number;
+  outroSeconds?: number;
 }
 
 const MILESTONES = [25, 50, 75] as const;
-const COMPLETE_PCT = 90;
 const LOCAL_MIRROR_MS = 5000;
+
+/**
+ * Completion rule — mirror of backend/src/product-events/video-completion.ts
+ * (docs/tech/progress-tracking-accuracy.md § 3). The server recomputes from
+ * the ranges and is authoritative; this only decides when to send
+ * `video_completed`. Keep the constants in sync.
+ */
+function isWatched(merged: number[][], duration: number, outroSeconds = 0): boolean {
+  if (!Number.isFinite(duration) || duration <= 0) return false;
+  const content = duration - Math.min(Math.max(0, outroSeconds), duration * 0.5);
+  const required = Math.max(0.75 * content, Math.min(0.9 * content, content - 10));
+  let watched = 0;
+  for (const [a, b] of merged) {
+    const end = Math.min(b, content);
+    if (end > a) watched += end - Math.max(0, a);
+  }
+  return watched >= required;
+}
 
 export const localVideoKey = (courseId: number, unitRef: string) =>
   `de:video:${courseId}:${unitRef}`;
+
+/**
+ * `video_started` once per video per tab session — reloads, revisits and
+ * "Start over" remount the player but are not new plays (R21).
+ */
+function firstStartThisSession(courseId: number, unitRef: string): boolean {
+  try {
+    const key = `de:video-started:${courseId}:${unitRef}`;
+    if (window.sessionStorage.getItem(key)) return false;
+    window.sessionStorage.setItem(key, '1');
+  } catch {
+    /* storage unavailable — count the play */
+  }
+  return true;
+}
 
 function mergeRanges(ranges: number[][]): number[][] {
   const sorted = ranges
@@ -48,30 +83,42 @@ function mergeRanges(ranges: number[][]): number[][] {
  * Attaches playback tracking to a <video> element (HLS or native):
  *  • watched ranges from timeupdate (seeks start a new range) → % watched is
  *    the union, so scrubbing to the end does not count as watching
- *  • video_started once per mount, video_progress at 25/50/75 %,
- *    video_completed at ≥ 90 % or `ended`
+ *  • video_started once per video per tab session, video_progress at
+ *    25/50/75 %, video_completed once the completion rule is met (isWatched);
+ *    `ended` without meeting it only flushes the ranges
  *  • live state published for the lesson heartbeat (position rides the 30 s tick)
+ *  • unsent ranges are sent as `video_position` when the player unmounts and
+ *    right before the page-leaving beacon (section videos have no heartbeat
+ *    of their own — R9)
  *  • localStorage mirror every 5 s as an offline / pre-fetch resume fallback
- * Resume: seeks to `startPosition` once metadata is loaded.
+ * Resume lives in its own effect so a late resume point (unsigned files get
+ * it after mount) seeks without resetting the watched ranges.
  */
 function useVideoTracking(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   src: string,
-  { courseId, unitRef, startPosition }: TrackingOptions,
+  { courseId, unitRef, startPosition, outroSeconds }: TrackingOptions,
 ): void {
+  // Resume applies even when tracking is off (guest preview never has one).
   useEffect(() => {
     const video = videoRef.current;
-    const enabled = !!(video && courseId && unitRef);
-    if (!video) return;
-
-    // Resume applies even when tracking is off (guest preview never has one).
-    const onMeta = () => {
-      if (startPosition && startPosition > 0 && Number.isFinite(video.duration)) {
-        if (startPosition < video.duration - 5) video.currentTime = startPosition;
-      }
+    if (!video || !startPosition || startPosition <= 0) return;
+    const seek = () => {
+      // Never yank a learner who already started watching from the top.
+      if (video.currentTime > 1 || !Number.isFinite(video.duration)) return;
+      if (startPosition < video.duration - 5) video.currentTime = startPosition;
     };
-    video.addEventListener('loadedmetadata', onMeta);
-    if (!enabled) return () => video.removeEventListener('loadedmetadata', onMeta);
+    if (video.readyState >= 1) {
+      seek();
+      return;
+    }
+    video.addEventListener('loadedmetadata', seek);
+    return () => video.removeEventListener('loadedmetadata', seek);
+  }, [videoRef, src, startPosition]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !courseId || !unitRef) return;
 
     let allRanges: number[][] = [];
     const pending: number[][] = [];
@@ -91,17 +138,18 @@ function useVideoTracking(
       current = null;
     };
 
+    const watchedRanges = () => mergeRanges([...allRanges, ...(current ? [current] : [])]);
     const watchedPct = () => {
       const d = video.duration;
       if (!Number.isFinite(d) || d <= 0) return 0;
-      const live = current ? [current] : [];
-      const total = mergeRanges([...allRanges, ...live]).reduce((s, [a, b]) => s + (b - a), 0);
+      const total = watchedRanges().reduce((s, [a, b]) => s + (b - a), 0);
       return Math.min(100, Math.round((100 * total) / d));
     };
+    const ruleMet = () => isWatched(watchedRanges(), video.duration, outroSeconds);
 
     const base = () => ({
-      courseId: courseId!,
-      unitRef: unitRef!,
+      courseId,
+      unitRef,
       position: Math.round(video.currentTime),
       duration: Number.isFinite(video.duration) ? Math.round(video.duration) : undefined,
     });
@@ -109,7 +157,7 @@ function useVideoTracking(
     const onPlay = () => {
       if (!started) {
         started = true;
-        track('video_started', base());
+        if (firstStartThisSession(courseId, unitRef)) track('video_started', base());
       }
     };
     const onTime = () => {
@@ -130,7 +178,7 @@ function useVideoTracking(
           track('video_progress', { ...base(), ranges: pending.splice(0), properties: { milestone: m, percent_watched: pct } });
         }
       }
-      if (!completed && pct >= COMPLETE_PCT) {
+      if (!completed && ruleMet()) {
         completed = true;
         closeRange();
         track('video_completed', { ...base(), ranges: pending.splice(0), properties: { percent_watched: pct } });
@@ -141,7 +189,7 @@ function useVideoTracking(
         lastMirror = now;
         try {
           window.localStorage.setItem(
-            localVideoKey(courseId!, unitRef!),
+            localVideoKey(courseId, unitRef),
             JSON.stringify({ position: Math.round(t), updatedAt: now }),
           );
         } catch {
@@ -152,9 +200,12 @@ function useVideoTracking(
     const onSeeking = () => closeRange();
     const onEnded = () => {
       closeRange();
-      if (!completed) {
+      if (!completed && ruleMet()) {
         completed = true;
         track('video_completed', { ...base(), ranges: pending.splice(0), properties: { percent_watched: watchedPct(), ended: true } });
+      } else if (pending.length) {
+        // Reached the end without the rule (scrubbed): still deliver the ranges.
+        track('video_progress', { ...base(), ranges: pending.splice(0), properties: { percent_watched: watchedPct(), ended: true } });
       }
     };
 
@@ -163,7 +214,15 @@ function useVideoTracking(
     video.addEventListener('seeking', onSeeking);
     video.addEventListener('ended', onEnded);
 
-    publishVideoState(unitRef!, {
+    const flushRanges = () => {
+      closeRange();
+      if (pending.length) {
+        track('video_position', { ...base(), ranges: pending.splice(0) });
+      }
+    };
+    const offLeave = onBeforeLeave(flushRanges);
+
+    publishVideoState(unitRef, {
       get position() {
         return video.currentTime;
       },
@@ -180,14 +239,15 @@ function useVideoTracking(
     });
 
     return () => {
-      video.removeEventListener('loadedmetadata', onMeta);
       video.removeEventListener('play', onPlay);
       video.removeEventListener('timeupdate', onTime);
       video.removeEventListener('seeking', onSeeking);
       video.removeEventListener('ended', onEnded);
-      publishVideoState(unitRef!, null);
+      offLeave();
+      flushRanges();
+      publishVideoState(unitRef, null);
     };
-  }, [videoRef, src, courseId, unitRef, startPosition]);
+  }, [videoRef, src, courseId, unitRef, outroSeconds]);
 }
 
 function getEmbedUrl(url: string): string | null {
@@ -338,8 +398,9 @@ export default function VideoComponent({
   courseId,
   unitRef,
   startPosition,
+  outroSeconds,
 }: VideoComponentProps) {
-  const tracking: TrackingOptions = { courseId, unitRef, startPosition };
+  const tracking: TrackingOptions = { courseId, unitRef, startPosition, outroSeconds };
   const url = typeof src === 'string' ? src.trim() : '';
   debugLog('VideoComponent', {
     src: src ?? null,

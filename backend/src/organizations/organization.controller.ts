@@ -403,7 +403,9 @@ export class OrganizationController {
     return this.insights.getUtilization(orgId);
   }
 
-  @ApiOperation({ summary: "One member's quiz/exam gradebook and attempt history" })
+  @ApiOperation({
+    summary: "One member's quiz/exam gradebook and attempt history",
+  })
   @Get(':id/members/:userId/exams')
   @UseGuards(JwtAuthGuard, OrgManagerGuard)
   async getMemberExams(

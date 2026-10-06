@@ -15,7 +15,7 @@ Companion docs: [`analytics-implementation-plan.md`](analytics-implementation-pl
 | Source | Freshness | Use for |
 |---|---|---|
 | Live tables — `product_events`, `video_progress`, `progress`, `entitlements`, `orders`, `order_items`, `exam_attempt_history` | real time | "what happened today", per-student drill-down, manager screens |
-| Rollup — `product_events_daily` | nightly at 00:30 UTC; the cron recomputes the last 2 days so late events land | any *minutes / active days* aggregate |
+| Rollup — `product_events_daily` | **hourly** (`:15`, last 2 days) and nightly at 00:30 UTC (back to the last successful rollup, ≤ 35 days). Each run **rebuilds** its window (delete + insert, one transaction, `pg_try_advisory_xact_lock`) | any *minutes / active days* aggregate |
 | Materialized views — `v_*` | nightly after the rollup (same job) | every headline number, cohorts, revenue, org utilization |
 
 Check freshness first; put the timestamps on the report cover page:
@@ -92,14 +92,118 @@ v_user_entitlements → v_user_course_usage → v_entitlement_utilization
 | `order_items` | one line | `order_id`, `sku`, `product_type`, `course_id`, `quantity`, `unit_price_cents`, `unit_cost_cents`, `discount_cents`, `refunded_amount_cents`, `fulfillment_source` (digital·warehouse·dropship), `placement`, `offer_id` | `unit_cost_cents` is COGS → contribution margin. `placement`/`offer_id` tie a line to the upsell that produced it. |
 | `entitlements` | user × course × source | `user_id`, `course_id` (NULL = Pro), `source` (purchase·bundle·pro·admin_grant·signup_link·trial), `product_sku`, `order_item_id`, `allocated_price_cents`, `price_estimated`, `starts_at`, `ends_at`, `revoked_at`, `revoke_reason` (refund·cancelled·expired·admin) | **Live** = `revoked_at IS NULL AND (ends_at IS NULL OR ends_at > now())`. Org seats are *not* rows here — derived from `organization_members × organization_courses`. |
 | `progress` | user × course | `status`, `units_completed`, `units_total`, `unit_statuses` jsonb, `created_at` (= started), `completed_at`, `last_activity_at`, `unit_completed_at` jsonb `{unit_ref: iso}` | Pre-existing table; the four timestamp columns are new. |
-| `video_progress` | user × course × unit | `position_seconds`, `max_position_seconds`, `watched_ranges` jsonb `[[s,e],…]`, `duration_seconds`, `percent_watched` (union of ranges ÷ duration), `completed` (≥ 90 %), `play_count`, `first/last_played_at` | Resume point + "did they actually watch it" (scrubbing to the end does not count). |
+| `video_progress` | user × course × unit | `position_seconds`, `max_position_seconds`, `watched_ranges` jsonb `[[s,e],…]`, `duration_seconds`, `percent_watched` (union of ranges ÷ duration), `completed` (completion rule — 90 % of duration minus `course_units.video_outro_seconds`, 10 s end grace, 75 % floor; see [`progress-tracking-accuracy.md`](progress-tracking-accuracy.md) § 3), `play_count`, `first/last_played_at` | Resume point + "did they actually watch it" (scrubbing to the end does not count). |
 | `exam_attempt_history` | one submission | `user_id`, `exam_id`, `course_id`, `scope`, `scope_refs[]`, `exam_pool`, `attempt_no`, `score`, `section_breakdown` jsonb, `submitted_at` | Append-only; `exam_attempts` still holds the latest only. |
 | `product_events` | one event | `user_id` / `anonymous_id`, `session_id`, `organization_id`, `class_id`, `event_name`, `occurred_at`, `course_id`, `unit_ref`, `entitlement_source`, `properties` jsonb, `event_id` | RANGE-partitioned by month (`product_events_YYYY_MM`). **Always filter on `occurred_at`** so Postgres prunes partitions. `lesson_heartbeat` = 30 s → 0.5 min. Partitions older than `ANALYTICS_RETENTION_MONTHS` (12) are archived to S3 and dropped. |
-| `product_events_daily` | user × course × day | `organization_id`, `class_id`, `entitlement_source`, `minutes_engaged`, `lessons_viewed`, `videos_completed`, `units_completed`, `exams_submitted`, `events`, `computed_at` | The rollup. Survives partition archival — this is the +12-month history. |
+| `product_events_daily` | user × course × day | `organization_id`, `class_id`, `entitlement_source`, `minutes_engaged`, `lessons_viewed`, `videos_completed`, `units_completed`, `exams_submitted`, `events`, `computed_at` | The rollup. Survives partition archival — this is the +12-month history. Since 2026-10-04 (`engagement-sql.ts`, shared with the live "today" queries): `minutes_engaged` = **distinct 30 s heartbeat buckets** × 0.5 (two windows count once); `lessons_viewed`, `videos_completed`, `units_completed` = **distinct unit refs** that day; `exams_submitted` counts `exam_submitted` + `exam_submit`. Rows before the change were event counts until recomputed. **`day` is the org's local date** (`organizations.timezone`, via `product_events.organization_id`) for org members, the UTC date for everyone else — sum across orgs with that in mind. |
 | `analytics_reconciliation` | one check run | `check_name`, `mismatches`, `detail`, `ran_at` | Also logs `views_refreshed`. |
+| `leads` | email × interest | `email`, `interest` (building·part107·schools·newsletter), `source_path`, `landing_path`, `utm_source/medium/campaign/term/content`, `gclid`, `fbclid`, `ref`, `consent_at`, `confirmation_sent_at`, `unsubscribed_at`, `bounced_at`, `created_at` | Waitlist / email capture (launch W3). Attribution = first-touch `de_attr` cookie. **Active** = `unsubscribed_at IS NULL AND bounced_at IS NULL`. |
 
 Event names (allow-list in `backend/src/product-events/types/product-event.dto.ts`):
-`page_view article_view course_view pricing_viewed` · `lesson_viewed lesson_heartbeat video_started video_progress video_completed video_position course_started lesson_completed unit_completed course_completed` · `exam_started exam_submitted exam_category_scored` · `checkout_started purchase_completed order_recorded refund_issued pro_started pro_renewed pro_payment_failed pro_cancel_scheduled pro_cancelled pro_expired billing_portal_opened` · `upsell_shown/accepted/declined downsell_shown/accepted/declined` · `signup_started signup_completed login email_verified` · `invite_sent invite_redeemed manager_dashboard_viewed org_progress_exported class_created` · `feature_used`.
+`page_view article_view course_view pricing_viewed lead_captured` · `lesson_viewed lesson_heartbeat video_started video_progress video_completed video_position course_started lesson_completed unit_completed course_completed` · `exam_started exam_submitted exam_category_scored` · `checkout_started purchase_completed order_recorded refund_issued pro_started pro_renewed pro_payment_failed pro_cancel_scheduled pro_cancelled pro_expired billing_portal_opened` · `upsell_shown/accepted/declined downsell_shown/accepted/declined` · `signup_started signup_completed login email_verified` · `invite_sent invite_redeemed manager_dashboard_viewed org_progress_exported class_created` · `feature_used`.
+
+### 1.1a Leads and campaign attribution (launch W3/W5)
+
+Which tagged links bring signups. `utm_source` / `utm_campaign` come from the first-touch cookie, so a lead who first arrived from the Oct 8 email and signed up a week later still counts for that email. Tagged links: [`../marketing/utm-links.md`](../marketing/utm-links.md).
+
+```sql
+-- Leads by source and campaign (last 30 days)
+SELECT coalesce(utm_source, '(direct)') AS source,
+       coalesce(utm_campaign, '—')      AS campaign,
+       interest,
+       count(*)                                             AS leads,
+       count(*) FILTER (WHERE confirmation_sent_at IS NOT NULL) AS confirmed_sent,
+       count(*) FILTER (WHERE unsubscribed_at IS NOT NULL)     AS unsubscribed,
+       count(*) FILTER (WHERE bounced_at IS NOT NULL)          AS bounced
+FROM leads
+WHERE created_at >= now() - interval '30 days'
+GROUP BY 1, 2, 3
+ORDER BY leads DESC;
+
+-- Active list sizes (what a broadcast would reach, before per-address dedupe)
+SELECT interest, count(*) AS active
+FROM leads
+WHERE unsubscribed_at IS NULL AND bounced_at IS NULL
+GROUP BY interest ORDER BY interest;
+
+-- Signups per day, by source (announcement-day spike check)
+SELECT date_trunc('day', created_at)::date AS day,
+       coalesce(utm_source, '(direct)') AS source,
+       count(*) AS leads
+FROM leads
+WHERE created_at >= now() - interval '14 days'
+GROUP BY 1, 2 ORDER BY 1, 3 DESC;
+```
+
+Anonymous `page_view`s are **not** stored in `product_events` (OTel counters only — crawler noise), so visits by `utm_source` are not queryable in SQL yet; signed-in page views carry `utm_source` / `utm_medium` / `utm_campaign` / `ref` in `properties`. Full visit-level attribution is TODO **T8** (`marketing_attribution` table).
+
+### 1.1b Newsletter (Field Notes) — NL8
+
+Run 7 days after each send (runbook: [`../../workflows/marketing/newsletter.md`](../../workflows/marketing/newsletter.md) § 5). Opens are not tracked on purpose (Apple Mail Privacy Protection).
+
+```sql
+-- List health: active, joined and left in the last 30 days, by signup surface
+SELECT coalesce(source_path, '(unknown)') AS surface,
+       count(*) FILTER (WHERE unsubscribed_at IS NULL AND bounced_at IS NULL) AS active,
+       count(*) FILTER (WHERE created_at      >= now() - interval '30 days') AS joined_30d,
+       count(*) FILTER (WHERE unsubscribed_at >= now() - interval '30 days') AS left_30d,
+       count(*) FILTER (WHERE bounced_at      >= now() - interval '30 days') AS bounced_30d
+FROM leads
+WHERE interest = 'newsletter'
+GROUP BY 1 ORDER BY active DESC;
+
+-- Waitlist / list joins whose first touch was a newsletter link, by issue
+SELECT utm_campaign AS issue, utm_content AS section, interest, count(*) AS leads
+FROM leads
+WHERE utm_source IN ('newsletter', 'newsletter-forward')
+GROUP BY 1, 2, 3 ORDER BY 1 DESC, 4 DESC;
+
+-- Signed-in readers who clicked an issue, and any order they placed within 30 days
+WITH clicks AS (
+  SELECT user_id, properties->>'utm_campaign' AS issue, min(occurred_at) AS first_click
+  FROM product_events
+  WHERE event_name = 'page_view' AND user_id IS NOT NULL
+    AND properties->>'utm_source' = 'newsletter'
+  GROUP BY 1, 2
+)
+SELECT c.issue,
+       count(DISTINCT c.user_id) AS signed_in_clickers,
+       count(DISTINCT o.user_id) AS buyers_30d,
+       coalesce(sum(o.total_cents), 0) / 100.0 AS revenue_30d
+FROM clicks c
+LEFT JOIN orders o ON o.user_id = c.user_id
+  AND o.created_at BETWEEN c.first_click AND c.first_click + interval '30 days'
+GROUP BY 1 ORDER BY 1 DESC;
+```
+
+**Limits (read before quoting numbers):** `de_attr` is first touch, so a reader who first arrived another way is credited to that source, not the newsletter — the newsletter is under-counted until **NL15** (session-touch UTM). Anonymous clicks are not in SQL (OTel only), consultations carry no UTM yet (**T3**/**T8**), and orders join only for readers who were signed in when they clicked.
+
+### 1.1c Signup → purchase funnel (T3 / PA37, Oct 2026)
+
+Server-recorded since Oct 4 2026: `signup_completed` (`properties.via` = direct · org_invite · signup_link), `login`, `email_verified`, `checkout_started` / `pro_checkout_started` (with `promo_code`, `promo_applied`), `billing_portal_opened`, `consultation_submitted` (anonymous, no PII), `invite_sent`, `invite_redeemed`, `class_created`. `signup_started` comes from the register page (stored for anonymous visitors with a first-party id). Stripe-webhook events carry a deterministic `event_id` and Stripe's timestamp, so redeliveries don't double count (PA42).
+
+```sql
+-- Signup → checkout → purchase funnel, last 30 days (T3 / PA37). Distinct people per step;
+-- anonymous signup_started rows count by anonymous_id. Steps are not strictly ordered per person.
+WITH w AS (
+  SELECT * FROM product_events WHERE occurred_at >= now() - interval '30 days'
+)
+SELECT 'signup_started'         AS step, count(DISTINCT coalesce(user_id::text, anonymous_id)) AS people FROM w WHERE event_name = 'signup_started'
+UNION ALL SELECT 'signup_completed',      count(DISTINCT user_id) FROM w WHERE event_name = 'signup_completed' AND properties->>'via' = 'direct'
+UNION ALL SELECT 'email_verified',        count(DISTINCT user_id) FROM w WHERE event_name = 'email_verified'
+UNION ALL SELECT 'checkout_started',      count(DISTINCT user_id) FROM w WHERE event_name IN ('checkout_started', 'pro_checkout_started')
+UNION ALL SELECT 'purchase_completed',    count(DISTINCT user_id) FROM w WHERE event_name IN ('purchase_completed', 'pro_started')
+UNION ALL SELECT 'consultation_submitted', count(*)               FROM w WHERE event_name = 'consultation_submitted';
+
+-- Promo code use at checkout (T21): started vs. applied, by code
+SELECT properties->>'promo_code' AS code,
+       count(*) AS checkouts,
+       count(*) FILTER (WHERE (properties->>'promo_applied')::boolean) AS applied
+FROM product_events
+WHERE event_name IN ('checkout_started', 'pro_checkout_started')
+  AND properties->>'promo_code' IS NOT NULL
+GROUP BY 1 ORDER BY 2 DESC;
+```
 
 ### 1.2 Materialized views
 

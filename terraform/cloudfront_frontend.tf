@@ -205,7 +205,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Authorization", "Content-Type", "Origin", "Referer"]
+      # Only listed headers reach the origin. Stripe-Signature is required by
+      # /api/purchases/webhook — without it every delivery fails with 400.
+      headers = ["Authorization", "Content-Type", "Origin", "Referer", "Stripe-Signature"]
       cookies {
         forward = "all"
       }

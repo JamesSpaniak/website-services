@@ -34,7 +34,7 @@ export function hasScopedQuestions(
 
 export default function UnitComponent({ unitData, courseId, courseUnits, focusUnitId, questionCounts }: UnitComponentProps) {
     const [unit, setUnit] = useState<UnitData>(unitData);
-    const { id, title, sub_units, description, text_content, video_url, status } = unit;
+    const { id, title, sub_units, description, text_content, video_url, video_outro_seconds, status } = unit;
     const progressTarget =
         (focusUnitId ? findUnitInTree([unit], focusUnitId) : undefined) ?? unit;
 
@@ -52,6 +52,7 @@ export default function UnitComponent({ unitData, courseId, courseUnits, focusUn
                     courseId,
                     String(progressTarget.id),
                     ProgressStatus.IN_PROGRESS,
+                    { auto: true },
                 );
                 if (!cancelled) {
                     setUnit((prev) =>
@@ -76,7 +77,16 @@ export default function UnitComponent({ unitData, courseId, courseUnits, focusUn
 
     const handleSubUnitStatusUpdate = async (unitId: string, newStatus: ProgressStatus) => {
         const updatedSubUnit = await updateUnitProgress(courseId, unitId, newStatus);
-        setUnit((prevUnit) => updateUnitInState(prevUnit, updatedSubUnit));
+        setUnit((prevUnit) => {
+            let next = updateUnitInState(prevUnit, updatedSubUnit);
+            // Finishing the last lesson completes its section / this unit (PTD3).
+            for (const ref of updatedSubUnit.auto_completed ?? []) {
+                next = String(next.id) === ref
+                    ? { ...next, status: ProgressStatus.COMPLETED }
+                    : updateUnitInState(next, { id: ref, status: ProgressStatus.COMPLETED } as UnitData);
+            }
+            return next;
+        });
     };
 
     const unitScopeRef = String(id);
@@ -100,6 +110,7 @@ export default function UnitComponent({ unitData, courseId, courseUnits, focusUn
                             courseId={courseId}
                             unitId={String(id)}
                             videoUrl={video_url}
+                            outroSeconds={video_outro_seconds}
                             title={title}
                         />
                     </div>

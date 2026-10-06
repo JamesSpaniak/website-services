@@ -22,3 +22,18 @@ output "nameservers" {
   description = "Route53 nameservers for the hosted zone. Set these at your domain registrar."
   value       = aws_route53_zone.main.name_servers
 }
+
+output "ses_marketing_identity_arn" {
+  description = "SES domain identity for marketing email (news.<domain>)."
+  value       = aws_sesv2_email_identity.marketing.arn
+}
+
+output "ses_marketing_configuration_set" {
+  description = "SES configuration set used for marketing sends (SES_CONFIGURATION_SET)."
+  value       = aws_sesv2_configuration_set.marketing.configuration_set_name
+}
+
+output "ses_events_topic_arn" {
+  description = "SNS topic receiving SES bounce/complaint/delivery/reject/open/click events."
+  value       = aws_sns_topic.ses_events.arn
+}

@@ -19,7 +19,7 @@ export class AuditService {
    * bubble up to callers so they don't break business logic.
    */
   async log(
-    userId: number,
+    userId: number | null,
     action: AuditAction,
     metadata?: Record<string, unknown>,
   ): Promise<void> {

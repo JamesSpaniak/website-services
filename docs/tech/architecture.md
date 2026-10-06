@@ -182,7 +182,7 @@ All names use prefix **`droneedge-dev-`** unless noted. Count ≈ **120** manage
 | `media.thedroneedge.com` | Media CloudFront |
 | MX | Google Workspace |
 | TXT SPF | Google + NAT EIP |
-| TXT DMARC | Quarantine + RUA to admin email |
+| TXT DMARC | Quarantine + RUA to `dmarc@thedroneedge.com` (Workspace alias, Gmail filter → "DMARC" label); `_dmarc.news` uses the same address |
 | ACM validation | CNAMEs per SAN |
 
 DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
@@ -201,11 +201,13 @@ DKIM: manual TXT in console (documented in `terraform/email_dns.tf`).
 | `droneedge-dev-test-user-password` | API (dev-only, when `seed_test_data = true`) |
 | `droneedge-dev-grafana-otel-headers` | API OTLP auth |
 | `droneedge-dev-cloudfront-signing-private-key` | API video URL signing |
+| `droneedge-dev-leads-unsubscribe-secret` | API `LEADS_UNSUBSCRIBE_SECRET` (HMAC for marketing unsubscribe links) |
 
 **Terraform owns the resources.** All AWS resources — including the secret *containers* above — are declared in Terraform, never created by hand. See [Resource ownership](#resource-ownership-terraform-first) below.
 
 Secret **values** are split by sensitivity:
 - Stripe / JWT / admin / DB / CloudFront private key: seeded out-of-band (manual or pipeline reconcile scripts), never in Terraform or git.
+- `leads-unsubscribe-secret`: the value **is** Terraform-generated (`random_password`) — nobody needs to know it, and it must exist before the task starts. Replacing it breaks every unsubscribe link already sent.
 - `test-user-password`: the value **is** Terraform-managed (`terraform/env/dev.tfvars` → `test_user_password`), because it is a throwaway dev credential and this removes the create-secret-before-deploy ordering trap.
 
 ### IAM (shared ECS roles)
@@ -227,6 +229,7 @@ Separate roles: MediaConvert, transcode Lambdas, VPC flow logs.
 | Budget | `droneedge-dev-monthly-budget` — $150/mo alerts to `admin_email` |
 | SNS `droneedge-dev-ops-alerts` | CloudWatch alarm emails to `admin_email` (`james@thedroneedge.com`). Confirm the AWS subscription mail once. |
 | Alarm `droneedge-dev-nat-no-egress` | NAT `ConnectionEstablishedCount` = 0 for 2 hours. Console: CloudWatch → Alarms. Recreate a stuck NAT with `./pipeline.sh --env dev --replace aws_nat_gateway.nat`. |
+| Alarms `droneedge-dev-ses-bounce-rate` / `-ses-complaint-rate` | SES account `Reputation.BounceRate` ≥ 2.5% / `Reputation.ComplaintRate` ≥ 0.05% (half of AWS's 5% / 0.1% review levels). On alarm: stop marketing sends and clean the list before the next one. |
 
 ### App autoscaling
 
@@ -355,6 +358,7 @@ Terraform owns the task definition's `container_definitions` (no `ignore_changes
 | `ADMIN_SEED_PASSWORD` | `admin-seed-password` |
 | `OTEL_EXPORTER_OTLP_HEADERS` | `grafana-otel-headers` |
 | `CLOUDFRONT_SIGNING_PRIVATE_KEY` | `cloudfront-signing-private-key` |
+| `LEADS_UNSUBSCRIBE_SECRET` | `leads-unsubscribe-secret` |
 
 #### Environment (plain)
 
@@ -379,6 +383,7 @@ Terraform owns the task definition's `container_definitions` (no `ignore_changes
 | `cloudwatch-logs-policy` | `CreateLogStream`, `PutLogEvents`, `DescribeLogStreams` | API log group |
 | `s3-media-policy` | `PutObject`, `DeleteObject`, `ListBucket` | Media bucket |
 | `s3-media-policy` | `cloudfront:CreateInvalidation` | Media distribution ARN |
+| `ses-send-policy` | `ses:SendEmail`, `ses:SendRawEmail` (condition `ses:FromAddress = hello@news.thedroneedge.com`) | SES identity `news.thedroneedge.com` + configuration set `droneedge-dev-marketing` (`terraform/ses.tf`) |
 
 SDK calls use **task role credentials** via ECS metadata (no static keys in env).
 
@@ -503,7 +508,8 @@ Neither Lambda is in the VPC (default AWS-managed networking).
 | Service | Role | Called from | Credentials |
 |---------|------|-------------|-------------|
 | **Stripe** | Payments, webhooks | API (+ Stripe.js in browser) | Secret key + webhook secret in Secrets Manager; publishable key in frontend build |
-| **Google Workspace SMTP** | Outbound email | API (`nodemailer`) | No auth in env—IP allowlist (NAT EIP in SPF) |
+| **Google Workspace SMTP** | Transactional email (verify, reset, contact) | API (`nodemailer`) | No auth in env—IP allowlist (NAT EIP in SPF) |
+| **Amazon SES** (`news.thedroneedge.com`) | Marketing email — waitlist confirmation, broadcasts | API (`@aws-sdk/client-sesv2`, `MarketingMailerService`) | Task role; Easy DKIM + MAIL FROM `bounce.news…` + DMARC in `terraform/ses.tf`; events → SNS `droneedge-dev-ses-events` → `POST /api/email/ses-events`. Account starts in the SES sandbox until production access is granted (console request) |
 | **Grafana Cloud** | Metrics & traces | API (OTLP HTTP) | Basic auth header in Secrets Manager |
 
 ---

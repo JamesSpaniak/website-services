@@ -5,6 +5,8 @@ import { Course } from 'src/courses/types/course.entity';
 import { User } from 'src/users/types/user.entity';
 import { PurchaseController } from './purchase.controller';
 import { PurchaseService } from './purchase.service';
+import { StripeEventReplayService } from './stripe-event-replay.service';
+import { StripeConfigService } from './stripe-config.service';
 import { Stripe } from 'stripe';
 import { AuditModule } from 'src/audit/audit.module';
 
@@ -17,6 +19,8 @@ import { AuditModule } from 'src/audit/audit.module';
   controllers: [PurchaseController],
   providers: [
     PurchaseService,
+    StripeEventReplayService,
+    StripeConfigService,
     {
       provide: 'STRIPE_CLIENT', // Custom provider token
       useFactory: (configService: ConfigService) => {
@@ -27,5 +31,7 @@ import { AuditModule } from 'src/audit/audit.module';
       inject: [ConfigService],
     },
   ],
+  // Account deletion (UsersService) removes the Stripe customer.
+  exports: ['STRIPE_CLIENT', StripeConfigService],
 })
 export class PurchaseModule {}
