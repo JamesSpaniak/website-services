@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'About',
+  alternates: { canonical: '/about' },
   description:
     'Drone Edge is built by people from the drone community—serious Part 107 preparation, practical lessons, and a mission to grow safe, skilled operators.',
   openGraph: {

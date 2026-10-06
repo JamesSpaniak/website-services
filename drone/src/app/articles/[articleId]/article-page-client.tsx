@@ -1,38 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getArticleById } from '@/app/lib/api-client';
+import { useEffect } from 'react';
 import { trackArticleView } from '@/app/lib/analytics';
-import LoadingComponent from '@/app/ui/components/loading';
-import ErrorComponent from '@/app/ui/components/error';
 import { ArticleFull } from '@/app/lib/types/article';
 import ArticleComponent from '@/app/ui/components/article';
 
-export default function ArticlePageClient({ articleId }: { articleId: string }) {
-  const [article, setArticle] = useState<ArticleFull | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+/** Article HTML is server-rendered by page.tsx; this wrapper only records the view. */
+export default function ArticlePageClient({ article }: { article: ArticleFull }) {
   useEffect(() => {
-    async function fetchArticle() {
-      try {
-        const id = parseInt(articleId);
-        if (isNaN(id)) throw new Error("Invalid article ID.");
-        const articleData = await getArticleById(id);
-        setArticle(articleData);
-        trackArticleView(articleId, articleData.title);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load article.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchArticle();
-  }, [articleId]);
-
-  if (loading) return <LoadingComponent />;
-  if (error) return <ErrorComponent message={error} />;
-  if (!article) return <ErrorComponent message="Article not found." />;
+    trackArticleView(article.id, article.title);
+  }, [article.id, article.title]);
 
   return <ArticleComponent article={article} />;
 }

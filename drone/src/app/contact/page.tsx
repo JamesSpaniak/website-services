@@ -5,6 +5,7 @@ import { EnvelopeIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
   title: 'Contact',
+  alternates: { canonical: '/contact' },
   description: "Get in touch with Drone Edge. We respond to every message within 48 hours.",
   openGraph: {
     title: 'Contact — Drone Edge',

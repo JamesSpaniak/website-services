@@ -77,7 +77,7 @@ The account has **two separate test environments** — their keys come from diff
 
 **Navigation.** Settings pages are not in the left sidebar. Open them with the **gear icon (⚙) in the top-right** header → **Settings**, or type the page name into the **Search** bar. The sidebar's Payments section (Analytics, Managed Payments, Checkout, Disputes, Radar, …) is for activity, not configuration. Before each step confirm the header shows the **sandbox** name, not "Test mode".
 
-**Managed Payments** (sidebar → Payments → Managed Payments, "3.5% add-on fee"): **do not enable.** It makes Stripe the merchant of record (handles sales tax / VAT in 80+ countries) for +3.5% per transaction on top of normal card fees (~$1.23 extra per $35 renewal, ~$4.50 per $129 course). Worth revisiting only if international sales or tax filing (**PD9**) become a real burden.
+**Managed Payments** — *superseded Oct 6 2026: adopted for launch (PD9), on via the `STRIPE_MANAGED_PAYMENTS` flag; see [`purchase-flows.md`](purchase-flows.md). Original note:* It makes Stripe the merchant of record (handles sales tax / VAT in 80+ countries) for +3.5% per transaction on top of normal card fees (~$1.23 extra per $35 renewal, ~$4.50 per $129 course). Worth revisiting only if international sales or tax filing (**PD9**) become a real burden.
 
 ### 3.2 Step by step
 
@@ -201,7 +201,7 @@ Backend:
    ```
    **Key point:** `payment_intent_data.metadata` copies the same metadata onto the PaymentIntent, so the existing `payment_intent.succeeded` handler fulfils the course with **no webhook changes**. `checkout.session.completed` already ignores `mode !== 'subscription'`.
 3. `POST /purchases/confirm-checkout { sessionId }` — client fallback when the webhook lags: retrieve the session (expand `payment_intent`), check `payment_status === 'paid'` and `metadata.userId === caller`, then reuse the existing `confirm-payment` path with the PaymentIntent id. Idempotent like today.
-4. Keep `create-payment-intent` + `confirm-payment` for one release (old tabs, rollback), then delete with the `CardElement` code.
+4. Keep `create-payment-intent` + `confirm-payment` for one release (old tabs, rollback), then delete with the `CardElement` code. *`create-payment-intent` deleted Oct 6 2026.*
 
 Frontend ([`purchase-flow.tsx`](../../drone/src/app/ui/components/purchase-flow.tsx), [`api-client.tsx`](../../drone/src/app/lib/api-client.tsx)):
 5. Replace the `CardElement` form with a "Buy course — $129" button → `createCourseCheckout()` → `window.location.href = url` (same as the Pro button).
@@ -406,6 +406,6 @@ Money-model note: [`../sales/money-model.md`](../sales/money-model.md) warns aga
 | Course price source | DB `courses.price` via `price_data` (not Stripe catalog) |
 | Promo codes | Off now; **T21** turns them on for the launch sale and the $1 owner test (§ 8.2–8.3) |
 | Adaptive Pricing | Off (USD only) |
-| Stripe Tax | Off until PD9 |
+| Stripe Tax | Not needed for Checkout sales: Managed Payments (Oct 6 2026) collects and remits. Still open for physical goods (PD9) |
 
 *Update this file as phases complete; delete it (or fold the matrix into [`purchase-flows.md`](purchase-flows.md)) once live keys ship.*

@@ -50,11 +50,13 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
-  const course = await fetchPublicCourse(parseInt(courseId, 10));
+  const id = parseInt(courseId, 10);
+  const course = await fetchPublicCourse(id);
   if (!course) return { title: 'Course not found' };
   return {
-    title: `${course.title} — Drone Edge`,
+    title: course.title,
     description: course.description || course.sub_title,
+    alternates: { canonical: `/courses/${id}/preview` },
     openGraph: {
       title: `${course.title} — Drone Edge`,
       description: course.description || course.sub_title,

@@ -1,19 +1,19 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791300943,
+  "created": 1791300699,
   "data": {
     "object": {
       "account_country": "US",
       "account_name": "Link",
       "account_tax_ids": null,
-      "amount_due": 2799,
+      "amount_due": 9675,
       "amount_overpaid": 0,
-      "amount_paid": 2799,
+      "amount_paid": 9675,
       "amount_remaining": 0,
       "amount_shipping": 0,
       "application": null,
-      "attempt_count": 0,
+      "attempt_count": 1,
       "attempted": true,
       "auto_advance": false,
       "automatic_tax": {
@@ -26,9 +26,9 @@
         "status": "complete"
       },
       "automatically_finalizes_at": null,
-      "billing_reason": "subscription_create",
-      "collection_method": "charge_automatically",
-      "created": 1791300940,
+      "billing_reason": "manual",
+      "collection_method": "send_invoice",
+      "created": 1791300695,
       "currency": "usd",
       "custom_fields": null,
       "customer": "cus_VON2dDzmQUtAmJ",
@@ -52,15 +52,15 @@
       "default_tax_rates": [],
       "description": null,
       "discounts": [
-        "di_1UNaP32Rw6cpyMyJ218F1scM"
+        "di_1UNaL42Rw6cpyMyJx1tIUQEV"
       ],
-      "due_date": null,
-      "effective_at": 1791300940,
+      "due_date": 1791300695,
+      "effective_at": 1791300695,
       "ending_balance": 0,
       "footer": null,
       "from_invoice": null,
       "hosted_invoice_url": "REDACTED",
-      "id": "in_1UNaP32Rw6cpyMyJcaj62jVw",
+      "id": "in_1UNaL62Rw6cpyMyJk7Xg7rdR",
       "invoice_pdf": "REDACTED",
       "issuer": {
         "type": "stripe"
@@ -70,71 +70,66 @@
       "lines": {
         "data": [
           {
-            "amount": 3500,
+            "amount": 12900,
             "currency": "usd",
-            "description": "1 \u00d7 Drone Edge Pro (at $35.00 / month)",
+            "description": "FAA Part 107 Remote Pilot Certification Prep",
             "discount_amounts": [
               {
-                "amount": 875,
-                "discount": "di_1UNaP32Rw6cpyMyJ218F1scM"
+                "amount": 3225,
+                "discount": "di_1UNaL42Rw6cpyMyJx1tIUQEV"
               }
             ],
             "discountable": true,
             "discounts": [],
-            "id": "il_1UNaP22Rw6cpyMyJHxRYZxz6",
-            "invoice": "in_1UNaP32Rw6cpyMyJcaj62jVw",
+            "id": "il_1UNaL62Rw6cpyMyJiQjihomX",
+            "invoice": "in_1UNaL62Rw6cpyMyJk7Xg7rdR",
             "livemode": false,
-            "metadata": {
-              "duration": "monthly",
-              "productType": "pro_membership",
-              "userId": "70"
-            },
+            "metadata": {},
             "object": "line_item",
             "parent": {
-              "invoice_item_details": null,
-              "license_fee_subscription_details": null,
-              "subscription_item_details": {
-                "invoice_item": null,
+              "invoice_item_details": {
+                "invoice_item": "ii_1UNaL62Rw6cpyMyJJUZ3xR6C",
                 "proration": false,
                 "proration_details": {
                   "credited_items": null
                 },
-                "subscription": "sub_1UNaP52Rw6cpyMyJmu5zbeXZ",
-                "subscription_item": "si_VON99cBYmJKRbt"
+                "subscription": null
               },
-              "type": "subscription_item_details"
+              "license_fee_subscription_details": null,
+              "subscription_item_details": null,
+              "type": "invoice_item_details"
             },
             "period": {
-              "end": 1793979340,
-              "start": 1791300940
+              "end": 1791300696,
+              "start": 1791300696
             },
             "pretax_credit_amounts": [
               {
-                "amount": 875,
-                "discount": "di_1UNaP32Rw6cpyMyJ218F1scM",
+                "amount": 3225,
+                "discount": "di_1UNaL42Rw6cpyMyJx1tIUQEV",
                 "type": "discount"
               }
             ],
             "pricing": {
               "price_details": {
-                "price": "price_1ULulr2Rw6cpyMyJcc0cCqmA",
-                "product": "prod_VMe3HA5NfsWBxd"
+                "price": "price_1UNaIf2Rw6cpyMyJuBRrbTLu",
+                "product": "prod_VON2U6hB8oTyKB"
               },
               "type": "price_details",
-              "unit_amount_decimal": "3500"
+              "unit_amount_decimal": "12900"
             },
             "quantity": 1,
             "quantity_decimal": "1",
-            "subtotal": 3500,
+            "subtotal": 12900,
             "taxes": [
               {
-                "amount": 174,
+                "amount": 0,
                 "tax_behavior": "exclusive",
                 "tax_rate_details": {
-                  "tax_rate": "txr_1UNZST2Rw6cpyMyJEd5n2Ba1"
+                  "tax_rate": "txr_1UNaJh2Rw6cpyMyJTZW2m35g"
                 },
-                "taxability_reason": "standard_rated",
-                "taxable_amount": 2625,
+                "taxability_reason": "product_exempt",
+                "taxable_amount": 0,
                 "type": "tax_rate_details"
               }
             ]
@@ -148,49 +143,25 @@
       "livemode": false,
       "metadata": {},
       "next_payment_attempt": null,
-      "number": "4MNLKMRG-0002",
+      "number": "4MNLKMRG-0001",
       "object": "invoice",
       "on_behalf_of": null,
-      "parent": {
-        "quote_details": null,
-        "subscription_details": {
-          "metadata": {
-            "duration": "monthly",
-            "productType": "pro_membership",
-            "userId": "70"
-          },
-          "subscription": "sub_1UNaP52Rw6cpyMyJmu5zbeXZ"
-        },
-        "type": "subscription_details"
-      },
+      "parent": null,
       "payment_settings": {
         "default_mandate": null,
-        "payment_method_options": {
-          "acss_debit": null,
-          "bancontact": null,
-          "billie": null,
-          "blik": null,
-          "card": {
-            "request_three_d_secure": "automatic"
-          },
-          "customer_balance": null,
-          "konbini": null,
-          "payto": null,
-          "pix": null,
-          "sepa_debit": null,
-          "upi": null,
-          "us_bank_account": null
-        },
+        "payment_method_options": null,
         "payment_method_types": null
       },
-      "period_end": 1791300940,
-      "period_start": 1791300940,
+      "period_end": 1791300695,
+      "period_start": 1791300695,
       "post_payment_credit_notes_amount": 0,
       "pre_payment_credit_notes_amount": 0,
       "receipt_number": null,
       "rendering": {
         "amount_tax_display": null,
-        "pdf": null,
+        "pdf": {
+          "page_size": "letter"
+        },
         "template": null,
         "template_version": null
       },
@@ -200,51 +171,51 @@
       "statement_descriptor": null,
       "status": "paid",
       "status_transitions": {
-        "finalized_at": 1791300940,
+        "finalized_at": 1791300695,
         "marked_uncollectible_at": null,
-        "paid_at": 1791300941,
+        "paid_at": 1791300695,
         "voided_at": null
       },
-      "subtotal": 3500,
-      "subtotal_excluding_tax": 3500,
+      "subtotal": 12900,
+      "subtotal_excluding_tax": 12900,
       "test_clock": null,
-      "total": 2799,
+      "total": 9675,
       "total_discount_amounts": [
         {
-          "amount": 875,
-          "discount": "di_1UNaP32Rw6cpyMyJ218F1scM"
+          "amount": 3225,
+          "discount": "di_1UNaL42Rw6cpyMyJx1tIUQEV"
         }
       ],
-      "total_excluding_tax": 2625,
+      "total_excluding_tax": 9675,
       "total_pretax_credit_amounts": [
         {
-          "amount": 875,
-          "discount": "di_1UNaP32Rw6cpyMyJ218F1scM",
+          "amount": 3225,
+          "discount": "di_1UNaL42Rw6cpyMyJx1tIUQEV",
           "type": "discount"
         }
       ],
       "total_taxes": [
         {
-          "amount": 174,
+          "amount": 0,
           "tax_behavior": "exclusive",
           "tax_rate_details": {
-            "tax_rate": "txr_1UNZST2Rw6cpyMyJEd5n2Ba1"
+            "tax_rate": "txr_1UNaJh2Rw6cpyMyJTZW2m35g"
           },
-          "taxability_reason": "standard_rated",
-          "taxable_amount": 2625,
+          "taxability_reason": "product_exempt",
+          "taxable_amount": 0,
           "type": "tax_rate_details"
         }
       ],
       "webhooks_delivered_at": null
     }
   },
-  "id": "evt_1UNaP62Rw6cpyMyJgKSJAtzN",
+  "id": "evt_1UNaLC2Rw6cpyMyJtFK51iCe",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
     "id": null,
-    "idempotency_key": "eaebcdef-602f-45ae-8e68-e502ae07a024"
+    "idempotency_key": null
   },
   "type": "invoice.paid"
 }

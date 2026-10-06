@@ -127,26 +127,6 @@ export class PurchaseController {
   /**
    * Legacy: Stripe Payment Intent for a course (Card Element). Superseded by create-course-checkout.
    */
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Create a Stripe Payment Intent for a one-time course purchase',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Payment Intent created successfully.',
-  })
-  @Post('create-payment-intent')
-  async createPaymentIntent(
-    @Request() req,
-    @Body() purchaseDto: PurchaseCourseDto,
-  ) {
-    return this.purchasesService.createPaymentIntent(
-      req.user.userId,
-      purchaseDto.courseId,
-    );
-  }
-
   /**
    * Stripe Checkout (subscription mode) for monthly/yearly Pro — all courses while active.
    */

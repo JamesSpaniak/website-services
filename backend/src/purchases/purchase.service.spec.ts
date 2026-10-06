@@ -94,8 +94,9 @@ describe('PurchaseService — hosted Checkout', () => {
       expect(params.line_items[0].price_data).toMatchObject({
         currency: 'usd',
         unit_amount: 12900,
-        product_data: { name: 'Part 107' },
+        product_data: { name: 'Part 107', tax_code: 'txcd_10000000' },
       });
+      expect(params.managed_payments).toBeUndefined();
       const meta = { userId: '7', courseId: '3', productType: 'course' };
       expect(params.metadata).toEqual(meta);
       // payment_intent.succeeded fulfils from this — must match the legacy PI metadata.
@@ -242,6 +243,40 @@ describe('PurchaseService — hosted Checkout', () => {
         metadata: { userId: '7' },
         subscription_data: { metadata: { userId: '7' } },
       });
+    });
+  });
+
+  describe('STRIPE_MANAGED_PAYMENTS', () => {
+    beforeEach(() => {
+      config.STRIPE_MANAGED_PAYMENTS = 'true';
+    });
+    afterEach(() => {
+      delete config.STRIPE_MANAGED_PAYMENTS;
+    });
+
+    it('enables Managed Payments on course and Pro sessions', async () => {
+      await service.createCourseCheckoutSession(7, 3);
+      userRepo.findOneBy.mockResolvedValue(buyer());
+      await service.createProCheckoutSession(7);
+      const [course, pro] = stripe.checkout.sessions.create.mock.calls.map(
+        (c) => c[0],
+      );
+      expect(course.managed_payments).toEqual({ enabled: true });
+      expect(pro.managed_payments).toEqual({ enabled: true });
+    });
+
+    it('keeps it on the retry without a rejected promo code', async () => {
+      stripe.promotionCodes.list.mockResolvedValueOnce({
+        data: [{ id: 'promo_pro_only' }],
+      });
+      stripe.checkout.sessions.create.mockRejectedValueOnce(
+        Object.assign(new Error('coupon not applicable'), {
+          type: 'StripeInvalidRequestError',
+        }),
+      );
+      await service.createCourseCheckoutSession(7, 3, 'PROONLY');
+      const retry = stripe.checkout.sessions.create.mock.calls[1][0];
+      expect(retry.managed_payments).toEqual({ enabled: true });
     });
   });
 });

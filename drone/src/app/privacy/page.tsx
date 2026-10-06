@@ -4,6 +4,7 @@ import PageShell from '../ui/components/page-shell';
 
 export const metadata: Metadata = {
   title: 'Privacy Notice',
+  alternates: { canonical: '/privacy' },
   description:
     'How Drone Edge collects, uses, and protects information for visitors, account holders, and school programs. Read alongside our Terms of Service.',
   openGraph: {

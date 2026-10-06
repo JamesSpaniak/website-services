@@ -1,4 +1,5 @@
 import { SITE_ASSETS, SOCIAL_PROFILES } from '@/app/lib/site-assets';
+import { articlePath } from '@/app/lib/article-url';
 
 interface JsonLdProps {
   data: Record<string, unknown>;
@@ -51,6 +52,8 @@ export function articleJsonLd(article: {
   updated_at?: string | Date;
   image_url?: string;
   id: number;
+  slug?: string;
+  tags?: string[];
 }) {
   return {
     '@context': 'https://schema.org',
@@ -60,6 +63,7 @@ export function articleJsonLd(article: {
     datePublished: new Date(article.submitted_at).toISOString(),
     ...(article.updated_at && { dateModified: new Date(article.updated_at).toISOString() }),
     ...(article.image_url && { image: [article.image_url] }),
+    ...(article.tags?.length ? { keywords: article.tags.join(', ') } : {}),
     author: {
       '@type': 'Organization',
       name: SITE_NAME,
@@ -76,7 +80,7 @@ export function articleJsonLd(article: {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SITE_URL}/articles/${article.id}`,
+      '@id': `${SITE_URL}${articlePath(article)}`,
     },
   };
 }

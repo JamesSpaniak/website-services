@@ -1,11 +1,11 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791028789,
+  "created": 1791300695,
   "data": {
     "object": {
       "allowed_payment_method_types": null,
-      "amount": 2900,
+      "amount": 9675,
       "amount_capturable": 0,
       "amount_details": {
         "shipping": {
@@ -18,7 +18,7 @@
         },
         "tip": {}
       },
-      "amount_received": 2900,
+      "amount_received": 9675,
       "application": null,
       "application_fee_amount": null,
       "automatic_payment_methods": null,
@@ -27,32 +27,32 @@
       "capture_method": "automatic_async",
       "client_secret": "REDACTED",
       "confirmation_method": "automatic",
-      "created": 1791028784,
+      "created": 1791300694,
       "currency": "usd",
-      "customer": "cus_VNBzceAJtrpnII",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "customer_account": null,
       "description": null,
       "excluded_payment_method_types": null,
-      "id": "pi_3UMRbQ2Rw6cpyMyJ17w0KIqE",
+      "id": "pi_3UNaL42Rw6cpyMyJ0uzglYuN",
       "last_payment_error": null,
-      "latest_charge": "ch_3UMRbQ2Rw6cpyMyJ1uYQZWmk",
+      "latest_charge": "ch_3UNaL42Rw6cpyMyJ0iyf0yjj",
       "livemode": false,
       "managed_payments": {
-        "enabled": false
+        "enabled": true
       },
       "metadata": {
-        "courseId": "1",
+        "courseId": "35",
         "productType": "course",
-        "userId": "28"
+        "userId": "70"
       },
       "next_action": null,
       "object": "payment_intent",
       "on_behalf_of": null,
       "payment_details": {
         "customer_reference": null,
-        "order_reference": "cs_test_a1hUf37is7m5cm8hiTXeNShilxVesSl4QZKFVYboYcYGHfGrelUC5sdgfh"
+        "order_reference": "cs_test_a1B41vN9DVbBoqSk0cWTF7QBQ0n27fA0pAHeNHFKe1R1smHQXnjlurlUmW"
       },
-      "payment_method": "pm_1UMRbP2Rw6cpyMyJXx6YSbhk",
+      "payment_method": "pm_1UNaL32Rw6cpyMyJPLCOJkop",
       "payment_method_configuration_details": null,
       "payment_method_options": {
         "card": {
@@ -80,13 +80,13 @@
       "transfer_group": null
     }
   },
-  "id": "evt_3UMRbQ2Rw6cpyMyJ18OENz0l",
+  "id": "evt_3UNaL42Rw6cpyMyJ0sM6uOX2",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
     "id": null,
-    "idempotency_key": "pi_3UMRbQ2Rw6cpyMyJ17w0KIqE-payatt_3UMRbQ2Rw6cpyMyJ1zpbEfzp"
+    "idempotency_key": "10e4fe87-4a34-4eca-9742-04f3cf07ddcf"
   },
   "type": "payment_intent.succeeded"
 }

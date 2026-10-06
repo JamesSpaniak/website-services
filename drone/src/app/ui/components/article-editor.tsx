@@ -9,6 +9,12 @@ import { tryParseArticleImportJson, type ArticleImportResult } from '@/app/lib/a
 import ContentBlockEditor from './content-block-editor';
 import MediaUpload from './media-upload';
 
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function parseTags(text: string): string[] {
+    return text.split(',').map((t) => t.trim()).filter(Boolean);
+}
+
 interface ArticleEditorProps {
     article?: ArticleFull;
     onSave: (article: ArticleFull) => void;
@@ -17,6 +23,8 @@ interface ArticleEditorProps {
 
 export default function ArticleEditor({ article, onSave, onCancel }: ArticleEditorProps) {
     const [title, setTitle] = useState(article?.title || '');
+    const [slug, setSlug] = useState(article?.slug || '');
+    const [tagsText, setTagsText] = useState((article?.tags ?? []).join(', '));
     const [subHeading, setSubHeading] = useState(article?.sub_heading || '');
     const [imageUrl, setImageUrl] = useState(article?.image_url || '');
     const [body, setBody] = useState(() =>
@@ -31,7 +39,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
     );
 
     // Dirty = current form serialization differs from the snapshot taken on mount.
-    const currentSnapshot = JSON.stringify({ title, subHeading, imageUrl, body, contentBlocks, hidden, useBlocks });
+    const currentSnapshot = JSON.stringify({ title, slug, tagsText, subHeading, imageUrl, body, contentBlocks, hidden, useBlocks });
     const initialSnapshotRef = useRef<string | null>(null);
     if (initialSnapshotRef.current === null) initialSnapshotRef.current = currentSnapshot;
     const dirty = currentSnapshot !== initialSnapshotRef.current;
@@ -51,6 +59,8 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
         let effectiveSub = subHeading.trim();
         let effectiveImg = imageUrl.trim();
         let effectiveBody = body;
+        let effectiveSlug = slug.trim();
+        let effectiveTags = parseTags(tagsText);
 
         if (!useBlocks && body.trim().startsWith('{')) {
             const imp = tryParseArticleImportJson(body.trim());
@@ -59,6 +69,8 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
                 effectiveSub = imp.sub_heading || effectiveSub || 'Overview and key points.';
                 effectiveImg = imp.image_url || effectiveImg;
                 effectiveBody = imp.body;
+                effectiveSlug = imp.slug || effectiveSlug;
+                if (imp.tags.length > 0) effectiveTags = imp.tags;
             } else {
                 effectiveBody = prepareArticleBodyHtml(body);
             }
@@ -75,8 +87,17 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
             effectiveSub = 'Overview and key points.';
         }
 
+        if (effectiveSlug && !SLUG_RE.test(effectiveSlug)) {
+            setError('Slug must be lowercase letters, numbers and single hyphens (e.g. drone-careers-2026).');
+            setSaving(false);
+            return;
+        }
+
         const dto: ArticleCreateDto = {
             title: effectiveTitle,
+            // Empty → API keeps the current slug (edit) or generates one from the title (new).
+            slug: effectiveSlug || undefined,
+            tags: effectiveTags,
             sub_heading: effectiveSub,
             image_url: effectiveImg || undefined,
             body: useBlocks ? '' : effectiveBody,
@@ -104,8 +125,11 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
 
     const applyJsonImport = (imp: ArticleImportResult) => {
         setTitle(imp.title);
+        if (imp.slug) setSlug(imp.slug);
+        if (imp.tags.length > 0) setTagsText(imp.tags.join(', '));
         setSubHeading(imp.sub_heading);
-        setImageUrl(imp.image_url);
+        // JSON without a hero keeps the current image (edits of published articles).
+        if (imp.image_url) setImageUrl(imp.image_url);
         setBody(imp.body);
         setUseBlocks(false);
     };
@@ -131,6 +155,23 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
             <div>
                 <label className="block text-sm font-medium text-[var(--brand-foreground)]">Title</label>
                 <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} onPaste={handleJsonPaste} className={input} />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label className="block text-sm font-medium text-[var(--brand-foreground)]">Slug (URL)</label>
+                    <input type="text" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase())}
+                        placeholder="auto from title, e.g. drone-careers-2026" className={`${input} font-mono text-sm`} />
+                    <p className="mt-1 text-xs text-[var(--brand-muted)]">
+                        /articles/{slug || '…'} — changing it on a published article breaks links to the old one.
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-[var(--brand-foreground)]">Tags</label>
+                    <input type="text" value={tagsText} onChange={(e) => setTagsText(e.target.value)}
+                        placeholder="Schools, Part 107" className={input} />
+                    <p className="mt-1 text-xs text-[var(--brand-muted)]">Comma-separated, up to 8. Reuse existing tags: Schools, Funding, Careers, Part 107, Building.</p>
+                </div>
             </div>
 
             <div>
@@ -188,8 +229,8 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
                     <div>
                         <label className="block text-sm font-medium text-[var(--brand-foreground)]">Body (HTML)</label>
                         <p className="text-xs text-[var(--brand-muted)] mb-2">
-                            You can paste a <strong>full</strong> <code className="font-mono text-[var(--brand-subtle)]">news/articles/*.json</code> export (title, sub_heading, hero_image, body_html, seo_phrases)—fields
-                            auto-fill and <code className="font-mono">seo_phrases</code> are appended to the HTML body. Or paste HTML only; saving also accepts JSON in the body field without filling title first.
+                            You can paste a <strong>full</strong> <code className="font-mono text-[var(--brand-subtle)]">news/articles/*.json</code> export (title, slug, tags, sub_heading, hero_image, body_html)—fields
+                            auto-fill; <code className="font-mono">seo_phrases</code> is ignored. Or paste HTML only; saving also accepts JSON in the body field without filling title first.
                         </p>
                         <textarea value={body} onChange={(e) => setBody(e.target.value)} onPaste={handleJsonPaste} rows={12}
                             placeholder="Enter HTML or paste full article JSON..."

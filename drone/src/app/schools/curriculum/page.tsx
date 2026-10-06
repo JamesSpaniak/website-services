@@ -18,7 +18,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
-  title: 'Curriculum Overview — Drone Edge for Schools',
+  title: { absolute: 'Curriculum Overview — Drone Edge for Schools' },
+  alternates: { canonical: '/schools/curriculum' },
   description:
     'FAA Part 107 certification prep is available now; Drone Building opens for early access in January 2027; Video & Photography and AI & Drones are planned. Explore units, activities, practice tests, and teacher resources.',
 };

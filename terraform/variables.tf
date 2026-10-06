@@ -53,6 +53,12 @@ variable "stripe_pro_price_id_monthly" {
   default     = ""
 }
 
+variable "stripe_managed_payments" {
+  description = "Put every Checkout Session on Stripe Managed Payments (Stripe as merchant of record: tax, fraud, disputes; +3.5%/txn). Needs the Managed Payments terms accepted in the same Stripe account."
+  type        = bool
+  default     = false
+}
+
 variable "stripe_pro_price_id_yearly" {
   description = "Optional Stripe Price ID for yearly Pro subscription."
   type        = string

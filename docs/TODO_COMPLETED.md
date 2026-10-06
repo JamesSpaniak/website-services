@@ -4,6 +4,26 @@ Items moved from [`TODO.md`](TODO.md) when shipped. **Each entry is dated** so y
 
 ---
 
+## 2026-10-06
+
+| Item | Notes |
+|------|--------|
+| **Rehearsal fixes: Managed Payments course invoices, refund matching, duplicate Pro log** — uncommitted, not deployed | The Oct 6 sandbox rehearsal showed Managed Payments invoices one-time course payments (`billing_reason: manual`). `invoice.paid` recorded each as a bogus PRO_MONTHLY order, double-counting revenue, and `applyRefund` (PI **or** invoice, `LIMIT 1`) then refunded that row instead of the course, so the course stayed granted. Fix: `isSubscriptionInvoice` guard on `invoice.paid` / `invoice.payment_failed`; `applyRefund` prefers the PaymentIntent-keyed order. `PRO_UPGRADE` is now audited once per subscription, not on every update. Profile labels `REFUND_ISSUED`. Fixtures re-captured from the rehearsal (adds `invoice.paid.manual`). Unit 41/41, e2e 81/81 |
+| **Managed Payments flag + legacy PaymentIntent route removed** — uncommitted, not deployed | `STRIPE_MANAGED_PAYMENTS` (tfvar `stripe_managed_payments`, `true` in dev.tfvars and local `.env`) adds `managed_payments: { enabled: true }` to course and Pro Checkout Sessions. The course's inline product now carries `tax_code: txcd_10000000`; without it Stripe rejects the session (checked against the sandbox, then the probe sessions were expired). Removed `POST /purchases/create-payment-intent`, which bypassed Managed Payments, plus its frontend client function. Tests: purchases unit 38/38, e2e access control 3/3. Docs: purchase-flows, backend-data, frontend-data, local-dev, stripe-sandbox-test-plan |
+| **Real 404s + server-rendered pages** — uncommitted, not deployed | Root cause of `notFound()` → 200: `AuthProvider` rendered `{!isLoading && children}`, so **every page's server HTML was empty** (only the shell) and `notFound()` never ran during SSR. Bisected (not middleware, not metadata; a bare Next 15.5 app 404s fine). Now children always render; guards already wait on `isLoading`; `NewsletterSignup` / `WaitlistForm` hide until auth resolves. Surfaced one latent build error (`/reset-password` `useSearchParams` without Suspense, fixed). Verified: `/articles/999999`, `/newsletter/nope`, `/courses/99999/preview` → 404; `/articles/42` HTML has 1,764 words of article text; no hydration errors on 27 public/auth pages. 404 page: Go back button, popular links, recent articles |
+| **Article slugs, tags, read time** — uncommitted, not deployed | Migration `1765000013000` (`slug` unique + backfill from title, `tags text[]`); `GET /articles/:idOrSlug`; computed `read_minutes`. Frontend: `/articles/<slug>` with 308 from numeric ids, topic filter `/articles?tag=`, tag chips + read time on cards and articles, JSON-LD keywords, sitemap slugs, admin Slug/Tags fields. Paste-batch JSON carries slug + tags and links published articles by slug — re-import steps in `assets/articles/import/paste-2026-10/README.md`. Also fixed: pasting JSON without `hero_image` no longer clears the editor's image |
+| **RSS feed** | `/rss.xml` (+ `?tag=` per topic); `/feed`, `/feed.xml`, `/articles/rss.xml` redirect; `<link rel="alternate">` on home, index, articles |
+| **Field Notes sample + archive space** | `/newsletter`: *Inside each issue* sample with the newest article as a live example, *Issues* list with an "Issue 1 · Coming Nov 3" row until the archive has entries, RSS link |
+| **`notFound()` returns HTTP 200** (TODO P2, added Oct 5) | Closed by the first row |
+| **Footer Field Notes layout** | Full-width row on md+: blurb left, form right (was a left-third block); stacks on phones. Header width left as is (decision Oct 6) |
+| **Hidden articles reachable by URL** (TODO P2, added Oct 6) | `GET /articles/:idOrSlug` now uses `OptionalJwtAuthGuard`: hidden → 404 unless admin; hidden and missing share one 404 message. Admin editor unaffected (browser request carries the admin cookie). Public pages, RSS and sitemap already used the hidden-filtered list. Comments endpoints for a hidden article's id still respond (low risk, not changed) |
+
+## 2026-10-05
+
+| Item | Notes |
+|------|--------|
+| **Site review fixes (browser-agent pass)** — uncommitted, not deployed | **Canonical:** root layout no longer sets `canonical: SITE_URL` (every page without an override pointed at `/`); each public page sets its own. **Titles:** removed hardcoded `— Drone Edge` (double suffix on `/schools`, `/consultation`, course preview); `articles/layout.tsx` re-declares the template so articles get the suffix. **Articles:** index and article pages server-rendered; missing/non-numeric IDs → `notFound()` + new root `not-found.tsx` (`noindex`; status still 200, see TODO P2). Card hero box 16:9 → 3:2 and the `w-full mx-5` overflow fixed, so baked-in caption bars show. **`/schools`:** portrait photo band → photo-beside-caption section; hero image fills the text column on `lg` with the checkmark row moved full width; aspect box when stacked. **Header:** desktop links at `lg`+ (were wrapping at ~900–1100px), Book a Call at `xl`+. **Field Notes:** CTA *Subscribe* and *first Tuesday of each month* everywhere; footer link; footer signup hidden on `/articles/*` |
+
 ## 2026-10-04
 
 | Item | Notes |

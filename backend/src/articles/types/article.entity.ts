@@ -19,6 +19,14 @@ export class Article {
   @Column({ type: 'varchar' })
   sub_heading: string;
 
+  /** URL segment: /articles/<slug>. Unique; set from the title when not given (see ArticleService.slugify). */
+  @Column({ type: 'varchar', length: 120, unique: true })
+  slug: string;
+
+  /** Display labels, e.g. ["Schools", "Part 107"]. Filtered on /articles?tag=<slugified label>. */
+  @Column({ type: 'text', array: true, default: '{}' })
+  tags: string[];
+
   @Column({ type: 'varchar', nullable: true })
   image_url?: string;
 

@@ -447,13 +447,6 @@ async function purchaseCourse(courseId: number): Promise<void> {
     });
 }
 
-async function createPaymentIntent(courseId: number): Promise<{ clientSecret: string }> {
-    return apiClient('purchases/create-payment-intent', {
-        method: 'POST',
-        body: JSON.stringify({ courseId }),
-    });
-}
-
 async function confirmCoursePurchase(paymentIntentId: string): Promise<{ granted: boolean; alreadyOwned: boolean }> {
     return apiClient('purchases/confirm-payment', {
         method: 'POST',
@@ -1133,7 +1126,6 @@ export {
     confirmCourseCheckout,
     confirmProCheckout,
     logToServer,
-    createPaymentIntent,
     createProCheckout,
     createBillingPortal,
     uploadMedia,

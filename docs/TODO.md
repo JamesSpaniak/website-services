@@ -36,6 +36,14 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **Thu Oct 8** | Watch alerts, orders, webhooks | **Live** + Announcement 1 |
 | **Fri–Sun Oct 9–11** | **PTA5** Playwright student scenarios · PR `launch-batch1` → `main` · **PTA8** outro seconds | Review PR |
 
+*Found in the Oct 6 sandbox rehearsal (non-blocking UX, after go-live):*
+
+| ID | Item | Status |
+|----|------|--------|
+| **R1** | Profile shows "Pro membership: active" with no hint once the subscription is set to cancel at period end — show "Ends <date>" from `cancel_at_period_end` | Open |
+| **R2** | `?promo=EDGE25` is applied only on Stripe Checkout; the site's course/Pro pages still show full price. Show "25% off applied at checkout" when the `de_promo` cookie is set | Open |
+| **R3** | "Verify your email when you can" banner shown while the activity log says "Verified email" (rehearsal user) — check the banner reads fresh auth state | Open |
+
 ---
 
 ## P0 — Product & course delivery

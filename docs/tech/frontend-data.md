@@ -54,7 +54,10 @@ The shared `apiClient` sets `Content-Type: application/json` and `X-Request-Id`;
 
 Some RSC/metadata code calls the backend **directly** with `API_INTERNAL_BASE_URL` (no browser cookies):
 
-- `drone/src/app/articles/[articleId]/page.tsx` — article for metadata + page.
+- `drone/src/app/articles/page.tsx` — article index (`force-dynamic`, fetch cached 5 min; hidden articles filtered).
+- `drone/src/app/articles/[articleId]/page.tsx` — article by slug or id for metadata + page (one cached fetch); API 404/400 → `notFound()`.
+- `drone/src/app/rss.xml/route.ts` — RSS feed.
+- `drone/src/app/newsletter/page.tsx` — newest article as the sample issue's "The one thing" example (ISR 300).
 - `drone/src/app/sitemap.ts` — published articles list.
 
 These align with backend **`GET /articles`** and **`GET /articles/:id`** (public).
@@ -133,7 +136,7 @@ All functions in `drone/src/app/lib/api-client.tsx` map to the backend routes li
 | Courses / progress | `courses`, `courses/:id`, `progress/courses`, `progress/courses/:id`, `progress/courses/:id/reset`, `progress/courses/:courseId/units/:unitId`, `courses/:courseId/units/:unitId/media` |
 | Articles (public + admin) | `articles`, `articles/:id`, `articles/admin/all`, `articles` POST, `articles/:id` PATCH/DELETE |
 | Comments | `articles/:articleId/comments`, `comments/:id` PATCH/DELETE, `comments/:id/upvote` |
-| Purchases | `purchases/create-course-checkout`, `purchases/confirm-checkout`, `purchases/create-pro-checkout`, `purchases/billing-portal`, `purchases/course` (legacy `create-payment-intent` / `confirm-payment` still exported) |
+| Purchases | `purchases/create-course-checkout`, `purchases/confirm-checkout`, `purchases/create-pro-checkout`, `purchases/billing-portal`, `purchases/course` (legacy `confirm-payment` still exported) |
 | Media | `media/presigned-url`, `media/profile-picture`, `media` GET/DELETE, `media?folder&subfolder` |
 | Organizations | `organizations/my`, `organizations/invite-info`, `organizations`, `organizations/:id`, members, classes, invite-codes, courses, progress |
 | Audit / analytics | `audit/my`, `audit/users/:userId`, `audit/analytics/overview`, `audit/analytics/daily` |
@@ -175,7 +178,7 @@ The **Exam** UI (`exam.tsx`) submits answers via **`submitUnitExam`** → **`POS
 
 ## 6. Pages — route map
 
-**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (nav incl. **Pricing** + auth menu + Book a Call CTA at `lg`+; logged-out **Log in** (outline) / **Sign up** (primary) on desktop and mobile, preserving the current path via `loginHref` / `registerHref`), and `FooterComponent` (nav columns incl. Pricing + socials — X/LinkedIn icons are still `#`, TODO **S7**/W4).
+**Global shell** (`app/layout.tsx`): wraps all routes with `ThemeProvider`, `AuthProvider`, `PageAnalytics` ( **`trackPageView`** → `POST /analytics/event` on client navigations), optional **Umami** script when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set, `HeaderComponent` (desktop nav links at `lg`+, menu button below `lg` — the six links wrapped at ~900–1100px; Book a Call CTA at `xl`+; nav incl. **Pricing** + auth menu; logged-out **Log in** (outline) / **Sign up** (primary) on desktop and mobile, preserving the current path via `loginHref` / `registerHref`), and `FooterComponent` (nav columns incl. Pricing + Field Notes + socials — X/LinkedIn icons are still `#`, TODO **S7**/W4).
 
 Below: **page file** → **permissions** → **HTTP/API** (backend names match [`backend-data.md`](./backend-data.md) §4) → **UI components** (primary children; nested components may call additional APIs).
 
@@ -279,18 +282,24 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | | |
 |--|--|
 | **Permissions** | Public (listed articles are published-only from API). |
-| **API** | **`GET /articles`** → `getArticles`. |
-| **Components** | `PageShell`, `ArticlePreviewComponent`, `LoadingComponent`, `ErrorComponent`. |
+| **API** | Server component: direct **`GET /articles`** (server `fetch`, revalidate 300). Rendered per request (`force-dynamic`) because the API isn't reachable during the Docker build. |
+| **Components** | `PageShell`, `NewsletterSignup` (`band`), topic filter (`ArticleTags`, `?tag=<tag slug>`; filtered views keep `/articles` as canonical), link to the RSS feed (per-topic when filtered), `ArticlePreviewComponent` (3:2 hero box so the baked-in caption bar isn't cropped; date · read time · tags line). |
 
 ### `/articles/[articleId]` — `app/articles/[articleId]/page.tsx` + `article-page-client.tsx`
+
+The segment is a **slug** (`/articles/drone-careers-2026`) or a legacy **numeric id**. Numeric URLs `permanentRedirect` (308) to `articlePath(article)` once the API returns a slug. URL helpers live in `lib/article-url.ts` (`articlePath`, `tagSlug`, `tagHref`, `RSS_ALTERNATE_TYPES`); never build `/articles/${id}` by hand.
 
 | | |
 |--|--|
 | **Permissions** | Public for reading. Comments require JWT for write/upvote (see below). |
-| **API** | **RSC metadata:** direct **`GET /articles/:id`** (server `fetch`, revalidate). **Client:** **`GET /articles/:id`** → `getArticleById`; **`trackArticleView`** → `POST /analytics/event`. **`CommentSection`:** `GET/POST /articles/:id/comments`, `PATCH/DELETE /comments/:id`, `POST /comments/:id/upvote` (see [`backend-data.md`](./backend-data.md)). |
-| **Components** | `ArticlePageClient` → `ArticleComponent` (`ImageComponent`, `ContentBlockRenderer`, `JsonLd`) + **`CommentSection`**. |
+| **API** | **Server-rendered:** direct **`GET /articles/:idOrSlug`** (server `fetch`, revalidate 300, shared by metadata + page via `cache`). Missing / malformed → `notFound()` (real 404 + `noindex`). **Client:** `ArticlePageClient` only fires **`trackArticleView`** → `POST /analytics/event`. **`CommentSection`:** `GET/POST /articles/:id/comments`, `PATCH/DELETE /comments/:id`, `POST /comments/:id/upvote` (see [`backend-data.md`](./backend-data.md)). |
+| **Components** | `ArticlePageClient` → `ArticleComponent` (date · read time, `ArticleTags`, `ImageComponent`, `ContentBlockRenderer`, `JsonLd` with `keywords`) + **`CommentSection`**. |
 
-### `/courses` — `app/courses/page.tsx`
+### `/rss.xml` — `app/rss.xml/route.ts`
+
+RSS 2.0 of published articles (newest 50), `force-dynamic`, article fetch cached 5 min, `Cache-Control: public, max-age=300`. `?tag=<tag slug>` narrows to one topic. Items: title, slug link, stable `guid` (`drone-edge-article-<id>`, survives slug changes), `pubDate`, sub-heading as description, one `<category>` per tag, `media:content` hero. `/feed`, `/feed.xml`, `/articles/rss.xml`, `/articles/feed` 308 → `/rss.xml` (`next.config.mjs` + `.ts`). Discoverable via `<link rel="alternate">` on `/`, `/articles` and article pages.
+
+### `/courses` — `app/courses/page.tsx` (server wrapper: metadata/canonical) + `courses-page-client.tsx`
 
 | | |
 |--|--|
@@ -339,7 +348,9 @@ Below: **page file** → **permissions** → **HTTP/API** (backend names match [
 | **Permissions** | Public (RSC, static). In the sitemap. |
 | **Content** | Field Notes landing page (newsletter plan NL1): the five sections, cadence (first Tuesday, summer merged, ≤ 1 extra dispatch), adults 18+, teachers may share with a class, how to leave (one-click / Profile). `WaitlistForm interest="newsletter"`. Archive list arrives with NL13 (Phase 2). |
 
-**Newsletter signup placement (NL3)** — `NewsletterSignup` (`ui/components/newsletter-signup.tsx`): `card` at the end of every article (before comments), `band` under the `/articles` heading, `footer` in the site footer. Renders nothing on private routes (`/admin`, `/manager`, `/profile`, `/settings`, auth flows, `/unsubscribe`, `/account-deleted`, `/newsletter` itself, and course lessons / exams / preview) and nothing for signed-in **org members**. `WaitlistForm` also returns `null` for org members, and `POST /leads` ignores them server-side. `/courses/tracks/building` passes `offerNewsletter` (unchecked "Also send me Field Notes" box → a second `newsletter` lead). The consultation success state links to `/newsletter`.
+**Newsletter signup placement (NL3)** — `NewsletterSignup` (`ui/components/newsletter-signup.tsx`): `card` at the end of every article (before comments), `band` under the `/articles` heading, `footer` in the site footer (full-width row: blurb left, form right; skipped on `/articles/*`, which already have an inline signup). Copy everywhere: CTA **Subscribe**, cadence **first Tuesday of each month**. Footer *Learn* column links to `/newsletter`. Renders nothing on private routes (`/admin`, `/manager`, `/profile`, `/settings`, auth flows, `/unsubscribe`, `/account-deleted`, `/newsletter` itself, and course lessons / exams / preview) and nothing for signed-in **org members**. `WaitlistForm` also returns `null` for org members, and `POST /leads` ignores them server-side. `/courses/tracks/building` passes `offerNewsletter` (unchecked "Also send me Field Notes" box → a second `newsletter` lead). The consultation success state links to `/newsletter`.
+
+**`/newsletter` page:** signup form, an *Inside each issue* sample (the five sections in email layout; "The one thing" shows the newest published article as a live example — nothing else is invented), an *Issues* list (archive once issues are 7 days old; until then a single "Issue 1 · Coming Tuesday, November 3, 2026" row — `FIRST_ISSUE_DATE` in the page), and the cadence / audience / leaving notes plus an RSS link.
 
 ### `/newsletter/[slug]` — `app/newsletter/[slug]/page.tsx`
 
@@ -391,7 +402,7 @@ Each tab is a **real route** (shared tab bar renders on every admin page, includ
 | Route | Content / API |
 |-------|----------------|
 | `/admin/articles` | Article table — `GET /articles/admin/all`, `DELETE /articles/:id`. |
-| `/admin/articles/new`, `/admin/articles/[articleId]` | **`ArticleEditor`** (`createArticle` / `updateArticle`); edit route loads `GET /articles/:id`. Save/Cancel navigate back to `/admin/articles`. Unsaved-changes guard (see below). |
+| `/admin/articles/new`, `/admin/articles/[articleId]` | **`ArticleEditor`** (`createArticle` / `updateArticle`) with **Slug** (blank = keep / generate) and comma-separated **Tags** fields; pasted import JSON fills `slug` and `tags` too, and keeps the current hero when the JSON has no `hero_image`; edit route loads `GET /articles/:id`. Save/Cancel navigate back to `/admin/articles`. Unsaved-changes guard (see below). |
 | `/admin/courses` | Course table — `GET /courses`, `DELETE /courses/:id`. Per-row shortcut to `/admin/questions?course=<id>`. |
 | `/admin/courses/new`, `/admin/courses/[courseId]` | **`CourseEditor`** (`createCourse` / `updateCourse`) with **`MediaUpload`** → presigned URL + S3 PUT; course payload uses **`images_url`** (arrays) — see [`course-editing-roadmap.md`](./course-editing-roadmap.md). Edit route loads **`GET /courses/:id`** (`getCourseById`) so **`sub_units`** and exams are present (`GET /courses` list strips nested content). Header link to the course's question bank. Visual ↔ JSON mode switch is in-memory (no save needed); image fields show inline thumbnails and video fields have a collapsed **Preview video** toggle (`video-preview.tsx`). |
 | `/admin/questions` | **`QuestionBankEditor`** — question CRUD, bulk import/export. Accepts `?course=<id>` to preselect a course. |
@@ -477,3 +488,11 @@ Same routed-tab pattern as `/admin`: `app/manager/layout.tsx` → **`ManagerShel
 | Analytics beacon | `drone/src/app/lib/analytics.ts`, `drone/src/app/lib/use-page-analytics.ts` |
 
 Keep this file aligned with `api-client.tsx` and route-handler changes; mirror permission semantics with [`backend-data.md`](./backend-data.md).
+
+### SEO metadata conventions
+
+- **Article URLs:** slug-based, see `/articles/[articleId]`. Sitemap and JSON-LD use `articlePath`.
+- **Canonical:** the root layout sets **no** `alternates.canonical` (a root value is inherited by every page and pointed them all at `/`). Each public page sets its own (`/`, `/articles`, `/articles/:slug`, `/courses`, `/courses/:id/preview`, `/schools`, `/schools/curriculum`, `/schools/funding`, `/about`, `/contact`, `/consultation`, `/legal`, `/privacy`, `/pricing`, `/refunds`, `/newsletter`, `/newsletter/:slug`). Private / auth pages have none.
+- **Titles:** pages give the bare title; the root template adds `— Drone Edge`. Don't hardcode the suffix (it doubles). Use `{ absolute: … }` for a fully custom title. A nested layout with a plain-string `title` stops the template reaching its children, so `articles/layout.tsx` re-declares `template`.
+- **404s:** `notFound()` returns a real HTTP 404. It did not until Oct 6 2026: `AuthProvider` rendered `{!isLoading && children}`, so the server HTML had **no page content at all** (only the shell) and `notFound()` never ran during SSR. `AuthProvider` now always renders children; anything that depends on the user must check `isLoading` (the guards do; `NewsletterSignup` / `WaitlistForm` hide until it resolves so school students never see them flash). `app/not-found.tsx`: Go back (`GoBackButton`: history back on same-origin referrer, else home), popular links, and `RecentArticles` (client fetch — the 404 page is prerendered at build, when the API is unreachable).
+

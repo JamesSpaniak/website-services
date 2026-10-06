@@ -5,6 +5,7 @@ import TermsOfServiceBody from './terms-of-service-body';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
+  alternates: { canonical: '/legal' },
   description:
     'Drone Edge Sales Agreement — terms and conditions for digital and physical offerings. Governs purchases subject to your quote unless superseded by a signed agreement.',
   openGraph: {

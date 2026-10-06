@@ -1,17 +1,19 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791028805,
+  "created": 1791300943,
   "data": {
     "object": {
       "application": null,
       "application_fee_percent": null,
       "automatic_tax": {
         "disabled_reason": null,
-        "enabled": false,
-        "liability": null
+        "enabled": true,
+        "liability": {
+          "type": "stripe"
+        }
       },
-      "billing_cycle_anchor": 1791028802,
+      "billing_cycle_anchor": 1791300940,
       "billing_cycle_anchor_config": null,
       "billing_mode": {
         "flexible": null,
@@ -28,37 +30,37 @@
         "reason": null
       },
       "collection_method": "charge_automatically",
-      "created": 1791028802,
+      "created": 1791300940,
       "currency": "usd",
-      "customer": "cus_VNBzRem9rtRQAq",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "customer_account": null,
       "days_until_due": null,
-      "default_payment_method": "pm_1UMRbh2Rw6cpyMyJoxIJ9M0Q",
+      "default_payment_method": "pm_1UNaP22Rw6cpyMyJectUHPxi",
       "default_source": null,
       "default_tax_rates": [],
       "description": null,
       "discounts": [],
       "ended_at": null,
-      "id": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
+      "id": "sub_1UNaP52Rw6cpyMyJmu5zbeXZ",
       "invoice_settings": {
         "account_tax_ids": null,
         "custom_fields": null,
         "description": null,
         "footer": null,
         "issuer": {
-          "type": "self"
+          "type": "stripe"
         }
       },
       "items": {
         "data": [
           {
             "billing_thresholds": null,
-            "created": 1791028802,
-            "current_period_end": 1793707202,
-            "current_period_start": 1791028802,
+            "created": 1791300941,
+            "current_period_end": 1793979340,
+            "current_period_start": 1791300940,
             "current_trial": null,
             "discounts": [],
-            "id": "si_VNBzc53Ffr6JfS",
+            "id": "si_VON99cBYmJKRbt",
             "metadata": {},
             "object": "subscription_item",
             "plan": {
@@ -110,7 +112,7 @@
               "unit_amount_decimal": "3500"
             },
             "quantity": 1,
-            "subscription": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
+            "subscription": "sub_1UNaP52Rw6cpyMyJmu5zbeXZ",
             "tax_rates": []
           }
         ],
@@ -119,15 +121,15 @@
         "total_count": 1,
         "url": "REDACTED"
       },
-      "latest_invoice": "in_1UMRbi2Rw6cpyMyJfvjZ40zS",
+      "latest_invoice": "in_1UNaP32Rw6cpyMyJcaj62jVw",
       "livemode": false,
       "managed_payments": {
-        "enabled": false
+        "enabled": true
       },
       "metadata": {
         "duration": "monthly",
         "productType": "pro_membership",
-        "userId": "29"
+        "userId": "70"
       },
       "next_pending_invoice_item_invoice": null,
       "object": "subscription",
@@ -180,7 +182,7 @@
       },
       "quantity": 1,
       "schedule": null,
-      "start_date": 1791028802,
+      "start_date": 1791300940,
       "status": "active",
       "test_clock": null,
       "transfer_data": null,
@@ -194,13 +196,13 @@
       "trial_start": null
     }
   },
-  "id": "evt_1UMRbm2Rw6cpyMyJp4Y54T8s",
+  "id": "evt_1UNaP62Rw6cpyMyJPJeq16Uq",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
     "id": null,
-    "idempotency_key": "1ae19548-05b0-43c5-b667-538da5758ec1"
+    "idempotency_key": "eaebcdef-602f-45ae-8e68-e502ae07a024"
   },
   "type": "customer.subscription.created"
 }

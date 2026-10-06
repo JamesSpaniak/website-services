@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { ClockIcon, ChatBubbleLeftRightIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
-  title: 'Free Consultation — Drone Edge',
+  title: 'Free Consultation',
+  alternates: { canonical: '/consultation' },
   description:
     'Book a free 30-minute call with the Drone Edge team. Learn how to bring FAA Part 107 certification into your school or program.',
   openGraph: {

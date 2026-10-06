@@ -418,6 +418,7 @@ const PROFILE_ACTION_LABELS: Record<string, { label: string; icon: string; color
     PROGRESS_RESET: { label: 'Reset course progress', icon: '🔄', color: 'text-red-500' },
     COURSE_PURCHASED: { label: 'Purchased a course', icon: '💰', color: 'text-[var(--brand-muted)]' },
     PRO_UPGRADE: { label: 'Upgraded to Pro', icon: '⭐', color: 'text-[var(--brand-primary)]' },
+    REFUND_ISSUED: { label: 'Refund issued', icon: '↩️', color: 'text-[var(--brand-muted)]' },
 };
 
 function formatProfileMeta(metadata: Record<string, unknown> | null): string {

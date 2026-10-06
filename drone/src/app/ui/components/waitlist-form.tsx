@@ -13,7 +13,7 @@ const CONSENT_TOPIC: Record<LeadInterest, string> = {
   building: 'Drone Building early access',
   part107: 'the Part 107 course',
   schools: 'Drone Edge for schools and programs',
-  newsletter: 'Drone Edge Field Notes, once a month',
+  newsletter: 'Drone Edge Field Notes, on the first Tuesday of each month',
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,14 +51,15 @@ export default function WaitlistForm({
   offerNewsletter = false,
 }: WaitlistFormProps) {
   const id = useId();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
   const [alsoNewsletter, setAlsoNewsletter] = useState(false);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  if (user?.organization?.role === 'member') return null;
+  // Hidden until the session check finishes so school students never see it flash in.
+  if (isLoading || user?.organization?.role === 'member') return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

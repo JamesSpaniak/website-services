@@ -14,7 +14,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
-  title: 'For Schools — Drone Edge',
+  title: 'For Schools',
+  alternates: { canonical: '/schools' },
   description:
     'Structured FAA Part 107 curriculum, org-wide progress tracking, and flexible delivery for CTE and STEM programs.',
   openGraph: {
@@ -86,8 +87,8 @@ export default function SchoolsPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section className="bg-[#f0f5eb] border-b border-[#d4e0c8] overflow-hidden">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-20 pb-12 sm:pt-28 sm:pb-16 lg:pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:items-stretch">
             {/* Text */}
             <div>
               <span className="inline-block text-xs font-semibold tracking-widest text-[#4a6b2f] uppercase mb-4">
@@ -130,40 +131,40 @@ export default function SchoolsPage() {
                   <ArrowRightIcon className="h-4 w-4 shrink-0" aria-hidden />
                 </Link>
               </div>
-
-              {/* Quick stats — 2×2 grid so the right column aligns; items-start when left cell wraps */}
-              <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 text-sm text-[#525252] max-w-lg">
-                <span className="flex items-start gap-2 min-w-0">
-                  <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
-                  <span className="leading-snug">600+ practice questions</span>
-                </span>
-                <span className="flex items-start gap-2 min-w-0">
-                  <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
-                  <span className="leading-snug">FAA ACS-aligned</span>
-                </span>
-                <span className="flex items-start gap-2 min-w-0">
-                  <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
-                  <span className="leading-snug">Async + hybrid delivery</span>
-                </span>
-                <span className="flex items-start gap-2 min-w-0">
-                  <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
-                  <span className="leading-snug">No locked hardware</span>
-                </span>
-              </div>
             </div>
 
-            {/* Hero image */}
-            <div className="relative h-80 lg:h-[420px] overflow-hidden" style={{ borderRadius: '4px' }}>
+            {/* Hero image — aspect box when stacked (a fixed height cropped heads off at tablet width); fills the text column's height on lg. Position favours the faces and the controller. */}
+            <div className="relative aspect-[4/3] sm:aspect-[3/2] lg:aspect-auto lg:h-full lg:min-h-[420px] overflow-hidden" style={{ borderRadius: '4px' }}>
               <Image
                 src="/3_kids_holding.png"
-                alt="Students holding drones in a classroom"
+                alt="Students flying a drone outdoors during a school session"
                 fill
-                className="object-cover object-center"
+                className="object-cover object-[35%_25%]"
                 priority
                 unoptimized
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
+          </div>
+
+          {/* Quick stats — full-width row under the grid so the text column stays close to the photo height */}
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-4 text-sm text-[#525252]">
+            <span className="flex items-start gap-2 min-w-0">
+              <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
+              <span className="leading-snug">600+ practice questions</span>
+            </span>
+            <span className="flex items-start gap-2 min-w-0">
+              <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
+              <span className="leading-snug">FAA ACS-aligned</span>
+            </span>
+            <span className="flex items-start gap-2 min-w-0">
+              <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
+              <span className="leading-snug">Async + hybrid delivery</span>
+            </span>
+            <span className="flex items-start gap-2 min-w-0">
+              <CheckCircleIcon className="h-4 w-4 text-[#4a6b2f] shrink-0 mt-0.5" aria-hidden />
+              <span className="leading-snug">No locked hardware</span>
+            </span>
           </div>
         </div>
       </section>
@@ -333,17 +334,32 @@ export default function SchoolsPage() {
         </div>
       </section>
 
-      {/* ── Drone image strip ─────────────────────────────────────────── */}
+      {/* ── Flight day photo + caption (portrait photo, so it sits beside text rather than in a wide band) ── */}
       <section className="bg-[#f0f5eb] border-b border-[#d4e0c8]">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="relative h-[22rem] sm:h-[28rem] overflow-hidden" style={{ borderRadius: '4px' }}>
-            <Image
-              src="/security_drone_v3.png"
-              alt="Community member visits school flying session"
-              fill
-              className="object-contain object-center"
-              sizes="(max-width: 768px) 100vw, 768px"
-            />
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,20rem)_1fr] gap-10 md:gap-14 items-center">
+            <div className="relative w-full max-w-xs mx-auto md:mx-0 aspect-[2/3] overflow-hidden" style={{ borderRadius: '4px' }}>
+              <Image
+                src="/security_drone_v3.png"
+                alt="Community member visits a school flying session"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 320px, 320px"
+              />
+            </div>
+            <div>
+              <span className="inline-block text-xs font-semibold tracking-widest text-[#4a6b2f] uppercase mb-4">
+                Flight days
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[#171717]">
+                The classroom work leads to real flying.
+              </h2>
+              <p className="mt-4 text-[#525252] leading-relaxed">
+                Part 107 study pays off on the field. Outdoor flying sessions let students put the rules into
+                practice, and give the wider community, from local public-safety pilots to families, a reason to
+                come and see what the program is building.
+              </p>
+            </div>
           </div>
         </div>
       </section>

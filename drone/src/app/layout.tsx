@@ -64,9 +64,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: SITE_URL,
-  },
   verification: {
     // google: 'your-google-verification-code',  // Add after setting up Google Search Console
     // yandex: 'your-yandex-verification-code',

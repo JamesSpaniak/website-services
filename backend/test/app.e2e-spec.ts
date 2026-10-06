@@ -289,7 +289,7 @@ describe('API (e2e)', () => {
     it('requires auth for purchase endpoints', async () => {
       await request(app.getHttpServer()).post('/purchases/course').expect(401);
       await request(app.getHttpServer())
-        .post('/purchases/create-payment-intent')
+        .post('/purchases/create-course-checkout')
         .expect(401);
       await request(app.getHttpServer())
         .post('/purchases/pro-membership')
@@ -1342,7 +1342,7 @@ describe('API (e2e)', () => {
       expect(response.body.user.email_verified).toBe(false);
     });
 
-    it('allows unverified users to create-payment-intent', async () => {
+    it('allows unverified users to create-course-checkout', async () => {
       await createUnverifiedUser('unverified2', 'unverified2@example.com');
       const course = await createCourse('Paid Course');
       const token = await loginAndGetToken('unverified2');
@@ -1350,7 +1350,7 @@ describe('API (e2e)', () => {
       // Without Stripe keys in test, expect 5xx from Stripe or 201 if mocked —
       // the gate we care about is that EMAIL_NOT_VERIFIED is not returned.
       const res = await request(app.getHttpServer())
-        .post('/purchases/create-payment-intent')
+        .post('/purchases/create-course-checkout')
         .set('Authorization', `Bearer ${token}`)
         .send({ courseId: course.id });
 

@@ -33,7 +33,7 @@ Steps: workflows/marketing/newsletter.md.
 
 <3–4 sentences, answer first. The single most useful number or fact.>
 
-[Read the article →]({{site_url}}/articles/<id>?utm_source=newsletter&utm_medium=email&utm_campaign=nl-YYYY-MM&utm_content=lead)
+[Read the article →]({{site_url}}/articles/<slug>?utm_source=newsletter&utm_medium=email&utm_campaign=nl-YYYY-MM&utm_content=lead)
 
 ## Rules watch (as of <Mon D>)
 

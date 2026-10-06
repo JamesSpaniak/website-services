@@ -8,6 +8,8 @@ stripe_publishable_key = "pk_test_51T1cg92Rw6cpyMyJI6BOeozOuntx5b1qpgz6yyKfiJZpJ
 # Drone Edge sandbox: Drone Edge Pro $35/mo. Swap for the live price at cutover.
 stripe_pro_price_id_monthly = "price_1ULulr2Rw6cpyMyJcc0cCqmA"
 stripe_pro_price_id_yearly  = ""
+# Stripe as merchant of record (PD9). Rehearsed on sandbox keys; stays on at the live cutover.
+stripe_managed_payments = true
 # PA41 — first apply needs TF_VAR_stripe_webhook_secret=whsec_... (pipeline.sh checks).
 stripe_webhook_enabled = true
 email_enabled          = true

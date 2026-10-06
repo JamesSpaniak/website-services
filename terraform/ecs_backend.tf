@@ -295,6 +295,7 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "STRIPE_PUBLISHABLE_KEY", value = var.stripe_publishable_key },
         { name = "STRIPE_PRO_PRICE_ID_MONTHLY", value = var.stripe_pro_price_id_monthly },
         { name = "STRIPE_PRO_PRICE_ID_YEARLY", value = var.stripe_pro_price_id_yearly },
+        { name = "STRIPE_MANAGED_PAYMENTS", value = tostring(var.stripe_managed_payments) },
         # Hourly replay of Stripe events whose webhook delivery failed
         # (StripeEventReplayService). Only where the webhook is live; local dev
         # leaves it unset because it shares the sandbox account.

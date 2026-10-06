@@ -1,11 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import PageShell from '../ui/components/page-shell';
 import ResetPasswordFormComponent from '../ui/components/reset-password-form';
 import ErrorComponent from '../ui/components/error';
+import LoadingComponent from '../ui/components/loading';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
@@ -21,5 +23,13 @@ export default function ResetPasswordPage() {
     <PageShell title="Reset password" subtitle="Choose a new password for your account." maxWidthClass="max-w-lg">
       <ResetPasswordFormComponent token={token} />
     </PageShell>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

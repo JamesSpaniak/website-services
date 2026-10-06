@@ -1,22 +1,24 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791028806,
+  "created": 1791300944,
   "data": {
     "object": {
       "adaptive_pricing": {
         "enabled": true
       },
       "after_expiration": null,
-      "allow_promotion_codes": false,
+      "allow_promotion_codes": null,
       "allowed_payment_method_types": null,
       "amount_subtotal": 3500,
-      "amount_total": 3500,
+      "amount_total": 2799,
       "automatic_tax": {
-        "enabled": false,
-        "liability": null,
-        "provider": null,
-        "status": null
+        "enabled": true,
+        "liability": {
+          "type": "stripe"
+        },
+        "provider": "stripe",
+        "status": "complete"
       },
       "billing_address_collection": "auto",
       "branding_settings": {
@@ -34,8 +36,8 @@
           "type": "file"
         }
       },
-      "cancel_url": "http://localhost:8080/profile?pro=canceled",
-      "client_reference_id": "29",
+      "cancel_url": "https://thedroneedge.com/profile?pro=canceled",
+      "client_reference_id": "70",
       "client_secret": null,
       "collected_information": {
         "business_name": null,
@@ -44,7 +46,7 @@
       },
       "consent": null,
       "consent_collection": null,
-      "created": 1791028797,
+      "created": 1791300827,
       "currency": "usd",
       "currency_conversion": null,
       "custom_fields": [],
@@ -54,17 +56,17 @@
         "submit": null,
         "terms_of_service_acceptance": null
       },
-      "customer": "cus_VNBzRem9rtRQAq",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "customer_account": null,
       "customer_creation": null,
       "customer_details": {
         "address": {
-          "city": null,
+          "city": "REDACTED",
           "country": "US",
-          "line1": null,
+          "line1": "REDACTED",
           "line2": null,
           "postal_code": "REDACTED",
-          "state": null
+          "state": "REDACTED"
         },
         "business_name": null,
         "email": "REDACTED",
@@ -75,21 +77,26 @@
         "tax_ids": []
       },
       "customer_email": null,
-      "discounts": [],
-      "expires_at": 1791115197,
-      "id": "cs_test_a1hdIAFlIC0ml4qMF0X10wcfV5Cx8Ke0Uei2kQ0L47lqoefkVHY5Y4yU7w",
+      "discounts": [
+        {
+          "coupon": null,
+          "promotion_code": "promo_1UNZu62Rw6cpyMyJzY49gKYo"
+        }
+      ],
+      "expires_at": 1791387227,
+      "id": "cs_test_a1b0UqRQbtx6dsmSBySvXYktRlVpITJajwkLp4Mzfphosj3xE7ZmZVw1pX",
       "integration_identifier": null,
-      "invoice": "in_1UMRbi2Rw6cpyMyJfvjZ40zS",
+      "invoice": "in_1UNaP32Rw6cpyMyJcaj62jVw",
       "invoice_creation": null,
       "livemode": false,
       "locale": null,
       "managed_payments": {
-        "enabled": false
+        "enabled": true
       },
       "metadata": {
         "duration": "monthly",
         "productType": "pro_membership",
-        "userId": "29"
+        "userId": "70"
       },
       "mode": "subscription",
       "object": "checkout.session",
@@ -97,10 +104,7 @@
       "payment_intent": null,
       "payment_link": null,
       "payment_method_collection": "always",
-      "payment_method_configuration_details": {
-        "id": "pmc_1T1cgg2Rw6cpyMyJWw1qvMwR",
-        "parent": null
-      },
+      "payment_method_configuration_details": null,
       "payment_method_options": {
         "card": {
           "request_three_d_secure": "automatic"
@@ -108,10 +112,7 @@
       },
       "payment_method_types": [
         "card",
-        "klarna",
-        "link",
-        "cashapp",
-        "amazon_pay"
+        "cashapp"
       ],
       "payment_status": "paid",
       "permissions": null,
@@ -132,19 +133,23 @@
       "shipping_options": [],
       "status": "complete",
       "submit_type": null,
-      "subscription": "sub_1UMRbk2Rw6cpyMyJWaby3Zxz",
-      "success_url": "http://localhost:8080/profile?pro=success",
+      "subscription": "sub_1UNaP52Rw6cpyMyJmu5zbeXZ",
+      "success_url": "https://thedroneedge.com/profile?pro=success&session_id={CHECKOUT_SESSION_ID}",
+      "tax_id_collection": {
+        "enabled": true,
+        "required": "never"
+      },
       "total_details": {
-        "amount_discount": 0,
+        "amount_discount": 875,
         "amount_shipping": 0,
-        "amount_tax": 0
+        "amount_tax": 174
       },
       "ui_mode": "hosted",
       "url": null,
       "wallet_options": null
     }
   },
-  "id": "evt_1UMRbm2Rw6cpyMyJg2R8mRYI",
+  "id": "evt_1UNaP62Rw6cpyMyJYBuf2ObL",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,

@@ -1,3 +1,4 @@
+import { articlePath } from './lib/article-url';
 import { MetadataRoute } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://thedroneedge.com';
@@ -5,6 +6,7 @@ const API_BASE = process.env.API_INTERNAL_BASE_URL || 'http://localhost:3000';
 
 interface ArticleSlim {
   id: number;
+  slug?: string;
   submitted_at: string;
   updated_at?: string;
 }
@@ -127,7 +129,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${SITE_URL}/articles/${article.id}`,
+    url: `${SITE_URL}${articlePath(article)}`,
     lastModified: new Date(article.updated_at || article.submitted_at),
     changeFrequency: 'monthly' as const,
     priority: 0.8,

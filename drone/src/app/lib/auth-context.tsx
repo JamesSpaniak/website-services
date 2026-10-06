@@ -49,8 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
+        // Children render while the session check runs, so pages are server-rendered (SEO, real 404s).
+        // Anything that depends on the user must check `isLoading` — private routes do via AuthGuard /
+        // AdminGuard / ManagerGuard.
         <AuthContext.Provider value={{ user, setUser, isLoading, login, logout }}>
-            {!isLoading && children}
+            {children}
         </AuthContext.Provider>
     );
 }

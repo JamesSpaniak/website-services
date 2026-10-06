@@ -25,6 +25,8 @@ import { withEventOrigin } from 'src/product-events/event-origin';
 
 const PRODUCT_COURSE = 'course';
 const PRODUCT_PRO = 'pro_membership';
+/** General electronically supplied services — eligible for Managed Payments; matches the live catalog. */
+const COURSE_TAX_CODE = 'txcd_10000000';
 
 /** Provenance passed from the payment path into purchaseCourse (plan § 4.1). */
 interface PurchaseContext {
@@ -310,7 +312,7 @@ export class PurchaseService {
     return { repaired, unmatched };
   }
 
-  /** Newest succeeded course PaymentIntent for a user × course, by the metadata set in createPaymentIntent. */
+  /** Newest succeeded course PaymentIntent for a user × course, by the metadata set at checkout. */
   private async findSucceededCoursePI(
     userId: number,
     courseId: number,
@@ -391,30 +393,6 @@ export class PurchaseService {
   }
 
   /**
-   * Legacy one-time course purchase (PaymentIntent + Card Element). Superseded
-   * by createCourseCheckoutSession; kept one release for open tabs / rollback.
-   */
-  async createPaymentIntent(
-    userId: number,
-    courseId: number,
-  ): Promise<{ clientSecret: string }> {
-    const { course } = await this.assertCoursePurchasable(userId, courseId);
-
-    const amount = Math.round(Number(course.price) * 100);
-    const paymentIntent = await this.stripe.paymentIntents.create({
-      amount,
-      currency: 'usd',
-      metadata: {
-        userId: String(userId),
-        courseId: String(courseId),
-        productType: PRODUCT_COURSE,
-      },
-    });
-
-    return { clientSecret: paymentIntent.client_secret };
-  }
-
-  /**
    * One-time course purchase via hosted Stripe Checkout (lifetime access to
    * that course). The course metadata is copied onto the PaymentIntent, so the
    * existing payment_intent.succeeded handler fulfils it unchanged.
@@ -446,7 +424,9 @@ export class PurchaseService {
             price_data: {
               currency: 'usd',
               unit_amount: Math.round(Number(course.price) * 100),
-              product_data: { name: course.title },
+              // Managed Payments rejects inline products without a tax code
+              // (the account default does not apply to price_data).
+              product_data: { name: course.title, tax_code: COURSE_TAX_CODE },
             },
           },
         ],
@@ -630,6 +610,14 @@ export class PurchaseService {
     params: Stripe.Checkout.SessionCreateParams,
     promoCode?: string,
   ): Promise<Stripe.Checkout.Session> {
+    if (this.managedPaymentsEnabled()) {
+      // Stripe as merchant of record (tax, fraud, disputes). stripe-node 18
+      // has no type for it yet; the pinned API version accepts it.
+      params = {
+        ...params,
+        managed_payments: { enabled: true },
+      } as Stripe.Checkout.SessionCreateParams;
+    }
     const promotionCodeId = promoCode
       ? await this.findPromotionCodeId(promoCode)
       : null;
@@ -873,6 +861,7 @@ export class PurchaseService {
       }
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
+        if (!this.isSubscriptionInvoice(invoice)) break;
         const userId = await this.userIdFromInvoice(invoice);
         if (userId != null) {
           // Grafana emails on this (observability.md A16); Stripe retries the card itself.
@@ -989,6 +978,9 @@ export class PurchaseService {
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     if (active) {
+      // Every subscription update re-syncs; audit only the start of Pro.
+      const alreadyPro =
+        user.role === Role.Pro && user.stripe_subscription_id === sub.id;
       user.role = Role.Pro;
       user.pro_membership_expires_at = periodEnd;
       user.stripe_subscription_id = sub.id;
@@ -997,13 +989,15 @@ export class PurchaseService {
       if (customerId) user.stripe_customer_id = customerId;
       user.token_version = (user.token_version || 0) + 1;
       await this.userRepository.save(user);
-      this.auditService.log(userId, AuditAction.PRO_UPGRADE, {
-        duration: sub.metadata?.duration ?? 'monthly',
-        expiryDate: periodEnd.toISOString(),
-        source: 'stripe_subscription',
-        subscriptionId: sub.id,
-        status,
-      });
+      if (!alreadyPro) {
+        this.auditService.log(userId, AuditAction.PRO_UPGRADE, {
+          duration: sub.metadata?.duration ?? 'monthly',
+          expiryDate: periodEnd.toISOString(),
+          source: 'stripe_subscription',
+          subscriptionId: sub.id,
+          status,
+        });
+      }
       await this.entitlements.syncPro(userId, {
         productSku:
           sub.metadata?.duration === ProMembershipDuration.Yearly
@@ -1037,6 +1031,11 @@ export class PurchaseService {
     invoice: Stripe.Invoice,
     stripeEventId: string,
   ): Promise<void> {
+    if (!this.isSubscriptionInvoice(invoice)) {
+      // Managed Payments invoices one-time course payments too; those are
+      // fulfilled and recorded from payment_intent.succeeded.
+      return;
+    }
     const userId = await this.userIdFromInvoice(invoice);
     if (userId == null) {
       this.logger.warn(
@@ -1109,6 +1108,19 @@ export class PurchaseService {
         billing_reason: invoice.billing_reason ?? null,
       },
     });
+  }
+
+  /** Pro invoices belong to a subscription; one-time (course) invoices do not. */
+  private isSubscriptionInvoice(invoice: Stripe.Invoice): boolean {
+    const inv = invoice as Stripe.Invoice & {
+      subscription?: string | { id: string } | null;
+      parent?: { subscription_details?: unknown } | null;
+    };
+    return (
+      !!inv.parent?.subscription_details ||
+      !!inv.subscription ||
+      (invoice.billing_reason ?? '').startsWith('subscription')
+    );
   }
 
   private async userIdFromInvoice(
@@ -1288,6 +1300,15 @@ export class PurchaseService {
     }
     return (
       this.configService.get<string>('STRIPE_PRO_PRICE_ID_MONTHLY') || undefined
+    );
+  }
+
+  /** STRIPE_MANAGED_PAYMENTS=true puts every Checkout Session on Managed Payments. */
+  private managedPaymentsEnabled(): boolean {
+    return (
+      this.configService
+        .get<string>('STRIPE_MANAGED_PAYMENTS')
+        ?.toLowerCase() === 'true'
     );
   }
 

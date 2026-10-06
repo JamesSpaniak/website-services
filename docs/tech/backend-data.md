@@ -92,7 +92,8 @@ Relationships are TypeORM entities under `backend/src/**/types/*.entity.ts`.
 
 ### `articles`
 
-- `title` (unique), `sub_heading`, `image_url`, `body`, optional **`content_blocks`** (JSONB), `hidden`.
+- `title` (unique), **`slug`** (unique, not null — URL segment; migration `1765000013000` backfilled existing rows from the title), **`tags`** (`text[]`, default `{}`, display labels), `sub_heading`, `image_url`, `body`, optional **`content_blocks`** (JSONB), `hidden`.
+- Responses also carry computed **`read_minutes`** (~230 wpm over body + text blocks, min 1). Slug rules: create without `slug` → generated from the title with `-2`, `-3`… on collision; explicit slug must match `^[a-z0-9]+(-[a-z0-9]+)*$` and be free (409 if taken); update without `slug` keeps the current one (title edits never change a URL). Tags are trimmed and de-duplicated case-insensitively, max 8 × 40 chars.
 
 ### `sessions`
 
@@ -258,7 +259,7 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 |--------|------|------|--------|
 | GET | `/articles` | Public | Published list. |
 | GET | `/articles/admin/all` | JWT + **Admin** | Includes hidden. |
-| GET | `/articles/:id` | Public | By id. |
+| GET | `/articles/:idOrSlug` | Optional JWT | Digits → by id (old links); otherwise by slug. **Hidden articles 404 unless the caller is an admin** (the admin editor loads through this route with its cookie); hidden and missing return the identical 404 so slugs can't be probed. |
 | POST | `/articles` | JWT + **Admin** | |
 | PATCH | `/articles/:id` | JWT + **Admin** | |
 | DELETE | `/articles/:id` | JWT + **Admin** | |
@@ -327,7 +328,6 @@ Base path has **no** global prefix unless you add one in `main.ts` (default: rou
 | POST | `/purchases/course` | JWT + **Admin** | Manual grant (no payment). |
 | POST | `/purchases/create-course-checkout` | JWT | Body `{ courseId }` → `{ url }`. Hosted Stripe Checkout (`mode: payment`) — **one course**, lifetime, priced from `courses.price` (`price_data`). Course metadata copied to the PaymentIntent so `payment_intent.succeeded` fulfils. Returns to `/courses/:id?purchase=success&session_id=…` (cancel → `?purchase=1`). Logged-in only; **email verification not required**. Rejects if already owned or active Pro. |
 | POST | `/purchases/confirm-checkout` | JWT | Body `{ sessionId }`. Idempotent reconcile after the Checkout redirect when the webhook lags: session must be `mode=payment`, `paid`, and belong to the caller; then same path as `confirm-payment`. |
-| POST | `/purchases/create-payment-intent` | JWT | **Legacy** (Card Element) — superseded by `create-course-checkout`, kept one release. Same guards. |
 | POST | `/purchases/create-pro-checkout` | JWT | Stripe Checkout **subscription** for Pro (all courses while active). Needs `STRIPE_PRO_PRICE_ID_MONTHLY` (or yearly). Email verification **not** required. The success URL gets `session_id={CHECKOUT_SESSION_ID}` appended for `confirm-pro-checkout`. |
 | POST | `/purchases/confirm-pro-checkout` | JWT | Body `{ sessionId }` → `{ active }`. The Pro version of `confirm-checkout`, called by the profile and course pages when the subscription webhook is late. The session must be `mode=subscription`, `status=complete` and belong to the caller; it then runs the same path as `checkout.session.completed`. It does nothing if the user is already Pro on that subscription, so no extra `token_version` bump. |
 | POST | `/purchases/billing-portal` | JWT | Stripe Customer Portal (manage/cancel Pro). Requires `stripe_customer_id`. |

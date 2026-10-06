@@ -6,11 +6,34 @@ Paste-ready article JSON from the [Oct 2026 article review](../../../../docs/mar
 
 **`seo_phrases` is left out on purpose.** The admin importer used to append a "Topics & related search terms" block whenever that field was present. Fixed Oct 4 2026: the importer no longer appends it, and `prepareArticleBodyHtml` strips the block from already-published articles at render, so the field is safe to include again.
 
+## Re-import after the slugs + tags deploy (Oct 2026)
+
+Each file now carries `slug` and `tags`, and links between published articles use slugs (`/articles/drone-careers-2026`) instead of IDs, so they work on every environment.
+
+1. Deploy first (backend migration `1765000013000` adds `slug` + `tags`; existing articles get a slug from their title automatically).
+2. Admin → Articles → edit #39, #40, #41, #42 → paste the **whole JSON** into the body field → check the Slug and Tags fields filled in → **Update**. The hero image is kept unless the JSON sets one.
+3. Check each `/articles/<slug>` loads and the old `/articles/<id>` redirects to it.
+
+| File | Slug | Tags |
+|---|---|---|
+| 01 | `part-107-high-school-cte` | Schools, Part 107 |
+| 02 | `drone-careers-2026` | Careers, Part 107 |
+| 03 | `drone-grant-application-language` | Schools, Funding |
+| 04 | `drone-education-programs-2026` | Schools, Careers |
+| 05 | `drone-grants-for-schools` | Schools, Funding |
+| 06 | `who-gets-to-build-drones` | Building, Careers |
+
+**Links still pointing at `/articles` on purpose** (their target isn't published yet; hidden articles 404 for readers, so a link to one would be broken):
+- 01 "funding a school drone program in 2026" and 03 "2026 guide to drone grants for schools" → switch to `/articles/drone-grants-for-schools` when 05 is published.
+- 02 "Who Gets to Build Drones?" → switch to `/articles/who-gets-to-build-drones` when 06 is published.
+
+Keep tags to the shared set (Schools, Funding, Careers, Part 107, Building) so the topic filter and per-topic RSS feeds stay useful.
+
 ## How to apply each file
 
 1. Admin → Articles → open the article (edits) or click **New Article** (new ones).
 2. Paste the **whole JSON** into the body field. Title, sub-heading and body fill in automatically.
-3. **Then** upload the hero image, if the table below lists one. Upload after pasting, because pasting resets the image field.
+3. **Then** upload the hero image, if the table below lists one. Pasting JSON with a `hero_image` replaces the image field; JSON without one leaves the current image alone (fixed Oct 6 2026).
 4. Save. Set the status shown in the table.
 
 ## Order and status
@@ -24,7 +47,7 @@ Paste-ready article JSON from the [Oct 2026 article review](../../../../docs/mar
 | 5 | `05-new-gap-03-drone-grants-for-schools.json` | New | **Needs a photo.** Shot idea: two drones on a classroom desk next to a printed budget sheet with a few line items circled | Hidden until photo, or publish without one |
 | 6 | `06-new-gap-01-who-gets-to-build-drones.json` | New | **Needs a photo.** Shot idea: a 3D-printed 3.5" frame on a bench with a soldering iron and flight controller. Ask Joe for build photos. | **Hidden until `/courses/tracks/building` is live** (launch W2) |
 
-**After all six are saved:** note their IDs. Then replace the generic `/articles` links with the real ones:
+**After all six are saved:** (superseded by slugs — see the re-import section above) note their IDs. Then replace the generic `/articles` links with the real ones:
 - #40: the funding-guide and education-map links.
 - #39: the two "Related reading" links.
 - #3 and #5: their links to each other.

@@ -64,19 +64,19 @@ function HeaderInner() {
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link
           href="/"
-          className="flex items-center justify-start shrink-0 touch-manipulation min-h-[44px] min-w-[44px] md:min-w-0"
+          className="flex items-center justify-start shrink-0 touch-manipulation min-h-[44px] min-w-[44px] lg:min-w-0"
           aria-label="The Drone Edge – Home"
         >
           <BrandLogo variant="header" />
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-4 lg:gap-8 text-sm font-medium tracking-wide text-[var(--brand-muted)]">
+        {/* Desktop nav — lg+; below that the six links crowd the logo and wrap, so the menu button takes over */}
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium tracking-wide text-[var(--brand-muted)]">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`hover:text-[var(--brand-primary)] transition-colors ${pathname === link.href ? 'text-[var(--brand-primary)]' : ''}`}
+              className={`whitespace-nowrap hover:text-[var(--brand-primary)] transition-colors ${pathname === link.href ? 'text-[var(--brand-primary)]' : ''}`}
             >
               {link.label}
             </Link>
@@ -84,10 +84,10 @@ function HeaderInner() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Book a Call CTA — lg+ (md is too narrow next to Log in / Sign up; mobile menu has it) */}
+          {/* Book a Call CTA — xl+ (lg is too narrow next to the nav links + Log in / Sign up; mobile menu has it) */}
           <Link
             href="/consultation"
-            className="hidden lg:inline-flex items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-black)] transition-colors"
+            className="hidden xl:inline-flex whitespace-nowrap items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-black)] transition-colors"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Book a Call
@@ -139,14 +139,14 @@ function HeaderInner() {
                   Log in moves into the mobile menu below sm. */}
               <Link
                 href={signInHref}
-                className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--surface)] transition-colors touch-manipulation"
+                className="hidden sm:inline-flex whitespace-nowrap items-center justify-center min-h-[44px] px-4 text-sm font-medium tracking-wide border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--surface)] transition-colors touch-manipulation"
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 Log in
               </Link>
               <Link
                 href={registerHrefResolved}
-                className="inline-flex items-center justify-center min-h-[44px] px-3 sm:px-4 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
+                className="inline-flex whitespace-nowrap items-center justify-center min-h-[44px] px-3 sm:px-4 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 Sign up
@@ -156,7 +156,7 @@ function HeaderInner() {
 
           <button
             type="button"
-            className="md:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] touch-manipulation"
+            className="lg:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] touch-manipulation"
             style={{ borderRadius: 'var(--radius-sm)' }}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-expanded={isMobileMenuOpen}
@@ -168,7 +168,7 @@ function HeaderInner() {
       </nav>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[var(--surface-border)] bg-[var(--background)] max-h-[min(70vh,calc(100dvh-4rem))] overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="lg:hidden border-t border-[var(--surface-border)] bg-[var(--background)] max-h-[min(70vh,calc(100dvh-4rem))] overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))]">
           <nav className="px-3 py-3 space-y-0.5" aria-label="Mobile">
             {navLinks.map((link) => (
               <Link

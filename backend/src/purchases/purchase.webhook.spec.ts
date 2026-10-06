@@ -50,6 +50,7 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
   };
   const entitlements = { syncPro: jest.fn(), revokePro: jest.fn() };
   const productEvents = { record: jest.fn(), invalidateUser: jest.fn() };
+  const audit = { log: jest.fn() };
   let service: PurchaseService;
 
   const deliver = (name: string) => {
@@ -65,7 +66,7 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
       { findOneBy: jest.fn() } as never,
       stripe as never,
       { get: jest.fn(() => 'whsec_test') } as never,
-      { log: jest.fn() } as never,
+      audit as never,
       entitlements as never,
       orders as never,
       productEvents as never,
@@ -99,6 +100,28 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
     );
   });
 
+  it('invoice.paid for a one-time Managed Payments course invoice records nothing', async () => {
+    // Managed Payments invoices course purchases (billing_reason manual, no
+    // subscription parent); payment_intent.succeeded already recorded the order.
+    await deliver('invoice.paid.manual');
+    expect(orders.recordStripeOrder).not.toHaveBeenCalled();
+    expect(productEvents.record).not.toHaveBeenCalled();
+  });
+
+  it('charge.refunded for a Managed Payments course passes the PaymentIntent', async () => {
+    stripe.invoicePayments.list.mockResolvedValue({
+      data: [{ invoice: 'in_course' }],
+    });
+    const ev = fixture('charge.refunded.course');
+    await deliver('charge.refunded.course');
+    expect(orders.applyRefund).toHaveBeenCalledWith(
+      ev.data.object.payment_intent,
+      'in_course',
+      ev.data.object.amount_refunded,
+      true,
+    );
+  });
+
   it('customer.subscription.created → Pro until the item period end', async () => {
     const ev = fixture('customer.subscription.created');
     await deliver('customer.subscription.created');
@@ -127,6 +150,25 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
       expect.objectContaining({ event: 'pro_cancel_scheduled' }),
     );
     expect(entitlements.revokePro).not.toHaveBeenCalled();
+  });
+
+  it('logs "Upgraded to Pro" once per subscription, not on every update', async () => {
+    const ev = fixture('customer.subscription.updated.cancel-scheduled');
+    userRepo.findOneBy.mockResolvedValue({
+      ...user(),
+      role: Role.Pro,
+      stripe_subscription_id: ev.data.object.id,
+    });
+    await deliver('customer.subscription.updated.cancel-scheduled');
+    expect(audit.log).not.toHaveBeenCalled();
+
+    userRepo.findOneBy.mockResolvedValue(user());
+    await deliver('customer.subscription.created');
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.any(Number),
+      'PRO_UPGRADE',
+      expect.anything(),
+    );
   });
 
   it('customer.subscription.deleted → Pro revoked', async () => {

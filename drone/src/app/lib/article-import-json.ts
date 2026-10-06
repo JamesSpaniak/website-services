@@ -2,6 +2,9 @@ import { prepareArticleBodyHtml } from '@/app/lib/article-html';
 
 export type ArticleImportResult = {
   title: string;
+  /** Empty when the JSON has none (editor then keeps / generates one). */
+  slug: string;
+  tags: string[];
   sub_heading: string;
   image_url: string;
   body: string;
@@ -47,5 +50,10 @@ function normalizeArticleImportObject(o: Record<string, unknown>): ArticleImport
   // `seo_phrases` stays metadata only — never appended to the body (keyword stuffing).
   const body = prepareArticleBodyHtml(rawBody);
 
-  return { title, sub_heading, image_url, body };
+  const slug = typeof o.slug === 'string' ? o.slug.trim() : '';
+  const tags = Array.isArray(o.tags)
+    ? o.tags.filter((t): t is string => typeof t === 'string' && t.trim() !== '').map((t) => t.trim())
+    : [];
+
+  return { title, slug, tags, sub_heading, image_url, body };
 }

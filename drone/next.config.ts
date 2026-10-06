@@ -20,6 +20,10 @@ const nextConfig = {
       return [
         { source: '/courses/tracks/video', destination: '/courses', permanent: true },
         { source: '/courses/tracks/ai', destination: '/courses', permanent: true },
+        { source: '/feed', destination: '/rss.xml', permanent: true },
+        { source: '/feed.xml', destination: '/rss.xml', permanent: true },
+        { source: '/articles/rss.xml', destination: '/rss.xml', permanent: true },
+        { source: '/articles/feed', destination: '/rss.xml', permanent: true },
       ];
     },
   };

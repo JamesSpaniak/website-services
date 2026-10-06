@@ -1,22 +1,24 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791028789,
+  "created": 1791300699,
   "data": {
     "object": {
       "adaptive_pricing": {
         "enabled": true
       },
       "after_expiration": null,
-      "allow_promotion_codes": false,
+      "allow_promotion_codes": null,
       "allowed_payment_method_types": null,
-      "amount_subtotal": 2900,
-      "amount_total": 2900,
+      "amount_subtotal": 12900,
+      "amount_total": 9675,
       "automatic_tax": {
-        "enabled": false,
-        "liability": null,
-        "provider": null,
-        "status": null
+        "enabled": true,
+        "liability": {
+          "type": "stripe"
+        },
+        "provider": "stripe",
+        "status": "complete"
       },
       "billing_address_collection": "auto",
       "branding_settings": {
@@ -34,8 +36,8 @@
           "type": "file"
         }
       },
-      "cancel_url": "http://localhost:8080/courses/1?purchase=1",
-      "client_reference_id": "28",
+      "cancel_url": "https://thedroneedge.com/courses/35?purchase=1",
+      "client_reference_id": "70",
       "client_secret": null,
       "collected_information": {
         "business_name": null,
@@ -44,7 +46,7 @@
       },
       "consent": null,
       "consent_collection": null,
-      "created": 1791028779,
+      "created": 1791300545,
       "currency": "usd",
       "currency_conversion": null,
       "custom_fields": [],
@@ -54,17 +56,17 @@
         "submit": null,
         "terms_of_service_acceptance": null
       },
-      "customer": "cus_VNBzceAJtrpnII",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "customer_account": null,
       "customer_creation": null,
       "customer_details": {
         "address": {
-          "city": null,
+          "city": "REDACTED",
           "country": "US",
-          "line1": null,
+          "line1": "REDACTED",
           "line2": null,
           "postal_code": "REDACTED",
-          "state": null
+          "state": "REDACTED"
         },
         "business_name": null,
         "email": "REDACTED",
@@ -75,43 +77,50 @@
         "tax_ids": []
       },
       "customer_email": null,
-      "discounts": [],
-      "expires_at": 1791115179,
-      "id": "cs_test_a1hUf37is7m5cm8hiTXeNShilxVesSl4QZKFVYboYcYGHfGrelUC5sdgfh",
+      "discounts": [
+        {
+          "coupon": null,
+          "promotion_code": "promo_1UNZu62Rw6cpyMyJzY49gKYo"
+        }
+      ],
+      "expires_at": 1791386945,
+      "id": "cs_test_a1B41vN9DVbBoqSk0cWTF7QBQ0n27fA0pAHeNHFKe1R1smHQXnjlurlUmW",
       "integration_identifier": null,
-      "invoice": null,
+      "invoice": "in_1UNaL62Rw6cpyMyJk7Xg7rdR",
       "invoice_creation": {
-        "enabled": false,
+        "enabled": true,
         "invoice_data": {
           "account_tax_ids": null,
           "custom_fields": null,
           "description": null,
           "footer": null,
-          "issuer": null,
+          "issuer": {
+            "type": "stripe"
+          },
           "metadata": {},
-          "rendering_options": null
+          "rendering_options": {
+            "amount_tax_display": null,
+            "template": null
+          }
         }
       },
       "livemode": false,
       "locale": null,
       "managed_payments": {
-        "enabled": false
+        "enabled": true
       },
       "metadata": {
-        "courseId": "1",
+        "courseId": "35",
         "productType": "course",
-        "userId": "28"
+        "userId": "70"
       },
       "mode": "payment",
       "object": "checkout.session",
       "origin_context": null,
-      "payment_intent": "pi_3UMRbQ2Rw6cpyMyJ17w0KIqE",
+      "payment_intent": "pi_3UNaL42Rw6cpyMyJ0uzglYuN",
       "payment_link": null,
       "payment_method_collection": "if_required",
-      "payment_method_configuration_details": {
-        "id": "pmc_1T1cgg2Rw6cpyMyJWw1qvMwR",
-        "parent": null
-      },
+      "payment_method_configuration_details": null,
       "payment_method_options": {
         "card": {
           "request_three_d_secure": "automatic"
@@ -119,10 +128,7 @@
       },
       "payment_method_types": [
         "card",
-        "klarna",
-        "link",
-        "cashapp",
-        "amazon_pay"
+        "cashapp"
       ],
       "payment_status": "paid",
       "permissions": null,
@@ -144,9 +150,13 @@
       "status": "complete",
       "submit_type": null,
       "subscription": null,
-      "success_url": "http://localhost:8080/courses/1?purchase=success&session_id={CHECKOUT_SESSION_ID}",
+      "success_url": "https://thedroneedge.com/courses/35?purchase=success&session_id={CHECKOUT_SESSION_ID}",
+      "tax_id_collection": {
+        "enabled": true,
+        "required": "never"
+      },
       "total_details": {
-        "amount_discount": 0,
+        "amount_discount": 3225,
         "amount_shipping": 0,
         "amount_tax": 0
       },
@@ -155,7 +165,7 @@
       "wallet_options": null
     }
   },
-  "id": "evt_1UMRbV2Rw6cpyMyJvMZcsZUL",
+  "id": "evt_1UNaLA2Rw6cpyMyJWrgDn03E",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,

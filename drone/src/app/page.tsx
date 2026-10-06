@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { RSS_ALTERNATE_TYPES } from './lib/article-url';
 import JsonLd, { organizationJsonLd, websiteJsonLd } from './ui/components/json-ld';
 import HomeAuthCta from './ui/components/home-auth-cta';
 import LoginConversionPanel from './ui/components/login-conversion-panel';
@@ -9,6 +11,10 @@ import { ArrowRightIcon, AcademicCapIcon, WrenchScrewdriverIcon } from '@heroico
 import { ArticleSlim } from './lib/types/article';
 import ArticlePreviewComponent from './ui/components/article-preview';
 import { FEATURED_COURSE_ID, registerHref } from './lib/auth-redirect';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/', types: RSS_ALTERNATE_TYPES },
+};
 
 // ── Server-side data ──────────────────────────────────────────────────────────
 

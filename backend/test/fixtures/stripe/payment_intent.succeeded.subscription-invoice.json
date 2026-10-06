@@ -1,16 +1,16 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1791028804,
+  "created": 1791300942,
   "data": {
     "object": {
       "allowed_payment_method_types": null,
-      "amount": 3500,
+      "amount": 2799,
       "amount_capturable": 0,
       "amount_details": {
         "tip": {}
       },
-      "amount_received": 3500,
+      "amount_received": 2799,
       "application": null,
       "application_fee_amount": null,
       "automatic_payment_methods": null,
@@ -19,18 +19,18 @@
       "capture_method": "automatic",
       "client_secret": "REDACTED",
       "confirmation_method": "automatic",
-      "created": 1791028803,
+      "created": 1791300941,
       "currency": "usd",
-      "customer": "cus_VNBzRem9rtRQAq",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "customer_account": null,
       "description": "Subscription creation",
       "excluded_payment_method_types": null,
-      "id": "pi_3UMRbj2Rw6cpyMyJ1k28irPp",
+      "id": "pi_3UNaP32Rw6cpyMyJ1hEDPpYv",
       "last_payment_error": null,
-      "latest_charge": "ch_3UMRbj2Rw6cpyMyJ1xbJiqDk",
+      "latest_charge": "ch_3UNaP32Rw6cpyMyJ1DLRcVK9",
       "livemode": false,
       "managed_payments": {
-        "enabled": false
+        "enabled": true
       },
       "metadata": {},
       "next_action": null,
@@ -38,9 +38,9 @@
       "on_behalf_of": null,
       "payment_details": {
         "customer_reference": null,
-        "order_reference": "cs_test_a1hdIAFlIC0ml4qMF0X10wcfV5Cx8Ke0Uei2kQ0L47lqoefkVHY5Y4yU7w"
+        "order_reference": "cs_test_a1b0UqRQbtx6dsmSBySvXYktRlVpITJajwkLp4Mzfphosj3xE7ZmZVw1pX"
       },
-      "payment_method": "pm_1UMRbh2Rw6cpyMyJoxIJ9M0Q",
+      "payment_method": "pm_1UNaP22Rw6cpyMyJectUHPxi",
       "payment_method_configuration_details": null,
       "payment_method_options": {
         "card": {
@@ -69,13 +69,13 @@
       "transfer_group": null
     }
   },
-  "id": "evt_3UMRbj2Rw6cpyMyJ1XRXgZ3S",
+  "id": "evt_3UNaP32Rw6cpyMyJ1xkvt8bA",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
     "id": null,
-    "idempotency_key": "1ae19548-05b0-43c5-b667-538da5758ec1"
+    "idempotency_key": "eaebcdef-602f-45ae-8e68-e502ae07a024"
   },
   "type": "payment_intent.succeeded"
 }

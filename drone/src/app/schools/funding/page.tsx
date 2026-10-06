@@ -12,7 +12,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
-  title: 'PA SMART, Federal & State School Grants — Drone Edge for Schools',
+  title: { absolute: 'PA SMART, Federal & State School Grants — Drone Edge for Schools' },
+  alternates: { canonical: '/schools/funding' },
   description:
     'Pennsylvania PA SMART (PAsmart) school grants, federal STEM and CTE funding (Perkins, Title), and state-level sources for drone Part 107 programs. Official PA links and grant-language tips—not legal advice.',
   keywords: [

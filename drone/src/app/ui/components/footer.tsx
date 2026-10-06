@@ -9,6 +9,7 @@ const NAV_COLUMNS = [
     links: [
       { href: '/courses', label: 'Courses' },
       { href: '/articles', label: 'Articles' },
+      { href: '/newsletter', label: 'Field Notes newsletter' },
       { href: '/pricing', label: 'Pricing' },
     ],
   },

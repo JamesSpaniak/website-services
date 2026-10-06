@@ -350,6 +350,9 @@ export class OrderService {
         `SELECT id, user_id, total_cents FROM orders
            WHERE ($1::text IS NOT NULL AND stripe_payment_intent_id = $1)
               OR ($2::text IS NOT NULL AND stripe_invoice_id = $2)
+           -- A course order is keyed by PaymentIntent; prefer it over any
+           -- invoice-keyed row for the same payment.
+           ORDER BY (stripe_payment_intent_id IS NOT DISTINCT FROM $1) DESC, id
            LIMIT 1`,
         [paymentIntentId, invoiceId],
       );

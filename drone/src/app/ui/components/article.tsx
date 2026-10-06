@@ -9,6 +9,7 @@ import ContentBlockRenderer from './content-block-renderer';
 import JsonLd, { articleJsonLd } from './json-ld';
 import CommentSection from './comment-section';
 import NewsletterSignup from './newsletter-signup';
+import ArticleTags from './article-tags';
 
 interface ArticleProps {
   article: ArticleFull;
@@ -27,9 +28,11 @@ export default function ArticleComponent({ article }: ArticleProps) {
             <time dateTime={new Date(article.submitted_at).toISOString()}>
               {new Date(article.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
             </time>
+            {article.read_minutes ? <span className="text-[var(--brand-muted)]"> · {article.read_minutes} min read</span> : null}
           </p>
           <h1 className="mt-2 text-2xl font-display font-semibold tracking-tight text-[var(--brand-foreground)] sm:text-3xl lg:text-4xl">{article.title}</h1>
           {article.sub_heading && <p className="mt-4 text-[var(--brand-muted)] leading-relaxed">{article.sub_heading}</p>}
+          <ArticleTags tags={article.tags} className="mt-5" />
         </header>
         <div className="mt-10">
           <div

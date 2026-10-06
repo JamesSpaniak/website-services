@@ -1,6 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { ArticleDto } from './types/article.dto';
 import { Article } from './types/article.entity';
 import { MediaService } from 'src/media/media.service';
@@ -15,23 +20,73 @@ export class ArticleService {
     private readonly mediaService: MediaService,
   ) {}
 
+  /** Same rule as migration 1765000013000's backfill (lowercase, non-alphanumerics → "-", max 80 chars), plus accent folding (é → e). */
+  static slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80)
+      .replace(/-+$/g, '');
+  }
+
+  /** Trim, drop blanks and case-insensitive duplicates; keeps the editor's casing. */
+  static normalizeTags(tags: string[] | undefined): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const raw of tags ?? []) {
+      const tag = raw.trim().replace(/\s+/g, ' ');
+      const key = tag.toLowerCase();
+      if (!tag || seen.has(key)) continue;
+      seen.add(key);
+      out.push(tag);
+    }
+    return out;
+  }
+
+  /** ~230 words per minute over the body HTML plus text content blocks. */
+  static readMinutes(
+    article: Pick<Article, 'body' | 'content_blocks'>,
+  ): number {
+    const blocks = (article.content_blocks ?? [])
+      .filter((b) => b.type === 'text')
+      .map((b) => b.content);
+    const text = [article.body ?? '', ...blocks]
+      .join(' ')
+      .replace(/<[^>]*>/g, ' ');
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 230));
+  }
+
+  private withReadMinutes(
+    article: Article,
+  ): Article & { read_minutes: number } {
+    return { ...article, read_minutes: ArticleService.readMinutes(article) };
+  }
+
   static articleDtoToEntity(article: ArticleDto): Article {
     return {
       ...article,
+      slug: article.slug ?? '',
+      tags: ArticleService.normalizeTags(article.tags),
     };
   }
 
   async getArticles(): Promise<Article[]> {
-    return this.articleRepository.find({
+    const articles = await this.articleRepository.find({
       where: { hidden: false },
       order: { submitted_at: 'DESC' },
     });
+    return articles.map((a) => this.withReadMinutes(a));
   }
 
   async getAllArticles(): Promise<Article[]> {
-    return this.articleRepository.find({
+    const articles = await this.articleRepository.find({
       order: { submitted_at: 'DESC' },
     });
+    return articles.map((a) => this.withReadMinutes(a));
   }
 
   async getArticle(id: string): Promise<Article> {
@@ -42,27 +97,83 @@ export class ArticleService {
     if (!article) {
       throw new NotFoundException(`Article ID ${id} does not exist.`);
     }
-    return article;
+    return this.withReadMinutes(article);
+  }
+
+  async getArticleBySlug(slug: string): Promise<Article> {
+    const article = await this.articleRepository.findOne({ where: { slug } });
+    if (!article) {
+      throw new NotFoundException(`Article "${slug}" does not exist.`);
+    }
+    return this.withReadMinutes(article);
+  }
+
+  /** Explicit slug must be free; a generated one gets "-2", "-3"… until it is. */
+  private async resolveSlug(
+    requested: string | undefined,
+    title: string,
+    excludeId?: number,
+  ): Promise<string> {
+    const taken = (slug: string) =>
+      this.articleRepository.exists({
+        where: excludeId != null ? { slug, id: Not(excludeId) } : { slug },
+      });
+
+    if (requested) {
+      if (await taken(requested)) {
+        throw new ConflictException(
+          `Another article already uses the slug "${requested}".`,
+        );
+      }
+      return requested;
+    }
+
+    const base = ArticleService.slugify(title) || 'article';
+    let candidate = base;
+    for (let n = 2; await taken(candidate); n++) {
+      candidate = `${base}-${n}`;
+    }
+    return candidate;
   }
 
   async saveArticle(article: ArticleDto): Promise<Article> {
-    const newArticle = this.articleRepository.create(
-      ArticleService.articleDtoToEntity(article),
-    );
+    const newArticle = this.articleRepository.create({
+      ...ArticleService.articleDtoToEntity(article),
+      slug: await this.resolveSlug(article.slug, article.title),
+    });
     await this.articleRepository.save(newArticle);
-    return newArticle;
+    return this.withReadMinutes(newArticle);
   }
 
-  async updateArticle(id: string, article: Article): Promise<Article> {
+  async updateArticle(id: string, article: ArticleDto): Promise<Article> {
     const existingArticle = await this.getArticle(id);
-    const updatedArticle = this.articleRepository.create(
-      ArticleService.articleDtoToEntity(article),
-    );
+    // Omitted slug keeps the current one, so editing a title never breaks a published URL.
+    const slug =
+      article.slug && article.slug !== existingArticle.slug
+        ? await this.resolveSlug(
+            article.slug,
+            article.title,
+            existingArticle.id,
+          )
+        : existingArticle.slug;
+    const tags =
+      article.tags !== undefined
+        ? ArticleService.normalizeTags(article.tags)
+        : existingArticle.tags;
+    const updatedArticle = this.articleRepository.create({
+      ...ArticleService.articleDtoToEntity(article),
+      slug,
+      tags,
+    });
     await this.articleRepository.update(id, {
       ...updatedArticle,
       submitted_at: existingArticle.submitted_at,
     });
-    return updatedArticle;
+    return this.withReadMinutes({
+      ...updatedArticle,
+      id: existingArticle.id,
+      submitted_at: existingArticle.submitted_at,
+    });
   }
 
   async deleteArticle(id: string) {

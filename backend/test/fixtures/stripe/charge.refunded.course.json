@@ -1,35 +1,35 @@
 {
   "api_version": "2026-01-28.clover",
   "context": "acct_1T1cg92Rw6cpyMyJ",
-  "created": 1790905832,
+  "created": 1791301254,
   "data": {
     "object": {
-      "amount": 2900,
-      "amount_captured": 2900,
-      "amount_refunded": 2900,
+      "amount": 9675,
+      "amount_captured": 9675,
+      "amount_refunded": 9675,
       "application": null,
       "application_fee": null,
       "application_fee_amount": null,
-      "balance_transaction": "txn_3ULvS02Rw6cpyMyJ06bvhkB8",
+      "balance_transaction": "txn_3UNaL42Rw6cpyMyJ0YbPvVMh",
       "billing_details": {
         "address": {
-          "city": null,
-          "country": null,
-          "line1": null,
+          "city": "REDACTED",
+          "country": "US",
+          "line1": "REDACTED",
           "line2": null,
-          "postal_code": null,
-          "state": null
+          "postal_code": "REDACTED",
+          "state": "REDACTED"
         },
-        "email": null,
-        "name": null,
+        "email": "REDACTED",
+        "name": "REDACTED",
         "phone": null,
         "tax_id": null
       },
-      "calculated_statement_descriptor": "DRONE EDGE SANDBOX",
+      "calculated_statement_descriptor": "LINK.COM* DRONE EDGE S",
       "captured": true,
-      "created": 1790905192,
+      "created": 1791300695,
       "currency": "usd",
-      "customer": "cus_VMelUyrNOrB1Sm",
+      "customer": "cus_VON2dDzmQUtAmJ",
       "description": null,
       "destination": null,
       "dispute": null,
@@ -38,12 +38,12 @@
       "failure_code": null,
       "failure_message": null,
       "fraud_details": {},
-      "id": "ch_3ULvS02Rw6cpyMyJ0z678XKk",
+      "id": "ch_3UNaL42Rw6cpyMyJ0iyf0yjj",
       "livemode": false,
       "metadata": {
-        "courseId": "1",
+        "courseId": "35",
         "productType": "course",
-        "userId": "2"
+        "userId": "70"
       },
       "object": "charge",
       "on_behalf_of": null,
@@ -55,27 +55,27 @@
         "network_status": "approved_by_network",
         "reason": null,
         "risk_level": "normal",
-        "risk_score": 8,
+        "risk_score": 57,
         "seller_message": "Payment complete.",
         "type": "authorized"
       },
       "paid": true,
-      "payment_intent": "pi_3ULvS02Rw6cpyMyJ0kTqr2RV",
-      "payment_method": "pm_1ULvS02Rw6cpyMyJshaL6Z3x",
+      "payment_intent": "pi_3UNaL42Rw6cpyMyJ0uzglYuN",
+      "payment_method": "pm_1UNaL32Rw6cpyMyJPLCOJkop",
       "payment_method_details": {
         "card": {
-          "amount_authorized": 2900,
-          "authorization_code": "382966",
+          "amount_authorized": 9675,
+          "authorization_code": "398664",
           "brand": "visa",
           "checks": {
-            "address_line1_check": null,
-            "address_postal_code_check": null,
+            "address_line1_check": "pass",
+            "address_postal_code_check": "pass",
             "cvc_check": "pass"
           },
           "country": "US",
           "electronic_commerce_indicator": "07",
-          "exp_month": 10,
-          "exp_year": 2027,
+          "exp_month": 3,
+          "exp_year": 2031,
           "extended_authorization": {
             "status": "disabled"
           },
@@ -96,7 +96,7 @@
           },
           "network_transaction_id": "114555749719011",
           "overcapture": {
-            "maximum_amount_capturable": 2900,
+            "maximum_amount_capturable": 9675,
             "status": "unavailable"
           },
           "regulated_status": "unregulated",
@@ -127,13 +127,13 @@
       "refunded": false
     }
   },
-  "id": "evt_3ULvS02Rw6cpyMyJ0zw5xdeb",
+  "id": "evt_3UNaL42Rw6cpyMyJ0tBF4bar",
   "livemode": false,
   "object": "event",
   "pending_webhooks": 0,
   "request": {
-    "id": "req_aqNmtdvPAnug16",
-    "idempotency_key": "254ea71e-4cb3-4922-ae16-b439be2cf729"
+    "id": "req_Opfc1WCCsFSrJ4",
+    "idempotency_key": "6a865387-03ac-4974-811a-6920c0221afa"
   },
   "type": "charge.refunded"
 }

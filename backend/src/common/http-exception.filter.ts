@@ -13,6 +13,7 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   UQ_users_email: 'A user with this email already exists.',
   UQ_fe0bb3f6520ee0469504521e710: 'A user with this username already exists.',
   UQ_organizations_name: 'An organization with this name already exists.',
+  UQ_articles_slug: 'Another article already uses this slug.',
 };
 
 function parseConstraintMessage(

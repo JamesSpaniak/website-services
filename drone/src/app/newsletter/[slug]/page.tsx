@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!issue) return { title: 'Issue not found', robots: { index: false, follow: false } };
   return {
     title: `${issue.subject}`,
-    description: 'Drone Edge Field Notes — drone rules, classroom ideas and build notes, once a month.',
+    description: 'Drone Edge Field Notes — drone rules, classroom ideas and build notes on the first Tuesday of each month.',
     alternates: { canonical: `/newsletter/${issue.slug}` },
     // Subscribers get it first: unlisted and noindex until 7 days after send (NL-D6).
     robots: issue.listed ? undefined : { index: false, follow: true },
