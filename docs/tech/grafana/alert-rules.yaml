@@ -5,7 +5,7 @@ groups:
       folder: ""
       interval: 1m
       rules:
-        - uid: cg057nd9rkglcb
+        - uid: ag0fq5n61xnuof
           title: Stripe events dead
           condition: C
           data:
@@ -52,7 +52,7 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: eg057nd9u2cxsb
+        - uid: ag0fq5n64fk74e
           title: Stripe webhook signature failing
           condition: C
           data:
@@ -99,7 +99,7 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: ag057nd9z25mob
+        - uid: fg0fq5n66xgjkc
           title: Stripe webhook 5xx
           condition: C
           data:
@@ -146,7 +146,54 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: fg057nda1k1z4e
+        - uid: dg0fq5n6bx98ga
+          title: Stripe config error
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(increase(stripe_config_errors_total{service_name="droneedge"}[1h])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: 'Usually the live cutover left the sandbox price_ in tfvars (or the reverse). Pro checkout fails until fixed. Check CloudWatch for ''StripeConfigService'', fix stripe_pro_price_id_monthly in tfvars, redeploy. Runbook: docs/tech/stripe-sandbox-test-plan.md section 8.'
+            summary: The API started with a Stripe price that doesn't exist in its key's mode.
+          labels:
+            severity: critical
+            team: core
+          isPaused: false
+        - uid: fg0fq5n6ef5kwd
           title: Order or access write failed
           condition: C
           data:
@@ -193,7 +240,7 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: dg057nda41ybkd
+        - uid: dg0fq5n6gx1xcb
           title: API error rate high
           condition: C
           data:
@@ -241,7 +288,7 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: eg057nda6juo0e
+        - uid: ag0fq5n6lwum8c
           title: API not reporting
           condition: C
           data:
@@ -289,7 +336,7 @@ groups:
             severity: critical
             team: core
           isPaused: false
-        - uid: fg057nda91r0gf
+        - uid: fg0fq5n6oeqyob
           title: Pro payment failed
           condition: C
           data:
@@ -332,6 +379,100 @@ groups:
           annotations:
             description: Stripe retries the card and emails the customer automatically. Look at Stripe Dashboard -> Subscriptions (past_due). Pro access is kept while past_due and removed if Stripe finally cancels.
             summary: A Pro subscription payment failed.
+          labels:
+            severity: warning
+            team: core
+          isPaused: false
+        - uid: cg0fq5n6tejnke
+          title: Tracking data check failed
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: max(progress_tracking_violations) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: 'The check label says which: minutes_over_cap, units_completed_drift, rollup_drift or silent_learners. Sample rows are in analytics_reconciliation (check = ''tracking_<name>''). Runbook: docs/tech/progress-tracking-accuracy.md Phase 4.'
+            summary: A nightly progress-tracking check found rows teachers would see wrong.
+          labels:
+            severity: warning
+            team: core
+          isPaused: false
+        - uid: bg0fq5n6vwg00c
+          title: Learner events dropped
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: grafanacloud-prom
+              model:
+                expr: sum(increase(product_events_dropped_total{reason=~"course_scoped_anonymous|stale"}[1h])) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 20
+                        type: gt
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: Alerting
+          execErrState: Error
+          annotations:
+            description: 'Usually sessions expiring mid-lesson (course_scoped_anonymous) or a client replaying an old offline queue (stale): teachers will see missing minutes. Check the latest frontend deploy and CloudWatch for 401s on /api/analytics/event.'
+            summary: More than 20 learner events in 1 h were dropped as logged-out or stale.
           labels:
             severity: warning
             team: core

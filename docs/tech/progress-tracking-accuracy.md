@@ -2,7 +2,7 @@
 
 **Goal:** every number a teacher sees about a student is defined, tested, and monitored, so it can be trusted (no phantom completions, no silently missing study time) — without making the learner experience worse (no nagging, no "watch the credits to get credit").
 
-**Status:** Phases 1, 1b and 2 done locally 2026-10-04 (uncommitted, not deployed). **All decisions PTD1–PTD7 made 2026-10-04**; PTD3 + PTD6 implemented. Next: deploy, then **PTA2** (rollup rebuild only); Phases 3–5 not started. Open risk: **R16** (ad blockers — Phase 3). Track rows **PTA1–PTA8** in [`../TODO.md`](../TODO.md); decisions **PTD1–PTD7** in § 6.
+**Status:** Phases 1, 1b, 2 and 4 (PTA6) committed (`571bce0`) and deployed 2026-10-05; PTA6 alerts applied 2026-10-06. **All decisions PTD1–PTD7 made 2026-10-04**; PTD3 + PTD6 implemented. **PTA2** (35-day rollup rebuild) skipped 2026-10-06 — older days keep the previous counts. Phases 3 (PTA5) and 5 (PTA7) not started. Open risk: **R16** (ad blockers — Phase 3). Track rows **PTA5, PTA7, PTA8** in [`../TODO.md`](../TODO.md); decisions **PTD1–PTD7** in § 6.
 
 Related: [`manager-progress-visibility.md`](manager-progress-visibility.md) (teacher views), [`analytics-implementation-plan.md`](analytics-implementation-plan.md) (ingest, video § 4.5), [`analytics-queries.md`](analytics-queries.md) (schema + SQL), [`frontend-data.md`](frontend-data.md) (client events).
 
@@ -149,7 +149,7 @@ SQL checks run after the rollup; any non-zero count alerts:
 | `rollup_drift` | user × course where the day − 2 rollup ≠ a recount from raw events (minutes, lessons viewed, units completed; org-local day) |
 | `silent_learners` | users with ≥ 3 `lesson_viewed` and zero heartbeats in the last 24 h |
 
-Alerts (`scripts/grafana_alerts.py`, both `warning`, **not applied yet**): "Tracking data check failed" (any violation) and "Learner events dropped" (> 20 `course_scoped_anonymous` + `stale` drops in 1 h, any time of day). Not built: the `video_progress.completed` check (PTD2 kept old ✓s, so it would flag legacy rows forever) and heartbeat-vs-wall-clock buckets (`minutes_over_cap` catches the same double counting). Covered by the "Phase 4" test in `progress-tracking.e2e-spec.ts`.
+Alerts (`scripts/grafana_alerts.py`, both `warning`, applied 2026-10-06): "Tracking data check failed" (any violation) and "Learner events dropped" (> 20 `course_scoped_anonymous` + `stale` drops in 1 h, any time of day). Not built: the `video_progress.completed` check (PTD2 kept old ✓s, so it would flag legacy rows forever) and heartbeat-vs-wall-clock buckets (`minutes_over_cap` catches the same double counting). Covered by the "Phase 4" test in `progress-tracking.e2e-spec.ts`.
 
 ### Phase 5 — classroom pilot
 One teacher (Chichester Edgemont), 3–4 students keep a one-week log (lessons, videos, rough minutes). Compare to the dashboard and publish the measured accuracy internally before quoting it to schools.

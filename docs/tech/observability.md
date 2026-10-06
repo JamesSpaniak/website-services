@@ -129,10 +129,10 @@ Folder **DroneEdge**, group `droneedge-critical`, evaluated every 1 m. All of th
 | Order or access write failed | critical | any `orders_record_failures` / `entitlements_write_failures` in 1 h | A2 |
 | API error rate high | critical | 5xx > 5 % of requests **and** ≥ 5 errors, for 10 m | A8, tightened |
 | API not reporting | critical | no `target_info` sample for 15 m, for 5 m | replaces A15's 3 h window |
-| Stripe config error | critical | any `stripe_config_errors` in 1 h (boot-time price check) | new 2026-10-04 — **not applied yet**: run `scripts/grafana_alerts.py apply` after the next deploy |
+| Stripe config error | critical | any `stripe_config_errors` in 1 h (boot-time price check) | new 2026-10-04, applied 2026-10-06 |
 | Pro payment failed | warning | any `stripe_payments_failed` in 1 h | A16 (new) |
-| Tracking data check failed | warning | `max(progress_tracking_violations) > 0` (nightly checks) | PTA6 — new 2026-10-05, **not applied yet** |
-| Learner events dropped | warning | > 20 `product_events_dropped` with `reason` `course_scoped_anonymous` or `stale` in 1 h | PTA6 — new 2026-10-05, **not applied yet** |
+| Tracking data check failed | warning | `max(progress_tracking_violations) > 0` (nightly checks) | PTA6 — new 2026-10-05, applied 2026-10-06 |
+| Learner events dropped | warning | > 20 `product_events_dropped` with `reason` `course_scoped_anonymous` or `stale` in 1 h | PTA6 — new 2026-10-05, applied 2026-10-06 |
 
 Phase 2, not created yet: A1, A3–A6 and A9–A12 below. Add them by appending to `RULES` in the script.
 
