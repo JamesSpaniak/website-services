@@ -82,7 +82,7 @@ We want to **push this knowledge to a wider audience**: career switchers, CTE cl
 | Area | Capability |
 |------|------------|
 | **Orgs** | Create orgs (admin), **members**, **classes/periods** (group students within an org, e.g. "Period 2" and "Period 5" under one school), **invite codes** (single + bulk, optionally tied to a class), **assign courses** to org (admin) |
-| **Manager dashboard** | Progress summaries (filterable by class), member activity, invite management (single + bulk), class exams targetable to a class |
+| **Manager dashboard** | Progress summaries (filterable by class), member activity, invite management (single + bulk), class exams targetable to a class, **one-time password reset codes** for students whose reset email doesn't arrive (teacher reads the code out; works once, 1 hour) — *code complete Oct 6 2026, not yet deployed* |
 | **Registration** | Invite code on signup for org affiliation (auto-joins the invite's class) |
 
 ### Administration

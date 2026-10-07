@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* `dark:` follows the in-app theme (html[data-theme], set by theme-context), not the OS,
+   and is off inside light-scoped [data-edu-theme] sections. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *):not(:where([data-edu-theme], [data-edu-theme] *)));
+
 /* Font faces: `font-imports.css` (@fontsource, bundled — no Google Fonts at build or runtime). */
 :root {
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
@@ -13,6 +17,7 @@
   --background: #fafafa;
   --foreground: #0d0d0d;
   --brand-primary: #4a6b2f;
+  --brand-on-primary: #ffffff;
   --brand-foreground: #171717;
   --brand-muted: #525252;
   --brand-subtle: #404040;
@@ -41,6 +46,8 @@ html[data-theme="dark"] {
   --background: var(--brand-black);
   --foreground: var(--brand-white);
   --brand-primary: var(--brand-green-accent);
+  /* Text/icons on a --brand-primary fill (WCAG AA ≥4.5:1 in each theme) */
+  --brand-on-primary: var(--brand-black);
   --brand-foreground: var(--brand-white);
   --brand-muted: #c9c9c9;
   --brand-subtle: rgba(255, 255, 255, 0.88);
@@ -68,6 +75,7 @@ html[data-theme="light"] {
   --background: #fafafa;
   --foreground: #0d0d0d;
   --brand-primary: #4a6b2f;
+  --brand-on-primary: #ffffff;
   --brand-foreground: #171717;
   --brand-muted: #525252;
   --brand-subtle: #404040;
@@ -184,7 +192,7 @@ html {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   background: var(--brand-primary);
-  color: var(--brand-black);
+  color: var(--brand-on-primary);
   font-size: 0.875rem;
   font-weight: 500;
   outline: 2px solid var(--brand-foreground);

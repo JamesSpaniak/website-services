@@ -109,7 +109,7 @@ export default function ManagerOverviewPage() {
                                 <button
                                     key={r}
                                     onClick={() => setDays(r)}
-                                    className={`px-2.5 py-1 ${days === r ? 'bg-[var(--brand-primary)] text-white' : 'text-[var(--brand-muted)] hover:bg-[var(--surface-border)]'}`}
+                                    className={`px-2.5 py-1 ${days === r ? 'bg-[var(--brand-primary)] text-[var(--brand-on-primary)]' : 'text-[var(--brand-muted)] hover:bg-[var(--surface-border)]'}`}
                                 >
                                     {r}d
                                 </button>

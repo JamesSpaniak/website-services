@@ -11,6 +11,7 @@ Task-oriented index for humans and agents. Each row points to the canonical doc 
 | Smoke-test the site after a deploy (browser agent or by hand) | [`workflows/tech/post-deploy-smoke-test.md`](../workflows/tech/post-deploy-smoke-test.md) | Claude in Chrome · Stripe test cards |
 | Deploy from a cloud session / phone | [`workflows/tech/deploy-from-cloud.md`](../workflows/tech/deploy-from-cloud.md) | `scripts/deploy-preflight.sh`, `scripts/cloud-setup.sh` |
 | Rehearse migrations on a prod clone / get prod-shaped data locally | [`workflows/tech/prod-db-clone.md`](../workflows/tech/prod-db-clone.md) | `scripts/prod-db-clone.sh dump && …/prod-db-clone.sh restore` |
+| Lock the ALB to CloudFront / rate-limit by real client IP | [`workflows/tech/shared-ip-hardening-rollout.md`](../workflows/tech/shared-ip-hardening-rollout.md) | `alb_*` + `trusted_proxy_hops` flags in `dev.tfvars` |
 
 | Add or change a metric / set up Grafana alerts / "are we within the free tier" | [`docs/tech/observability.md`](tech/observability.md) | `backend/src/telemetry.ts`, `backend/src/analytics/analytics.service.ts` |
 | Understand API surface | [`docs/tech/backend-data.md`](tech/backend-data.md) | `backend/src/` |

@@ -145,6 +145,26 @@ See [`competitor-analysis.md`](competitor-analysis.md) for detail.
 - FAA exam fee included in price
 - FLEX-style “no engineering, just fly” as what we sell
 
+### Testimonials and endorsements: where the line is
+
+US rules: FTC Endorsement Guides (16 CFR 255, revised 2023) and the FTC rule on fake reviews and testimonials (16 CFR 465, in force Oct 2024). Not legal advice; ask counsel when unsure.
+
+| Situation | OK? | What's required |
+|---|---|---|
+| A stranger bought the course and praises it unprompted | ✅ | Their real words; permission to quote. Selecting the best quotes is fine. If we ever show a "reviews" section, we can't hide the negative ones |
+| **A friend, neighbor or family member of the team actually took the course** (paid or free) and likes it | ✅ **with disclosure** | They really used it; their own honest words; a visible line such as *"A neighbor of a Drone Edge team member; received free access."* The relationship and any free or discounted access are both material connections |
+| A customer with a discount or prior relationship (e.g. the reference teacher) | ✅ **with disclosure** | Same: state the discount and the relationship |
+| Free access **in exchange for an honest review** | ✅ **with disclosure** | We never ask for or reward positive-only reviews |
+| Friends **act** in a video (study, fly, react) | ✅ | They don't speak as customers or describe results |
+| A friend reads a script praising the course, or says it helped them pass, without having that experience | ❌ | Fake testimonial |
+| A friend presented as an ordinary customer or stranger | ❌ | Hidden connection |
+| Friends or the team post reviews on Google, Reddit, app stores or forums without disclosure | ❌ | Fake or undisclosed review; also breaks community rules ([`../marketing/paid-acquisition.md`](../marketing/paid-acquisition.md) § Group funnel) |
+| Rewards (credit, Pro months, merch) only for positive reviews | ❌ | Review buying |
+| Editing a quote so it says something they didn't mean | ❌ | Trimming for length is fine; changing meaning is not |
+| "I passed on my first try" in an ad | ⚠️ **Not yet** | Implies typical results; needs data on typical outcomes or a clear statement of what's typical. Same spirit as the pass-rate ban above. Fine as a learner's quote on a page only with context |
+
+Disclosures never name the founder (brand anonymity). "A Drone Edge team member" is enough.
+
 ---
 
 ## Brand & visual identity

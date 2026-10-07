@@ -2,6 +2,8 @@
 
 Event-day brief for Drone Edge. Official hackathon is **Sat Oct 24 – Sun Oct 25, 2026** at the **Microsoft NERD Center, 1 Memorial Drive, Cambridge MA** (Kendall Square; ~5 min walk from Kendall/MIT Red Line). Venue confirmed by Jaime, Sep 2026. Treat **Fri Oct 23** as travel / kit setup / last dry-run. Facts below are from [action-space.pages.dev](https://action-space.pages.dev/) and [Luma](https://luma.com/xl77cp4v) as of mid-September 2026 — re-check the week of the 17th (approvals close Oct 17).
 
+**Filming the event (vlog + team interviews):** [`action-space-hackathon-filming.md`](action-space-hackathon-filming.md).
+
 **Do not invent FAA pass rates, student counts, or product claims** if talking to organizers or teams. Product language: [`docs/sales/features.md`](../sales/features.md).
 
 ---

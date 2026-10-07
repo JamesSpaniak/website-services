@@ -270,7 +270,7 @@ export default function QuestionBankEditor({ courses, initialCourseId }: Props) 
                     </button>
                     <button
                         onClick={openNew}
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90"
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90"
                     >
                         <PlusIcon className="h-4 w-4" /> New Question
                     </button>
@@ -313,7 +313,7 @@ export default function QuestionBankEditor({ courses, initialCourseId }: Props) 
                         <button
                             onClick={handleImport}
                             disabled={importing || !importJson.trim()}
-                            className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {importing ? 'Importing…' : 'Import'}
                         </button>
@@ -469,7 +469,7 @@ export default function QuestionBankEditor({ courses, initialCourseId }: Props) 
                             <button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                                className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50"
                             >
                                 {saving ? 'Saving…' : editingId ? 'Save Changes' : 'Create Question'}
                             </button>

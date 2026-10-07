@@ -8,7 +8,9 @@ import { mergeCourseImages } from '@/app/lib/course-images';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/auth-context';
 import { logger } from '@/app/lib/logger';
-import { coursePath, registerHref } from '@/app/lib/auth-redirect';
+import { courseCheckoutPath, registerHref } from '@/app/lib/auth-redirect';
+import { PriceText, PromoNote } from '@/app/ui/components/price-tag';
+import { PRO_SKU, FALLBACK_PRO_CENTS, courseSku } from '@/app/lib/pricing';
 
 // Both options redirect to Stripe-hosted Checkout. Access is granted by the
 // webhook; the course page handles the return (?purchase=success / ?pro=success).
@@ -24,7 +26,7 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
         return `/login?redirect=${encodeURIComponent(base)}`;
     }, [redirectPath]);
     const registerHrefForCourse = useMemo(() => {
-        const base = redirectPath ?? coursePath(course.id, true);
+        const base = redirectPath ?? courseCheckoutPath(course.id);
         return registerHref(base);
     }, [redirectPath, course.id]);
     const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +56,7 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
                         Create an account first, then return here to pay.
                     </p>
                     <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
-                        <Link href={registerHrefForCourse} className="inline-block px-6 py-2.5 font-semibold text-[var(--brand-black)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
+                        <Link href={registerHrefForCourse} className="inline-block px-6 py-2.5 font-semibold text-[var(--brand-on-primary)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90">
                             Create account &amp; checkout
                         </Link>
                         <Link href={loginHref} className="inline-block px-6 py-2.5 font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] rounded-lg hover:bg-[var(--background)]">
@@ -88,7 +90,7 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
                         <p className="text-[var(--brand-muted)] mt-1">{course.sub_title}</p>
                     </div>
                     <div className="text-3xl font-bold text-[var(--brand-foreground)]">
-                        ${course.price}
+                        <PriceText sku={courseSku(course.id)} fallbackCents={Math.round(Number(course.price) * 100)} />
                     </div>
                 </div>
 
@@ -100,7 +102,10 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div className="p-4 border border-[var(--brand-primary)] bg-[var(--brand-primary)]/5 rounded-lg">
                             <p className="text-sm font-semibold text-[var(--brand-foreground)]">This course — one-time</p>
-                            <p className="mt-1 text-2xl font-bold text-[var(--brand-foreground)]">${course.price}</p>
+                            <p className="mt-1 text-2xl font-bold text-[var(--brand-foreground)]">
+                                <PriceText sku={courseSku(course.id)} fallbackCents={Math.round(Number(course.price) * 100)} />
+                            </p>
+                            <PromoNote sku={courseSku(course.id)} />
                             <p className="mt-1 text-xs text-[var(--brand-muted)]">Lifetime access to {course.title} only.</p>
                         </div>
                         <button
@@ -129,6 +134,11 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
                             className="p-4 border border-[var(--surface-border)] bg-[var(--comment-secondary-bg)] rounded-lg text-left hover:border-[var(--brand-primary)]/50 transition-colors disabled:opacity-50"
                         >
                             <p className="text-sm font-semibold text-[var(--brand-foreground)]">Pro — monthly</p>
+                            <p className="mt-1 text-2xl font-bold text-[var(--brand-foreground)]">
+                                <PriceText sku={PRO_SKU} fallbackCents={FALLBACK_PRO_CENTS} />
+                                <span className="text-sm font-normal text-[var(--brand-muted)]">/mo</span>
+                            </p>
+                            <PromoNote sku={PRO_SKU} />
                             <p className="mt-1 text-sm text-[var(--brand-muted)]">All courses while subscribed. Manage or cancel anytime from your profile.</p>
                             <span className="mt-2 inline-block text-xs font-medium text-[var(--brand-primary)]">Continue to Stripe Checkout →</span>
                         </button>
@@ -139,7 +149,11 @@ export default function PurchaseFlow({ course, redirectPath }: PurchaseFlowProps
                     <p className="text-sm text-[var(--brand-muted)]">One-time payment unlocks lifetime access to this course only. You&apos;ll pay on Stripe&apos;s secure checkout page and come straight back here.</p>
                     <div className="mt-4 flex justify-center gap-4">
                         <button onClick={handlePurchase} disabled={isLoading} className="px-8 py-3 font-semibold text-[var(--background)] bg-[var(--brand-primary)] rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--background)] focus:ring-[var(--brand-primary)] transition-colors disabled:opacity-40">
-                            {isLoading ? 'Opening checkout…' : `Buy this course — $${course.price}`}
+                            {isLoading ? 'Opening checkout…' : (
+                                <>
+                                    Buy this course — <PriceText sku={courseSku(course.id)} fallbackCents={Math.round(Number(course.price) * 100)} />
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

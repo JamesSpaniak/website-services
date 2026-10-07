@@ -32,7 +32,7 @@ const STATUS_STYLE: Record<IssueStatus, string> = {
 const btn =
     'inline-flex min-h-[40px] items-center gap-2 px-4 text-sm font-semibold border border-[var(--surface-border)] bg-[var(--surface)] text-[var(--brand-foreground)] hover:opacity-90 disabled:opacity-50';
 const btnPrimary =
-    'inline-flex min-h-[40px] items-center gap-2 px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 disabled:opacity-50';
+    'inline-flex min-h-[40px] items-center gap-2 px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 disabled:opacity-50';
 
 /**
  * Admin → Newsletter (newsletter plan § 8 "Publishing and updates").
@@ -575,7 +575,7 @@ function PreviewPane({ preview }: { preview: IssuePreview }) {
                         role="tab"
                         aria-selected={view === v}
                         onClick={() => setView(v)}
-                        className={`px-3 min-h-[36px] text-sm border border-[var(--surface-border)] ${view === v ? 'bg-[var(--brand-primary)] text-[var(--brand-black)] font-semibold' : 'bg-[var(--surface)] text-[var(--brand-foreground)]'}`}
+                        className={`px-3 min-h-[36px] text-sm border border-[var(--surface-border)] ${view === v ? 'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] font-semibold' : 'bg-[var(--surface)] text-[var(--brand-foreground)]'}`}
                     >
                         {v === 'email' ? 'Email' : v === 'web' ? 'Web page' : 'Plain text'}
                     </button>

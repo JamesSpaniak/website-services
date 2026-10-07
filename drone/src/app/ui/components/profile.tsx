@@ -11,6 +11,9 @@ import { z } from 'zod';
 import CourseProgressPreview from './course-progress-preview';
 import DeleteAccountSection from './delete-account-section';
 import EmailPreferencesSection from './email-preferences-section';
+import ThemeToggle from './theme-toggle';
+import { PriceText, PromoNote } from '@/app/ui/components/price-tag';
+import { FALLBACK_PRO_CENTS, PRO_SKU } from '@/app/lib/pricing';
 
 const emailSchema = z.string().email({ message: "Please enter a valid email." });
 
@@ -255,8 +258,9 @@ export default function ProfileComponent() {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <div>
                                 <h3 className="text-lg font-semibold text-[var(--brand-foreground)]">
-                                    Go Pro: every course for $35/month
+                                    Go Pro: every course for <PriceText sku={PRO_SKU} fallbackCents={FALLBACK_PRO_CENTS} />/month
                                 </h3>
+                                <PromoNote sku={PRO_SKU} />
                                 <p className="mt-1 text-sm text-[var(--brand-muted)]">
                                     All courses, plus new courses and updates while you subscribe. Cancel anytime.{' '}
                                     <Link href="/pricing" className="text-[var(--brand-primary)] hover:underline">Compare plans</Link>
@@ -391,6 +395,15 @@ export default function ProfileComponent() {
                             </button>
                         </div>
                         {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
+                    </div>
+
+                    {/* Appearance — one theme for the whole site, saved to the profile */}
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--brand-foreground)]">Appearance</p>
+                            <p className="text-xs text-[var(--brand-muted)]">Night, Day, or match your device. Applies on every device you sign in to.</p>
+                        </div>
+                        <ThemeToggle />
                     </div>
 
                     <EmailPreferencesSection />

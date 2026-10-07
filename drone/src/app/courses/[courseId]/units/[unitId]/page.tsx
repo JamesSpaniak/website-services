@@ -10,6 +10,7 @@ import AuthGuard from '@/app/lib/auth-guard';
 import UnitComponent from '@/app/ui/components/unit';
 import CourseUnitNav from '@/app/ui/components/course-unit-nav';
 import CourseOutlineSidebar from '@/app/ui/components/course-outline-sidebar';
+import ReaderThemeControl from '@/app/ui/components/reader-theme-control';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
 import { CourseData } from '@/app/lib/types/course';
@@ -20,7 +21,9 @@ import {
     unitNavNeighbors,
     unitPageTarget,
 } from '@/app/lib/course-tree';
-import { coursePath, unitPath, FOCUS_QUERY } from '@/app/lib/auth-redirect';
+import { courseCheckoutPath, coursePath, unitPath, FOCUS_QUERY } from '@/app/lib/auth-redirect';
+import { PriceText } from '@/app/ui/components/price-tag';
+import { courseSku } from '@/app/lib/pricing';
 
 function LockedUnitNotice({ courseId, unitTitle, price }: { courseId: number; unitTitle: string; price: number }) {
     return (
@@ -35,11 +38,17 @@ function LockedUnitNotice({ courseId, unitTitle, price }: { courseId: number; un
             </p>
             <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                 <Link
-                    href={coursePath(courseId, true)}
-                    className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+                    href={courseCheckoutPath(courseId)}
+                    className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
                     style={{ borderRadius: 'var(--radius-sm)' }}
                 >
-                    {price > 0 ? `Unlock full course — $${price}` : 'Unlock full course'}
+                    {price > 0 ? (
+                        <>
+                            Unlock full course — <PriceText sku={courseSku(courseId)} fallbackCents={Math.round(price * 100)} />
+                        </>
+                    ) : (
+                        'Unlock full course'
+                    )}
                 </Link>
                 <Link
                     href={coursePath(courseId)}
@@ -194,6 +203,7 @@ function UnitPageContent() {
                     </div>
                 </aside>
             </div>
+            <ReaderThemeControl />
         </div>
     );
 }

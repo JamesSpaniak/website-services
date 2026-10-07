@@ -147,10 +147,10 @@ export class EmailService {
       from: this.supportFrom,
       to: user.email,
       subject: 'Your Password Reset Request',
-      text: `Hello ${user.username},\n\nYou requested a password reset. Open the link below to reset your password. This link is valid for 15 minutes.\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+      text: `Hello ${user.username},\n\nYou requested a password reset. Open the link below to reset your password. This link works once and is valid for 60 minutes.\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
       html: `
         <p>Hello ${user.username},</p>
-        <p>You requested a password reset. Please click the link below to reset your password. This link is valid for 15 minutes.</p>
+        <p>You requested a password reset. Please click the link below to reset your password. This link works once and is valid for 60 minutes.</p>
         <p><a href="${resetLink}">Reset Password</a></p>
         <p>If you did not request this, please ignore this email.</p>
       `,

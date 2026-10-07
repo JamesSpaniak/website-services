@@ -307,7 +307,11 @@ resource "aws_ecs_task_definition" "api_server" {
         { name = "SES_REPLY_TO", value = local.ses_reply_to },
         { name = "SES_CONFIGURATION_SET", value = aws_sesv2_configuration_set.marketing.configuration_set_name },
         { name = "SES_EVENTS_TOPIC_ARN", value = aws_sns_topic.ses_events.arn },
-        { name = "MARKETING_POSTAL_ADDRESS", value = var.marketing_postal_address }
+        { name = "MARKETING_POSTAL_ADDRESS", value = var.marketing_postal_address },
+        # Rate-limit client IP (backend/src/common/client-ip.ts). Empty = legacy
+        # first X-Forwarded-For entry; see variables.tf before changing.
+        { name = "TRUSTED_PROXY_HOPS", value = var.trusted_proxy_hops },
+        { name = "LOG_FORWARDED_CHAIN", value = tostring(var.log_forwarded_chain) }
       ])
     }
   ])

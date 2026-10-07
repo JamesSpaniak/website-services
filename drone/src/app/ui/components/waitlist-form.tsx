@@ -139,7 +139,7 @@ export default function WaitlistForm({
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="inline-flex min-h-[44px] items-center justify-center px-5 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus touch-manipulation"
+          className="inline-flex min-h-[44px] items-center justify-center px-5 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus touch-manipulation"
           style={{ borderRadius: 'var(--radius-sm)' }}
         >
           {status === 'submitting' ? 'Joining…' : ctaLabel}

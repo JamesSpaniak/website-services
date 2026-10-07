@@ -48,6 +48,8 @@ export interface CreateSignupLinkPayload {
     email?: string;
     note?: string;
     expires_in_days?: number;
+    /** >1 = multi-use giveaway link (no email lock). */
+    max_uses?: number;
 }
 
 /** Public info about a `?signup=` code shown on the register page. */

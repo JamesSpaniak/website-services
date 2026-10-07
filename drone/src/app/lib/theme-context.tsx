@@ -12,17 +12,24 @@ import React, {
 
 export type ThemePreference = 'light' | 'dark' | 'system';
 
-const STORAGE_KEY = 'drone-theme-preference';
+export const THEME_STORAGE_KEY = 'drone-theme-preference';
 
-function getStoredPreference(): ThemePreference {
-  if (typeof window === 'undefined') return 'dark';
+/**
+ * Runs in <head> before first paint (layout.tsx) so a saved Day / System choice
+ * applies without a dark flash. Mirrors getStoredPreference + resolveEffectiveTheme.
+ */
+export const THEME_INIT_SCRIPT = `(function(){try{var p=localStorage.getItem('${THEME_STORAGE_KEY}');if(p!=='light'&&p!=='dark'&&p!=='system')return;var t=p==='system'?(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):p;var d=document.documentElement;d.dataset.theme=t;d.dataset.themePreference=p;}catch(e){}})();`;
+
+/** The user's saved choice, or null when they never picked one. */
+function getStoredPreference(): ThemePreference | null {
+  if (typeof window === 'undefined') return null;
   try {
-    const v = localStorage.getItem(STORAGE_KEY);
+    const v = localStorage.getItem(THEME_STORAGE_KEY);
     if (v === 'light' || v === 'dark' || v === 'system') return v;
   } catch {
     /* ignore */
   }
-  return 'dark';
+  return null;
 }
 
 function resolveEffectiveTheme(preference: ThemePreference): 'light' | 'dark' {
@@ -38,6 +45,11 @@ type ThemeContextValue = {
   preference: ThemePreference;
   /** Resolved UI theme after applying system preference */
   resolved: 'light' | 'dark';
+  /** True once the user has picked a theme on this browser (vs the Night default) */
+  explicit: boolean;
+  /** True after the stored preference has been read on the client */
+  ready: boolean;
+  /** Local only — use `useChooseTheme` (theme-sync) for user-initiated changes so the profile is saved. */
   setPreference: (p: ThemePreference) => void;
 };
 
@@ -46,6 +58,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [preference, setPreferenceState] = useState<ThemePreference>('dark');
   const [resolved, setResolved] = useState<'light' | 'dark'>('dark');
+  const [explicit, setExplicit] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const applyDom = useCallback((pref: ThemePreference) => {
@@ -59,8 +72,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = getStoredPreference();
-    setPreferenceState(stored);
-    applyDom(stored);
+    setPreferenceState(stored ?? 'dark');
+    setExplicit(stored !== null);
+    applyDom(stored ?? 'dark');
     setMounted(true);
   }, [applyDom]);
 
@@ -75,8 +89,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setPreference = useCallback(
     (p: ThemePreference) => {
       setPreferenceState(p);
+      setExplicit(true);
       try {
-        localStorage.setItem(STORAGE_KEY, p);
+        localStorage.setItem(THEME_STORAGE_KEY, p);
       } catch {
         /* ignore */
       }
@@ -86,8 +101,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ preference, resolved, setPreference }),
-    [preference, resolved, setPreference],
+    () => ({ preference, resolved, explicit, ready: mounted, setPreference }),
+    [preference, resolved, explicit, mounted, setPreference],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

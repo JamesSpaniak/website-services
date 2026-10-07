@@ -70,8 +70,8 @@ flowchart TB
 | 1 | Browser | `https://thedroneedge.com`, `www`, `app`, `app.dev` |
 | 2 | Route 53 | A/ALIAS → frontend CloudFront |
 | 3 | WAFv2 | Managed rules + **20 000 req/IP / 5 min** rate limit (`waf_ip_rate_limit`; was 1000, which blocked classroom NATs) |
-| 4 | CloudFront (frontend) | Origin = public ALB (HTTP). Caches `/_next/static/*`, `/images/*`; forwards cookies/Authorization on default behavior |
-| 5 | Public ALB | Host-based rules → frontend target group :8080 |
+| 4 | CloudFront (frontend) | Origin = public ALB (HTTP). Caches `/_next/static/*`, `/images/*`; forwards cookies/Authorization on default behavior. Adds the `X-Origin-Verify` secret header (`random_password.origin_verify`) to every origin request (**in Terraform since Oct 6 2026, not yet applied**) |
+| 5 | Public ALB | Rule 1: `X-Origin-Verify` matches → frontend target group :8080. Default action forwards while `alb_require_origin_header = false`, **403** once true. Security group admits port 80 from the CloudFront origin-facing prefix list only (443 closed). **Not yet applied** — see [`workflows/tech/shared-ip-hardening-rollout.md`](../../workflows/tech/shared-ip-hardening-rollout.md) |
 | 6 | Next.js (`drone-frontend`) | SSR/RSC + client bundles. `/api/*` proxied server-side to internal ALB |
 | 7 | Internal ALB | HTTP :80 → API target group :3000 |
 | 8 | NestJS (`api-server`) | JWT cookies, TypeORM → Aurora, Stripe, S3, email |
@@ -258,7 +258,7 @@ Reference only — not on the active backlog (deferred Sep 17 2026). Revisit aft
 
 | From | To | Port | Purpose |
 |------|-----|------|---------|
-| Internet | `lb_sg` | 80, 443 | Public ALB |
+| CloudFront origin-facing prefix list | `lb_sg` | 80 | Public ALB. In Terraform since Oct 6 2026, **not yet applied** — live is still Internet on 80 + 443 |
 | `lb_sg` | `frontend_tasks_sg` | 8080 | ALB → Next.js |
 | `frontend_tasks_sg` | `internal_lb_sg` | 80 | API proxy |
 | `internal_lb_sg` | `ecs_tasks_sg` | 3000 | Internal ALB → API |

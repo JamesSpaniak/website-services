@@ -12,12 +12,13 @@ import {
     updateOrgClass,
     deleteOrgClass,
     updateMemberClass,
+    createMemberResetCode,
 } from '@/app/lib/api-client';
 import type { OrganizationMember, OrgClass } from '@/app/lib/types/organization';
 import { ORG_ROLE_TONE } from '@/app/lib/status-tones';
 import LoadingComponent from '@/app/ui/components/loading';
 import ErrorComponent from '@/app/ui/components/error';
-import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
+import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon, KeyIcon } from '@heroicons/react/24/solid';
 
 export default function ManagerMembersPage() {
     const { org, refreshOrg } = useManagerOrg();
@@ -34,6 +35,8 @@ export default function ManagerMembersPage() {
     const [filterClassId, setFilterClassId] = useState<'all' | 'none' | number>('all');
     const [newClassName, setNewClassName] = useState('');
     const [classSaving, setClassSaving] = useState(false);
+    /** Teacher reset code, shown once until dismissed (only a hash is stored). */
+    const [resetCode, setResetCode] = useState<{ username: string; code: string; expiresAt: string } | null>(null);
 
     const load = useCallback(async () => {
         try {
@@ -103,6 +106,16 @@ export default function ManagerMembersPage() {
         }
     };
 
+    const handleResetCode = async (userId: number, username: string) => {
+        if (!confirm(`Create a one-time password reset code for ${username}? Any earlier code for them stops working.`)) return;
+        try {
+            const result = await createMemberResetCode(orgId, userId);
+            setResetCode({ username: result.username, code: result.code, expiresAt: result.expires_at });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create reset code');
+        }
+    };
+
     const handleClassChange = async (userId: number, classId: number | null) => {
         try {
             await updateMemberClass(orgId, userId, classId);
@@ -166,6 +179,25 @@ export default function ManagerMembersPage() {
     return (
         <div>
             {error && <ErrorComponent message={error} />}
+
+            {resetCode && (
+                <div role="status" className="bg-[var(--surface)] border-2 border-[var(--brand-primary)] rounded-xl p-6 mb-6">
+                    <h3 className="text-lg font-semibold text-[var(--brand-foreground)]">Reset code for @{resetCode.username}</h3>
+                    <p className="mt-3 font-mono text-3xl tracking-widest text-[var(--brand-foreground)]">{resetCode.code}</p>
+                    <p className="mt-3 text-sm text-[var(--brand-muted)] leading-relaxed">
+                        The student goes to <strong className="text-[var(--brand-foreground)]">Sign in → Use a reset code</strong> (/reset-code), enters
+                        their username, this code and a new password. It works once, until{' '}
+                        {new Date(resetCode.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}, and stops after 5 wrong tries.
+                        We don&apos;t keep a copy — create a new one if it&apos;s lost.
+                    </p>
+                    <button
+                        onClick={() => setResetCode(null)}
+                        className="mt-4 px-4 py-2 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] rounded-lg hover:bg-[var(--comment-secondary-bg)]"
+                    >
+                        Done
+                    </button>
+                </div>
+            )}
 
             <div className="bg-[var(--surface)] rounded-xl shadow-sm p-6 mb-6">
                 <h3 className="text-lg font-semibold text-[var(--brand-foreground)] mb-4">Classes (Periods)</h3>
@@ -320,6 +352,16 @@ export default function ManagerMembersPage() {
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm text-right">
                                 <div className="flex items-center justify-end gap-1">
+                                    {member.role === 'member' && (
+                                        <button
+                                            onClick={() => handleResetCode(member.user_id, member.username)}
+                                            className="p-1.5 text-[var(--brand-muted)] hover:text-[var(--brand-foreground)] rounded hover:bg-[var(--comment-secondary-bg)]"
+                                            title="Reset password (one-time code)"
+                                            aria-label={`Reset password for ${member.username}`}
+                                        >
+                                            <KeyIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
                                     {member.role === 'member' ? (
                                         <button
                                             onClick={() => handleRoleChange(member.user_id, 'manager')}

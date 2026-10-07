@@ -39,7 +39,7 @@ suffix rules changed twice in 2025.
 | `product_events.failures` | counter | `stage` = `batch` \| `insert` \| `video_progress` \| `progress_touch` \| `server` | `ProductEventsService`, `AnalyticsController` |
 | `orders.record_failures` | counter | — | `PurchaseService.recordCourseOrder` |
 | `stripe.webhook.failures` | counter | `stage` = `signature` \| `processing`; `type` = Stripe event type (8 fixed, only on `processing`) | `PurchaseService.handleWebhookEvent` (added 2026-10-03) |
-| `stripe.config_errors` | counter | `check` = `pro_price` | `StripeConfigService` at boot (added 2026-10-04): configured Pro price missing, inactive, or in the other mode than the key |
+| `stripe.config_errors` | counter | `check` = `pro_price` · `product_price` | `StripeConfigService` at boot (added 2026-10-04): configured Pro price missing, inactive, or in the other mode than the key. `product_price` (2026-10-06): `PricingService` could not use a linked Stripe price (no price for the lookup key, wrong mode, recurring/one-time mismatch, missing tax code) — checkout falls back to the inline price; Admin → Pricing & promos shows the reason |
 | `stripe.webhook.replays` | counter | `result` = `processed` \| `failed` \| `dead` \| `skipped` | `StripeEventReplayService`, hourly at :15 |
 | `stripe.webhook.dead_events` | gauge | — | same: unresolved events that failed 5 replays (latest run) |
 | `stripe.payments_failed` | counter | `kind` = `renewal` \| `other` | `PurchaseService` on `invoice.payment_failed` (added 2026-10-03; live after the next deploy) |

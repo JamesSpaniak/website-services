@@ -112,7 +112,7 @@ Goal: take money confidently and measure the funnel.
 | ID | Item | Size | Notes |
 |----|------|------|-------|
 | **Y1** | **Talk landing page** `/boston` (or `/talk`) — 3 paths: try Unit 1 free · Part 107 with the launch code pre-applied · Drone Building waitlist; plus the charity/donation link from the keynote doc if Path A | 0.5 d | QR code points here with UTM. Never collect donations on our site — keynote doc § 2 |
-| **Y2** | **Load/smoke check** — 50 concurrent anonymous visits to `/boston` + 10 registers from one IP (event Wi-Fi = shared NAT) | 0.25 d | Register is 30/min/IP today — see TODO "Classroom / shared-IP rate limits". If the room shares Wi-Fi, ship the login/register 120/min/IP change from that row first |
+| **Y2** | **Load/smoke check** — 50 concurrent anonymous visits to `/boston` + 10 registers from one IP (event Wi-Fi = shared NAT) | 0.25 d | Register is 120 per 10 min per IP (plus 500/day) once **Shared-IP + bot hardening** step A deploys — see TODO.md; before that it is 30/min/IP, so ship A first if the room shares Wi-Fi |
 | **Y3** | **Freeze** — no deploys Oct 21–26 except hotfixes | — | |
 
 ---

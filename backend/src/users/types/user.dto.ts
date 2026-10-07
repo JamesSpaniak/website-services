@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import {
   IsEmail,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,6 +12,9 @@ import {
   IsUrl,
 } from 'class-validator';
 import { Role } from './role.enum';
+
+export const THEME_PREFERENCES = ['light', 'dark', 'system'] as const;
+export type ThemePreference = (typeof THEME_PREFERENCES)[number];
 
 export class UserSlim {
   @ApiProperty()
@@ -81,6 +85,14 @@ export class UserFull extends UserSlim {
   @Expose()
   @IsOptional()
   organization?: { id: number; name: string; role: string };
+
+  @ApiPropertyOptional({
+    enum: THEME_PREFERENCES,
+    nullable: true,
+    description: 'Saved site color theme; null when the user never chose one.',
+  })
+  @Expose()
+  theme_preference?: ThemePreference | null;
 }
 
 export class UserDto {
@@ -135,6 +147,13 @@ export class UpdateUserDto {
   @IsOptional()
   @IsUrl()
   picture_url?: string;
+}
+
+/** Display preferences — saved without bumping token_version (no sign-out). */
+export class UpdatePreferencesDto {
+  @ApiProperty({ enum: THEME_PREFERENCES, description: 'Site color theme.' })
+  @IsIn(THEME_PREFERENCES)
+  theme_preference: ThemePreference;
 }
 
 export class ResetPictureDto {

@@ -15,7 +15,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { UpdateUserDto, UserDto, UserFull, UserSlim } from './types/user.dto';
+import {
+  UpdatePreferencesDto,
+  UpdateUserDto,
+  UserDto,
+  UserFull,
+  UserSlim,
+} from './types/user.dto';
 import {
   AdminUserRow,
   CreateSignupLinkDto,
@@ -246,6 +252,23 @@ export class UsersController {
     return plainToInstance(UserFull, fullUser, {
       excludeExtraneousValues: true,
     });
+  }
+
+  /**
+   * Saves display preferences (site theme) for the current user.
+   * Separate from PATCH /users/me so it does not bump token_version.
+   */
+  @Patch('me/preferences')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Save the current user's display preferences" })
+  @ApiResponse({ status: 200, description: 'Preferences saved.' })
+  @ApiResponse({ status: 400, description: 'Invalid theme_preference.' })
+  async updateCurrentUserPreferences(
+    @Request() req,
+    @Body() dto: UpdatePreferencesDto,
+  ): Promise<{ theme_preference: UpdatePreferencesDto['theme_preference'] }> {
+    await this.userService.updatePreferences(req.user.userId, dto);
+    return { theme_preference: dto.theme_preference };
   }
 
   /**

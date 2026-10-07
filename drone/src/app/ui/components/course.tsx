@@ -10,6 +10,7 @@ import StatusUpdater from './status-updater';
 import UnitPreviewComponent from './unit-preview';
 import VideoComponent from './video';
 import Link from 'next/link';
+import { courseCheckoutPath } from '@/app/lib/auth-redirect';
 import JsonLd, { courseJsonLd } from './json-ld';
 import { debugLog } from '@/app/lib/logger';
 import { mergeCourseImages } from '@/app/lib/course-images';
@@ -17,6 +18,8 @@ import CourseImageStrip from './course-image-strip';
 import CourseExamsSection from './course-exams-section';
 import CourseOutlineSidebar from './course-outline-sidebar';
 import { isUnitPreviewAccessible } from '@/app/lib/course-tree';
+import { PriceText } from '@/app/ui/components/price-tag';
+import { courseSku } from '@/app/lib/pricing';
 
 export default function CourseComponent(props: CourseData & { initialShowPurchase?: boolean }) {
     const [course, setCourse] = useState<CourseData>(props);
@@ -68,7 +71,7 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
         <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-12">
             <JsonLd data={courseJsonLd(course)} />
             {!fullAccess && paidCourse && (
-                <CoursePurchaseBanner course={course} onPurchaseClick={() => setShowPurchase(true)} />
+                <CoursePurchaseBanner course={course} />
             )}
             {/* Sidebar (with the course h1) comes first in DOM for a sane heading/reading order; the grid places it visually on the right on lg+. */}
             <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
@@ -93,20 +96,21 @@ export default function CourseComponent(props: CourseData & { initialShowPurchas
                             {paidCourse && (
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-[var(--brand-muted)]">Price</span>
-                                    <span className="font-mono text-xs text-[var(--brand-foreground)]">${Number(price)}</span>
+                                    <span className="font-mono text-xs text-[var(--brand-foreground)]">
+                                        <PriceText sku={courseSku(course.id)} fallbackCents={Math.round(Number(price) * 100)} />
+                                    </span>
                                 </div>
                             )}
                         </div>
 
                         {!fullAccess && paidCourse && (
-                            <button
-                                type="button"
-                                onClick={() => setShowPurchase(true)}
-                                className="mt-6 w-full py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+                            <Link
+                                href={courseCheckoutPath(course.id)}
+                                className="block text-center mt-6 w-full py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
                                 style={{ borderRadius: 'var(--radius-sm)' }}
                             >
-                                Unlock for ${Number(price)}
-                            </button>
+                                Unlock for <PriceText sku={courseSku(course.id)} fallbackCents={Math.round(Number(price) * 100)} />
+                            </Link>
                         )}
 
                         {fullAccess && (

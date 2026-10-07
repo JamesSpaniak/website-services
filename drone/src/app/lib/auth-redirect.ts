@@ -30,6 +30,31 @@ export function coursePath(courseId: number, purchase = false): string {
   return purchase ? `${base}?${PURCHASE_QUERY}=1` : base;
 }
 
+/** One-click checkout route: creates the Stripe Checkout session on load. */
+export const CHECKOUT_PATH = '/checkout';
+
+export type CheckoutItem = { kind: 'course'; courseId: number } | { kind: 'pro' };
+
+export function checkoutPath(item: CheckoutItem): string {
+  const value = item.kind === 'pro' ? 'pro' : `course-${item.courseId}`;
+  return `${CHECKOUT_PATH}?item=${value}`;
+}
+
+export function courseCheckoutPath(courseId: number): string {
+  return checkoutPath({ kind: 'course', courseId });
+}
+
+export const PRO_CHECKOUT_PATH = checkoutPath({ kind: 'pro' });
+
+/** Parses `?item=course-<id>` / `?item=pro`; null for anything else. */
+export function parseCheckoutItem(value: string | null | undefined): CheckoutItem | null {
+  if (value === 'pro') return { kind: 'pro' };
+  const match = value?.match(/^course-(\d{1,9})$/);
+  if (!match) return null;
+  const courseId = Number(match[1]);
+  return courseId > 0 ? { kind: 'course', courseId } : null;
+}
+
 export function coursePreviewPath(courseId: number, purchase = false): string {
   const base = `/courses/${courseId}/preview`;
   return purchase ? `${base}#purchase` : base;
@@ -64,8 +89,8 @@ export function redirectIndicatesPurchase(redirect: string | null | undefined): 
   if (!redirect) return false;
   try {
     const url = new URL(redirect, 'http://local');
-    return url.searchParams.get(PURCHASE_QUERY) === '1';
+    return url.pathname === CHECKOUT_PATH || url.searchParams.get(PURCHASE_QUERY) === '1';
   } catch {
-    return redirect.includes(`${PURCHASE_QUERY}=1`);
+    return redirect.startsWith(CHECKOUT_PATH) || redirect.includes(`${PURCHASE_QUERY}=1`);
   }
 }

@@ -50,14 +50,23 @@ export async function payOnStripe(page: Page, card: string) {
     if (await country.isVisible().catch(() => false)) {
         await country.selectOption('US');
     }
-    const zip = page.locator('#billingPostalCode');
-    if (await zip.isVisible().catch(() => false)) {
-        await zip.fill('10001');
+    // Managed Payments (tax) can ask for the full address; fill whatever is shown.
+    for (const [selector, value] of [
+        ['#billingAddressLine1', '1 Test Street'],
+        ['#billingLocality', 'New York'],
+        ['#billingPostalCode', '10001'],
+    ] as const) {
+        const field = page.locator(selector);
+        if (await field.isVisible().catch(() => false)) await field.fill(value);
     }
-    // Don't opt into Link — it would ask for a phone number.
+    const state = page.locator('#billingAdministrativeArea');
+    if (await state.isVisible().catch(() => false)) await state.selectOption('NY');
+    // Don't opt into Link — it would ask for a phone number. A transparent
+    // overlay can swallow a normal click, so dispatch it like the Card row.
     const link = page.getByRole('checkbox', { name: 'Save my information for faster checkout' });
     if (await link.isVisible().catch(() => false) && (await link.isChecked())) {
-        await link.uncheck();
+        await link.dispatchEvent('click');
+        await expect(link).not.toBeChecked();
     }
 
     await page.locator('[data-testid="hosted-payment-submit-button"]').click();

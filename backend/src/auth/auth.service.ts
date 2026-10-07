@@ -22,10 +22,32 @@ import { maskEmail } from '../common/pii';
 import { AuditAction } from '../audit/types/audit-action.enum';
 import { AnalyticsService } from '../analytics/analytics.service';
 import * as crypto from 'crypto';
+import { AttemptLimiter } from '../common/attempt-limiter.service';
+import {
+  generateResetCode,
+  hashResetCode,
+  resetCodeMatches,
+} from '../common/reset-code';
+import { OrgRole } from '../organizations/types/org-role.enum';
+import { Role } from '../users/types/role.enum';
 
 export const LOGIN_USER_NOT_FOUND =
   'No account found with that username or email.';
 export const LOGIN_BAD_PASSWORD = 'Incorrect password.';
+export const RESET_LINK_INVALID = 'Invalid or expired password reset token.';
+
+/** Reset-link lifetime — school mail gateways can hold a message for a while. */
+const RESET_LINK_TTL = '60m';
+
+/** Wrong passwords allowed per account per window, from any number of IPs. */
+export const LOGIN_FAILURE_LIMIT = 8;
+export const LOGIN_FAILURE_WINDOW_MS = 10 * 60 * 1000;
+export const loginFailureKey = (userId: number) => `login-fail:${userId}`;
+
+export const RESET_CODE_INVALID =
+  'That reset code is not valid or has expired. Ask your teacher for a new one.';
+const RESET_CODE_TTL_MS = 60 * 60 * 1000;
+const RESET_CODE_MAX_ATTEMPTS = 5;
 
 @Injectable()
 export class AuthService {
@@ -42,6 +64,7 @@ export class AuthService {
     private auditService: AuditService,
     private analyticsService: AnalyticsService,
     private productEvents: ProductEventsService,
+    private attemptLimiter: AttemptLimiter,
   ) {}
 
   async validateUser(identifier: string, pass: string): Promise<User> {
@@ -59,16 +82,27 @@ export class AuthService {
       `User found: id=${user.id}, verified=${user.is_email_verified}, role=${user.role}`,
     );
 
+    // Per account, not per IP: a classroom shares one IP, and an attacker
+    // rotating IPs still hits the same account counter.
+    const failKey = loginFailureKey(user.id);
+    this.attemptLimiter.assertBelow(
+      failKey,
+      LOGIN_FAILURE_LIMIT,
+      'Too many incorrect passwords for this account. Wait a few minutes, reset your password, or ask your teacher for a reset code.',
+    );
+
     const passwordMatch = await UsersService.comparePassword(
       pass,
       user.password,
     );
     if (!passwordMatch) {
+      this.attemptLimiter.hit(failKey, LOGIN_FAILURE_WINDOW_MS);
       this.logger.warn(
         `Login failed: incorrect password for user="${user.username}" (id=${user.id})`,
       );
       throw new UnauthorizedException(LOGIN_BAD_PASSWORD);
     }
+    this.attemptLimiter.reset(failKey);
 
     this.logger.log(
       `Login validated successfully for user="${user.username}" (id=${user.id})`,
@@ -416,7 +450,8 @@ export class AuthService {
   }
 
   async sendPasswordResetLink(email: string): Promise<{ message: string }> {
-    const user = await this.usersService.getUserByEmail(email);
+    // Case-insensitive: students type Mike@School.org and mike@school.org.
+    const user = await this.usersService.findForLogin(email);
 
     if (!user) {
       this.logger.warn(
@@ -428,14 +463,23 @@ export class AuthService {
       };
     }
 
-    const payload = { sub: user.id, username: user.username };
+    // `ver` makes the link single-use: resetting the password bumps
+    // token_version, so the same link (or any older one) stops verifying.
+    // Requesting another link does not bump it, so earlier links in a slow
+    // inbox keep working until one is used.
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      ver: user.token_version ?? 0,
+    };
     const token = this.jwtService.sign(payload, {
       // Fall back to the main JWT secret / a sane TTL when the reset-specific
       // env vars are absent (they are not wired into the ECS task definition;
       // an undefined expiresIn makes jsonwebtoken throw and 500s this route).
       secret: this.resetTokenSecret(),
       expiresIn:
-        this.configService.get<string>('JWT_RESET_EXPIRES_IN') || '15m',
+        this.configService.get<string>('JWT_RESET_EXPIRES_IN') ||
+        RESET_LINK_TTL,
     });
 
     const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${token}`;
@@ -451,25 +495,121 @@ export class AuthService {
     token: string,
     newPassword: string,
   ): Promise<{ message: string }> {
+    let payload: { sub?: number; ver?: number };
     try {
-      const payload = this.jwtService.verify(token, {
+      payload = this.jwtService.verify(token, {
         secret: this.resetTokenSecret(),
       });
+    } catch {
+      throw new UnauthorizedException(RESET_LINK_INVALID);
+    }
 
-      const userId = payload.sub;
-      if (!userId) {
-        throw new UnauthorizedException('Invalid token payload.');
-      }
+    const user = payload?.sub
+      ? await this.usersService.getUserById(payload.sub)
+      : undefined;
+    // Missing `ver` = a link issued before single-use links (≤ 60 min old at
+    // deploy); refusing it only costs the user a fresh request.
+    if (!user || payload.ver !== (user.token_version ?? 0)) {
+      throw new UnauthorizedException(RESET_LINK_INVALID);
+    }
 
-      const hashedPassword = await UsersService.hashPassword(newPassword);
-      await this.usersService.updatePassword(userId, hashedPassword);
+    await this.setNewPassword(user, newPassword);
+    return { message: 'Password has been reset successfully.' };
+  }
 
-      return { message: 'Password has been reset successfully.' };
-    } catch (error) {
-      throw new UnauthorizedException(
-        'Invalid or expired password reset token.',
+  /**
+   * Teacher reset code: a manager of `orgId` issues a one-time code for one of
+   * its students, for classrooms where reset emails never arrive (district
+   * filters, no inbox in class). Students (org `member`) only — never another
+   * manager or a site admin, so a manager can't take over a peer's account.
+   */
+  async createMemberResetCode(
+    orgId: number,
+    targetUserId: number,
+    actorUserId: number,
+  ): Promise<{ code: string; expires_at: string; username: string }> {
+    const role = await this.organizationService.getMemberRole(
+      orgId,
+      targetUserId,
+    );
+    if (!role) {
+      throw new NotFoundException('Member not found in this organization.');
+    }
+    if (role !== OrgRole.Member) {
+      throw new ForbiddenException(
+        'Reset codes are for students. Managers can reset their own password from the sign-in page.',
       );
     }
+    const user = await this.usersService.getUserById(targetUserId);
+    if (!user) throw new NotFoundException('User not found.');
+    if (user.role === Role.Admin) {
+      throw new ForbiddenException('Reset codes are for students.');
+    }
+
+    const code = generateResetCode();
+    const expiresAt = new Date(Date.now() + RESET_CODE_TTL_MS);
+    await this.usersService.setResetCode(
+      user.id,
+      hashResetCode(user.id, code),
+      expiresAt,
+    );
+    this.auditService.log(user.id, AuditAction.RESET_CODE_CREATED, {
+      orgId,
+      byUserId: actorUserId,
+    });
+    this.logger.log(
+      `Reset code issued for user id=${user.id} in org=${orgId} by user id=${actorUserId}`,
+    );
+    return {
+      code,
+      expires_at: expiresAt.toISOString(),
+      username: user.username,
+    };
+  }
+
+  /** Redeem a teacher reset code. Wrong guesses count in the DB (5 max). */
+  async resetPasswordWithCode(
+    identifier: string,
+    code: string,
+    newPassword: string,
+  ): Promise<{ message: string; username: string }> {
+    const user = await this.usersService.findForLogin(identifier);
+    // One message for every failure so the form can't be used to probe
+    // which usernames have a live code.
+    const invalid = () => new UnauthorizedException(RESET_CODE_INVALID);
+    if (!user) throw invalid();
+
+    const stored = await this.usersService.getResetCode(user.id);
+    const live =
+      stored.hash &&
+      stored.expiresAt &&
+      stored.expiresAt.getTime() > Date.now() &&
+      stored.attempts < RESET_CODE_MAX_ATTEMPTS;
+    if (!live) throw invalid();
+
+    if (!resetCodeMatches(user.id, code, stored.hash)) {
+      await this.usersService.incrementResetCodeAttempts(user.id);
+      throw invalid();
+    }
+
+    await this.setNewPassword(user, newPassword);
+    await this.usersService.clearResetCode(user.id);
+    this.auditService.log(user.id, AuditAction.PASSWORD_RESET_BY_CODE);
+    return {
+      message: 'Password has been reset successfully.',
+      username: user.username,
+    };
+  }
+
+  /**
+   * Shared tail of every reset path: store the hash (which bumps
+   * token_version, signing out other sessions and killing outstanding reset
+   * links), and lift any failed-login lockout on the account.
+   */
+  private async setNewPassword(user: User, newPassword: string) {
+    const hashedPassword = await UsersService.hashPassword(newPassword);
+    await this.usersService.updatePassword(user.id, hashedPassword);
+    this.attemptLimiter.reset(loginFailureKey(user.id));
   }
 
   async logout(token: string): Promise<void> {

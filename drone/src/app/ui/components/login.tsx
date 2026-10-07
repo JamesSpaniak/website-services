@@ -184,8 +184,16 @@ export default function LoginComponent({ redirectPath }: { redirectPath?: string
                     </div>
                     <input id="password" name="password" type="password" value={formData.password} onChange={handleChange} className={inputClass(!!validationErrors?.password)} style={{ borderRadius: 'var(--radius-sm)' }} required />
                     {validationErrors?.password && <p className="text-xs text-red-400 mt-1">{validationErrors.password._errors[0]}</p>}
+                    {mode === 'login' && (
+                        <p className="text-xs text-[var(--brand-muted)] mt-1">
+                            Got a reset code from your teacher?{' '}
+                            <Link href="/reset-code" className="text-[var(--brand-primary)] hover:opacity-90">
+                                Use it here
+                            </Link>
+                        </p>
+                    )}
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-2.5 font-medium text-sm tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus" style={{ borderRadius: 'var(--radius-sm)' }}>
+                <button type="submit" disabled={loading} className="w-full py-2.5 font-medium text-sm tracking-wide bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus" style={{ borderRadius: 'var(--radius-sm)' }}>
                     {loading ? 'Processing...' : (mode === 'login' ? 'Sign in' : 'Sign up')}
                 </button>
                 <button type="button" onClick={toggleMode} className="w-full mt-4 text-sm text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors">

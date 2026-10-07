@@ -16,7 +16,7 @@ export default function GoBackButton({ className = '' }: { className?: string })
     <button
       type="button"
       onClick={goBack}
-      className={`inline-flex items-center gap-2 min-h-[44px] px-5 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity ${className}`}
+      className={`inline-flex items-center gap-2 min-h-[44px] px-5 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity ${className}`}
       style={{ borderRadius: 'var(--radius-sm)' }}
     >
       <ArrowLeftIcon className="h-4 w-4" aria-hidden />

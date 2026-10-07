@@ -434,6 +434,7 @@ function SignupLinksPanel({
     const [email, setEmail] = useState('');
     const [note, setNote] = useState('');
     const [expiresInDays, setExpiresInDays] = useState(30);
+    const [maxUses, setMaxUses] = useState(1);
     const [creating, setCreating] = useState(false);
     const [copiedId, setCopiedId] = useState<number | null>(null);
 
@@ -451,15 +452,17 @@ function SignupLinksPanel({
         try {
             const link = await createSignupLink({
                 course_ids: selectedCourseIds,
-                email: email.trim() || undefined,
+                email: maxUses > 1 ? undefined : email.trim() || undefined,
                 note: note.trim() || undefined,
                 expires_in_days: expiresInDays,
+                max_uses: maxUses,
             });
             setLinks((prev) => [link, ...prev]);
             setSelectedCourseIds([]);
             setEmail('');
             setNote('');
             setExpiresInDays(30);
+            setMaxUses(1);
             setShowForm(false);
             onNotice(
                 link.email
@@ -515,8 +518,8 @@ function SignupLinksPanel({
                 </button>
             </div>
             <p className="text-sm text-[var(--brand-muted)] mb-4">
-                One-time links that grant course access on registration — for promos, gifts, and partners. Recipients
-                register through the link and access is applied automatically.
+                Free course access on registration — one-time links for gifts and partners, or multi-use links for
+                giveaways (&quot;first 30 at the talk&quot;). Paid discounts are Stripe promo codes — see Pricing &amp; promos.
             </p>
 
             {showForm && (
@@ -538,16 +541,17 @@ function SignupLinksPanel({
                             ))}
                         </div>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         <div>
                             <label className="block text-sm font-medium text-[var(--brand-foreground)] mb-1">
                                 Email (optional)
                             </label>
                             <input
                                 type="email"
-                                value={email}
+                                value={maxUses > 1 ? '' : email}
+                                disabled={maxUses > 1}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Lock to an email & send it"
+                                placeholder={maxUses > 1 ? 'Not for multi-use links' : 'Lock to an email & send it'}
                                 className="w-full px-3 py-2 text-sm rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)]"
                             />
                         </div>
@@ -573,6 +577,20 @@ function SignupLinksPanel({
                                 max={365}
                                 value={expiresInDays}
                                 onChange={(e) => setExpiresInDays(Number(e.target.value))}
+                                className="w-full px-3 py-2 text-sm rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)]"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="signup-max-uses" className="block text-sm font-medium text-[var(--brand-foreground)] mb-1">
+                                Uses
+                            </label>
+                            <input
+                                id="signup-max-uses"
+                                type="number"
+                                min={1}
+                                max={1000}
+                                value={maxUses}
+                                onChange={(e) => setMaxUses(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
                                 className="w-full px-3 py-2 text-sm rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)]"
                             />
                         </div>
@@ -628,9 +646,11 @@ function SignupLinksPanel({
                                 <td className="px-4 py-3 text-[var(--brand-muted)]">{link.note ?? '—'}</td>
                                 <td className="px-4 py-3">{statusBadge(link.status)}</td>
                                 <td className="px-4 py-3 text-[var(--brand-muted)]">
-                                    {link.used_by_username
-                                        ? `${link.used_by_username}${link.used_at ? ` · ${new Date(link.used_at).toLocaleDateString()}` : ''}`
-                                        : '—'}
+                                    {(link.max_uses ?? 1) > 1
+                                        ? `${link.use_count} / ${link.max_uses} used`
+                                        : link.used_by_username
+                                          ? `${link.used_by_username}${link.used_at ? ` · ${new Date(link.used_at).toLocaleDateString()}` : ''}`
+                                          : '—'}
                                 </td>
                                 <td className="px-4 py-3 text-[var(--brand-muted)]">
                                     {new Date(link.expires_at).toLocaleDateString()}

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  * /pricing; this page is the full text. Mirror into the Terms of Service (X2)
  * and keep docs/tech/legal-and-privacy-site-sync.md in step.
  */
-const REFUNDS_LAST_UPDATED = '2026-10-03';
+const REFUNDS_LAST_UPDATED = '2026-10-06';
 
 const SUPPORT_EMAIL = 'support@thedroneedge.com';
 
@@ -101,7 +101,24 @@ export default function RefundsPage() {
         </section>
 
         <section>
-          <h2 className={h2}>7. Questions</h2>
+          <h2 className={h2}>7. Buying with an AI assistant</h2>
+          <p>
+            You can have an AI assistant or other automated tool create your account and buy a course or Pro for you.
+            When it does:
+          </p>
+          <ul className="list-disc pl-5 mt-2 space-y-2">
+            <li>The account and purchase are yours, as if you had made them yourself.</li>
+            <li>This refund policy applies the same way. Request refunds from the email on the account.</li>
+            <li>The account should use your own email address so receipts and password resets reach you.</li>
+          </ul>
+          <p className="mt-3">
+            Creating accounts in bulk, or trying several payment cards, isn&apos;t allowed whether a person or a tool
+            does it. We may cancel those accounts and refund or block the payments.
+          </p>
+        </section>
+
+        <section>
+          <h2 className={h2}>8. Questions</h2>
           <p>
             Contact <SupportLink />.
           </p>

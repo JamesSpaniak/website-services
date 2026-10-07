@@ -11,7 +11,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './types/user.entity';
-import { UpdateUserDto, UserDto, UserFull } from './types/user.dto';
+import {
+  UpdatePreferencesDto,
+  UpdateUserDto,
+  UserDto,
+  UserFull,
+} from './types/user.dto';
 import {
   AdminUserCourse,
   AdminUserRow,
@@ -210,6 +215,63 @@ export class UsersService {
     if (data.picture_url !== undefined) user.picture_url = data.picture_url;
     user.token_version = (user.token_version || 0) + 1;
     return this.userRepository.save(user);
+  }
+
+  /**
+   * Save display preferences. Unlike updateUser this does not bump
+   * token_version — a theme change must not sign the user out.
+   */
+  async updatePreferences(
+    id: number,
+    data: UpdatePreferencesDto,
+  ): Promise<void> {
+    await this.userRepository.update(id, {
+      theme_preference: data.theme_preference,
+    });
+  }
+
+  /** Replace the user's teacher reset code (one live code per user). */
+  async setResetCode(id: number, hash: string, expiresAt: Date): Promise<void> {
+    await this.userRepository.update(id, {
+      reset_code_hash: hash,
+      reset_code_expires_at: expiresAt,
+      reset_code_attempts: 0,
+    });
+  }
+
+  async getResetCode(id: number): Promise<{
+    hash: string | null;
+    expiresAt: Date | null;
+    attempts: number;
+  }> {
+    const row = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.id')
+      .addSelect([
+        'user.reset_code_hash',
+        'user.reset_code_expires_at',
+        'user.reset_code_attempts',
+      ])
+      .where('user.id = :id', { id })
+      .getOne();
+    return {
+      hash: row?.reset_code_hash ?? null,
+      expiresAt: row?.reset_code_expires_at ?? null,
+      attempts: row?.reset_code_attempts ?? 0,
+    };
+  }
+
+  /** Atomic +1 so two wrong guesses at once both count. */
+  async incrementResetCodeAttempts(id: number): Promise<void> {
+    await this.userRepository.increment({ id }, 'reset_code_attempts', 1);
+  }
+
+  async clearResetCode(id: number): Promise<void> {
+    await this.userRepository.update(id, {
+      reset_code_hash: null,
+      reset_code_expires_at: null,
+      reset_code_attempts: 0,
+    });
   }
 
   async updatePassword(id: number, password: string): Promise<void> {

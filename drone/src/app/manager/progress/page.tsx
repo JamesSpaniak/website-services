@@ -440,6 +440,8 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
     PROGRESS_RESET: { label: 'Reset progress', color: AUDIT_ACTION_TONE.PROGRESS_RESET },
     COURSE_PURCHASED: { label: 'Purchased a course', color: AUDIT_ACTION_TONE.COURSE_PURCHASED },
     PRO_UPGRADE: { label: 'Upgraded to Pro', color: AUDIT_ACTION_TONE.PRO_UPGRADE },
+    RESET_CODE_CREATED: { label: 'Teacher reset code issued', color: AUDIT_ACTION_TONE.LOGIN },
+    PASSWORD_RESET_BY_CODE: { label: 'Reset password with a code', color: AUDIT_ACTION_TONE.LOGIN },
 };
 
 function formatActionMeta(action: string, metadata: Record<string, unknown> | null): string {
@@ -492,7 +494,7 @@ function StudentActivityPanel({ userId, studentName, orgId, onClose }: { userId:
                             <button
                                 key={v}
                                 onClick={() => setView(v)}
-                                className={`px-2 py-1 ${view === v ? 'bg-[var(--brand-primary)] text-white' : 'text-[var(--brand-muted)] hover:bg-[var(--surface-border)]'}`}
+                                className={`px-2 py-1 ${view === v ? 'bg-[var(--brand-primary)] text-[var(--brand-on-primary)]' : 'text-[var(--brand-muted)] hover:bg-[var(--surface-border)]'}`}
                             >
                                 {v === 'quizzes' ? 'Quizzes' : v === 'timeline' ? 'Learning (30d)' : 'Account'}
                             </button>

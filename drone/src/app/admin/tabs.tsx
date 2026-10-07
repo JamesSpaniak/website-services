@@ -9,6 +9,7 @@ import {
     ChartBarIcon,
     EnvelopeIcon,
     DocumentTextIcon,
+    TagIcon,
 } from '@heroicons/react/24/solid';
 import DashboardTabs, { DashboardTab } from '@/app/ui/components/dashboard-tabs';
 
@@ -20,6 +21,7 @@ const ADMIN_TABS: DashboardTab[] = [
     { href: '/admin/users', label: 'Users', icon: UsersIcon },
     { href: '/admin/leads', label: 'Leads', icon: EnvelopeIcon },
     { href: '/admin/newsletter', label: 'Newsletter', icon: DocumentTextIcon },
+    { href: '/admin/pricing', label: 'Pricing & promos', icon: TagIcon },
     { href: '/admin/analytics', label: 'Analytics', icon: ChartBarIcon },
 ];
 

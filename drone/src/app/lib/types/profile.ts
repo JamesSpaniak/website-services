@@ -8,6 +8,8 @@ interface UserDto {
     picture_url?: string;
     role: string; // e.g., 'user', 'admin', 'pro'
     pro_membership_expires_at?: Date;
+    /** Saved site theme; null/absent when the user never chose one. */
+    theme_preference?: 'light' | 'dark' | 'system' | null;
     organization?: {
         id: number;
         name: string;

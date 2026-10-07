@@ -87,7 +87,7 @@ function HeaderInner() {
           {/* Book a Call CTA — xl+ (lg is too narrow next to the nav links + Log in / Sign up; mobile menu has it) */}
           <Link
             href="/consultation"
-            className="hidden xl:inline-flex whitespace-nowrap items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-black)] transition-colors"
+            className="hidden xl:inline-flex whitespace-nowrap items-center justify-center h-9 px-4 text-xs font-semibold tracking-wide border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-[var(--brand-on-primary)] transition-colors"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Book a Call
@@ -146,7 +146,7 @@ function HeaderInner() {
               </Link>
               <Link
                 href={registerHrefResolved}
-                className="inline-flex whitespace-nowrap items-center justify-center min-h-[44px] px-3 sm:px-4 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity touch-manipulation"
+                className="inline-flex whitespace-nowrap items-center justify-center min-h-[44px] px-3 sm:px-4 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity touch-manipulation"
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 Sign up
@@ -199,7 +199,7 @@ function HeaderInner() {
                   </Link>
                   <Link
                     href={registerHrefResolved}
-                    className="min-h-[44px] flex items-center justify-center px-3 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-black)] touch-manipulation"
+                    className="min-h-[44px] flex items-center justify-center px-3 text-sm font-semibold tracking-wide bg-[var(--brand-primary)] text-[var(--brand-on-primary)] touch-manipulation"
                     style={{ borderRadius: 'var(--radius-sm)' }}
                   >
                     Sign up

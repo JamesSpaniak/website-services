@@ -2,34 +2,55 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { CheckIcon, XMarkIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import PageShell from '@/app/ui/components/page-shell';
-import { FEATURED_COURSE_ID, registerHref } from '@/app/lib/auth-redirect';
+import { FEATURED_COURSE_ID, PRO_CHECKOUT_PATH, courseCheckoutPath, registerHref } from '@/app/lib/auth-redirect';
+import JsonLd, { faqPageJsonLd, offerCatalogJsonLd } from '@/app/ui/components/json-ld';
 import PricingViewTracker from './pricing-view-tracker';
+import { PriceText, PromoNote } from '@/app/ui/components/price-tag';
+import {
+  FALLBACK_COURSE_CENTS,
+  FALLBACK_PRO_CENTS,
+  PRO_SKU,
+  courseSku,
+  fetchPricingServer,
+  formatCents,
+  listCents,
+} from '@/app/lib/pricing';
 
-export const metadata: Metadata = {
-  title: 'Pricing',
-  description:
-    'Try Unit 1 of FAA Part 107 free, buy the full Part 107 course for $129 one-time, or bring Drone Edge to your school starting at $79 per seat.',
-  alternates: { canonical: '/pricing' },
-  openGraph: {
-    title: 'Pricing — Drone Edge',
-    description: 'Unit 1 free · Part 107 course $129 one-time · Schools from $79/seat.',
-  },
-};
+const COURSE_SKU = courseSku(FEATURED_COURSE_ID);
+
+// List prices come from Stripe via GET /pricing (docs/tech/pricing-and-promotions.md).
+export async function generateMetadata(): Promise<Metadata> {
+  const course = formatCents(listCents(await fetchPricingServer(), COURSE_SKU, FALLBACK_COURSE_CENTS));
+  return {
+    title: 'Pricing',
+    description: `Try Unit 1 of FAA Part 107 free, buy the full Part 107 course for ${course} one-time, or bring Drone Edge to your school starting at $79 per seat.`,
+    alternates: { canonical: '/pricing' },
+    openGraph: {
+      title: 'Pricing — Drone Edge',
+      description: `Unit 1 free · Part 107 course ${course} one-time · Schools from $79/seat.`,
+    },
+  };
+}
 
 type Tier = {
   id: string;
   name: string;
   price: string;
+  /** Live Stripe price for this tier (overrides `price`). */
+  sku?: string;
+  fallbackCents?: number;
   priceNote: string;
   blurb: string;
   includes: string[];
   excludes?: string[];
-  cta: { label: string; href: string };
+  cta: { label: string; href: string; withPrice?: boolean };
   secondary?: { label: string; href: string };
   highlight?: boolean;
   footnote?: string;
   /** Optional link appended after the footnote. */
   footnoteLink?: { label: string; href: string };
+  /** Machine-readable price for the JSON-LD offer catalog; omit for quoted tiers. */
+  offer?: { price: number; billingDuration?: string };
 };
 
 // Ladder per docs/sales/money-model.md § 7 and launch plan X1. Course inclusions
@@ -43,11 +64,14 @@ const TIERS: Tier[] = [
     blurb: 'Start the FAA Part 107 course with a free account.',
     includes: ['Unit 1 of the Part 107 course', 'Section practice questions in Unit 1', 'Progress tracking'],
     cta: { label: 'Try Unit 1 free', href: registerHref(`/courses/${FEATURED_COURSE_ID}`) },
+    offer: { price: 0 },
   },
   {
     id: 'part107',
     name: 'Part 107 course',
     price: '$129',
+    sku: COURSE_SKU,
+    fallbackCents: FALLBACK_COURSE_CENTS,
     priceNote: 'One-time payment',
     blurb: 'Everything you need to prepare for the FAA Remote Pilot knowledge test.',
     includes: [
@@ -58,21 +82,25 @@ const TIERS: Tier[] = [
       'Lifetime access on any device',
     ],
     excludes: ['FAA knowledge test fee — paid to the testing center, not to us'],
-    cta: { label: 'View the course', href: `/courses/${FEATURED_COURSE_ID}/preview` },
+    cta: { label: 'Buy the course', href: courseCheckoutPath(FEATURED_COURSE_ID), withPrice: true },
     highlight: true,
     footnote: 'Full refund available.',
     footnoteLink: { label: 'Refund policy', href: '/refunds' },
+    offer: { price: FALLBACK_COURSE_CENTS / 100 },
   },
   // DRAFT_PRO — price and benefits pending owner confirmation (launch plan E5 / money-model MM2).
   {
     id: 'pro',
     name: 'Pro',
     price: '$35',
+    sku: PRO_SKU,
+    fallbackCents: FALLBACK_PRO_CENTS,
     priceNote: 'per month',
     blurb: 'Every course on Drone Edge for as long as you subscribe.',
     includes: ['All courses', 'New courses and updates while subscribed'],
-    cta: { label: 'Go Pro', href: registerHref('/profile') },
+    cta: { label: 'Go Pro', href: PRO_CHECKOUT_PATH, withPrice: true },
     footnote: 'Cancel anytime.',
+    offer: { price: FALLBACK_PRO_CENTS / 100, billingDuration: 'P1M' },
   },
   {
     id: 'schools',
@@ -100,6 +128,10 @@ const FAQ = [
     a: 'A course purchase is one-time with lifetime access — it stays on your account. Pro gives you every course while your subscription is active. Details are in our refund & access policy.',
   },
   {
+    q: 'Can an AI assistant buy the course for me?',
+    a: 'Yes. An assistant like ChatGPT or Claude can create your account and check out for you. Use your own email address so receipts and refunds reach you; the purchase is yours and the same refund policy applies.',
+  },
+  {
     q: 'Do you offer group or school pricing?',
     a: 'Yes. School and program pricing starts at $79 per seat, with options for different class sizes and programs. Book a call and we will put together a quote.',
   },
@@ -108,7 +140,8 @@ const FAQ = [
 const btnBase =
   'inline-flex w-full items-center justify-center gap-2 min-h-[44px] px-5 text-sm font-semibold tracking-wide transition-opacity ring-focus touch-manipulation';
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const pricing = await fetchPricingServer();
   return (
     <PageShell
       title="Pricing"
@@ -116,6 +149,26 @@ export default function PricingPage() {
       maxWidthClass="max-w-6xl"
     >
       <PricingViewTracker />
+      <JsonLd
+        data={offerCatalogJsonLd(
+          TIERS.flatMap((tier) =>
+            tier.offer
+              ? [
+                  {
+                    name: tier.name,
+                    description: tier.blurb,
+                    url: tier.cta.href,
+                    ...tier.offer,
+                    ...(tier.sku
+                      ? { price: listCents(pricing, tier.sku, tier.fallbackCents ?? 0) / 100 }
+                      : {}),
+                  },
+                ]
+              : [],
+          ),
+        )}
+      />
+      <JsonLd data={faqPageJsonLd(FAQ.map(({ q, a }) => ({ question: q, answer: a })))} />
 
       {/* Ladder */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -130,7 +183,7 @@ export default function PricingPage() {
           >
             {tier.highlight && (
               <span
-                className="absolute -top-3 left-5 px-2 py-0.5 text-xs font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)]"
+                className="absolute -top-3 left-5 px-2 py-0.5 text-xs font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)]"
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 Recommended
@@ -140,9 +193,19 @@ export default function PricingPage() {
               {tier.name}
             </h2>
             <p className="mt-3 flex items-baseline gap-1.5">
-              <span className="text-3xl font-display font-semibold text-[var(--brand-foreground)]">{tier.price}</span>
+              <span className="text-3xl font-display font-semibold text-[var(--brand-foreground)]">
+                {tier.sku ? (
+                  <PriceText
+                    sku={tier.sku}
+                    fallbackCents={listCents(pricing, tier.sku, tier.fallbackCents ?? 0)}
+                  />
+                ) : (
+                  tier.price
+                )}
+              </span>
               <span className="text-xs text-[var(--brand-muted)]">{tier.priceNote}</span>
             </p>
+            {tier.sku && <PromoNote sku={tier.sku} />}
             <p className="mt-2 text-sm text-[var(--brand-muted)] leading-relaxed">{tier.blurb}</p>
 
             <ul className="mt-5 space-y-2 flex-1">
@@ -185,12 +248,22 @@ export default function PricingPage() {
                 href={tier.cta.href}
                 className={`${btnBase} ${
                   tier.highlight
-                    ? 'bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90'
+                    ? 'bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90'
                     : 'border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--background)]'
                 }`}
                 style={{ borderRadius: 'var(--radius-sm)' }}
               >
                 {tier.cta.label}
+                {tier.cta.withPrice && tier.sku && (
+                  <>
+                    {' — '}
+                    <PriceText
+                      sku={tier.sku}
+                      fallbackCents={listCents(pricing, tier.sku, tier.fallbackCents ?? 0)}
+                    />
+                    {tier.sku === PRO_SKU && '/mo'}
+                  </>
+                )}
               </Link>
               {tier.secondary && (
                 <Link

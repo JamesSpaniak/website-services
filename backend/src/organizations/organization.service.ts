@@ -1107,6 +1107,14 @@ export class OrganizationService {
     return cls;
   }
 
+  /** The user's role in this organization, or null when not a member. */
+  async getMemberRole(orgId: number, userId: number): Promise<OrgRole | null> {
+    const membership = await this.memberRepository.findOne({
+      where: { organizationId: orgId, userId },
+    });
+    return membership?.role ?? null;
+  }
+
   async resetMemberPicture(orgId: number, userId: number): Promise<void> {
     const membership = await this.memberRepository.findOne({
       where: { organizationId: orgId, userId },

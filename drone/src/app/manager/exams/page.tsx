@@ -140,7 +140,7 @@ export default function ManagerExamsPage() {
                 </div>
                 <button
                     onClick={() => { setShowForm(!showForm); setResultsFor(null); }}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90"
                 >
                     <PlusIcon className="h-4 w-4" /> Assign Exam
                 </button>
@@ -296,7 +296,7 @@ export default function ManagerExamsPage() {
                         <button
                             onClick={handleGenerate}
                             disabled={generating || !courseId}
-                            className="px-5 py-2 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                            className="px-5 py-2 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {generating ? 'Generating…' : 'Generate & Assign'}
                         </button>

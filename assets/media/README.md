@@ -6,6 +6,7 @@ Working set for **business / ad / course-candidate** drone footage. Masters and 
 assets/media/
 ├── README.md                 # this file (tracked)
 ├── manifests/                # cut lists, ratings (tracked; no binaries)
+├── scripts/                  # video scripts + release templates (tracked) — plan: docs/marketing/video-and-photo-plan.md
 ├── raw/flights/YYYY-MM-DD/   # 4K masters + SRT (gitignored)
 └── edits/
     ├── snips/                # per-shot exports (gitignored)

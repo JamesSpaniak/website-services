@@ -50,6 +50,7 @@ import {
 } from './types/organization.dto';
 import { OrgInsightsService } from './org-insights.service';
 import { ProductEventsService } from '../product-events/product-events.service';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Organizations')
 @ApiBearerAuth()
@@ -73,6 +74,8 @@ export class OrganizationController {
   @ApiOperation({
     summary: 'Look up an invite code (public info for registration page)',
   })
+  // A whole class looks up the same code from one school IP on day one.
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @Get('invite-info')
   async getInviteInfo(@Query('code') code: string) {
     if (!code) return null;

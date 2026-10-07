@@ -230,7 +230,7 @@ export default function ContactFormComponent() {
 
         <div className="pt-2">
           <button type="submit" disabled={loading}
-            className="block w-full bg-[var(--brand-primary)] text-[var(--brand-black)] font-medium text-sm tracking-wide py-2.5 hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus"
+            className="block w-full bg-[var(--brand-primary)] text-[var(--brand-on-primary)] font-medium text-sm tracking-wide py-2.5 hover:opacity-90 disabled:opacity-50 transition-opacity ring-focus"
             style={{ borderRadius: 'var(--radius-sm)' }}>
             {loading ? 'Sending…' : 'Send message'}
           </button>

@@ -65,7 +65,7 @@ export default function CommentSection({ articleId }: { articleId: number }) {
                         <button
                             onClick={handleRootSubmit}
                             disabled={submitting || !rootBody.trim()}
-                            className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50"
                         >
                             {submitting ? 'Posting...' : 'Post Comment'}
                         </button>
@@ -221,7 +221,7 @@ function CommentThread({
                                     <button
                                         onClick={handleEdit}
                                         disabled={submitting || !editBody.trim()}
-                                        className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-md hover:opacity-90 disabled:opacity-50"
+                                        className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-md hover:opacity-90 disabled:opacity-50"
                                     >
                                         Save
                                     </button>
@@ -291,7 +291,7 @@ function CommentThread({
                             <button
                                 onClick={handleReply}
                                 disabled={submitting || !replyBody.trim()}
-                                className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-md hover:opacity-90 disabled:opacity-50"
+                                className="px-3 py-1 text-xs font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-md hover:opacity-90 disabled:opacity-50"
                             >
                                 {submitting ? 'Posting...' : 'Reply'}
                             </button>

@@ -84,7 +84,7 @@ export default function AssignedClassExamsSection({ courseId }: AssignedClassExa
                             </div>
                             <Link
                                 href={href}
-                                className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity shrink-0"
+                                className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity shrink-0"
                                 style={{ borderRadius: 'var(--radius-sm)' }}
                             >
                                 {assignment.attempt ? 'Review exam' : 'Take exam'}

@@ -1,3 +1,4 @@
+import type { AdminPricingOverview } from './types/pricing-admin';
 import { ContactPayload, ConsultationPayload, CreateUserDto, UserDto } from "./types/profile";
 import { CourseData, UnitData, UnitProgressUpdate } from "./types/course";
 import { ArticleCreateDto, ArticleFull, ArticleSlim } from "./types/article";
@@ -92,12 +93,32 @@ export const refreshSession = () => {
 /** Error thrown by apiClient for non-2xx responses; carries the HTTP status. */
 export class ApiError extends Error {
     readonly status: number;
-    constructor(message: string, status: number) {
+    /** Seconds until a 429 window resets, when the backend says (per-email / per-account limits). */
+    readonly retryAfterSeconds?: number;
+    constructor(message: string, status: number, retryAfterSeconds?: number) {
         super(message);
         this.name = 'ApiError';
         this.status = status;
+        this.retryAfterSeconds = retryAfterSeconds;
     }
 }
+
+/** Auth endpoints where a 401 is a wrong password / code, not an outage. */
+const CREDENTIAL_ENDPOINTS = new Set(['auth/login', 'auth/reset-password', 'auth/reset-with-code']);
+
+/**
+ * Errors that are normal classroom traffic, not bugs: rate limits, wrong
+ * credentials, the logged-out session check. Shipping them to /logs flooded
+ * its 10/min IP bucket on shared school networks.
+ */
+const isExpectedError = (endpoint: string, error: unknown) => {
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('Session expired')) return true;
+    if (!(error instanceof ApiError)) return false;
+    if (error.status === 429) return true;
+    if (error.status === 401 && CREDENTIAL_ENDPOINTS.has(endpoint)) return true;
+    return endpoint === 'auth/profile' && message === 'Unauthorized';
+};
 
 // --- Core API Function ---
 const apiClient = async (endpoint: string, options: RequestInit = {}) => {
@@ -136,8 +157,13 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
         if (!response.ok) {
             const errorData = (await response.json().catch(() => ({ message: response.statusText }))) as {
                 message?: string;
+                retry_after_seconds?: number;
             };
-            throw new ApiError(errorData.message || `HTTP error! status: ${response.status}`, response.status);
+            throw new ApiError(
+                errorData.message || `HTTP error! status: ${response.status}`,
+                response.status,
+                errorData.retry_after_seconds,
+            );
         }
 
         if (response.status === 204 || response.headers.get('Content-Length') === '0') {
@@ -147,13 +173,7 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
         return response.json();
     } catch (error) {
         const duration = Date.now() - startTime;
-        const message = error instanceof Error ? error.message : '';
-        // Logged-out visitors always 401 on profile (and refresh). That is the
-        // session-check path, not an outage — don't ship it as an error.
-        const expectedAnonymous =
-            endpoint === 'auth/profile' &&
-            (message.includes('Session expired') || message === 'Unauthorized');
-        if (!expectedAnonymous) {
+        if (!isExpectedError(endpoint, error)) {
             logger.error(error as Error, {
                 endpoint,
                 options,
@@ -239,6 +259,16 @@ async function updateUser(userData: Partial<UserDto>): Promise<UserDto> {
     });
 }
 
+/** Saves the site theme to the profile. Separate from `updateUser` — that bumps token_version (sign-out). */
+async function updateThemePreference(
+    theme_preference: 'light' | 'dark' | 'system',
+): Promise<{ theme_preference: 'light' | 'dark' | 'system' }> {
+    return apiClient('users/me/preferences', {
+        method: 'PATCH',
+        body: JSON.stringify({ theme_preference }),
+    });
+}
+
 async function resetCourseProgress(courseId: number): Promise<void> {
     await apiClient(`progress/courses/${courseId}/reset`, { method: 'POST' });
 }
@@ -247,15 +277,35 @@ async function getCoursesWithProgress(): Promise<CourseData[]> {
     return apiClient('progress/courses');
 }
 
+/** Throws ApiError on failure (429 = per-email cooldown) — callers must show it, never fake success. */
 async function forgotPassword(email: string): Promise<void> {
-    try {
-        await apiClient('auth/forgot-password', {
-            method: 'POST',
-            body: JSON.stringify({ email }),
-        });
-    } catch (error) {
-        logger.error(error as Error, { endpoint: 'auth/forgot-password' });
-    }
+    await apiClient('auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    });
+}
+
+/** Student redeems a teacher reset code; returns the canonical username for sign-in. */
+async function resetPasswordWithCode(payload: {
+    username: string;
+    code: string;
+    password: string;
+}): Promise<{ message: string; username: string }> {
+    return apiClient('auth/reset-with-code', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+}
+
+/** Manager: one-time reset code for a student (shown once; only a hash is stored). */
+async function createMemberResetCode(
+    orgId: number,
+    userId: number,
+): Promise<{ code: string; expires_at: string; username: string }> {
+    return apiClient(`auth/organizations/${orgId}/members/${userId}/reset-code`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+    });
 }
 
 async function updateCourseProgress(courseId: number, status: string): Promise<void> {
@@ -407,6 +457,24 @@ function leadsQueryString(q: AdminLeadsQuery = {}): string {
 
 async function getLeadsAdmin(q: AdminLeadsQuery = {}): Promise<AdminLeadRow[]> {
     return apiClient(`leads${leadsQueryString(q)}`);
+}
+
+/** Admin → Pricing & promos: Stripe price sync status, site sale, promotion codes. */
+async function getPricingOverview(): Promise<AdminPricingOverview> {
+    return apiClient('pricing/admin/overview');
+}
+
+/** Re-reads prices and promotions from Stripe now. */
+async function syncPricing(): Promise<AdminPricingOverview> {
+    return apiClient('pricing/admin/sync', { method: 'POST' });
+}
+
+/** Links a product to a Stripe Price by lookup key (null unlinks → inline price). */
+async function setProductLookupKey(sku: string, stripe_lookup_key: string | null): Promise<AdminPricingOverview> {
+    return apiClient(`pricing/admin/products/${encodeURIComponent(sku)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ stripe_lookup_key }),
+    });
 }
 
 /** Browser link for the admin CSV export (cookie auth rides along). */
@@ -1082,6 +1150,7 @@ export {
     getArticleById,
     createUser,
     updateUser,
+    updateThemePreference,
     resetCourseProgress,
     getCoursesWithProgress,
     updateCourseProgress,
@@ -1115,9 +1184,14 @@ export {
     getNewsletterArchive,
     getNewsletterMetrics,
     getLeadsAdmin,
+    getPricingOverview,
+    syncPricing,
+    setProductLookupKey,
     leadsCsvUrl,
     sendMarketingBroadcast,
     resetPassword,
+    resetPasswordWithCode,
+    createMemberResetCode,
     verifyEmail,
     resendVerificationEmail,
     purchaseCourse,

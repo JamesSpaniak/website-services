@@ -16,6 +16,8 @@ const handler = async (req: NextRequest) => {
 
   const headers = new Headers(req.headers);
   headers.delete('host');
+  // CloudFront→ALB shared secret (terraform/alb.tf); the API has no use for it.
+  headers.delete('x-origin-verify');
 
   let body: string | undefined;
   if (req.method !== 'GET' && req.method !== 'HEAD') {

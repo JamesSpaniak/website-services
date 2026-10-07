@@ -101,6 +101,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = aws_lb.main.dns_name
     origin_id   = "ALB-${var.project_name}-frontend"
 
+    # Proves the request came through this distribution (alb.tf listener rules).
+    custom_header {
+      name  = local.origin_verify_header
+      value = random_password.origin_verify.result
+    }
+
     custom_origin_config {
       http_port              = 80
       https_port             = 443

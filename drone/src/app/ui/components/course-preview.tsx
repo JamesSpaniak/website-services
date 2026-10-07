@@ -5,8 +5,10 @@ import { useState } from 'react';
 import ImageComponent from './image';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import { coursePath, coursePreviewPath, registerHref } from '@/app/lib/auth-redirect';
+import { courseCheckoutPath, coursePath, coursePreviewPath, registerHref } from '@/app/lib/auth-redirect';
 import { useAuth } from '@/app/lib/auth-context';
+import { PriceText } from '@/app/ui/components/price-tag';
+import { courseSku } from '@/app/lib/pricing';
 
 interface CoursePreviewProps {
     id: number;
@@ -44,7 +46,8 @@ export default function CoursePreviewComponent({
     const courseHref = coursePreviewPath(id);
     // Logged-in users go straight to the course; guests go through register.
     const tryFreeHref = user ? coursePath(id) : registerHref(coursePath(id));
-    const purchaseHref = user ? coursePath(id, true) : registerHref(coursePath(id, true));
+    // /checkout sends guests through register and back.
+    const purchaseHref = courseCheckoutPath(id);
     const displayPrice = Number(price) || 0;
     const fullAccess = !!user && has_access === true;
 
@@ -117,7 +120,7 @@ export default function CoursePreviewComponent({
                     </span>
                     {displayPrice > 0 && (
                         <span className="inline-block font-mono text-xs tracking-wide text-[var(--brand-foreground)] border border-[var(--brand-primary)]/30 bg-[var(--brand-primary)]/10 px-2 py-1" style={{ borderRadius: 'var(--radius-sm)' }}>
-                            ${displayPrice}
+                            <PriceText sku={courseSku(id)} fallbackCents={displayPrice * 100} />
                         </span>
                     )}
                 </div>
@@ -135,7 +138,7 @@ export default function CoursePreviewComponent({
                         </Link>
                         {displayPrice > 0 && (
                             <Link href={purchaseHref} className="text-[var(--brand-muted)] hover:text-[var(--brand-primary)] transition-colors">
-                                Purchase ${displayPrice}
+                                Purchase <PriceText sku={courseSku(id)} fallbackCents={displayPrice * 100} />
                             </Link>
                         )}
                     </>

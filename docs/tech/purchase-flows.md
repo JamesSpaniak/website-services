@@ -13,7 +13,8 @@ Canonical pricing: [`docs/sales/packages.md`](../sales/packages.md) · target vs
 ```
 Logged-in account (email verification **not** required)
   → POST /purchases/create-course-checkout { courseId }  → { url }
-  → Redirect to hosted Stripe Checkout (mode=payment, price_data from courses.price,
+  → Redirect to hosted Stripe Checkout (mode=payment, linked Stripe Price by lookup key —
+    else price_data from courses.price; best of ?promo= code / site sale pre-applied,
     metadata {userId, courseId, productType=course} on session AND PaymentIntent)
   → Return /courses/:id?purchase=success&session_id=…   (cancel → ?purchase=1)
   → Stripe webhook payment_intent.succeeded
@@ -23,7 +24,7 @@ Logged-in account (email verification **not** required)
   → GET /courses/:id has_access=true
 ```
 
-**Promo codes (T21, Oct 4 2026):** a `?promo=CODE` link on any page sets the `de_promo` cookie (30 days, latest code wins); both `create-course-checkout` and `create-pro-checkout` send it as `promoCode`. The backend looks it up with `stripe.promotionCodes.list({ code, active: true })` and pre-applies it via `discounts`; an unknown code, a lookup failure, or a code Stripe rejects for that product falls back to `allow_promotion_codes: true` (Checkout's own "Add promotion code" field) — a bad code never blocks a sale. Codes are created in the Stripe Dashboard (coupon + promotion code, expiry, max redemptions); list prices never change. Order rows record the amount actually paid. **Never make a course code 100% off:** a $0 payment-mode Checkout creates no PaymentIntent, and course fulfilment keys off `payment_intent.succeeded` — use a signup link (admin) to give a course away instead.
+**Promo codes and site sales (T21 Oct 4, PP0 Oct 6 2026):** a `?promo=CODE` link on any page sets the `de_promo` cookie (30 days, latest code wins); both `create-course-checkout` and `create-pro-checkout` send it as `promoCode`. `PricingService.chooseDiscount` compares it with the active **site sale** (promotion code with metadata `site_sale=true`) and pre-applies whichever saves more on that product via `discounts` (session metadata `promo_code` / `promo_source`); `checkout.session.completed` records the code and amounts in `checkout_completions`. Full rules: [`pricing-and-promotions.md`](pricing-and-promotions.md); steps: [`workflows/sales/pricing-and-promos.md`](../../workflows/sales/pricing-and-promos.md). No candidate, a lookup failure, or a code Stripe rejects for that product falls back to `allow_promotion_codes: true` (Checkout's own "Add promotion code" field) — a bad code never blocks a sale. Codes are created in the Stripe Dashboard (coupon + promotion code, expiry, max redemptions); list prices never change. Order rows record the amount actually paid. **Never make a course code 100% off:** a $0 payment-mode Checkout creates no PaymentIntent, and course fulfilment keys off `payment_intent.succeeded` — use a signup link (admin) to give a course away instead.
 
 The course page polls `has_access` and calls `POST /purchases/confirm-checkout { sessionId }` if the webhook is slow (resolves the session's PaymentIntent → same order/entitlement path, idempotent). The legacy `create-payment-intent` route was removed Oct 6 2026 (it bypassed Managed Payments); `confirm-payment` remains only for already-paid legacy PaymentIntents.
 

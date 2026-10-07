@@ -39,7 +39,14 @@ import { RefreshTokenDto } from './types/refresh-token.dto';
 import { RegisterDto } from './types/register.dto';
 import { VerifyEmailDto } from './types/verify-email.dto';
 import { DeleteAccountDto } from './types/delete-account.dto';
+import { ResetWithCodeDto } from './types/reset-with-code.dto';
+import { OrgManagerGuard } from '../organizations/org-manager.guard';
 import { AnalyticsService } from '../analytics/analytics.service';
+import {
+  AttemptLimiter,
+  normalizeIdentifier,
+} from '../common/attempt-limiter.service';
+import { clientIp } from '../common/client-ip';
 
 /** Auth cookies are HttpOnly so tokens are unreachable from page JavaScript (XSS). */
 export const ACCESS_TOKEN_COOKIE = 'access_token';
@@ -47,6 +54,24 @@ export const REFRESH_TOKEN_COOKIE = 'refresh_token';
 
 const ACCESS_TOKEN_MAX_AGE_MS = 60 * 60 * 1000; // 1h — matches JWT_EXPIRES_IN
 const REFRESH_TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30d
+
+const MINUTE_MS = 60_000;
+const HOUR_MS = 60 * MINUTE_MS;
+
+/**
+ * Anonymous auth routes are keyed by IP, and a school is one IP. These limits
+ * are sized for 60 students on one network (two classes) and still stop one
+ * machine looping requests. The real abuse limits are per account / per email
+ * (AttemptLimiter). Rationale: docs/TODO.md "Shared-IP + bot hardening".
+ */
+const LOGIN_PER_IP = { default: { limit: 120, ttl: MINUTE_MS } };
+const REGISTER_PER_IP = { default: { limit: 120, ttl: 10 * MINUTE_MS } };
+/** Each registration sends a verification email through the Google relay (~10k/day cap). */
+const REGISTER_PER_IP_PER_DAY = 500;
+const FORGOT_PER_IP = { default: { limit: 30, ttl: MINUTE_MS } };
+const RESET_PER_IP = { default: { limit: 20, ttl: MINUTE_MS } };
+const REFRESH_PER_IP = { default: { limit: 120, ttl: MINUTE_MS } };
+const VERIFY_EMAIL_PER_IP = { default: { limit: 60, ttl: MINUTE_MS } };
 
 // Path is '/' (not '/auth') because the browser reaches the API through the
 // Next proxy under /api/*, so a backend-relative path would never match.
@@ -65,6 +90,7 @@ export class AuthController {
     private usersService: UsersService,
     private organizationService: OrganizationService,
     private analyticsService: AnalyticsService,
+    private attemptLimiter: AttemptLimiter,
   ) {}
 
   private setAuthCookies(
@@ -100,6 +126,7 @@ export class AuthController {
     description:
       'No account found with that username or email, or incorrect password.',
   })
+  @Throttle(LOGIN_PER_IP)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -146,8 +173,15 @@ export class AuthController {
     status: 201,
     description: 'Registration successful. Verification email sent.',
   })
+  @Throttle(REGISTER_PER_IP)
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
+  async register(@Request() req, @Body() registerDto: RegisterDto) {
+    this.attemptLimiter.consume(
+      `register-day:${clientIp(req)}`,
+      REGISTER_PER_IP_PER_DAY,
+      24 * HOUR_MS,
+      'Too many new accounts from this network today. Try again tomorrow, or contact support@thedroneedge.com.',
+    );
     const result = await this.authService.registerUser(registerDto);
     this.analyticsService.recordRegistration();
     return result;
@@ -158,6 +192,7 @@ export class AuthController {
     description: 'Validates email verification token.',
   })
   @ApiResponse({ status: 200, description: 'Email verified successfully.' })
+  @Throttle(VERIFY_EMAIL_PER_IP)
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
@@ -181,6 +216,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token.' })
+  @Throttle(REFRESH_PER_IP)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
@@ -284,9 +320,31 @@ export class AuthController {
     description:
       'A message indicating that if the user exists, an email has been sent.',
   })
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @ApiResponse({
+    status: 429,
+    description:
+      'Per email: one link per 60 s and five per hour (counted whether or not the account exists). Body has `retry_after_seconds`.',
+  })
+  @Throttle(FORGOT_PER_IP)
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    // Per address, not per IP: stops flooding one inbox without blocking a
+    // classroom where several students reset at once.
+    const email = normalizeIdentifier(forgotPasswordDto.email);
+    const cooldownKey = `reset-email-cooldown:${email}`;
+    const hourKey = `reset-email-hour:${email}`;
+    this.attemptLimiter.assertBelow(
+      cooldownKey,
+      1,
+      'We just sent a reset link to that address. Check your inbox and spam folder, or try again in a minute.',
+    );
+    this.attemptLimiter.assertBelow(
+      hourKey,
+      5,
+      'Several reset links have already gone to that address this hour. Check spam or quarantine, or ask your teacher for a reset code.',
+    );
+    this.attemptLimiter.hit(cooldownKey, MINUTE_MS);
+    this.attemptLimiter.hit(hourKey, HOUR_MS);
     return this.authService.sendPasswordResetLink(forgotPasswordDto.email);
   }
 
@@ -319,12 +377,50 @@ export class AuthController {
     status: 201,
     description: 'Password has been successfully reset.',
   })
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle(RESET_PER_IP)
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
       resetPasswordDto.token,
       resetPasswordDto.password,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Reset password with a teacher reset code',
+    description:
+      'For students whose reset email never arrives. Codes come from POST /auth/organizations/:id/members/:userId/reset-code, last 1 h and allow 5 wrong tries.',
+  })
+  @ApiResponse({ status: 201, description: 'Password reset.' })
+  @ApiResponse({ status: 401, description: 'Code wrong, expired or used up.' })
+  @Throttle(RESET_PER_IP)
+  @Post('reset-with-code')
+  async resetWithCode(@Body() dto: ResetWithCodeDto) {
+    return this.authService.resetPasswordWithCode(
+      dto.username,
+      dto.code,
+      dto.password,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Issue a one-time reset code for a student (org manager)',
+    description:
+      'Returns the code once; only a hash is stored. Students (org `member` role) only. Replaces any earlier code for that student.',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, OrgManagerGuard)
+  @Throttle({ default: { limit: 60, ttl: HOUR_MS } })
+  @Post('organizations/:id/members/:userId/reset-code')
+  async createMemberResetCode(
+    @Request() req,
+    @Param('id', ParseIntPipe) orgId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.authService.createMemberResetCode(
+      orgId,
+      userId,
+      req.user.userId,
     );
   }
 }

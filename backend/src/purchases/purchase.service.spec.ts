@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
+import { PricingService } from './pricing.service';
 import { Role } from '../users/types/role.enum';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,7 +38,11 @@ describe('PurchaseService — hosted Checkout', () => {
       ),
     },
     promotionCodes: {
-      list: jest.fn(async () => ({ data: [] as { id: string }[] })),
+      list: jest.fn(async () => ({ data: [] as Record<string, unknown>[] })),
+    },
+    prices: {
+      list: jest.fn(async () => ({ data: [] as Record<string, unknown>[] })),
+      retrieve: jest.fn(),
     },
   };
   const config: Record<string, string> = {
@@ -45,6 +50,27 @@ describe('PurchaseService — hosted Checkout', () => {
     STRIPE_PRO_PRICE_ID_MONTHLY: 'price_pro_monthly',
   };
   const configService = { get: jest.fn((k: string) => config[k]) };
+
+  // Catalog rows the PricingService reads; empty = no Stripe-linked price (inline fallback).
+  let productRows: Record<string, unknown>[] = [];
+  const dataSource = {
+    query: jest.fn(async (sql: string) => {
+      if (sql.includes('FROM products')) return productRows;
+      if (sql.includes('SELECT price FROM courses')) return [{ price: '129.00' }];
+      return [];
+    }),
+  };
+  const promo = (over: Record<string, unknown> = {}) => ({
+    id: 'promo_launch',
+    code: 'EDGE25',
+    active: true,
+    times_redeemed: 0,
+    created: 1,
+    metadata: {},
+    coupon: { id: 'co_25', valid: true, percent_off: 25, duration: 'once', metadata: {} },
+    ...over,
+  });
+  const saleCoupon = { id: 'co_50', valid: true, amount_off: 5000, currency: 'usd', duration: 'once', metadata: {} };
 
   let service: PurchaseService;
   const sessionParams = (): SessionParams =>
@@ -63,6 +89,7 @@ describe('PurchaseService — hosted Checkout', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    productRows = [];
     service = new PurchaseService(
       userRepo as never,
       courseRepo as never,
@@ -72,7 +99,8 @@ describe('PurchaseService — hosted Checkout', () => {
       {} as never,
       {} as never,
       { record: jest.fn(), invalidateUser: jest.fn() } as never,
-      {} as never,
+      dataSource as never,
+      new PricingService(stripe as never, configService as never, dataSource as never),
     );
     courseRepo.findOneBy.mockResolvedValue({
       id: 3,
@@ -112,19 +140,52 @@ describe('PurchaseService — hosted Checkout', () => {
     });
 
     it('pre-applies an active promo code from a ?promo= link', async () => {
-      stripe.promotionCodes.list.mockResolvedValueOnce({
-        data: [{ id: 'promo_launch' }],
-      });
+      stripe.promotionCodes.list.mockResolvedValueOnce({ data: [promo()] });
       await service.createCourseCheckoutSession(7, 3, 'EDGE25');
-      expect(stripe.promotionCodes.list).toHaveBeenCalledWith({
-        code: 'EDGE25',
-        active: true,
-        limit: 1,
-      });
+      expect(stripe.promotionCodes.list).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'EDGE25', active: true, limit: 1 }),
+      );
       const params = sessionParams();
       expect(params.discounts).toEqual([{ promotion_code: 'promo_launch' }]);
+      expect(params.metadata).toEqual(
+        expect.objectContaining({ promo_code: 'EDGE25', promo_source: 'code' }),
+      );
+      // PaymentIntent fulfilment metadata stays free of promo fields.
+      expect(params.payment_intent_data.metadata.promo_code).toBeUndefined();
       // Stripe rejects discounts + allow_promotion_codes together.
       expect(params.allow_promotion_codes).toBeUndefined();
+    });
+
+    it('auto-applies the site sale when the buyer has no code', async () => {
+      stripe.promotionCodes.list.mockResolvedValueOnce({
+        data: [promo({ id: 'promo_sale', code: 'SALE79', metadata: { site_sale: 'true' }, coupon: saleCoupon })],
+      });
+      await service.createCourseCheckoutSession(7, 3);
+      const params = sessionParams();
+      expect(params.discounts).toEqual([{ promotion_code: 'promo_sale' }]);
+      expect(params.metadata.promo_source).toBe('sale');
+    });
+
+    it('picks the bigger discount when the buyer code and the sale both apply', async () => {
+      stripe.promotionCodes.list
+        .mockResolvedValueOnce({ data: [promo()] }) // EDGE25: $32.25 off $129
+        .mockResolvedValueOnce({
+          data: [promo({ id: 'promo_sale', code: 'SALE79', metadata: { site_sale: 'true' }, coupon: saleCoupon })],
+        });
+      await service.createCourseCheckoutSession(7, 3, 'EDGE25');
+      expect(sessionParams().discounts).toEqual([{ promotion_code: 'promo_sale' }]);
+    });
+
+    it('uses the Stripe price when the course is linked by lookup key', async () => {
+      productRows = [{ sku: 'COURSE_3', name: 'Part 107', product_type: 'course', related_course_id: 3,
+        stripe_lookup_key: 'part107_course', stripe_price_id: null, stripe_product_id: null,
+        list_price_cents: 12900, active: true, price_synced_at: null }];
+      stripe.prices.list.mockResolvedValueOnce({
+        data: [{ id: 'price_course', active: true, livemode: false, currency: 'usd', unit_amount: 9900,
+          recurring: null, product: { id: 'prod_course', active: true, tax_code: 'txcd_10000000' } }],
+      });
+      await service.createCourseCheckoutSession(7, 3);
+      expect(sessionParams().line_items).toEqual([{ price: 'price_course', quantity: 1 }]);
     });
 
     it('falls back to the manual code field for an unknown promo code', async () => {
@@ -136,7 +197,7 @@ describe('PurchaseService — hosted Checkout', () => {
 
     it('sells without the code when Stripe rejects it for this product', async () => {
       stripe.promotionCodes.list.mockResolvedValueOnce({
-        data: [{ id: 'promo_pro_only' }],
+        data: [promo({ id: 'promo_pro_only', code: 'PROONLY' })],
       });
       stripe.checkout.sessions.create.mockRejectedValueOnce(
         Object.assign(new Error('coupon not applicable'), {
@@ -308,7 +369,7 @@ describe('PurchaseService — hosted Checkout', () => {
 
     it('keeps it on the retry without a rejected promo code', async () => {
       stripe.promotionCodes.list.mockResolvedValueOnce({
-        data: [{ id: 'promo_pro_only' }],
+        data: [promo({ id: 'promo_pro_only', code: 'PROONLY' })],
       });
       stripe.checkout.sessions.create.mockRejectedValueOnce(
         Object.assign(new Error('coupon not applicable'), {

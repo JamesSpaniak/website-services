@@ -32,7 +32,7 @@ export default function HomeAuthCta() {
     <>
       <Link
         href={registerHref(`/courses/${FEATURED_COURSE_ID}`)}
-        className="inline-flex items-center justify-center min-h-[44px] bg-[var(--brand-primary)] text-[var(--brand-black)] font-medium text-sm tracking-wide px-5 hover:opacity-90 transition-opacity ring-focus touch-manipulation"
+        className="inline-flex items-center justify-center min-h-[44px] bg-[var(--brand-primary)] text-[var(--brand-on-primary)] font-medium text-sm tracking-wide px-5 hover:opacity-90 transition-opacity ring-focus touch-manipulation"
         style={{ borderRadius: 'var(--radius-sm)' }}
       >
         Create account

@@ -22,6 +22,7 @@ import { EntitlementService } from 'src/commerce/entitlement.service';
 import { OrderService } from 'src/commerce/order.service';
 import { ProductEventsService } from 'src/product-events/product-events.service';
 import { withEventOrigin } from 'src/product-events/event-origin';
+import { PricingService } from './pricing.service';
 
 const PRODUCT_COURSE = 'course';
 const PRODUCT_PRO = 'pro_membership';
@@ -71,6 +72,7 @@ export class PurchaseService {
     private readonly orders: OrderService,
     private readonly productEvents: ProductEventsService,
     private readonly dataSource: DataSource,
+    private readonly pricing: PricingService,
   ) {}
 
   /**
@@ -414,21 +416,32 @@ export class PurchaseService {
       courseId: String(courseId),
       productType: PRODUCT_COURSE,
     };
+    const sku = `COURSE_${courseId}`;
+    // Stripe-owned price when the course has a lookup key; otherwise the
+    // inline price from courses.price (docs/tech/pricing-and-promotions.md § 2).
+    const stripePrice = await this.pricing.resolvePrice(sku);
+    const priceCents =
+      stripePrice?.unitAmountCents ?? Math.round(Number(course.price) * 100);
     const session = await this.createCheckoutSessionWithPromo(
       {
         mode: 'payment',
         customer: customerId,
         line_items: [
-          {
-            quantity: 1,
-            price_data: {
-              currency: 'usd',
-              unit_amount: Math.round(Number(course.price) * 100),
-              // Managed Payments rejects inline products without a tax code
-              // (the account default does not apply to price_data).
-              product_data: { name: course.title, tax_code: COURSE_TAX_CODE },
-            },
-          },
+          stripePrice
+            ? { price: stripePrice.priceId, quantity: 1 }
+            : {
+                quantity: 1,
+                price_data: {
+                  currency: 'usd',
+                  unit_amount: priceCents,
+                  // Managed Payments rejects inline products without a tax code
+                  // (the account default does not apply to price_data).
+                  product_data: {
+                    name: course.title,
+                    tax_code: COURSE_TAX_CODE,
+                  },
+                },
+              },
         ],
         success_url: `${frontend}/courses/${courseId}?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${frontend}/courses/${courseId}?purchase=1`,
@@ -437,6 +450,7 @@ export class PurchaseService {
         payment_intent_data: { metadata },
         billing_address_collection: 'auto',
       },
+      sku,
       promoCode,
     );
 
@@ -448,8 +462,9 @@ export class PurchaseService {
       event: 'checkout_started',
       courseId,
       properties: {
-        price_cents: Math.round(Number(course.price) * 100),
-        promo_code: promoCode ?? null,
+        price_cents: priceCents,
+        promo_code: session.metadata?.promo_code ?? promoCode ?? null,
+        promo_source: session.metadata?.promo_source ?? null,
         promo_applied: !!session.discounts?.length,
       },
     });
@@ -538,7 +553,11 @@ export class PurchaseService {
     cancelPath = '/profile?pro=canceled',
     promoCode?: string,
   ): Promise<{ url: string }> {
-    const priceId = this.proPriceIdFor(duration);
+    const priceId =
+      duration === ProMembershipDuration.Monthly
+        ? ((await this.pricing.resolvePrice('PRO_MONTHLY'))?.priceId ??
+          this.proPriceIdFor(duration))
+        : this.proPriceIdFor(duration);
     if (!priceId) {
       throw new ServiceUnavailableException(
         'Pro subscription is not configured (missing STRIPE_PRO_PRICE_ID_*).',
@@ -582,6 +601,7 @@ export class PurchaseService {
         },
         billing_address_collection: 'auto',
       },
+      duration === ProMembershipDuration.Yearly ? 'PRO_YEARLY' : 'PRO_MONTHLY',
       promoCode,
     );
 
@@ -593,7 +613,8 @@ export class PurchaseService {
       event: 'pro_checkout_started',
       properties: {
         duration,
-        promo_code: promoCode ?? null,
+        promo_code: session.metadata?.promo_code ?? promoCode ?? null,
+        promo_source: session.metadata?.promo_source ?? null,
         promo_applied: !!session.discounts?.length,
       },
     });
@@ -601,13 +622,15 @@ export class PurchaseService {
   }
 
   /**
-   * Launch promo codes (T21). A `?promo=` code that matches an active Stripe
-   * promotion code is pre-applied; otherwise Checkout shows its own "Add
-   * promotion code" field. Stripe rejects `discounts` together with
-   * `allow_promotion_codes`, so a session gets one or the other.
+   * Best offer wins (docs/tech/pricing-and-promotions.md § 4): the buyer's
+   * `?promo=` code or the active site sale, whichever saves more on `sku`, is
+   * pre-applied; with neither, Checkout shows its own "Add promotion code"
+   * field. Stripe rejects `discounts` together with `allow_promotion_codes`,
+   * so a session gets one or the other.
    */
   private async createCheckoutSessionWithPromo(
     params: Stripe.Checkout.SessionCreateParams,
+    sku: string,
     promoCode?: string,
   ): Promise<Stripe.Checkout.Session> {
     if (this.managedPaymentsEnabled()) {
@@ -618,22 +641,26 @@ export class PurchaseService {
         managed_payments: { enabled: true },
       } as Stripe.Checkout.SessionCreateParams;
     }
-    const promotionCodeId = promoCode
-      ? await this.findPromotionCodeId(promoCode)
-      : null;
-    if (promotionCodeId) {
+    const choice = await this.pricing.chooseDiscount(sku, promoCode);
+    if (choice) {
       try {
         return await this.stripe.checkout.sessions.create({
           ...params,
-          discounts: [{ promotion_code: promotionCodeId }],
+          // Session metadata only — the PaymentIntent keeps its fulfilment metadata.
+          metadata: {
+            ...params.metadata,
+            promo_code: choice.code,
+            promo_source: choice.source,
+          },
+          discounts: [{ promotion_code: choice.promotionCodeId }],
         });
       } catch (err) {
-        // e.g. a Pro-only coupon on a course checkout: sell without it rather than fail.
+        // e.g. a first-time-only code for a returning customer: sell without it rather than fail.
         if ((err as { type?: string }).type !== 'StripeInvalidRequestError') {
           throw err;
         }
         this.logger.warn(
-          `Promo code ${promoCode} not applied: ${(err as Error).message}`,
+          `Promo code ${choice.code} not applied: ${(err as Error).message}`,
         );
       }
     }
@@ -641,21 +668,6 @@ export class PurchaseService {
       ...params,
       allow_promotion_codes: true,
     });
-  }
-
-  /** Active promotion code id for a customer-facing code (Stripe matches case-insensitively). */
-  private async findPromotionCodeId(code: string): Promise<string | null> {
-    try {
-      const { data } = await this.stripe.promotionCodes.list({
-        code,
-        active: true,
-        limit: 1,
-      });
-      return data[0]?.id ?? null;
-    } catch (err) {
-      this.logger.warn(`Promo code lookup failed: ${(err as Error).message}`);
-      return null;
-    }
   }
 
   /** Stripe Customer Portal — cancel / update payment method for Pro. */
@@ -848,6 +860,7 @@ export class PurchaseService {
       }
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        await this.pricing.recordCompletion(session);
         if (session.mode !== 'subscription') break;
         await this.fulfillProCheckoutSession(session);
         break;

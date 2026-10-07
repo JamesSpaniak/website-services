@@ -13,11 +13,14 @@ import { EmailModule } from 'src/email/email.module';
 import { OrganizationModule } from 'src/organizations/organization.module';
 import { AuditModule } from 'src/audit/audit.module';
 import { Session } from './types/session.entity';
+import { OrganizationMember } from 'src/organizations/types/organization-member.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AttemptLimiter } from 'src/common/attempt-limiter.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Session]),
+    // OrganizationMember backs OrgManagerGuard on the teacher reset-code route.
+    TypeOrmModule.forFeature([Session, OrganizationMember]),
     UsersModule,
     PassportModule,
     ConfigModule,
@@ -50,6 +53,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [
     AuthService,
     JwtStrategy,
+    AttemptLimiter,
     {
       provide: APP_GUARD,
       useClass: UserThrottlerGuard,

@@ -6,20 +6,22 @@ import CoursePreviewActions from '@/app/ui/components/course-preview-actions';
 import { mergeCourseImages } from '@/app/lib/course-images';
 import type { CourseData } from '@/app/lib/types/course';
 import ImageComponent from '@/app/ui/components/image';
+import { PriceText, PromoNote } from '@/app/ui/components/price-tag';
+import { courseSku, formatCents } from '@/app/lib/pricing';
 
 const API_BASE =
   process.env.API_INTERNAL_BASE_URL ??
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   'http://localhost:3000';
 
-const FAA_FAQ = [
+const faaFaq = (priceLabel: string) => [
   {
     question: 'What is included in the free preview?',
     answer: 'Unit 1 of the FAA Part 107 course is free. You can read the material, track progress, and try section practice questions without purchasing.',
   },
   {
     question: 'How much does full access cost?',
-    answer: 'Full lifetime access to the Part 107 course is a one-time $129 purchase. There is no subscription.',
+    answer: `Full lifetime access to the Part 107 course is a one-time ${priceLabel} purchase. There is no subscription.`,
   },
   {
     question: 'Does this replace the FAA knowledge test?',
@@ -74,7 +76,9 @@ export default async function CoursePreviewPage({
   const course = await fetchPublicCourse(id);
   if (!course) notFound();
 
+  // courses.price is synced from Stripe (docs/tech/pricing-and-promotions.md § 3).
   const price = Number(course.price) || 0;
+  const FAA_FAQ = faaFaq(formatCents(Math.round(price * 100)));
   const hero = mergeCourseImages(course)[0];
   const unitCount = course.units?.length ?? 0;
   const heroPosition = course.image_focal_point?.trim() || 'center';
@@ -111,13 +115,14 @@ export default async function CoursePreviewPage({
         </span>
         {price > 0 && (
           <span className="px-3 py-1 border border-[var(--brand-primary)]/40 bg-[var(--brand-primary)]/10 font-mono text-[var(--brand-foreground)]" style={{ borderRadius: 'var(--radius-sm)' }}>
-            ${price} · Unit 1 free
+            <PriceText sku={courseSku(id)} fallbackCents={Math.round(price * 100)} /> · Unit 1 free
           </span>
         )}
       </div>
 
       <section id="purchase" className="mt-10 p-6 border border-[var(--surface-border)] bg-[var(--surface)]" style={{ borderRadius: 'var(--radius-md)' }}>
         <h2 className="text-xl font-display font-semibold text-[var(--brand-foreground)]">Start learning</h2>
+        <PromoNote sku={courseSku(id)} className="mt-2 text-sm font-medium text-[var(--brand-primary)]" />
         <CoursePreviewActions courseId={id} price={price} />
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1">
           <Link

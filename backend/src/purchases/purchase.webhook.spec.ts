@@ -51,6 +51,11 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
   const entitlements = { syncPro: jest.fn(), revokePro: jest.fn() };
   const productEvents = { record: jest.fn(), invalidateUser: jest.fn() };
   const audit = { log: jest.fn() };
+  const pricing = {
+    recordCompletion: jest.fn(),
+    resolvePrice: jest.fn(async () => null),
+    chooseDiscount: jest.fn(async () => null),
+  };
   let service: PurchaseService;
 
   const deliver = (name: string) => {
@@ -71,6 +76,7 @@ describe('PurchaseService webhook — sandbox fixtures', () => {
       orders as never,
       productEvents as never,
       {} as never,
+      pricing as never,
     );
   });
 

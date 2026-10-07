@@ -47,6 +47,16 @@ export class CreateSignupLinkDto {
   @Min(1)
   @Max(365)
   expires_in_days?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Accounts that may redeem the link (default 1). Above 1 makes a multi-use giveaway link (e.g. "first 30 at the talk"); it cannot be email-locked.',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  max_uses?: number;
 }
 
 export class GrantCourseDto {

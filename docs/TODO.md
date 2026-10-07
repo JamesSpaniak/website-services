@@ -11,7 +11,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 *Stripe is **live** (Oct 6 2026). Batch 1–2 launch code and the Stripe go-live prep are committed and deployed — archived in [`TODO_COMPLETED.md`](TODO_COMPLETED.md) 2026-10-06. Dates: **Announcement 1 Oct 8 · Announcement 2 Oct 16 · code freeze Oct 21 · talk Oct 23–25** ([`tech/launch-website-plan.md`](tech/launch-website-plan.md) § 8).*
 
 1. **Close out go-live (ops, you)** — see *Launch week* below.
-2. **Website fixes for live** — **CK1** one-click checkout + **SR2** promo price on site before Oct 8 if possible; SR1, SR3, SR5 by the Oct 15 deploy.
+2. **Website fixes for live** — CK1 one-click checkout and PP0 Stripe-owned pricing / promo prices on site (SR2) code done Oct 6, ship with the next deploy; SR1, SR3, SR5 by the Oct 15 deploy.
 3. **Marketing pages review** — home hero CTAs, footer newsletter width, header width; `/pricing`, `/schools`, `/articles`; act on the Oct 2026 article review (P1 — Marketing & content).
 4. **Schools CTA + teacher connect** — **SC1** `/schools` primary CTA, **TC1** one-click class join link (below); school one-page PDF by Oct 21.
 5. **Talk build (Oct 17–21)** — launch plan **Y1** `/boston` landing page, **Y2** load check (register is 30/min/IP — shared event Wi-Fi).
@@ -36,15 +36,14 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 
 | ID | Item | Status |
 |----|------|--------|
-| **CK1** | **One-click checkout.** Today a signed-in buyer needs 3 clicks from home (preview → `?purchase=1` "Purchase Course" page → Buy), and Pricing → "Go Pro" lands on `/profile`. Add a `/checkout?item=course-<id>` / `?item=pro` route that creates the Checkout session on load and redirects to Stripe ("Opening secure checkout…"), plus one shared `<BuyButton>` for home, pricing, course preview, courses list and the profile Pro card: signed in → straight to Stripe (1 click); signed out → register/login with `redirect=/checkout?...` so checkout continues after signup. Already-owned / already-Pro / Pro-not-configured show a message instead of redirecting (server already refuses them). Keep `PurchaseFlow` only as the Stripe **cancel** target — never point `cancel_url` at `/checkout` (redirect loop). Disable buttons while the session is created. Stripe Checkout now shows the refund policy, terms and support, so skipping the interstitial loses no disclosure. Playwright check per entry point. Frontend only; pairs with **SR2** (same buttons) | Open — before Oct 8 if possible |
 | **SR1** | Profile shows "Pro membership: active" with no hint once the subscription is set to cancel at period end — show "Ends <date>" from `cancel_at_period_end` | Open |
-| **SR2** | `?promo=EDGE25` is applied only on Stripe Checkout; the site's course/Pro pages still show full price. Small API to validate the saved `de_promo` code against Stripe (percent/amount off, expiry), then show ~~$129~~ $96.75 "EDGE25 applied at checkout" (Pro: first month $26.25) | Open — before Oct 8 if possible |
 | **SR3** | "Verify your email when you can" banner shown while the activity log says "Verified email" (rehearsal user) — check the banner reads fresh auth state | Open |
 | **SR4** | Turn off frontend debug logging (`frontend_debug_logging = "1"` in `terraform/env/dev.tfvars`) — browsers hit `POST /logs` 429s on every page | Open |
 | **SR5** | Hidden articles are still reachable by direct URL — return 404 for non-published articles to non-admins | Open |
 | **SC1** | **`/schools` primary CTA** — today consultation-only and no Resources block. Decide the main ask (book a call vs start a pilot vs request the one-pager), then add the Resources block linking P0 school articles | Open — needs your decision |
 | **TC1** | **One-click class join for teachers.** `invite_codes` today are one per person (optional `email`, `classId`). Add a reusable **class join link + QR** (seat cap, expiry, revocable) with a "Copy class link" button in Manager → Invites; signup or login through it lands the student in that class (`signup_completed.via = org_invite` already exists). Respect `max_students`; no student email needed up front | Open — design first ([`tech/backend-data.md`](tech/backend-data.md) § `invite_codes`) |
 | **T3b** | `preview_started` funnel event (course preview page) — last missing funnel step | Open |
+| **PP1** | Link the live course to a Stripe price: lookup key `part107_course` on the live Part 107 price (product needs `tax_code txcd_10000000`), then set it on `COURSE_35` in Admin → Pricing & promos. Not blocking — until then live checkout uses the inline `courses.price` | Open — after PP0 deploys |
 
 ---
 
@@ -425,8 +424,7 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 |------|--------|--------|
 | **Verify prod video signing end-to-end** — smoke-test HLS after first video | Open | Wave 2 · P0 recordings |
 | **SES multi-region** (Oct 5 2026) — SES is single-region (`var.aws_region`, us-east-1): identity, configuration set, events topic, reputation, production access and the `click.news` tracking origin (`r.us-east-1.awstrack.me`) are all per region, and the backend's SES client follows `AWS_REGION`. Moving or adding servers in another region does **not** double-send, but running this stack there as-is would (a) send from an unverified sandbox region and (b) collide on `click.news` / `bounce.news` / `_dmarc.news` DNS. Simplest plan: pin SES to us-east-1 with a separate `SES_REGION` env var regardless of where servers run. True multi-region sending needs per-region identity + DKIM, MAIL FROM, config set, SNS topic, tracking subdomain (`click-<region>.news…`) + CloudFront, and a production-access request per region | Open — revisit before any second region | `terraform/ses.tf` · `terraform/ses_tracking.tf` header · `backend/src/email/marketing-mailer.service.ts` |
-| **Classroom / shared-IP rate limits** — WAF raised to 20k/5 min (Sep 17 2026) after Chichester NAT `50.227.29.34` got 403s. Nest still keys anonymous login/register/`POST /logs` by IP (30/min global, 10/min logs). A 30-student lab on one NAT will 429 at bell (login) and at the hour-mark (expired access JWT → IP fallback); quiet video playback is fine (per-user after login). **Proposed Nest pass first** (do not raise the global 30; do not start with a school IP-set): (1) `UserThrottlerGuard` verify with `ignoreExpiration: true` so expired cookies still key `user:${sub}`; (2) login/register **120/min/IP** plus **8/10 min per normalized username-or-email**, refresh **120/min/IP**; (3) stop shipping expected 401/429 to `/logs` (optionally raise `/logs` to 30/min once per-user). WAF path exclusions / school allowlist stay later — coffee shops and 1:1 NAT are the same class of problem. Do **not** just "tighten `/logs`" (M4). Detail below. | Open | Sep 17 classroom 403 review · `terraform/cloudfront_frontend.tf` · `UserThrottlerGuard` · `logging.controller.ts` |
-| **Tighten `POST /logs`** — DTO done; throttle is **not** "make it stricter" (see classroom rate-limits row). Remaining: fold into that item — expired-JWT user key + don't POST expected 401/429; keep payload cap; auth on `/logs` still deferred | Open | Wave 1 · **M4** · classroom rate limits |
+| **Shared-IP + bot hardening (A–E, Oct 6 2026)** — let agents and real classrooms in, stop cheap abuse. Replaces the old "Classroom / shared-IP rate limits" and "Tighten `POST /logs`" rows. **A** classroom-safe limits + forgot-password fixes (code) · **B** load balancer accepts CloudFront only (Terraform, two applies) · **C** log the `X-Forwarded-For` chain for an hour to confirm the hop count · **D** rate-limit by the real client IP (`TRUSTED_PROXY_HOPS`) · **E** teacher reset code. Order: A → E → B → C → D (D is unsafe before B). Detail below | **A, E: code complete Oct 6 (unit + e2e green), not deployed** · B/C/D: Terraform flags in place, all off — run [`workflows/tech/shared-ip-hardening-rollout.md`](../workflows/tech/shared-ip-hardening-rollout.md) | Sep 17 classroom 403 review · `UserThrottlerGuard` · `terraform/alb.tf` · `terraform/cloudfront_frontend.tf` |
 | **Analytics, pixels, attribution, PWA** — see **P1 — Paid acquisition build** above (T1–T20, D1–D12) | Sequenced | [`tech/analytics-and-attribution.md`](tech/analytics-and-attribution.md) · [`tech/pwa-and-mobile-app.md`](tech/pwa-and-mobile-app.md) |
 | **Prod/dev environment split** | Planning only | [`tech/environment-split-plan.md`](tech/environment-split-plan.md) |
 | **Find where the Aug 13 / Sep 20 applies ran from** — ten resources reached AWS without ever reaching this laptop's state file (see [`TODO_COMPLETED.md`](TODO_COMPLETED.md) 2026-09-22). Largely self-healing now: any other machine's next `terraform init` binds to the committed S3 backend, and the pipeline refuses to apply from a state that disagrees with AWS. Worth knowing only if another machine or cloud session is still holding an old local state file | **Low — informational** | [`../workflows/tech/terraform-state.md`](../workflows/tech/terraform-state.md) |
@@ -438,25 +436,21 @@ Single prioritized backlog pulled from sales, marketing, product, and engineerin
 | **FAA category weighting in exam generation** — `exam_blueprint_buckets` table + `exams.blueprint_snapshot`, largest-remainder apportionment in `ExamGeneratorService`; today's unweighted draw gives ~24% Operations vs FAA 35–45% floor. Blocked on author confirming u4 bucket mapping | Proposed | [`tech/exam-weighting-plan.md`](tech/exam-weighting-plan.md) |
 | **Course lesson list / markdown rendering** — `text_content` only does `\n` → `<br />`; markdown `-`/`*` bullets do not become lists. HTML `<ul><li>` works today via `prose` + `dangerouslySetInnerHTML` (used in Ch.5 Surface Obs). Add a small markdown→HTML (or sanitized rich-text) path so authors can write lists without raw HTML; keep sanitization in mind (**A8**) | Open | Ch.5 content pass · `drone/src/app/ui/components/unit.tsx` · `section.tsx` |
 
-#### Classroom / shared-IP — 30-user notes (Sep 17 2026)
+#### Shared-IP + bot hardening — detail (Oct 6 2026)
 
-WAF 20k/5 min is already live. Remaining pain is **Nest IP buckets** on a shared NAT (school, coffee shop, 1:1). Do not raise the global 30/min (that is the per-user cap after login).
+**Goal:** AI agents buying for a real person and 30–60 students on one school NAT both work; one machine looping requests does not. No CAPTCHA, no bot detection. Background: Sep 17 Chichester NAT `50.227.29.34` got WAF 403s (WAF since raised to 20k/5 min).
 
-| Moment | Shared bucket | 30-user reality |
-|--------|----------------|-----------------|
-| Bell — everyone signs in | login **30/min / IP** | 30 clean logins = full. One typo / double-click / email-vs-username retry → room **429**. |
-| Hour mark — access JWTs expire together | refresh + API retries fall back to **IP** (`jwt.verify()` throws on expiry) | 30 × (failed API + refresh + retry) ≈ **90** vs 30/min. |
-| Quiet video lesson | per-user 30/min + analytics 120/min | Fine. Video bytes are CloudFront, not Nest. |
-| `POST /logs` | **10/min / IP** if JWT missing/expired | Fine during playback. Overflows if many tabs error at once. |
+**Bugs found Oct 6:** (1) `forgot-password` 400'd on every request — `ForgotPasswordDto.username` was `@IsString()` without `@IsOptional()` — and the form swallowed the error and showed "Request sent", so no reset email has ever been sent from the form. (2) Reset links were reusable for their whole 15 min. (3) Anonymous rate limits key on the **first** `X-Forwarded-For` entry, which the client writes — a script gets a fresh bucket per request. (4) The public ALB accepts traffic from anywhere, so the WAF and the hop count can be bypassed.
 
-**Proposed ship order**
+| Step | What | Status |
+|------|------|--------|
+| **A** | Expired access JWT (≤ 7 days, signature still checked) keeps the `user:` bucket. Per-route limits: login 120/min/IP + 8 failures per 10 min per account; register 120 per 10 min + 500/day per IP, password ≥ 8 chars; `invite-info`, refresh 120/min; verify-email 60/min; forgot-password 30/min/IP + per email 1 per 60 s and 5/hour; reset-password 20/min. Reset links 60 min, single-use (`token_version` in the token). 429s logged with route + bucket type. Frontend: forgot-password shows real errors + 60 s cooldown; expected 401/429 no longer shipped to `/logs` | Code complete, not deployed |
+| **E** | Teacher reset code: manager roster → 8-char one-time code (1 h, 5 wrong tries, hashed, audit-logged) → student enters username + code on `/reset-code` and sets a password. Students (org `member` role) only, never managers/admins. Migration `1765000016000` | Code complete, not deployed |
+| **B** | CloudFront sends a secret origin header; ALB forwards only with it (403 otherwise); `lb_sg` port 80 from the CloudFront origin-facing prefix list only, 443 ingress removed. Flags `alb_cloudfront_only_ingress` + `alb_require_origin_header` (both default false; the next normal deploy only adds the header + forwarding rules). Flip both after the distribution shows Deployed | Code only — needs owner go-ahead |
+| **C** | `LOG_FORWARDED_CHAIN=true` for ~1 h: logs the XFF chain shape; compare your own requests against whatismyip to confirm the client is N-th from the right (expected 3: CloudFront, public ALB, internal ALB) | Code only |
+| **D** | `TRUSTED_PROXY_HOPS=<N from C>`: rate limits key on the real client IP. Unset = today's behaviour. Only after B is enforced | Code only |
 
-1. **`UserThrottlerGuard`:** `verify` with `ignoreExpiration: true` (signature still required). Expired access cookie stays `user:${sub}` — fixes hour-mark stampede and most `/logs` IP collapse.
-2. **Login/register** `@Throttle` **120/min/IP** (not the global 30) + **8/10 min per normalized username-or-email** (same `findForLogin` key). Stops one-account spray without punishing the lab. Keep login UI: disable submit while loading; existing shared-network 429 copy.
-3. **`POST /auth/refresh` 120/min/IP** (refresh has no access JWT by design). Single-flight refresh in `api-client` done Oct 3 2026 (plus race-safe rotation on the backend); proactive refresh at ~50 min still optional, later.
-4. **`POST /logs`:** do not ship expected classroom noise (login 401, "Session expired", 429). Optionally raise to 30/min once per-user. Keep 8 KB context cap. Requiring auth on `/logs` stays deferred (login-page errors still useful).
-
-**Defer:** school IP-set allowlist and WAF path exclusions (`/api/logs`, `/api/analytics/event`, `/_next/static`, favicon). Same class of problem exists off-campus; Nest pass is enough for 30.
+**Known limits:** throttle counters are in memory per backend task (exact at 1 task; autoscaling to 5 only loosens). Per-account login lockout can be triggered by a classmate typing someone's username wrong 8 times — it lasts ≤ 10 min and the teacher reset code clears it. **Deferred:** school IP allowlist and WAF path exclusions — only if a 100+ student school hits limits.
 
 ### Secret rotation — deferred to the prod cutover
 
@@ -482,11 +476,10 @@ The plan is to rotate **into prod** rather than in place — a `--env prod` stac
 | **M1** | DB TLS `rejectUnauthorized: false` | **Open** — ship RDS CA bundle |
 | **M2** | Unlimited exam retries; answer key via `GET …/attempt` | **Partial** — `sanitizeAnswers` strips keys on read; unlimited retries remain |
 | **M3** | `GET /users/:username` returns email + role to any logged-in user | **Open** — return `UserSlim` or restrict to self/admin |
-| **M4** | Unauthenticated `/logs` + `/analytics/event` ingestion | **Partial** — analytics DTO validated; `/logs` DTO exists; throttle still IP-keyed at 10/min (classroom 429s Sep 17 — see **Classroom / shared-IP rate limits**) |
+| **M4** | Unauthenticated `/logs` + `/analytics/event` ingestion | **Partial** — analytics DTO validated; `/logs` DTO exists; throttle still IP-keyed at 10/min (classroom 429s Sep 17 — see **Shared-IP + bot hardening** step A) |
 | **H2** | Orphaned question links in bulk JSON | **Partial** — import validates refs against `course_units`; reconcile bulk artifact orphans |
 | **L1** | `Exam.question_ids` silent filter; deprecated `image_url` | **Partial** — `images_url` migration done; silent filter still by design |
 | **A4** | Videos without captions/transcripts | **Open** — also P0 |
-| **A5** | Primary CTA contrast fails in light theme | **Open** — `--brand-primary-contrast` token |
 | **A6** | Form labels missing `htmlFor`/`id` in editors | **Open** |
 | **A8** | Lesson HTML via `dangerouslySetInnerHTML` unsanitized | **Open** — DOMPurify |
 | **D7** | Bare spinners; error component no retry | **Open** |
@@ -508,7 +501,7 @@ The plan is to rotate **into prod** rather than in place — a `--env prod` stac
 **Detailed plan:** [`tech/wave-1-2-implementation-plan.md`](tech/wave-1-2-implementation-plan.md).
 
 **Wave 1 — correctness**
-1. **`POST /logs` classroom-safe ingest** (Sec M4) — not a stricter IP throttle; fold into **Classroom / shared-IP rate limits**.
+1. **`POST /logs` classroom-safe ingest** (Sec M4) — not a stricter IP throttle; fold into **Shared-IP + bot hardening** step A.
 
 **Wave 2 — launch-blocking product surface**
 2. **Home page join CTAs** (Sales **S3**) — see P1 B2C.

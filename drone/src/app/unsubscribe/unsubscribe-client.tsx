@@ -165,7 +165,7 @@ export default function UnsubscribeClient() {
               type="button"
               onClick={() => submit(toUnsubscribe)}
               disabled={busy || toUnsubscribe.length === 0}
-              className="inline-flex min-h-[44px] items-center justify-center px-5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 disabled:opacity-40 transition-opacity touch-manipulation"
+              className="inline-flex min-h-[44px] items-center justify-center px-5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 disabled:opacity-40 transition-opacity touch-manipulation"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
               {busy ? 'Saving…' : 'Save preferences'}

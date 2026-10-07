@@ -54,7 +54,7 @@ export default function MarkCompleteBar({
                     <button
                         type="button"
                         onClick={goNext}
-                        className="inline-flex items-center gap-1.5 min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+                        className="inline-flex items-center gap-1.5 min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
                         style={{ borderRadius: 'var(--radius-sm)' }}
                     >
                         Continue: {nextTitle}
@@ -75,7 +75,7 @@ export default function MarkCompleteBar({
                 type="button"
                 onClick={markThenContinue}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 disabled:opacity-60 transition-opacity"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 disabled:opacity-60 transition-opacity"
                 style={{ borderRadius: 'var(--radius-sm)' }}
             >
                 {busy ? 'Saving…' : label}

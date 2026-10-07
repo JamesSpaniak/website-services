@@ -209,3 +209,27 @@ variable "ses_custom_tracking_domain_enabled" {
   type        = bool
   default     = false
 }
+
+variable "alb_cloudfront_only_ingress" {
+  description = "Public ALB security group admits port 80 from the CloudFront origin-facing prefix list only (443 closed) instead of 0.0.0.0/0 on 80/443. See workflows/tech/shared-ip-hardening-rollout.md."
+  type        = bool
+  default     = false
+}
+
+variable "alb_require_origin_header" {
+  description = "Public ALB answers 403 unless the request carries CloudFront's X-Origin-Verify header (alb.tf). Two-step apply: leave false until CloudFront has finished deploying the header, then set true. See docs/TODO.md \"Shared-IP + bot hardening\" B."
+  type        = bool
+  default     = false
+}
+
+variable "trusted_proxy_hops" {
+  description = "TRUSTED_PROXY_HOPS for the API: how many X-Forwarded-For entries our own proxies append (expected 3). Empty keeps the legacy first-entry IP. Set only after alb_require_origin_header is true and the chain was confirmed with log_forwarded_chain."
+  type        = string
+  default     = ""
+}
+
+variable "log_forwarded_chain" {
+  description = "LOG_FORWARDED_CHAIN for the API: log every request's X-Forwarded-For chain (full IPs). Turn on for about an hour to confirm trusted_proxy_hops, then off."
+  type        = bool
+  default     = false
+}

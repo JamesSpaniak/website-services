@@ -7,7 +7,8 @@ import VerifyEmailBanner from "./ui/components/verify-email-banner";
 import FooterComponent from "./ui/components/footer";
 import PageAnalytics from "./ui/components/page-analytics";
 import { AuthProvider } from "./lib/auth-context";
-import { ThemeProvider } from "./lib/theme-context";
+import { THEME_INIT_SCRIPT, ThemeProvider } from "./lib/theme-context";
+import { ThemeProfileSync } from "./lib/theme-sync";
 import { SITE_ASSETS, THEME_COLOR } from "./lib/site-assets";
 
 /** Canonical site origin (apex). www redirects here via middleware. */
@@ -88,6 +89,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        {/* Apply the saved theme before first paint (no dark flash for Day users). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased">
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
@@ -99,6 +104,7 @@ export default function RootLayout({
         )}
         <ThemeProvider>
           <AuthProvider>
+            <ThemeProfileSync />
             <PageAnalytics />
             <a href="#main-content" className="skip-link">
               Skip to main content

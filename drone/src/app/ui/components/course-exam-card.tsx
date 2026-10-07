@@ -60,7 +60,7 @@ export default function CourseExamCard({
             )}
             <Link
                 href={href}
-                className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 transition-opacity"
+                className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 transition-opacity"
             >
                 {ctaLabel}
                 <ArrowRightIcon className="h-4 w-4" />

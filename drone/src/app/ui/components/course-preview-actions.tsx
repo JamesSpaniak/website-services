@@ -5,10 +5,13 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/lib/auth-context';
 import { getCourseById } from '@/app/lib/api-client';
 import {
+  courseCheckoutPath,
   coursePath,
   loginHref,
   registerHref,
 } from '@/app/lib/auth-redirect';
+import { PriceText } from '@/app/ui/components/price-tag';
+import { courseSku } from '@/app/lib/pricing';
 
 interface CoursePreviewActionsProps {
   courseId: number;
@@ -19,7 +22,7 @@ export default function CoursePreviewActions({ courseId, price }: CoursePreviewA
   const { user, isLoading } = useAuth();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const courseRedirect = coursePath(courseId);
-  const purchaseRedirect = coursePath(courseId, true);
+  const checkoutHref = courseCheckoutPath(courseId);
   const displayPrice = price > 0 ? price : 129;
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function CoursePreviewActions({ courseId, price }: CoursePreviewA
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={courseRedirect}
-            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Open course
@@ -75,18 +78,18 @@ export default function CoursePreviewActions({ courseId, price }: CoursePreviewA
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={courseRedirect}
-            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Continue learning
           </Link>
           {price > 0 && (
             <Link
-              href={purchaseRedirect}
+              href={checkoutHref}
               className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold border border-[var(--brand-primary)]/50 text-[var(--brand-foreground)] hover:bg-[var(--brand-primary)]/10 transition-colors"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Unlock full course — ${displayPrice}
+              Unlock full course — <PriceText sku={courseSku(courseId)} fallbackCents={displayPrice * 100} />
             </Link>
           )}
         </div>
@@ -102,17 +105,23 @@ export default function CoursePreviewActions({ courseId, price }: CoursePreviewA
       <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-3">
         <Link
           href={registerHref(courseRedirect)}
-          className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+          className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
           style={{ borderRadius: 'var(--radius-sm)' }}
         >
           Create account — try Unit 1 free
         </Link>
         <Link
-          href={registerHref(purchaseRedirect)}
+          href={checkoutHref}
           className="inline-flex items-center justify-center min-h-[44px] px-6 text-sm font-semibold border border-[var(--brand-primary)]/50 text-[var(--brand-foreground)] hover:bg-[var(--brand-primary)]/10 transition-colors"
           style={{ borderRadius: 'var(--radius-sm)' }}
         >
-          {price > 0 ? `Purchase — $${displayPrice}` : 'Purchase course'}
+          {price > 0 ? (
+            <>
+              Purchase — <PriceText sku={courseSku(courseId)} fallbackCents={displayPrice * 100} />
+            </>
+          ) : (
+            'Purchase course'
+          )}
         </Link>
         <Link
           href={loginHref(courseRedirect)}

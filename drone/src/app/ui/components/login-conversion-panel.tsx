@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {
+  courseCheckoutPath,
   coursePreviewPath,
   FEATURED_COURSE_ID,
   loginHref,
@@ -7,6 +8,8 @@ import {
   registerHref,
   sanitizeRedirect,
 } from '@/app/lib/auth-redirect';
+import { PriceText } from '@/app/ui/components/price-tag';
+import { FALLBACK_COURSE_CENTS, courseSku } from '@/app/lib/pricing';
 
 interface LoginConversionPanelProps {
   redirect?: string;
@@ -22,7 +25,7 @@ export default function LoginConversionPanel({
   const purchaseIntent = redirectIndicatesPurchase(safeRedirect);
   const previewHref = coursePreviewPath(featuredCourseId);
   const tryFreeHref = registerHref(`/courses/${featuredCourseId}`);
-  const purchaseHref = registerHref(`/courses/${featuredCourseId}?purchase=1`);
+  const purchaseHref = registerHref(courseCheckoutPath(featuredCourseId));
 
   return (
     <aside
@@ -43,7 +46,7 @@ export default function LoginConversionPanel({
           </p>
           <Link
             href={registerHref(safeRedirect)}
-            className="mt-5 flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+            className="mt-5 flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
             style={{ borderRadius: 'var(--radius-sm)' }}
           >
             Create account &amp; checkout
@@ -59,12 +62,13 @@ export default function LoginConversionPanel({
           </h2>
           <p className="mt-2 text-sm text-[var(--brand-muted)] leading-relaxed">
             Create a free account to preview Unit 1, track progress, and try practice questions.
-            Full course access is a one-time $129 purchase.
+            Full course access is a one-time{' '}
+            <PriceText sku={courseSku(featuredCourseId)} fallbackCents={FALLBACK_COURSE_CENTS} /> purchase.
           </p>
           <div className="mt-5 flex flex-col gap-2">
             <Link
               href={tryFreeHref}
-              className="flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] hover:opacity-90 transition-opacity"
+              className="flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] hover:opacity-90 transition-opacity"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
               Create free account
@@ -74,7 +78,7 @@ export default function LoginConversionPanel({
               className="flex w-full items-center justify-center min-h-[44px] px-4 text-sm font-medium border border-[var(--surface-border)] text-[var(--brand-foreground)] hover:bg-[var(--background)] transition-colors"
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
-              Purchase full course — $129
+              Purchase full course — <PriceText sku={courseSku(featuredCourseId)} fallbackCents={FALLBACK_COURSE_CENTS} />
             </Link>
           </div>
         </>

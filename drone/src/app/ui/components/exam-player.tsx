@@ -162,7 +162,7 @@ function ExamSubmitControls({
                 onClick={onSubmit}
                 disabled={phase === 'submitting' || !allAnswered}
                 aria-disabled={phase === 'submitting' || !allAnswered}
-                className={`${compact ? 'px-5' : 'w-full sm:w-auto px-6'} py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity whitespace-nowrap`}
+                className={`${compact ? 'px-5' : 'w-full sm:w-auto px-6'} py-2.5 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity whitespace-nowrap`}
             >
                 {phase === 'submitting' ? 'Submitting…' : 'Submit exam'}
             </button>
@@ -370,7 +370,7 @@ export default function ExamPlayer({
                                 onClick={handleGenerate}
                                 disabled={phase === 'generating'}
                                 aria-disabled={phase === 'generating'}
-                                className="mt-8 w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
+                                className="mt-8 w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
                             >
                                 {phase === 'generating' ? (
                                     <><ArrowPathIcon className="h-5 w-5 animate-spin" /> Generating exam…</>
@@ -402,7 +402,7 @@ export default function ExamPlayer({
                         onClick={handleGenerate}
                         disabled={phase === 'generating'}
                         aria-disabled={phase === 'generating'}
-                        className="shrink-0 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-black)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
+                        className="shrink-0 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--brand-on-primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
                     >
                         {phase === 'generating' ? (
                             <><ArrowPathIcon className="h-4 w-4 animate-spin" /> Generating…</>

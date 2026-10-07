@@ -24,10 +24,10 @@ import { maskEmail } from '../common/pii';
 /**
  * Admin-generated signup links (`/register?signup=CODE`).
  *
- * One-time links grant the listed courses free to the account that redeems
- * them. The schema also carries kind/max_uses/discount fields so multi-use
- * campaign links (e.g. discounted social-media promos) can be layered on
- * without a migration — see SignupLink entity docs.
+ * Links grant the listed courses free at signup. One-time links (optionally
+ * email-locked) serve one account; campaign links (`max_uses` > 1) are
+ * giveaways for events or partners. Paid discounts are Stripe promotion
+ * codes, not signup links (docs/tech/pricing-and-promotions.md § 8).
  */
 @Injectable()
 export class SignupLinkService {
@@ -60,17 +60,24 @@ export class SignupLinkService {
       );
     }
 
+    const maxUses = dto.max_uses ?? 1;
+    if (maxUses > 1 && dto.email) {
+      throw new BadRequestException(
+        'A multi-use link cannot be locked to one email.',
+      );
+    }
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + (dto.expires_in_days ?? 30));
 
     const link = await this.signupLinkRepository.save(
       this.signupLinkRepository.create({
         code: crypto.randomBytes(8).toString('hex'),
-        kind: SignupLinkKind.OneTime,
+        kind: maxUses > 1 ? SignupLinkKind.Campaign : SignupLinkKind.OneTime,
         email: dto.email?.trim().toLowerCase() || null,
         courseIds: dto.course_ids,
         note: dto.note?.trim() || null,
-        maxUses: 1,
+        maxUses,
         useCount: 0,
         createdByUserId: adminUserId,
         expiresAt,
@@ -80,6 +87,7 @@ export class SignupLinkService {
     this.auditService.log(adminUserId, AuditAction.SIGNUP_LINK_CREATED, {
       signupLinkId: link.id,
       courseIds: dto.course_ids,
+      maxUses,
       email: link.email,
       note: link.note,
     });

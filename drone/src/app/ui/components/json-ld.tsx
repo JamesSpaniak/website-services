@@ -1,5 +1,6 @@
 import { SITE_ASSETS, SOCIAL_PROFILES } from '@/app/lib/site-assets';
 import { articlePath } from '@/app/lib/article-url';
+import { courseCheckoutPath } from '@/app/lib/auth-redirect';
 
 interface JsonLdProps {
   data: Record<string, unknown>;
@@ -118,9 +119,41 @@ export function courseJsonLd(course: {
         price: course.price,
         priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
+        // Buy link for agents; logged-out visitors are sent through /register first.
+        url: `${SITE_URL}${courseCheckoutPath(course.id)}`,
       },
     }),
     url: `${SITE_URL}/courses/${course.id}/preview`,
+  };
+}
+
+/** Self-serve plans from /pricing. `billingDuration` (ISO 8601, e.g. `P1M`) marks a subscription. */
+export function offerCatalogJsonLd(
+  plans: { name: string; description: string; price: number; url: string; billingDuration?: string }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    name: `${SITE_NAME} plans`,
+    url: `${SITE_URL}/pricing`,
+    itemListElement: plans.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      description: plan.description,
+      url: `${SITE_URL}${plan.url}`,
+      availability: 'https://schema.org/InStock',
+      seller: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+      ...(plan.billingDuration
+        ? {
+            priceSpecification: {
+              '@type': 'UnitPriceSpecification',
+              price: plan.price,
+              priceCurrency: 'USD',
+              billingDuration: plan.billingDuration,
+            },
+          }
+        : { price: plan.price, priceCurrency: 'USD' }),
+    })),
   };
 }
 

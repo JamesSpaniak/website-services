@@ -6,6 +6,9 @@ Growth, SEO/GEO, brand, and content strategy.
 |----------|-------------|
 | [content-vision.md](content-vision.md) | North star for content/articles created with or by AI |
 | [seo-geo-strategy.md](seo-geo-strategy.md) | SEO + Generative Engine Optimization plan |
+| [next-90-days-plan.md](next-90-days-plan.md) | Oct 2026 – Jan 2027: consumer-first launch, $2,500 ad timing, expos vs course launch, content to make first; Dec 15 review |
+| [video-and-photo-plan.md](video-and-photo-plan.md) | Video pieces V1–V10: targets, funnel mapping, mood/look, setup, clip list, photo shot list, review log. Scripts: [`assets/media/scripts/`](../../assets/media/scripts/) |
+| [action-space-hackathon-filming.md](action-space-hackathon-filming.md) | Hackathon vlog + team interviews: permissions, gear, shot list, deliverables |
 | [paid-acquisition.md](paid-acquisition.md) | Paid media: readiness gates, funnel shapes, VSL/group funnel fit, proof, 70/20/10 |
 | [brand-assets.md](brand-assets.md) | Logo, social, mockups, fonts index |
 | [merch.md](merch.md) | Tees: designs, print files, blanks, local shops, event vs store plan |
